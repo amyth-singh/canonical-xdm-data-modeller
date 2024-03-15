@@ -1,0 +1,13 @@
+schemas:
+  - path: ../../shared/JSONSchemaRegistry/base/components/event/common/EventHeader.json
+    outputFolder: ../../shared/JSONSchemaRegistry/base/components/event/common/
+  - path: ../../shared/JSONSchemaRegistry/client-specific/crew/inventory/CrewArcheanInventoryLedgerLineSchema.json
+    outputFolder: ../../shared/JSONSchemaRegistry/client-specific/crew/inventory
+  - path: ../../shared/JSONSchemaRegistry/client-specific/crew/product/CrewR247ProductSchema.json
+    outputFolder: ../../shared/JSONSchemaRegistry/client-specific/crew/product
+  - path: ../../shared/JSONSchemaRegistry/client-specific/crew/sales/CrewPMCSalesOrderSchema.json
+    outputFolder: ../../shared/JSONSchemaRegistry/client-specific/crew/sales
+  - path: ../../shared/JSONSchemaRegistry/base/salesOrder/SalesOrderLineEventSchema.json
+    outputFolder: ../../shared/JSONSchemaRegistry/base/salesOrder
+  - path: ../../shared/JSONSchemaRegistry/base/salesOrder/SalesOrderEventSchema.json
+    outputFolder: ../../shared/JSONSchemaRegistry/base/salesOrder

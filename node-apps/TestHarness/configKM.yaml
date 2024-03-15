@@ -1,0 +1,8 @@
+jsonataExpressionFilePath: '/Users/kurtmaile/Library/go/src/github.com/xiatechs/xdm_modeller/JSONata/maps/EmptyMap.jsonata'
+performValidation: 'yes'
+schemaOption: 'load'
+jsonSchemaFilePath: '/Users/kurtmaile/Library/go/src/github.com/xiatechs/xdm_modeller/JSONschema/base/sales/SalesOrderCompositeEvent.json'
+saveDereferencedSchema: 'yes'
+schemaOutputPath: '/Users/kurtmaile/Library/go/src/github.com/xiatechs/xdm_modeller/JSONschema/tests/sales/schema/SalesOrderEventDereferenced.json'
+jsonDocumentsFolderPath: '/Users/kurtmaile/Library/go/src/github.com/xiatechs/xdm_modeller/JSONschema/tests/sales/inputs'
+outputDirectoryPath: '/Users/kurtmaile/Library/go/src/github.com/xiatechs/xdm_modeller/JSONschema/tests/sales/outputs'

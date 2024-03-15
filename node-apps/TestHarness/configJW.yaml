@@ -1,0 +1,8 @@
+jsonataExpressionFilePath: '/Users/thinkninja/repos/xdm_modeller/JSONata/maps/Crew/CrewProductMap.jsonata'
+performValidation: 'yes'
+schemaOption: 'load'
+jsonSchemaFilePath: '/Users/thinkninja/repos/xdm_modeller/JSONschema/domain/product/ProductEvent.json'
+saveDereferencedSchema: 'yes'
+schemaOutputPath: '/Users/thinkninja/repos/xdm_modeller/JSONschema/client/crew/product/CrewProductDereferenced.json'
+jsonDocumentsFolderPath: '/Users/thinkninja/repos/xdm_modeller/JSONata/inputs/Crew/Product/TestSample'
+outputDirectoryPath: '/Users/thinkninja/repos/xdm_modeller/JSONata/outputs/Crew/Product'

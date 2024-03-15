@@ -1,0 +1,19 @@
+{
+  "type": "module",
+  "dependencies": {
+    "@apidevtools/json-schema-ref-parser": "^10.1.0",
+    "@faker-js/faker": "^7.6.0",
+    "ajv": "^8.12.0",
+    "ajv-formats": "^2.1.1",
+    "allof-merge": "^0.5.3",
+    "chance": "^1.1.11",
+    "generate-schema": "^2.6.0",
+    "js-yaml": "^4.1.0",
+    "json-schema-faker": "^0.5.0-rcv.46",
+    "json-schema-library": "^9.1.2",
+    "jsonata": "^2.0.3",
+    "lodash": "^4.17.21",
+    "p-limit": "^4.0.0",
+    "yaml": "^2.3.2"
+  }
+}

@@ -1,0 +1,4 @@
+registryDir: '../../shared/JSONSchemaRegistry'
+transformationLibraries:
+  - '../../shared/JSONSchemaTransformLibs/industry-specific'
+  - '../../shared/JSONSchemaTransformLibs/client-specific'
