@@ -1,0 +1,394 @@
+(
+  /* common utility funcs*/
+  $upperTrim := $string ~> $trim ~> $uppercase;
+  $cleanStr := $string ~> $trim;
+  $cleanNum := function($num){$type($num) = "number" ? $num : $type($num) = "string" ? $contains($num,/^-?\d+(\.\d+)?$/) ? $number($num) : null};
+  $stringBoolMap := {"Y":"Y","1":"Y","TRUE":"Y","N":"N","0":"N","FALSE":"Y"};
+  $stringBool := function($value){$lookup($stringBoolMap, $upperTrim($value))};
+  $reverseBool := function($value){$value = "Y" ? "N" : $value = "N" ? "Y" : "U"};
+  $reverseStringBool := $stringBool ~> $reverseBool;
+  $buildEntityID := function($entityCode,$system,$rawEntityId){$replace($entityCode,".","_") & "_" & $system & "_" & $rawEntityId};
+  $buildAttributeID := function($entityID,$AttributeCode,$AttributeId){$entityID & "_" & $replace($AttributeCode,".","_") & ($AttributeId = "" ? "" : "_" & $AttributeId)};
+  $buildEventID := function($entityType,$eventVerb,$entityId,$eventOccurredTimestamp){$entityType & "_" & $eventVerb & "_" & $entityId & "_" & $eventOccurredTimestamp};
+
+  $getDateDimFn := function($dt,$isUTC,$tz) { /* TODO: make this really precise depending on local or UTC */
+    { 
+          "DateId": $fromMillis($toMillis($dt),"[Y0001][M01][D01]"),
+          "TimestampUTC": (isUTC ? $dt : NULL),
+          "DateUTC": (isUTC ? $dt : NULL), /* TODO convert to date */
+          "TimeZone": ($tz != null ? $tz : $rawSourceTimeZone),
+          "DateTimeLocal": $fromMillis($toMillis($dt)),
+          "DateLocal": $fromMillis($toMillis($dt),"[Y0001]-[M01]-[D01]"),
+          "HourId": $fromMillis($toMillis($dt),"[H01]"),
+          "Millis": $toMillis($dt)
+    }
+  };
+ $eventOccurredTimestamp := $now();
+ $ProductId := $buildEntityID("Product","Dolfin",productcode);
+ $PriceId := $buildEntityID("Product_Prices","Dolfin", productcode & "_" & ZoneCode & "_" & Effectivedate);
+ $EventId := $buildEventID("Product","Published",$ProductId,$eventOccurredTimestamp);
+ $AsOf := $eventOccurredTimestamp;
+{
+  "ProductId": $ProductId,
+  "Header": NULL,
+  "Variants": NULL,
+  "Prices": [
+    {
+      "ProductId": $ProductId,
+      "PriceId": $PriceId,
+      "PriceIds": NULL,
+      "Times": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($PriceId,"Prices.Time.CreatedOn",""),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Prices.Time.CreatedOn",
+          "Name": "CreatedOn",
+          "Desc": "Date zone prices created"
+        },
+        "DateDim": $getDateDimFn(Prices.CreatedOn,FALSE,'Europe/London'),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "Prices.CreatedOn",
+              "RawSourceVal": $string(Prices.CreatedOn)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($PriceId,"Prices.Time.Effectivedate",""),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Prices.Time.Effectivedate",
+          "Name": "Effectivedate",
+          "Desc": "Date zone prices created"
+        },
+        "DateDim": $getDateDimFn(Effectivedate,FALSE,'Europe/London'),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "Effectivedate",
+              "RawSourceVal": $string(Effectivedate)
+            }
+          ]
+        }
+      }
+      ],
+      "Location": [
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($ProductId,"Prices.Location.Zone",""),
+            "RawId": $cleanStr(ZoneCode),
+            "Class": "Price",
+            "Code": "Prices.Location.Zone",
+            "Name": "Zone",
+            "Desc": ""
+          },
+          "IsArray": "N",
+          "AttType": "STRING",
+          "AttValue": $cleanStr(ZoneCode),
+          "AttValues": NULL,
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ZoneCode",
+                "RawSourceVal": $string(ZoneCode)
+              }
+              ]
+          }
+        },
+        $.ZoneStores.ZoneStores
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($ProductId,"Prices.Location.StoreNumber",$cleanStr(StoreNumber)),
+            "RawId": $cleanStr(StoreNumber),
+            "Class": "Price",
+            "Code": "Prices.Location.StoreNumber",
+            "Name": "Zone",
+            "Desc": ""
+          },
+          "IsArray": "N",
+          "AttType": "STRING",
+          "AttValue": $cleanStr(StoreNumber),
+          "AttValues": NULL,
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "StoreNumber",
+                "RawSourceVal": $string(StoreNumber)
+              }
+              ]
+          }
+        }
+      ],
+      "Price": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Prices.Price.CurrentSellingPrice",""),
+          "RawId": NULL,
+          "Class": "Sale",
+          "Code": "Prices.Price.CurrentSellingPrice",
+          "Name": "CurrentSellingPrice",
+          "Desc": ""
+        },
+        "PriceLocalisation": "BCY",
+        "IsRecurring": NULL,
+        "RecurranceFrequency": NULL,
+        "PriceIncTax": $cleanNum(CurrentSellingPrice),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": $cleanStr(CurrencyCode),
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "IsExchangeRateEstimated": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "EntityLinks": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CurrentSellingPrice",
+              "RawSourceVal": $string(CurrentSellingPrice)
+            }
+            ]
+          }
+        },
+        {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Prices.Price.FullSellingPrice",""),
+          "RawId": NULL,
+          "Class": "Sale",
+          "Code": "Prices.Price.FullSellingPrice",
+          "Name": "FullSellingPrice",
+          "Desc": ""
+        },
+        "PriceLocalisation": "BCY",
+        "IsRecurring": NULL,
+        "RecurranceFrequency": NULL,
+        "PriceIncTax": $cleanNum(FullSellingPrice),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": $cleanStr(CurrencyCode),
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "IsExchangeRateEstimated": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "EntityLinks": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "FullSellingPrice",
+              "RawSourceVal": $string(FullSellingPrice)
+            }
+            ]
+          }
+        },
+        {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Prices.Price.ValueSellingPrice",""),
+          "RawId": NULL,
+          "Class": "Sale",
+          "Code": "Prices.Price.ValueSellingPrice",
+          "Name": "ValueSellingPrice",
+          "Desc": ""
+        },
+        "PriceLocalisation": "BCY",
+        "IsRecurring": NULL,
+        "RecurranceFrequency": NULL,
+        "PriceIncTax": $cleanNum(VSP),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": $cleanStr(CurrencyCode),
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "IsExchangeRateEstimated": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "EntityLinks": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "VSP",
+              "RawSourceVal": $string(VSP)
+            }
+            ]
+          }
+        },
+        {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Prices.Price.BaseSellingPrice",""),
+          "RawId": NULL,
+          "Class": "Sale",
+          "Code": "Prices.Price.BaseSellingPrice",
+          "Name": "BaseSellingPrice",
+          "Desc": ""
+        },
+        "PriceLocalisation": "BCY",
+        "IsRecurring": NULL,
+        "RecurranceFrequency": NULL,
+        "PriceIncTax": $cleanNum(BaseSellingPrice),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": $cleanStr(CurrencyCode),
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "IsExchangeRateEstimated": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "EntityLinks": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "BaseSellingPrice",
+              "RawSourceVal": $string(BaseSellingPrice)
+            }
+            ]
+          }
+        },
+        {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Prices.Price.HirePrice",""),
+          "RawId": NULL,
+          "Class": "Sale",
+          "Code": "Prices.Price.HirePrice",
+          "Name": "HirePrice",
+          "Desc": ""
+        },
+        "PriceLocalisation": "BCY",
+        "IsRecurring": NULL,
+        "RecurranceFrequency": NULL,
+        "PriceIncTax": $cleanNum(HirePrice),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": $cleanStr(CurrencyCode),
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "IsExchangeRateEstimated": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "EntityLinks": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "HirePrice",
+              "RawSourceVal": $string(HirePrice)
+            }
+            ]
+          }
+        },
+        {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Prices.Price.NonReturnPrice",""),
+          "RawId": NULL,
+          "Class": "Sale",
+          "Code": "Prices.Price.NonReturnPrice",
+          "Name": "NonReturnPrice",
+          "Desc": ""
+        },
+        "PriceLocalisation": "BCY",
+        "IsRecurring": NULL,
+        "RecurranceFrequency": NULL,
+        "PriceIncTax": $cleanNum(NonReturnPrice),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": $cleanStr(CurrencyCode),
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "IsExchangeRateEstimated": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "EntityLinks": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "NonReturnPrice",
+              "RawSourceVal": $string(NonReturnPrice)
+            }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "Suppliers": NULL,
+  "Availability": NULL,
+  "Features": NULL
+  
+}
+)

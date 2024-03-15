@@ -1,0 +1,167 @@
+{
+  "type": "object",
+  "description": "A fulfilment line related to a single fulfilment against a sales order entity (SOH, SOL).  Multiple fulfilment lines are possible (1:*), thus this line object is typically in an array",
+  "unevaluatedProperties": false,
+  "allOf": [
+    {
+      "$ref": "../../common/Entity.json#/EntityHeader"
+    },
+    {
+      "properties": {
+        "LineIds": {
+          "$ref": "./LineIds.json#/LineIdsProperties",
+          "description": "The (required) common set of order line Ids for this Fulfilment line, not all a required individually, only what can be mapped & derived."
+        },
+        "FulfilmentOrderId": {
+          "type": "string",
+          "description": "The Xfuze Fulfilment Order ID, e.g based on a shipmentId, typically a header for a number of fulfilmentLines"
+        },
+        "FulfilmentOrderKey": {
+          "type": "string",
+          "description": "The natural key/number of the fulfilment order e.g based on a shipmentId"
+        },
+        "FulfilmentLineKey": {
+          "type": "string",
+          "description": "The 'natural' Fulfilment line key/number, typically either a combination of SalesOrderNumber & a 'sequence number' (derived) OR explicitly supplied unique Id from source - also used to construct the synthetic SOL Xfuze Ids. e.g 123456789_1"
+        },
+        "FulfilmentLineSeq": {
+          "type": "number",
+          "description": "The ordinal line sequence number e.g 2"
+        },
+        "FulfilmentType": {
+          "type": "string",
+          "description": "The type of the fulfilment e.g DeliveryToCustomer, CollectFromStore",
+          "enum": [
+            "DirectToCustomer",
+            "CollectFromStore",
+            "ShipFromStore",
+            "FulfilFromWarehouse",
+            "FulfilByDropShip",
+            "FulfilByThirdParty",
+            "CrossDocking",
+            "Other"
+          ]
+        },
+        "FulfilmentTransportType": {
+          "type": "string",
+          "description": "The type of the fulfilment transportation method e.g AirFreight, ParcelServices",
+          "enum": [
+            "AirFreight",
+            "SeaFreight",
+            "GroundTransportation",
+            "RailFreight",
+            "ParcelServices",
+            "CourierServices",
+            "LastMileDelivery",
+            "ClickCollect",
+            "LocalDelivery",
+            "FulfilmentByAmazon",
+            "Combination",
+            "Other"
+          ]
+        },
+        "FulfilmentSplitType": {
+          "type": "string",
+          "description": "The type of the fulfilment split, where a fulfilment either needs to be a 'whole' as one complete unit, or can be split into multiple  e.g multi dispatch based on availability",
+          "enum": [
+            "Single",
+            "Multiple"
+          ]
+        },
+        "FulfilmentPartnerCode": {
+          "type": "string",
+          "description": "The partner code allocated to the fulfilment order to execute (e.g 001)"
+        },
+        "FulfilmentPartnerName": {
+          "type": "string",
+          "description": "The partner name allocated to the fulfilment order to execute (e.g dpd)"
+        },
+        "FulfilmentLocations": {
+          "type": "object",
+          "description": "The collection of locations related to this line.  e.g FulfilFrom.",
+          "unevaluatedProperties": false,
+          "properties": {
+            "FulfilFrom": {
+              "description": "The location to fulfil this line from",
+              "$ref": "../../common/Location.json#/LocationProperties"
+            },
+            "FulfilTo": {
+              "description": "The location to fulfil this line to",
+              "$ref": "../../common/Location.json#/LocationProperties"
+            }
+          }
+        },
+        "FulfilmentAtts": {
+          "type": "array",
+          "description": "A collection (array) of extended fulfilment attributes",
+          "items": {
+            "$ref" : "../../common/CustomAtt.json#/CustomAttProperties"
+          }
+        },
+        "FulfilmentProductQty": {
+          "type": "array",
+          "description": "The collection (array) of product / qty within the fulfilment line",
+          "items": {
+            "type": "object",
+            "description": "An individual set of product / qty within the fulfilment line",
+            "unevaluatedProperties": false,
+            "properties": {
+              "ProductIds": {
+                "$ref": "../product/ProductIds.json#/ProductIdsProperties",
+                "description": "The collection of core product ids related to identifying the product/variant on this line, as captured at point of the fulfilment within a parcel.  Sparsely populated depending on what source data is provided"
+              },
+              "QtyToFulfil": {
+                "description": "The quantity set to fulfil of this product within this fulfilment parcel (line)",
+                "$ref": "../../common/Measure.json#/MeasureProperties"
+              },
+              "QtyFulfilled": {
+                "description": "The quantity actually fulfilled of this product within this fulfilment parcel (line)",
+                "$ref": "../../common/Measure.json#/MeasureProperties"
+              }
+            }
+          }
+        },
+        "Totals": {
+          "type": "object",
+          "description": "The collection of possible totals, related to the Fulfilment.  Actual usage and ability to populate depends on the richness of the sources..",
+          "unevaluatedProperties": false,
+          "properties": {
+            "FulfilmentTotal": {
+              "description": "",
+              "$ref": "../../common/Price.json#/PriceProperties"
+            },
+            "FulfilmentDiscountTotal": {
+              "description": "",
+              "$ref": "../../common/Price.json#/PriceProperties"
+            }
+          },
+          "required": [
+            "FulfilmentTotal"
+          ]
+        },
+        "IsFree": {
+          "type": "string",
+          "description": "Is this fulfilment line free / zero cost?",
+          "enum": ["Y","N","U"]
+        },
+        "ReasonCode": {
+          "type": "string",
+          "description": "The reason code for this Fulfilment line"
+        },
+        "ReasonDesc": {
+          "type": "string",
+          "description": "The reason desc for this Fulfilment line"
+        },
+        "Lineage": {
+        "$ref": "../../common/EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+      },
+      "required": [
+        "LineIds",
+        "FulfilmentLocations",
+        "Totals"
+      ]
+    }
+  ]
+}

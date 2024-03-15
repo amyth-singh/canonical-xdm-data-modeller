@@ -1,0 +1,767 @@
+{
+	"id": "82ecbbe8-62f2-420f-8b8a-644af26a4afe",
+	"type": "SALE_EXCHANGE",
+	"transactionId": "A0001824",
+	"originalTransId": "A0001815",
+	"transactionRef": "H6jdoJ1892023-08-14T09:09:54.910Zacfb",
+	"dateTime": "2023-08-14T09:09:54.911Z",
+	"createdAt": "2023-08-14T09:09:54.919Z",
+	"updatedAt": "2023-08-14T09:10:28.624Z",
+	"updated_date": "2023-08-14T09:10:30.140Z",
+	"transCompletedAt": "2023-08-14T09:10:28.624Z",
+	"operationStatus": "PAY_SUCCESS",
+	"baseCurrency": "GBP",
+	"basketSummary": {
+		"webOrder": {
+			"saleTotal": 0,
+			"totalItems": 0,
+			"discountTotal": 0,
+			"refundTotal": 0,
+			"basketTotal": 0,
+			"VATTotal": 0
+		},
+		"inStore": {
+			"saleTotal": 58,
+			"totalItems": 2,
+			"discountTotal": 14,
+			"refundTotal": -14,
+			"basketTotal": 58,
+			"VATTotal": 5
+		},
+		"saleTotal": 58,
+		"totalItems": 1,
+		"discountTotal": 37,
+		"refundTotal": -14,
+		"basketTotal": 7,
+		"VATTotal": 5,
+		"cnc": {
+			"saleTotal": 0,
+			"totalItems": 0,
+			"discountTotal": 0,
+			"refundTotal": 0,
+			"basketTotal": 0,
+			"VATTotal": 0
+		}
+	},
+	"basket": {
+		"products": [
+			{
+				"SKU": "1196265",
+				"barcodes": [
+					"5054409799602"
+				],
+				"description": "  SLEEVELESS JERSEY DRESS| GAD003 | 6-7 | WHITE",
+				"imageUrls": [
+					"https://www.crewclothing.co.uk/images/products/large/GAD003_WHITE.jpg"
+				],
+				"price": 14,
+				"attributes": [],
+				"exchange": {
+					"quantity": 1,
+					"exchangeId": 1,
+					"reason": "601-1",
+					"newItems": [
+						{
+							"lineItemId": 2,
+							"Quantity": 1
+						}
+					],
+					"lineItemId": 1
+				},
+				"itemLineId": "1",
+				"isLastExchanged": false,
+				"quantity": 2,
+				"deliveryMethod": "3",
+				"refundedReason": "601-1",
+				"refundedTotal": -14,
+				"excludePromotion": false,
+				"leadTime": {
+					"type": "Days",
+					"value": "0"
+				},
+				"refundedQuantity": 1,
+				"itemDiscounts": {
+					"refundPortion": 0,
+					"currentRefundPortion": 0,
+					"trnDiscountsPortion": 0,
+					"trnPromotionsPortion": 0
+				},
+				"deliveryGroup": "1",
+				"totalLinePrice": 28,
+				"fullfilmentId": "189",
+				"originFullfillmentId": "N/A",
+				"refundedPromotionalQuantity": 0,
+				"refundedReasonDescription": "Changed Mind"
+			},
+			{
+				"SKU": "1201761",
+				"barcodes": [
+					"5.05441E+12"
+				],
+				"description": "OXFORD SHIRT DRESS | OWNJ001 | 12 | NAVY",
+				"imageUrls": [
+					"https://www.crewclothing.co.uk/images/products/large/OWNJ001_NAVY.jpg\r"
+				],
+				"price": 30,
+				"attributes": [],
+				"itemLineId": "2",
+				"quantity": 1,
+				"deliveryMethod": "3",
+				"excludePromotion": false,
+				"leadTime": {
+					"type": "Days",
+					"value": "0"
+				},
+				"itemDiscounts": {
+					"refundPortion": 0,
+					"trnDiscountsPortion": 0,
+					"trnPromotionsPortion": 0
+				},
+				"deliveryGroup": "1",
+				"totalLinePrice": 30,
+				"fullfilmentId": "189",
+				"originFullfillmentId": "N/A"
+			}
+		],
+		"lineDiscount": [],
+		"exchange": [
+			{
+				"quantity": 1,
+				"exchangeId": 1,
+				"reason": "601-1",
+				"newItems": [
+					{
+						"lineItemId": 2,
+						"Quantity": 1
+					}
+				],
+				"lineItemId": 1
+			}
+		],
+		"taxBreakdown": {
+			"taxLines": [
+				{
+					"VAT": 0,
+					"VATCode": "Z",
+					"taxableAmount": 28,
+					"PreTax": 28,
+					"itemLineId": 1,
+					"taxLineTotal": 0
+				},
+				{
+					"VAT": 20,
+					"VATCode": "H",
+					"taxableAmount": 30,
+					"PreTax": 25,
+					"itemLineId": 2,
+					"taxLineTotal": 5
+				}
+			],
+			"totalTaxableAmount": 58
+		},
+		"totalTaxSummary": [
+			{
+				"VAT": 0,
+				"VATCode": "Z",
+				"PreTaxSum": 28,
+				"TaxSum": 0,
+				"TXrateSum": 28
+			},
+			{
+				"VAT": 20,
+				"VATCode": "H",
+				"PreTaxSum": 25,
+				"TaxSum": 5,
+				"TXrateSum": 30
+			}
+		],
+		"linePromotion": [
+			{
+				"name": "30%OFF",
+				"displayText": "30%OFF",
+				"itemLineId": "2",
+				"promotionType": "PERCENTAGE_OFF",
+				"promotionInfo": "undefined",
+				"trigger": [
+					{
+						"itemLineId": "2",
+						"quantity": 1
+					}
+				],
+				"promotionAmount": 9,
+				"promotionId": "da1c5d2e-73cf-4edf-8410-ebe1d21b106a",
+				"promotionLinePrice": 21
+			}
+		],
+		"transactionDiscount": [],
+		"transactionPromotion": []
+	},
+	"currentTransactionDetails": {
+		"products": [
+			{
+				"SKU": "1196265",
+				"barcodes": [
+					"5054409799602"
+				],
+				"description": "  SLEEVELESS JERSEY DRESS| GAD003 | 6-7 | WHITE",
+				"imageUrls": [
+					"https://www.crewclothing.co.uk/images/products/large/GAD003_WHITE.jpg"
+				],
+				"attributes": [],
+				"exchange": {
+					"quantity": 1,
+					"exchangeId": 1,
+					"reason": "601-1",
+					"newItems": [
+						{
+							"lineItemId": 2,
+							"Quantity": 1
+						}
+					],
+					"lineItemId": 1
+				},
+				"itemLineId": 1,
+				"isLastExchanged": false,
+				"quantity": 1,
+				"deliveryMethod": "3",
+				"refundedReason": "601-1",
+				"refundedTotal": -14,
+				"excludePromotion": false,
+				"leadTime": {
+					"type": "Days",
+					"value": "0"
+				},
+				"refundedQuantity": 1,
+				"itemDiscounts": {
+					"refundPortion": 0,
+					"currentRefundPortion": 0,
+					"trnDiscountsPortion": 0,
+					"trnPromotionsPortion": 0
+				},
+				"deliveryGroup": "1",
+				"totalLinePrice": 14,
+				"fullfilmentId": "189",
+				"refunded": true,
+				"selectedVATCode": "Z",
+				"inReturnItem": true,
+				"total": 14,
+				"selectedPrice": 14,
+				"currency": "GBP",
+				"sealed": true,
+				"selectedVAT": 0,
+				"isChecked": false,
+				"changeQty": 1,
+				"refundPromotionalQuantity": 0,
+				"refundedReasonDescription": "Changed Mind"
+			},
+			{
+				"SKU": "1201761",
+				"barcodes": [
+					"5.05441E+12"
+				],
+				"categories": [
+					{
+						"categoryId": "600",
+						"name": "600: Womenswear"
+					},
+					{
+						"categoryId": "656",
+						"name": "656: Dresses",
+						"id": "c54a2dd4-7371-4031-86a0-f4e71ffb704a",
+						"parentId": "edead937-5bcc-4aaa-89cc-4277e9536b01"
+					},
+					{
+						"categoryId": "6603",
+						"name": "6603: Woven Dress",
+						"id": "47ac23e9-55c6-47a7-89a1-97847ab186af",
+						"parentId": "c54a2dd4-7371-4031-86a0-f4e71ffb704a"
+					}
+				],
+				"id": "0ccbea4e-a969-4ff9-b0de-38f940abddd2",
+				"colour": "NAVY",
+				"countryofOrigin": "BGD",
+				"createdBy": "System Import",
+				"createdDate": "2021-04-28T13:21:45.782Z",
+				"description": "OXFORD SHIRT DRESS | OWNJ001 | 12 | NAVY",
+				"imageUrls": [
+					"https://www.crewclothing.co.uk/images/products/large/OWNJ001_NAVY.jpg\r"
+				],
+				"ingredients": "",
+				"nodeStructure": [
+					{
+						"name": "Berkhamsted Test",
+						"parentId": "NODE::bd7cf38e-98c8-4252-a7cc-1cdc96d36828",
+						"isOverride": true,
+						"nodeId": "NODE::e8503ec8-e60c-4938-a057-72698b794097",
+						"nodeType": "STORE",
+						"status": true
+					},
+					{
+						"name": "Newbury",
+						"parentId": "NODE::bd7cf38e-98c8-4252-a7cc-1cdc96d36828",
+						"isOverride": true,
+						"nodeId": "NODE::2ae2c00a-bc75-4fe6-a832-09cfd3c3b7d1",
+						"nodeType": "STORE",
+						"status": true
+					},
+					{
+						"name": "Nottingham Open",
+						"parentId": "NODE::9193f385-1422-48f0-9d66-61a83e96293e",
+						"isOverride": true,
+						"nodeId": "NODE::ec7db3fe-7e3c-42fa-82da-6225b13cd383",
+						"nodeType": "STORE",
+						"status": true
+					},
+					{
+						"name": "PMC Abingdon",
+						"parentId": "NODE::0682036f-579b-42df-83a2-e5242ef4faf3",
+						"isOverride": true,
+						"nodeId": "NODE::f37f4592-da7e-4e59-bddc-6f6f2e17d3eb",
+						"nodeType": "STORE",
+						"status": true
+					},
+					{
+						"name": "Crew Clothing",
+						"parentId": "",
+						"isOverride": false,
+						"nodeId": "NODE::05b41253-65e1-4d7e-ae9c-da1a34841f3c",
+						"nodeType": "ORGANIZATION",
+						"status": true
+					},
+					{
+						"name": "smedev",
+						"parentId": "",
+						"isOverride": true,
+						"nodeId": "7365865b-5b47-4cb9-bb4d-e51944a12bdf",
+						"nodeType": "ORGANIZATION",
+						"status": true
+					},
+					{
+						"name": "ABC",
+						"parentId": "7365865b-5b47-4cb9-bb4d-e51944a12bdf",
+						"isOverride": true,
+						"nodeId": "41f6eb5a-5c5b-4a6c-aa0c-d2912ee995b1",
+						"nodeType": "COMPANY",
+						"status": true
+					}
+				],
+				"status": true,
+				"price": [
+					{
+						"VAT": "20",
+						"VATCode": "H",
+						"currencyCode": "GBP",
+						"salesPrice": "30"
+					}
+				],
+				"productId": "d2d7954f-7785-4e8c-9b61-fe313bf7437d",
+				"season": "OM SS21",
+				"size": "12",
+				"styleCode": "OWNJ001",
+				"type": "SKU",
+				"updateDate": "2022-02-22T16:50:57.983Z",
+				"updatedBy": "System Import",
+				"updatedDate": "2022-02-01T13:44:04.365Z",
+				"whyWeLoveIt": "",
+				"itemLineId": 2,
+				"quantity": 1,
+				"deliveryMethod": "3",
+				"excludePromotion": false,
+				"itemDiscounts": {
+					"refundPortion": 0,
+					"trnDiscountsPortion": 0,
+					"trnPromotionsPortion": 0
+				},
+				"deliveryGroup": "1",
+				"totalLinePrice": 30,
+				"fullfilmentId": "189",
+				"selectedVATCode": "H",
+				"total": 30,
+				"selectedPrice": 30,
+				"selectedVAT": 20,
+				"isnewProduct": true,
+				"addedInBasket": true,
+				"discountable": true,
+				"parentItemLineId": 1,
+				"linePromotions": {
+					"name": "30%OFF",
+					"displayText": "30%OFF",
+					"itemLineId": "2",
+					"promotionType": "PERCENTAGE_OFF",
+					"promotionInfo": "undefined",
+					"trigger": [
+						{
+							"itemLineId": "2",
+							"quantity": 1
+						}
+					],
+					"promotionAmount": 9,
+					"promotionId": "da1c5d2e-73cf-4edf-8410-ebe1d21b106a",
+					"promotionLinePrice": 21
+				}
+			},
+			{
+				"SKU": "1201761",
+				"barcodes": [
+					"5.05441E+12"
+				],
+				"categories": [
+					{
+						"categoryId": "600",
+						"name": "600: Womenswear"
+					},
+					{
+						"categoryId": "656",
+						"name": "656: Dresses",
+						"id": "c54a2dd4-7371-4031-86a0-f4e71ffb704a",
+						"parentId": "edead937-5bcc-4aaa-89cc-4277e9536b01"
+					},
+					{
+						"categoryId": "6603",
+						"name": "6603: Woven Dress",
+						"id": "47ac23e9-55c6-47a7-89a1-97847ab186af",
+						"parentId": "c54a2dd4-7371-4031-86a0-f4e71ffb704a"
+					}
+				],
+				"id": "0ccbea4e-a969-4ff9-b0de-38f940abddd2",
+				"colour": "NAVY",
+				"countryofOrigin": "BGD",
+				"createdBy": "System Import",
+				"createdDate": "2021-04-28T13:21:45.782Z",
+				"description": "OXFORD SHIRT DRESS | OWNJ001 | 12 | NAVY",
+				"imageUrls": [
+					"https://www.crewclothing.co.uk/images/products/large/OWNJ001_NAVY.jpg\r"
+				],
+				"ingredients": "",
+				"nodeStructure": [
+					{
+						"name": "Berkhamsted Test",
+						"parentId": "NODE::bd7cf38e-98c8-4252-a7cc-1cdc96d36828",
+						"isOverride": true,
+						"nodeId": "NODE::e8503ec8-e60c-4938-a057-72698b794097",
+						"nodeType": "STORE",
+						"status": true
+					},
+					{
+						"name": "Newbury",
+						"parentId": "NODE::bd7cf38e-98c8-4252-a7cc-1cdc96d36828",
+						"isOverride": true,
+						"nodeId": "NODE::2ae2c00a-bc75-4fe6-a832-09cfd3c3b7d1",
+						"nodeType": "STORE",
+						"status": true
+					},
+					{
+						"name": "Nottingham Open",
+						"parentId": "NODE::9193f385-1422-48f0-9d66-61a83e96293e",
+						"isOverride": true,
+						"nodeId": "NODE::ec7db3fe-7e3c-42fa-82da-6225b13cd383",
+						"nodeType": "STORE",
+						"status": true
+					},
+					{
+						"name": "PMC Abingdon",
+						"parentId": "NODE::0682036f-579b-42df-83a2-e5242ef4faf3",
+						"isOverride": true,
+						"nodeId": "NODE::f37f4592-da7e-4e59-bddc-6f6f2e17d3eb",
+						"nodeType": "STORE",
+						"status": true
+					},
+					{
+						"name": "Crew Clothing",
+						"parentId": "",
+						"isOverride": false,
+						"nodeId": "NODE::05b41253-65e1-4d7e-ae9c-da1a34841f3c",
+						"nodeType": "ORGANIZATION",
+						"status": true
+					},
+					{
+						"name": "smedev",
+						"parentId": "",
+						"isOverride": true,
+						"nodeId": "7365865b-5b47-4cb9-bb4d-e51944a12bdf",
+						"nodeType": "ORGANIZATION",
+						"status": true
+					},
+					{
+						"name": "ABC",
+						"parentId": "7365865b-5b47-4cb9-bb4d-e51944a12bdf",
+						"isOverride": true,
+						"nodeId": "41f6eb5a-5c5b-4a6c-aa0c-d2912ee995b1",
+						"nodeType": "COMPANY",
+						"status": true
+					}
+				],
+				"status": true,
+				"price": [
+					{
+						"VAT": "20",
+						"VATCode": "H",
+						"currencyCode": "GBP",
+						"salesPrice": "30"
+					}
+				],
+				"productId": "d2d7954f-7785-4e8c-9b61-fe313bf7437d",
+				"season": "OM SS21",
+				"size": "12",
+				"styleCode": "OWNJ001",
+				"type": "SKU",
+				"updateDate": "2022-02-22T16:50:57.983Z",
+				"updatedBy": "System Import",
+				"updatedDate": "2022-02-01T13:44:04.365Z",
+				"whyWeLoveIt": "",
+				"itemLineId": 3,
+				"quantity": 1,
+				"deliveryMethod": "3",
+				"excludePromotion": false,
+				"itemDiscounts": {
+					"refundPortion": 0,
+					"trnDiscountsPortion": 0,
+					"trnPromotionsPortion": 0
+				},
+				"deliveryGroup": "1",
+				"totalLinePrice": 30,
+				"fullfilmentId": "189",
+				"selectedVATCode": "H",
+				"total": 30,
+				"selectedPrice": 30,
+				"selectedVAT": 20,
+				"isnewProduct": true,
+				"addedInBasket": true,
+				"discountable": true,
+				"parentItemLineId": 1,
+				"linePromotions": {
+					"name": "30%OFF",
+					"displayText": "30%OFF",
+					"itemLineId": "2",
+					"promotionType": "PERCENTAGE_OFF",
+					"promotionInfo": "undefined",
+					"trigger": [
+						{
+							"itemLineId": "2",
+							"quantity": 1
+						}
+					],
+					"promotionAmount": 9,
+					"promotionId": "da1c5d2e-73cf-4edf-8410-ebe1d21b106a",
+					"promotionLinePrice": 21
+				}
+			}
+		],
+		"lineDiscount": [
+			{
+				"discountAmount": 16.25,
+				"discountType": "AMOUNT",
+				"discountedLinePrice": 48.75,
+				"itemLineId": 1,
+				"name": "EVENT25",
+				"percentageDiscountManagerOverride": {
+					"automaticApprove": false,
+					"originalUserId": "860150d3-2c0c-4d46-a466-096cac6af232",
+					"userId": "860150d3-2c0c-4d46-a466-096cac6af232"
+				},
+				"percentageDiscountReasonCode": 112,
+				"percentageDiscountReasonName": "EVENT25",
+				"percentageDiscountValue": 25,
+				"priceManagerOverride": {
+					"automaticApprove": true,
+					"originalUserId": "860150d3-2c0c-4d46-a466-096cac6af232",
+					"userId": "860150d3-2c0c-4d46-a466-096cac6af232"
+				},
+				"unitPrice": 48.75
+			}
+		],
+		"taxBreakdown": {
+			"taxLines": [
+				{
+					"VAT": 0,
+					"VATCode": "Z",
+					"taxableAmount": -14,
+					"PreTax": -14,
+					"itemLineId": 1,
+					"taxLineTotal": 0
+				},
+				{
+					"VAT": 20,
+					"VATCode": "H",
+					"taxableAmount": 30,
+					"PreTax": 25,
+					"itemLineId": 2,
+					"taxLineTotal": 5
+				}
+			],
+			"totalTaxableAmount": 16
+		},
+		"totalTaxSummary": [
+			{
+				"VAT": 0,
+				"VATCode": "Z",
+				"PreTaxSum": -14,
+				"TaxSum": 0,
+				"TXrateSum": -14
+			},
+			{
+				"VAT": 20,
+				"VATCode": "H",
+				"PreTaxSum": 25,
+				"TaxSum": 5,
+				"TXrateSum": 30
+			}
+		],
+		"linePromotion": [
+			{
+				"name": "30%OFF",
+				"displayText": "30%OFF",
+				"itemLineId": "2",
+				"promotionType": "PERCENTAGE_OFF",
+				"promotionInfo": "undefined",
+				"trigger": [
+					{
+						"itemLineId": "2",
+						"quantity": 1
+					}
+				],
+				"promotionAmount": 9,
+				"promotionId": "da1c5d2e-73cf-4edf-8410-ebe1d21b106a",
+				"promotionLinePrice": 21
+			}
+		],
+		"basketSummary": {
+			"webOrder": {
+				"saleTotal": 0,
+				"totalItems": 0,
+				"discountTotal": 0,
+				"refundTotal": 0,
+				"basketTotal": 0,
+				"VATTotal": 0
+			},
+			"inStore": {
+				"saleTotal": 44,
+				"totalItems": 1,
+				"discountTotal": 14,
+				"refundTotal": -14,
+				"basketTotal": 16,
+				"VATTotal": 5
+			},
+			"saleTotal": 44,
+			"totalItems": 1,
+			"discountTotal": 23,
+			"refundTotal": -14,
+			"basketTotal": 7,
+			"VATTotal": 5,
+			"cnc": {
+				"saleTotal": 0,
+				"totalItems": 0,
+				"discountTotal": 0,
+				"refundTotal": 0,
+				"basketTotal": 0,
+				"VATTotal": 0
+			}
+		},
+		"transactionDiscount": []
+	},
+	"deviceId": "f2383a29596c585f",
+	"export": "true",
+	"externalDeviceId": "",
+	"externalTerminalId": "",
+	"initiatingModule": "eBasket",
+	"isPaymentCompleted": true,
+	"offlineTransactionId": "",
+	"orgCode": "H6jdoJ",
+	"override": {
+		"automaticApprove": "true",
+		"originalUserId": "7cf32e6a-ff80-441c-b893-fc584dbec1e5",
+		"userId": "7cf32e6a-ff80-441c-b893-fc584dbec1e5"
+	},
+	"paymentDetails": [
+		{
+			"result": "AUTHORISED",
+			"currency": "GBP",
+			"amount": "7.00",
+			"hostReferenceId": "NA",
+			"cardType": "NA",
+			"transactionDate": "2023-08-14T09:09:54.911Z",
+			"paymentType": "PDQ",
+			"authcode": "NA",
+			"transactionType": "SALE_EXCHANGE",
+			"cncAmount": "0",
+			"inStoreAmount": "12.25",
+			"totalamount": "7.00",
+			"webOrderAmount": "0",
+			"shippingAmount": "0",
+			"pan": "NA",
+			"entryMethod": "NA",
+			"aid": "NA",
+			"transactionReference": "H6jdoJ1892023-08-14T09:09:54.910Zacfb"
+		}
+	],
+	"saleTotal": 7,
+	"splitPayment": false,
+	"storeId": "189",
+	"storeNodeId": "f37f4592-da7e-4e59-bddc-6f6f2e17d3eb",
+	"storeNodeStructure": [
+		{
+			"name": "PMC Abingdon",
+			"parentId": "NODE::0682036f-579b-42df-83a2-e5242ef4faf3",
+			"isOverride": true,
+			"nodeId": "NODE::f37f4592-da7e-4e59-bddc-6f6f2e17d3eb",
+			"nodeType": "STORE",
+			"status": true
+		},
+		{
+			"name": "Stores",
+			"parentId": "NODE::4d385484-9a44-4809-b83f-2ea142078599",
+			"isOverride": false,
+			"nodeId": "NODE::0682036f-579b-42df-83a2-e5242ef4faf3",
+			"nodeType": "STORE_GROUP",
+			"status": true
+		},
+		{
+			"name": "UK",
+			"parentId": "NODE::92a82e7c-e106-4c2c-af6a-7965ad711206",
+			"isOverride": true,
+			"nodeId": "NODE::4d385484-9a44-4809-b83f-2ea142078599",
+			"nodeType": "TRADING_REGION",
+			"status": true
+		},
+		{
+			"name": "Crew Clothing",
+			"parentId": "NODE::05b41253-65e1-4d7e-ae9c-da1a34841f3c",
+			"isOverride": true,
+			"nodeId": "NODE::92a82e7c-e106-4c2c-af6a-7965ad711206",
+			"nodeType": "COMPANY",
+			"status": true
+		},
+		{
+			"name": "Crew Clothing",
+			"parentId": "",
+			"isOverride": false,
+			"nodeId": "NODE::05b41253-65e1-4d7e-ae9c-da1a34841f3c",
+			"nodeType": "ORGANIZATION",
+			"status": true,
+			"checked": true
+		}
+	],
+	"subsidiaryId": "1",
+	"terminalId": "18996",
+	"transactionStructure": [
+		{
+			"id": "d4faff9a-9293-4bfb-9647-faaf48a7981e",
+			"parentId": "NA",
+			"type": "SALE",
+			"isGiftRefund": false,
+			"storeId": "189",
+			"transactionId": "A0001815",
+			"originalReceiptRefunded": true
+		},
+		{
+			"id": "82ecbbe8-62f2-420f-8b8a-644af26a4afe",
+			"parentId": "A0001815",
+			"type": "SALE_EXCHANGE",
+			"isGiftRefund": false,
+			"storeId": "189",
+			"transactionId": "A0001824"
+		}
+	],
+	"userId": "7cf32e6a-ff80-441c-b893-fc584dbec1e5",
+	"userName": "challinorc"
+}

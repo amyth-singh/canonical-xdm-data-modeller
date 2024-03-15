@@ -1,0 +1,43 @@
+{
+  "$id": "definitions",
+  "description": "Definition of resusable attributes",
+  "type": "object",
+  "properties": {
+    "AttHeader": {"Id": {"type": "string"},
+                  "RawId": {"type": "string"},
+                  "Class": {"type": "string"},
+                  "Code": {"type": "string"},
+                  "Name": {"type": "string"},
+                  "Desc": {"type": "string"}
+                  },
+    "AttMetadata": {"RawChangeTrackingHash": {"type": "string"},
+                    "IsAnonymised": {"$ref": "#/properties/StringBool"},
+                    "SecuringKeyId": {"type": "string"},
+                    "AsOf": {"$ref": "#/properties/Timestamp"},
+                    "EventId": {"type": "string"},
+                    "RawSourceAtts": [
+                      {"RawSourceSystem": {"type": "string"},
+                        "RawSourceId": {"type": "string"},
+                        "RawSourceVal": {"type": "string"}
+                      }
+                    ]
+                  },
+   "StringBool": {"enum": ["Y","N","U"]},
+   "AttDataType": {"enum": ["STRING","INTEGER","FLOAT","NUMERIC"]},
+   "Timestamp": {"type": "string","format": "date-time"},
+   "Date": {"type": "string","format": "date-time"},
+   "EntityIDType": {"enum": ["System","Master"]},
+   "EntityType": {"enum": ["Product","SalesOrder"]},
+   "EntitySubType": {"enum": ["Base"]},
+   "DateDimension": {"DateId": {"type": "string"},
+                     "TimestampUTC": {"$ref": "#/properties/Timestamp"},
+                     "DateUTC": {"$ref": "#/properties/Date"},
+                     "TimeZone": {"type": "string"},
+                     "DateTimeLocal": {"$ref": "#/properties/Timestamp"},
+                     "DateLocal": {"$ref": "#/properties/Date"},
+                     "HourId": {"type": "string"},
+                     "Millis":{"type": "integer"}
+                    }
+          }
+}
+

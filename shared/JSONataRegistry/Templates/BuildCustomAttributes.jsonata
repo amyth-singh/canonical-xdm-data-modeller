@@ -1,0 +1,87 @@
+(
+    $formatValue := function($value, $dType, $format){(
+        $formatString := $string ~> $trim;
+        $formatNumber := function($num){$type($num) = "number" ? $num : $type($num) = "string" ? $contains($num,/^-?\d+(\.\d+)?$/) ? $number($num) : null};
+        $formatDateTime := function($dt,$format) {(
+            $dateTimeRegexMap := {"[Y0001]-[M01]-[D01] [H01]:[m01]:[s01] [P]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]) (AM|PM)$/,
+                                  "[Y0001]-[M01]-[D01] [H01]:[m01]:[s01].[f001]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]).\d{3}$/,
+                                  "[M01]/[D01]/[Y0001]":/^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/[1-9][0-9]{3}$/,
+                                  "ISO8601":/^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d)(\.\d+)?([+-]([01]\d|2[0-3]):([0-5]\d)|Z)$/
+                                 };
+            $dateTimeFormatValidator := function($datetime,$dateTimeFormat){$exists($dateTimeFormat) ? $contains($datetime,$lookup($dateTimeRegexMap,$dateTimeFormat)): $contains($datetime,$lookup($dateTimeRegexMap,"ISO8601"))};
+            
+            $exists($dt) ? $dateTimeFormatValidator($dt,$format) ? $exists($format) ? $fromMillis($toMillis($dt,$format)) : $fromMillis($toMillis($dt)) : null;
+            )};
+        $formatStringBool := function($value,$format){(
+            $stringBoolMap := {"Y":"Y","1":"Y","TRUE":"Y","N":"N","0":"N","FALSE":"N"};
+            $upperTrim := $string ~> $trim ~> $uppercase;
+            $stringBool := function($v){$exists($value)?$lookup($stringBoolMap, $upperTrim($value)):""};
+            $reverseBool := function($v){$v = "Y" ? "N" : $v = "N" ? "Y" : "U"};
+            $type($format)="null" ? $value ~> $stringBool : $format="reverse" ? $value ~> $stringBool ~> $reverseBool : null
+        )};
+
+        $dType = "TIMESTAMP"  ? $formatDateTime($value,$format) :
+        $dType = "STRINGBOOL" ? $formatStringBool($value,$format) :
+        $dType = "NUMERIC"    ? $formatNumber($value) :
+        $dType = "STRING"     ? $formatString($value) :
+        null;
+    )};
+
+    $buildCustomAttribute := function($entityCode,$attributeId,$canonicalCode,$desc,$value,$dType,$dFormat){(
+        $buildAttributeID := function($entityCode,$canonicalCode,$attributeId){$entityCode & "_" & $replace($canonicalCode,".","_") & ($type($attributeId) = "null" ? "" : "_" & $attributeId)};
+        
+        {"Id":$buildAttributeID($entityCode,$canonicalCode,$attributeId),
+         "Desc":$desc,
+         "Code":$canonicalCode,
+         "Value":$formatValue($value,$dType,$dFormat),
+         "Type":$dType};
+         )
+    };    
+    
+
+    $entityType := "Deposit";
+    $sourceSystem := "ePayments";
+    $entityId := $formatValue(TransactionID,"STRING");
+    $entityCode := ($entityType & "_" & $sourceSystem & "_" & $entityId);
+    $canonicalCodePrefix:= "Customer.Accounts.Transactions.Deposit";
+    $tsFormat := "[Y0001]-[M01]-[D01] [H01]:[m01]:[s01].[f001]";
+
+    [
+     /* Times */
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Times.DepositRequestDateTime","",DepositRequestDateTime,"TIMESTAMP",$tsFormat),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Times.DepositApprovalDateTime","",DepositApprovalDateTime,"TIMESTAMP",$tsFormat),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Times.DepositStatusChangeDateTime","",DepositStatusChangeDateTime,"TIMESTAMP",$tsFormat),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Times.EventSentTime","",EventDateTime,"TIMESTAMP",$tsFormat),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Times.EventSentTime.UTCTimeStamp","",EventDateTime,"TIMESTAMP",$tsFormat),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Status.ProcessingStatus.StatusCode","",IsProcessed ? "Processed" : "NotProcessed","STRING"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Status.TransactionStatus.StatusCode","",TransactionStatus,"STRING"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Status.TransactionStatus.StatusReasonCode","",TransactionStatusReason,"STRING"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Status.RiskManagementStatus.StatusCode","",RiskManagementStatus,"STRING"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Amounts.DepositAmountBankroll.LCY.PriceIncTax","",DepositAmountBankrollCurrency,"NUMERIC"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Amounts.DepositAmountBankroll.LCY.CurrencyCode","",BankrollCurrency,"STRING"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Amounts.DepositAmountBankroll.BCY.CurrencyCode","","USD","STRING"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Amounts.DepositAmountBankroll.BCY.ExchangeRateDerived","",(DepositAmountUSD / DepositAmountBankrollCurrency),"NUMERIC"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Amounts.DepositClearingAmount.LCY.PriceIncTax","",DepositClearingAmount,"NUMERIC"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Amounts.DepositClearingAmount.LCY.CurrencyCode","",DepositRequestCurrencyISO,"STRING"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ProductAtts.ProductId","",ProductPackageID,"STRING"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PromoAtts.PromoCode.PromoAtts","",PromoCode,"STRING"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PromoAtts.PromoCode","",PromoCode,"STRING"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PromoAtts.PromotionId","",GrantedPromotionsID,"STRING"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.CashierType","",CashierType,"STRING"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.PSPName","",PSPName,"STRING"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.Bin","",Bin,"STRING"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.BankName","",BankName,"STRING"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.IsSentTo3D","",IsSentTo3D,"STRINGBOOL"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.ID3DSVersion","",ID3DSVersion,"STRINGBOOL"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.Is3DwithChallenged","",Is3DwithChallenged,"STRINGBOOL"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.IsRerouted","",IsRerouted,"STRINGBOOL"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.MFTUnitID","",MFTUnitID,"STRING"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.PaymentPlatformId","",PaymentPlatformID,"STRING"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.IsPayPalInstantPayment","",IsPayPalInstantPayment,"STRINGBOOL"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.MFTID","",MFTID,"STRINGBOOL"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.ExternalResponse","",ExternalResponse,"STRING"),
+     $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.MFTExternalSubResponseID","",ExternalSubResponse,"STRING")
+    ]
+
+
+)

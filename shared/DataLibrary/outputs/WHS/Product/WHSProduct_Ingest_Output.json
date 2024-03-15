@@ -1,0 +1,247 @@
+{
+    "CompositeEntityId": "ProductVariant_29355686",
+    "CompositeEntityType": "ProductVariant",
+    "DomainEvent": {
+        "TriggerEntity": {
+            "ProductVariant": {
+                "Classification": {
+                    "BookClassification": {
+                        "Code": "1"
+                    },
+                    "Category": {
+                        "Code": "F33A",
+                        "Desc": "Ambient Celebration"
+                    },
+                    "ProductGroup": {
+                        "Code": "Advent Calendar"
+                    },
+                    "ServiceClassification": {
+                        "Code": "1"
+                    }
+                },
+                "CompositeEntityId": "ProductVariant_29355686",
+                "CompositeEntityType": "ProductVariant",
+                "CoreAtts": {
+                    "Barcode": "29355686",
+                    "ProductCode": "29355686",
+                    "ProductName": "Spencer Bear Advent"
+                },
+                "EntityId": "ProductVariant_29355686",
+                "EntityType": "ProductVariant",
+                "InventoryLogistics": {
+                    "Fulfilment": {
+                        "Channel": {
+                            "Code": "D"
+                        }
+                    },
+                    "PackSize": 20,
+                    "Supplier": {
+                        "CharCode": "MARKK",
+                        "Code": "84408",
+                        "ProfileName": {
+                            "FullName": "M\u0026S",
+                            "NameType": "Organisation"
+                        }
+                    }
+                },
+                "ParentEntityId": "ProductVariant_29355686",
+                "ParentEntityType": "ProductVariant",
+                "PhysicalAttributes": {
+                    "LabelType": {
+                        "Code": 1
+                    },
+                    "UOM": {
+                        "Code": 1
+                    }
+                },
+                "PricingFinancial": {
+                    "SellingPrices": {
+                        "CurrentPrice": {
+                            "BCY": {
+                                "Currency": {
+                                    "ISO3": "GBP"
+                                },
+                                "IncTax": 2.99,
+                                "Localisation": "UK"
+                            }
+                        },
+                        "HospitalPrice": {
+                            "BCY": {
+                                "Currency": {
+                                    "ISO3": "GBP"
+                                },
+                                "IncTax": 2.5,
+                                "Localisation": "UK"
+                            }
+                        }
+                    },
+                    "Taxes": {
+                        "SalesTax": {
+                            "TaxCode": "TBD",
+                            "TaxSchemeCode": "VAT",
+                            "TaxTypeCode": "Sales"
+                        }
+                    }
+                },
+                "RegulatoryCompliance": {
+                    "AgeRestriction": {
+                        "Code": "0"
+                    },
+                    "CountryOfOrigin": {
+                        "ISO2": "GB"
+                    },
+                    "ShelfLifeDays": 177,
+                    "Tariff": {
+                        "Code": "1806903918069039"
+                    }
+                },
+                "Status": {
+                    "Availability": {
+                        "StatusCode": "Active"
+                    }
+                },
+                "Times": {
+                    "CreatedOn": {
+                        "DateId": "Dates_20231108",
+                        "Millis": 1699443588493,
+                        "UTC": "2023-11-08T11:39:48.493Z"
+                    },
+                    "UpdatedOn": {
+                        "DateId": "Dates_20231108",
+                        "Millis": 1699443588493,
+                        "UTC": "2023-11-08T11:39:48.493Z"
+                    }
+                },
+                "Type": {
+                    "TypeCode": "ProductVariant",
+                    "TypeDesc": "Daily Product Variant Catalogue"
+                },
+                "XRefIds": [
+                    {
+                        "Code": "UPC",
+                        "Id": "29355686",
+                        "SystemCode": "Retail247"
+                    }
+                ]
+            }
+        }
+    },
+    "EntityId": "ProductVariant_29355686",
+    "EntityType": "ProductVariant",
+    "EventId": "ProductVariantPublished_ProductVariant_29355686_2023-11-08T11:39:48.493Z",
+    "EventMetadata": {
+        "EntityAtts": {
+            "Origin": {
+                "EntityId": "29355686",
+                "ParentEntityId": "29355686"
+            },
+            "Xfuze": {
+                "CompositeEntityId": "ProductVariant_29355686",
+                "CompositeEntityType": "ProductVariant",
+                "EntityDomain": "Product",
+                "EntityId": "ProductVariant_29355686",
+                "EntityType": "ProductVariant",
+                "IsSensitive": "N",
+                "ParentEntityId": "ProductVariant_29355686",
+                "ParentEntityType": "ProductVariant"
+            }
+        },
+        "EventAtts": {
+            "Origin": {
+                "EventId": "",
+                "SourceFormatType": "CSV",
+                "SourceSystem": "Retail247"
+            },
+            "Xfuze": {
+                "ClientCode": "WHS",
+                "EnvCode": "dev",
+                "EventCategory": "Product",
+                "EventChangePattern": "FullSnapshot",
+                "EventClass": "TriggerEvent",
+                "EventId": "ProductVariantPublished_ProductVariant_29355686_2023-11-08T11:39:48.493Z",
+                "EventName": "ProductVariantPublished"
+            }
+        },
+        "IngestAtts": {
+            "Xfuze": {
+                "File": {
+                    "BatchId": null,
+                    "BatchNumber": null,
+                    "BytesOffsetInOriginalFile": 0,
+                    "ChangeTimestampUTC": null,
+                    "FormatType": "CSV",
+                    "LineNumber": 0,
+                    "Name": null,
+                    "ObjectNotificationPayload": null,
+                    "OriginalFileSizeBytes": 0,
+                    "OriginalRowSizeBytes": 0,
+                    "Path": null,
+                    "PatternType": "CloudObjectNotification",
+                    "SystemCode": "GCS",
+                    "TotalBatchLines": 0,
+                    "URI": null
+                }
+            }
+        },
+        "PayloadAtts": {
+            "Origin": {
+                "DataPayloadHash": "eyJhaXIsIHJhaWwgXHUwMDI2IGdyaWRzZXJ2ZSI6IjIuOTkiLCJjYXRlZ29yeSBjb2RlIjoiRjMzQSIsImNhdGVnb3J5IG5hbWUiOiJBbWJpZW50IENlbGVicmF0aW9uIiwiaG9zcGl0YWxzIjoiMi41IiwibmFtZSI6IlNwZW5jZXIgQmVhciBBZHZlbnQiLCJwcm9kdWN0IGdyb3VwIjoiQWR2ZW50IENhbGVuZGFyIiwicHJvZHVjdCBsaWZlIjoiMTc3IiwidXBjIjoiMjkzNTU2ODYiLCJ1cHQiOiIyMCJ9",
+                "EventPayloadHash": "eyJhaXIsIHJhaWwgXHUwMDI2IGdyaWRzZXJ2ZSI6IjIuOTkiLCJjYXRlZ29yeSBjb2RlIjoiRjMzQSIsImNhdGVnb3J5IG5hbWUiOiJBbWJpZW50IENlbGVicmF0aW9uIiwiaG9zcGl0YWxzIjoiMi41IiwibmFtZSI6IlNwZW5jZXIgQmVhciBBZHZlbnQiLCJwcm9kdWN0IGdyb3VwIjoiQWR2ZW50IENhbGVuZGFyIiwicHJvZHVjdCBsaWZlIjoiMTc3IiwidXBjIjoiMjkzNTU2ODYiLCJ1cHQiOiIyMCJ9",
+                "HashScheme": "BASE64"
+            },
+            "Xfuze": {
+                "DataPayloadHash": "eyJQcm9kdWN0VmFyaWFudCI6eyJDbGFzc2lmaWNhdGlvbiI6eyJCb29rQ2xhc3NpZmljYXRpb24iOnsiQ29kZSI6IjEifSwiQ2F0ZWdvcnkiOnsiQ29kZSI6IkYzM0EiLCJEZXNjIjoiQW1iaWVudCBDZWxlYnJhdGlvbiJ9LCJQcm9kdWN0R3JvdXAiOnsiQ29kZSI6IkFkdmVudCBDYWxlbmRhciJ9LCJTZXJ2aWNlQ2xhc3NpZmljYXRpb24iOnsiQ29kZSI6IjEifX0sIkNvbXBvc2l0ZUVudGl0eUlkIjoiUHJvZHVjdFZhcmlhbnRfMjkzNTU2ODYiLCJDb21wb3NpdGVFbnRpdHlUeXBlIjoiUHJvZHVjdFZhcmlhbnQiLCJDb3JlQXR0cyI6eyJCYXJjb2RlIjoiMjkzNTU2ODYiLCJQcm9kdWN0Q29kZSI6IjI5MzU1Njg2IiwiUHJvZHVjdE5hbWUiOiJTcGVuY2VyIEJlYXIgQWR2ZW50In0sIkVudGl0eUlkIjoiUHJvZHVjdFZhcmlhbnRfMjkzNTU2ODYiLCJFbnRpdHlUeXBlIjoiUHJvZHVjdFZhcmlhbnQiLCJJbnZlbnRvcnlMb2dpc3RpY3MiOnsiRnVsZmlsbWVudCI6eyJDaGFubmVsIjp7IkNvZGUiOiJEIn19LCJQYWNrU2l6ZSI6MjAsIlN1cHBsaWVyIjp7IkNoYXJDb2RlIjoiTUFSS0siLCJDb2RlIjoiODQ0MDgiLCJQcm9maWxlTmFtZSI6eyJGdWxsTmFtZSI6Ik1cdTAwMjZTIiwiTmFtZVR5cGUiOiJPcmdhbmlzYXRpb24ifX19LCJQYXJlbnRFbnRpdHlJZCI6IlByb2R1Y3RWYXJpYW50XzI5MzU1Njg2IiwiUGFyZW50RW50aXR5VHlwZSI6IlByb2R1Y3RWYXJpYW50IiwiUGh5c2ljYWxBdHRyaWJ1dGVzIjp7IkxhYmVsVHlwZSI6eyJDb2RlIjoxfSwiVU9NIjp7IkNvZGUiOjF9fSwiUHJpY2luZ0ZpbmFuY2lhbCI6eyJTZWxsaW5nUHJpY2VzIjp7IkN1cnJlbnRQcmljZSI6eyJCQ1kiOnsiQ3VycmVuY3kiOnsiSVNPMyI6IkdCUCJ9LCJJbmNUYXgiOjIuOTksIkxvY2FsaXNhdGlvbiI6IlVLIn19LCJIb3NwaXRhbFByaWNlIjp7IkJDWSI6eyJDdXJyZW5jeSI6eyJJU08zIjoiR0JQIn0sIkluY1RheCI6Mi41LCJMb2NhbGlzYXRpb24iOiJVSyJ9fX0sIlRheGVzIjp7IlNhbGVzVGF4Ijp7IlRheENvZGUiOiJUQkQiLCJUYXhTY2hlbWVDb2RlIjoiVkFUIiwiVGF4VHlwZUNvZGUiOiJTYWxlcyJ9fX0sIlJlZ3VsYXRvcnlDb21wbGlhbmNlIjp7IkFnZVJlc3RyaWN0aW9uIjp7IkNvZGUiOiIwIn0sIkNvdW50cnlPZk9yaWdpbiI6eyJJU08yIjoiR0IifSwiU2hlbGZMaWZlRGF5cyI6MTc3LCJUYXJpZmYiOnsiQ29kZSI6IjE4MDY5MDM5MTgwNjkwMzkifX0sIlN0YXR1cyI6eyJBdmFpbGFiaWxpdHkiOnsiU3RhdHVzQ29kZSI6IkFjdGl2ZSJ9fSwiVGltZXMiOnsiQ3JlYXRlZE9uIjp7IkRhdGVJZCI6IkRhdGVzXzIwMjMxMTA4IiwiTWlsbGlzIjoxNjk5NDQzNTg4NDkzLCJVVEMiOiIyMDIzLTExLTA4VDExOjM5OjQ4LjQ5M1oifSwiVXBkYXRlZE9uIjp7IkRhdGVJZCI6IkRhdGVzXzIwMjMxMTA4IiwiTWlsbGlzIjoxNjk5NDQzNTg4NDkzLCJVVEMiOiIyMDIzLTExLTA4VDExOjM5OjQ4LjQ5M1oifX0sIlR5cGUiOnsiVHlwZUNvZGUiOiJQcm9kdWN0VmFyaWFudCIsIlR5cGVEZXNjIjoiRGFpbHkgUHJvZHVjdCBWYXJpYW50IENhdGFsb2d1ZSJ9LCJYUmVmSWRzIjpbeyJDb2RlIjoiVVBDIiwiSWQiOiIyOTM1NTY4NiIsIlN5c3RlbUNvZGUiOiJSZXRhaWwyNDcifV19fQ==",
+                "EventPayloadHash": "eyJDb21wb3NpdGVFbnRpdHlJZCI6IlByb2R1Y3RWYXJpYW50XzI5MzU1Njg2IiwiQ29tcG9zaXRlRW50aXR5VHlwZSI6IlByb2R1Y3RWYXJpYW50IiwiRG9tYWluRXZlbnQiOnsiVHJpZ2dlckVudGl0eSI6eyJQcm9kdWN0VmFyaWFudCI6eyJDbGFzc2lmaWNhdGlvbiI6eyJCb29rQ2xhc3NpZmljYXRpb24iOnsiQ29kZSI6IjEifSwiQ2F0ZWdvcnkiOnsiQ29kZSI6IkYzM0EiLCJEZXNjIjoiQW1iaWVudCBDZWxlYnJhdGlvbiJ9LCJQcm9kdWN0R3JvdXAiOnsiQ29kZSI6IkFkdmVudCBDYWxlbmRhciJ9LCJTZXJ2aWNlQ2xhc3NpZmljYXRpb24iOnsiQ29kZSI6IjEifX0sIkNvbXBvc2l0ZUVudGl0eUlkIjoiUHJvZHVjdFZhcmlhbnRfMjkzNTU2ODYiLCJDb21wb3NpdGVFbnRpdHlUeXBlIjoiUHJvZHVjdFZhcmlhbnQiLCJDb3JlQXR0cyI6eyJCYXJjb2RlIjoiMjkzNTU2ODYiLCJQcm9kdWN0Q29kZSI6IjI5MzU1Njg2IiwiUHJvZHVjdE5hbWUiOiJTcGVuY2VyIEJlYXIgQWR2ZW50In0sIkVudGl0eUlkIjoiUHJvZHVjdFZhcmlhbnRfMjkzNTU2ODYiLCJFbnRpdHlUeXBlIjoiUHJvZHVjdFZhcmlhbnQiLCJJbnZlbnRvcnlMb2dpc3RpY3MiOnsiRnVsZmlsbWVudCI6eyJDaGFubmVsIjp7IkNvZGUiOiJEIn19LCJQYWNrU2l6ZSI6MjAsIlN1cHBsaWVyIjp7IkNoYXJDb2RlIjoiTUFSS0siLCJDb2RlIjoiODQ0MDgiLCJQcm9maWxlTmFtZSI6eyJGdWxsTmFtZSI6Ik1cdTAwMjZTIiwiTmFtZVR5cGUiOiJPcmdhbmlzYXRpb24ifX19LCJQYXJlbnRFbnRpdHlJZCI6IlByb2R1Y3RWYXJpYW50XzI5MzU1Njg2IiwiUGFyZW50RW50aXR5VHlwZSI6IlByb2R1Y3RWYXJpYW50IiwiUGh5c2ljYWxBdHRyaWJ1dGVzIjp7IkxhYmVsVHlwZSI6eyJDb2RlIjoxfSwiVU9NIjp7IkNvZGUiOjF9fSwiUHJpY2luZ0ZpbmFuY2lhbCI6eyJTZWxsaW5nUHJpY2VzIjp7IkN1cnJlbnRQcmljZSI6eyJCQ1kiOnsiQ3VycmVuY3kiOnsiSVNPMyI6IkdCUCJ9LCJJbmNUYXgiOjIuOTksIkxvY2FsaXNhdGlvbiI6IlVLIn19LCJIb3NwaXRhbFByaWNlIjp7IkJDWSI6eyJDdXJyZW5jeSI6eyJJU08zIjoiR0JQIn0sIkluY1RheCI6Mi41LCJMb2NhbGlzYXRpb24iOiJVSyJ9fX0sIlRheGVzIjp7IlNhbGVzVGF4Ijp7IlRheENvZGUiOiJUQkQiLCJUYXhTY2hlbWVDb2RlIjoiVkFUIiwiVGF4VHlwZUNvZGUiOiJTYWxlcyJ9fX0sIlJlZ3VsYXRvcnlDb21wbGlhbmNlIjp7IkFnZVJlc3RyaWN0aW9uIjp7IkNvZGUiOiIwIn0sIkNvdW50cnlPZk9yaWdpbiI6eyJJU08yIjoiR0IifSwiU2hlbGZMaWZlRGF5cyI6MTc3LCJUYXJpZmYiOnsiQ29kZSI6IjE4MDY5MDM5MTgwNjkwMzkifX0sIlN0YXR1cyI6eyJBdmFpbGFiaWxpdHkiOnsiU3RhdHVzQ29kZSI6IkFjdGl2ZSJ9fSwiVGltZXMiOnsiQ3JlYXRlZE9uIjp7IkRhdGVJZCI6IkRhdGVzXzIwMjMxMTA4IiwiTWlsbGlzIjoxNjk5NDQzNTg4NDkzLCJVVEMiOiIyMDIzLTExLTA4VDExOjM5OjQ4LjQ5M1oifSwiVXBkYXRlZE9uIjp7IkRhdGVJZCI6IkRhdGVzXzIwMjMxMTA4IiwiTWlsbGlzIjoxNjk5NDQzNTg4NDkzLCJVVEMiOiIyMDIzLTExLTA4VDExOjM5OjQ4LjQ5M1oifX0sIlR5cGUiOnsiVHlwZUNvZGUiOiJQcm9kdWN0VmFyaWFudCIsIlR5cGVEZXNjIjoiRGFpbHkgUHJvZHVjdCBWYXJpYW50IENhdGFsb2d1ZSJ9LCJYUmVmSWRzIjpbeyJDb2RlIjoiVVBDIiwiSWQiOiIyOTM1NTY4NiIsIlN5c3RlbUNvZGUiOiJSZXRhaWwyNDcifV19fX0sIkVudGl0eUlkIjoiUHJvZHVjdFZhcmlhbnRfMjkzNTU2ODYiLCJFbnRpdHlUeXBlIjoiUHJvZHVjdFZhcmlhbnQiLCJFdmVudElkIjoiUHJvZHVjdFZhcmlhbnRQdWJsaXNoZWRfUHJvZHVjdFZhcmlhbnRfMjkzNTU2ODZfMjAyMy0xMS0wOFQxMTozOTo0OC40OTNaIiwiRXZlbnRNZXRhZGF0YSI6eyJFbnRpdHlBdHRzIjp7Ik9yaWdpbiI6eyJFbnRpdHlJZCI6IjI5MzU1Njg2IiwiUGFyZW50RW50aXR5SWQiOiIyOTM1NTY4NiJ9LCJYZnV6ZSI6eyJDb21wb3NpdGVFbnRpdHlJZCI6IlByb2R1Y3RWYXJpYW50XzI5MzU1Njg2IiwiQ29tcG9zaXRlRW50aXR5VHlwZSI6IlByb2R1Y3RWYXJpYW50IiwiRW50aXR5RG9tYWluIjoiUHJvZHVjdCIsIkVudGl0eUlkIjoiUHJvZHVjdFZhcmlhbnRfMjkzNTU2ODYiLCJFbnRpdHlUeXBlIjoiUHJvZHVjdFZhcmlhbnQiLCJJc1NlbnNpdGl2ZSI6Ik4iLCJQYXJlbnRFbnRpdHlJZCI6IlByb2R1Y3RWYXJpYW50XzI5MzU1Njg2IiwiUGFyZW50RW50aXR5VHlwZSI6IlByb2R1Y3RWYXJpYW50In19LCJFdmVudEF0dHMiOnsiT3JpZ2luIjp7IkV2ZW50SWQiOiIiLCJTb3VyY2VGb3JtYXRUeXBlIjoiQ1NWIiwiU291cmNlU3lzdGVtIjoiUmV0YWlsMjQ3In0sIlhmdXplIjp7IkNsaWVudENvZGUiOiJXSFMiLCJFbnZDb2RlIjoiZGV2IiwiRXZlbnRDYXRlZ29yeSI6IlByb2R1Y3QiLCJFdmVudENoYW5nZVBhdHRlcm4iOiJGdWxsU25hcHNob3QiLCJFdmVudENsYXNzIjoiVHJpZ2dlckV2ZW50IiwiRXZlbnRJZCI6IlByb2R1Y3RWYXJpYW50UHVibGlzaGVkX1Byb2R1Y3RWYXJpYW50XzI5MzU1Njg2XzIwMjMtMTEtMDhUMTE6Mzk6NDguNDkzWiIsIkV2ZW50TmFtZSI6IlByb2R1Y3RWYXJpYW50UHVibGlzaGVkIn19LCJJbmdlc3RBdHRzIjp7IlhmdXplIjp7IkZpbGUiOnsiQmF0Y2hJZCI6bnVsbCwiQmF0Y2hOdW1iZXIiOm51bGwsIkJ5dGVzT2Zmc2V0SW5PcmlnaW5hbEZpbGUiOjAsIkNoYW5nZVRpbWVzdGFtcFVUQyI6bnVsbCwiRm9ybWF0VHlwZSI6IkNTViIsIkxpbmVOdW1iZXIiOjAsIk5hbWUiOm51bGwsIk9iamVjdE5vdGlmaWNhdGlvblBheWxvYWQiOm51bGwsIk9yaWdpbmFsRmlsZVNpemVCeXRlcyI6MCwiT3JpZ2luYWxSb3dTaXplQnl0ZXMiOjAsIlBhdGgiOm51bGwsIlBhdHRlcm5UeXBlIjoiQ2xvdWRPYmplY3ROb3RpZmljYXRpb24iLCJTeXN0ZW1Db2RlIjoiR0NTIiwiVG90YWxCYXRjaExpbmVzIjowLCJVUkkiOm51bGx9fX0sIlBheWxvYWRBdHRzIjp7Ik9yaWdpbiI6eyJEYXRhUGF5bG9hZEhhc2giOiJleUpoYVhJc0lISmhhV3dnWEhVd01ESTJJR2R5YVdSelpYSjJaU0k2SWpJdU9Ua2lMQ0pqWVhSbFoyOXllU0JqYjJSbElqb2lSak16UVNJc0ltTmhkR1ZuYjNKNUlHNWhiV1VpT2lKQmJXSnBaVzUwSUVObGJHVmljbUYwYVc5dUlpd2lhRzl6Y0dsMFlXeHpJam9pTWk0MUlpd2libUZ0WlNJNklsTndaVzVqWlhJZ1FtVmhjaUJCWkhabGJuUWlMQ0p3Y205a2RXTjBJR2R5YjNWd0lqb2lRV1IyWlc1MElFTmhiR1Z1WkdGeUlpd2ljSEp2WkhWamRDQnNhV1psSWpvaU1UYzNJaXdpZFhCaklqb2lNamt6TlRVMk9EWWlMQ0oxY0hRaU9pSXlNQ0o5IiwiRXZlbnRQYXlsb2FkSGFzaCI6ImV5SmhhWElzSUhKaGFXd2dYSFV3TURJMklHZHlhV1J6WlhKMlpTSTZJakl1T1RraUxDSmpZWFJsWjI5eWVTQmpiMlJsSWpvaVJqTXpRU0lzSW1OaGRHVm5iM0o1SUc1aGJXVWlPaUpCYldKcFpXNTBJRU5sYkdWaWNtRjBhVzl1SWl3aWFHOXpjR2wwWVd4eklqb2lNaTQxSWl3aWJtRnRaU0k2SWxOd1pXNWpaWElnUW1WaGNpQkJaSFpsYm5RaUxDSndjbTlrZFdOMElHZHliM1Z3SWpvaVFXUjJaVzUwSUVOaGJHVnVaR0Z5SWl3aWNISnZaSFZqZENCc2FXWmxJam9pTVRjM0lpd2lkWEJqSWpvaU1qa3pOVFUyT0RZaUxDSjFjSFFpT2lJeU1DSjkiLCJIYXNoU2NoZW1lIjoiQkFTRTY0In0sIlhmdXplIjp7IkRhdGFQYXlsb2FkSGFzaCI6ImV5SlFjbTlrZFdOMFZtRnlhV0Z1ZENJNmV5SkRiR0Z6YzJsbWFXTmhkR2x2YmlJNmV5SkNiMjlyUTJ4aGMzTnBabWxqWVhScGIyNGlPbnNpUTI5a1pTSTZJakVpZlN3aVEyRjBaV2R2Y25raU9uc2lRMjlrWlNJNklrWXpNMEVpTENKRVpYTmpJam9pUVcxaWFXVnVkQ0JEWld4bFluSmhkR2x2YmlKOUxDSlFjbTlrZFdOMFIzSnZkWEFpT25zaVEyOWtaU0k2SWtGa2RtVnVkQ0JEWVd4bGJtUmhjaUo5TENKVFpYSjJhV05sUTJ4aGMzTnBabWxqWVhScGIyNGlPbnNpUTI5a1pTSTZJakVpZlgwc0lrTnZiWEJ2YzJsMFpVVnVkR2wwZVVsa0lqb2lVSEp2WkhWamRGWmhjbWxoYm5SZk1qa3pOVFUyT0RZaUxDSkRiMjF3YjNOcGRHVkZiblJwZEhsVWVYQmxJam9pVUhKdlpIVmpkRlpoY21saGJuUWlMQ0pEYjNKbFFYUjBjeUk2ZXlKQ1lYSmpiMlJsSWpvaU1qa3pOVFUyT0RZaUxDSlFjbTlrZFdOMFEyOWtaU0k2SWpJNU16VTFOamcySWl3aVVISnZaSFZqZEU1aGJXVWlPaUpUY0dWdVkyVnlJRUpsWVhJZ1FXUjJaVzUwSW4wc0lrVnVkR2wwZVVsa0lqb2lVSEp2WkhWamRGWmhjbWxoYm5SZk1qa3pOVFUyT0RZaUxDSkZiblJwZEhsVWVYQmxJam9pVUhKdlpIVmpkRlpoY21saGJuUWlMQ0pKYm5abGJuUnZjbmxNYjJkcGMzUnBZM01pT25zaVJuVnNabWxzYldWdWRDSTZleUpEYUdGdWJtVnNJanA3SWtOdlpHVWlPaUpFSW4xOUxDSlFZV05yVTJsNlpTSTZNakFzSWxOMWNIQnNhV1Z5SWpwN0lrTm9ZWEpEYjJSbElqb2lUVUZTUzBzaUxDSkRiMlJsSWpvaU9EUTBNRGdpTENKUWNtOW1hV3hsVG1GdFpTSTZleUpHZFd4c1RtRnRaU0k2SWsxY2RUQXdNalpUSWl3aVRtRnRaVlI1Y0dVaU9pSlBjbWRoYm1sellYUnBiMjRpZlgxOUxDSlFZWEpsYm5SRmJuUnBkSGxKWkNJNklsQnliMlIxWTNSV1lYSnBZVzUwWHpJNU16VTFOamcySWl3aVVHRnlaVzUwUlc1MGFYUjVWSGx3WlNJNklsQnliMlIxWTNSV1lYSnBZVzUwSWl3aVVHaDVjMmxqWVd4QmRIUnlhV0oxZEdWeklqcDdJa3hoWW1Wc1ZIbHdaU0k2ZXlKRGIyUmxJam94ZlN3aVZVOU5JanA3SWtOdlpHVWlPakY5ZlN3aVVISnBZMmx1WjBacGJtRnVZMmxoYkNJNmV5SlRaV3hzYVc1blVISnBZMlZ6SWpwN0lrTjFjbkpsYm5SUWNtbGpaU0k2ZXlKQ1Exa2lPbnNpUTNWeWNtVnVZM2tpT25zaVNWTlBNeUk2SWtkQ1VDSjlMQ0pKYm1OVVlYZ2lPakl1T1Rrc0lreHZZMkZzYVhOaGRHbHZiaUk2SWxWTEluMTlMQ0pJYjNOd2FYUmhiRkJ5YVdObElqcDdJa0pEV1NJNmV5SkRkWEp5Wlc1amVTSTZleUpKVTA4eklqb2lSMEpRSW4wc0lrbHVZMVJoZUNJNk1pNDFMQ0pNYjJOaGJHbHpZWFJwYjI0aU9pSlZTeUo5Zlgwc0lsUmhlR1Z6SWpwN0lsTmhiR1Z6VkdGNElqcDdJbFJoZUVOdlpHVWlPaUpVUWtRaUxDSlVZWGhUWTJobGJXVkRiMlJsSWpvaVZrRlVJaXdpVkdGNFZIbHdaVU52WkdVaU9pSlRZV3hsY3lKOWZYMHNJbEpsWjNWc1lYUnZjbmxEYjIxd2JHbGhibU5sSWpwN0lrRm5aVkpsYzNSeWFXTjBhVzl1SWpwN0lrTnZaR1VpT2lJd0luMHNJa052ZFc1MGNubFBaazl5YVdkcGJpSTZleUpKVTA4eUlqb2lSMElpZlN3aVUyaGxiR1pNYVdabFJHRjVjeUk2TVRjM0xDSlVZWEpwWm1ZaU9uc2lRMjlrWlNJNklqRTRNRFk1TURNNU1UZ3dOamt3TXpraWZYMHNJbE4wWVhSMWN5STZleUpCZG1GcGJHRmlhV3hwZEhraU9uc2lVM1JoZEhWelEyOWtaU0k2SWtGamRHbDJaU0o5ZlN3aVZHbHRaWE1pT25zaVEzSmxZWFJsWkU5dUlqcDdJa1JoZEdWSlpDSTZJa1JoZEdWelh6SXdNak14TVRBNElpd2lUV2xzYkdseklqb3hOams1TkRRek5UZzRORGt6TENKVlZFTWlPaUl5TURJekxURXhMVEE0VkRFeE9qTTVPalE0TGpRNU0xb2lmU3dpVlhCa1lYUmxaRTl1SWpwN0lrUmhkR1ZKWkNJNklrUmhkR1Z6WHpJd01qTXhNVEE0SWl3aVRXbHNiR2x6SWpveE5qazVORFF6TlRnNE5Ea3pMQ0pWVkVNaU9pSXlNREl6TFRFeExUQTRWREV4T2pNNU9qUTRMalE1TTFvaWZYMHNJbFI1Y0dVaU9uc2lWSGx3WlVOdlpHVWlPaUpRY205a2RXTjBWbUZ5YVdGdWRDSXNJbFI1Y0dWRVpYTmpJam9pUkdGcGJIa2dVSEp2WkhWamRDQldZWEpwWVc1MElFTmhkR0ZzYjJkMVpTSjlMQ0pZVW1WbVNXUnpJanBiZXlKRGIyUmxJam9pVlZCRElpd2lTV1FpT2lJeU9UTTFOVFk0TmlJc0lsTjVjM1JsYlVOdlpHVWlPaUpTWlhSaGFXd3lORGNpZlYxOWZRPT0iLCJFdmVudFBheWxvYWRIYXNoIjpudWxsLCJIYXNoU2NoZW1lIjoiQkFTRTY0In19LCJQcml2YWN5QXR0cyI6eyJPcmlnaW4iOnsiSXNFbmNyeXB0ZWQiOiJOIn0sIlhmdXplIjp7IklzRW5jcnlwdGVkIjoiTiIsIklzU2Vuc2l0aXZlRW50aXR5IjoiTiJ9fSwiVGltZUF0dHMiOnsiT3JpZ2luIjp7IlRpbWVzIjp7IkV2ZW50T2NjdXJyZWRUaW1lc3RhbXAiOiIyMDIzLTExLTA4VDExOjM5OjQ4LjQ5M1oifX0sIlhmdXplIjp7IlRpbWVab25lcyI6eyJFdmVudFRpbWVab25lIjp7IlRpbWVab25lIjoiRXVyb3BlL0xvbmRvbiJ9LCJIb21lVGltZVpvbmUiOnsiVGltZVpvbmUiOiJFdXJvcGUvTG9uZG9uIn19LCJUaW1lcyI6eyJFdmVudE9jY3VycmVkVGltZXN0YW1wIjp7IkRhdGVJZCI6IkRhdGVzXzIwMjMxMTA4IiwiTG9jYWwiOiIyMDIzLTExLTA4VDExOjM5OjQ4LjQ5M1oiLCJNaWxsaXMiOjE2OTk0NDM1ODg0OTMsIlRpbWVab25lIjoiRXVyb3BlL0xvbmRvbiIsIlVUQyI6IjIwMjMtMTEtMDhUMTE6Mzk6NDguNDkzWiJ9LCJFdmVudE9jY3VycmVkVHlwZSI6IlN5c3RlbVRpbWUiLCJFdmVudFJlY2VpdmVkVGltZXN0YW1wIjp7IkRhdGVJZCI6IkRhdGVzXzIwMjMxMTA4IiwiTG9jYWwiOiIyMDIzLTExLTA4VDExOjM5OjQ4LjQ5M1oiLCJNaWxsaXMiOjE2OTk0NDM1ODg0OTMsIlRpbWVab25lIjoiRXVyb3BlL0xvbmRvbiIsIlVUQyI6IjIwMjMtMTEtMDhUMTE6Mzk6NDguNDkzWiJ9fX19fSwiRXZlbnROYW1lIjoiUHJvZHVjdFZhcmlhbnRQdWJsaXNoZWQiLCJFdmVudE9jY3VycmVkVGltZXN0YW1wTG9jYWwiOiIyMDIzLTExLTA4VDExOjM5OjQ4LjQ5M1oiLCJFdmVudE9jY3VycmVkVGltZXN0YW1wVVRDIjoiMjAyMy0xMS0wOFQxMTozOTo0OC40OTNaIiwiUGFyZW50RW50aXR5SWQiOiJQcm9kdWN0VmFyaWFudF8yOTM1NTY4NiIsIlBhcmVudEVudGl0eVR5cGUiOiJQcm9kdWN0VmFyaWFudCJ9",
+                "HashScheme": "BASE64"
+            }
+        },
+        "PrivacyAtts": {
+            "Origin": {
+                "IsEncrypted": "N"
+            },
+            "Xfuze": {
+                "IsEncrypted": "N",
+                "IsSensitiveEntity": "N"
+            }
+        },
+        "TimeAtts": {
+            "Origin": {
+                "Times": {
+                    "EventOccurredTimestamp": "2023-11-08T11:39:48.493Z"
+                }
+            },
+            "Xfuze": {
+                "TimeZones": {
+                    "EventTimeZone": {
+                        "TimeZone": "Europe/London"
+                    },
+                    "HomeTimeZone": {
+                        "TimeZone": "Europe/London"
+                    }
+                },
+                "Times": {
+                    "EventOccurredTimestamp": {
+                        "DateId": "Dates_20231108",
+                        "Local": "2023-11-08T11:39:48.493Z",
+                        "Millis": 1699443588493,
+                        "TimeZone": "Europe/London",
+                        "UTC": "2023-11-08T11:39:48.493Z"
+                    },
+                    "EventOccurredType": "SystemTime",
+                    "EventReceivedTimestamp": {
+                        "DateId": "Dates_20231108",
+                        "Local": "2023-11-08T11:39:48.493Z",
+                        "Millis": 1699443588493,
+                        "TimeZone": "Europe/London",
+                        "UTC": "2023-11-08T11:39:48.493Z"
+                    }
+                }
+            }
+        }
+    },
+    "EventName": "ProductVariantPublished",
+    "EventOccurredTimestampLocal": "2023-11-08T11:39:48.493Z",
+    "EventOccurredTimestampUTC": "2023-11-08T11:39:48.493Z",
+    "ParentEntityId": "ProductVariant_29355686",
+    "ParentEntityType": "ProductVariant"
+}

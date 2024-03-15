@@ -1,0 +1,39 @@
+{
+  "type": "array",
+  "minItems": 1,
+  "items": {
+     "type": "object",
+     "description": "An object to capture cross referencing fields to support entity lookups by various surrogate keys spanning systems",
+     "unevaluatedProperties": false,
+     "properties": {
+       "Id": {
+         "type": "string",
+         "description": "The value of the id/key to lookup using (i.e surrogate key 'value') e.g TRAN123456"
+       },
+       "SystemCode": {
+         "type": "string",
+         "description": "The system mastering the 'Code' field and its 'Id' value e.g PMC"
+       },
+       "Code": {
+         "type": "string",
+         "description": "The name of the id/key to lookup using (i.e surrogate key 'value') as is its exact name from source e.g transId"
+       },
+       "EntityId": {
+         "type": "string",
+         "description": "The Xfuze EntityId this cross referencing lookup resolves to e.g SalesOrderLine_PMC_TRAN123456"
+       },
+       "ParentEntityId": {
+         "type": "string",
+         "description": "The Xfuze ParentEntityId this cross referencing lookup resolves to e.g SalesOrderHeader_PMC_TRAN123456"
+       },
+       "CompositeEntityId": {
+         "type": "string",
+         "description": "The Xfuze CompositeEntityId this cross referencing lookup resolves to e.g SalesOrder_PMC_TRAN123456"
+       },
+       "Lineage": {
+         "$ref": "./EventLineage.json#/EventLineageProperties",
+         "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+       }
+     }
+    }
+}

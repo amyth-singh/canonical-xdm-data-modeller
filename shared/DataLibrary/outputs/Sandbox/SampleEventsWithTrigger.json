@@ -1,0 +1,2830 @@
+[
+  {
+    "EntityId": "SalesOrder_Hybris_4100823954",
+    "EventId": "SalesOrderCreated_4100823954",
+    "EventName": "SalesOrderPlaced",
+    "EventOccurredTimestampUTC": "2023-01-08T21:53:44+00:00",
+    "TriggerEvent": {
+      "SalesOrder": {
+        "id": "ORDER_4100823954",
+        "isAnonymised": null,
+        "anonymisedDate": null,
+        "originalId": null,
+        "accountOperator": "Hybris",
+        "callCentreUser": null,
+        "csrUser": null,
+        "accountId": "91413f8e-ed03-4015-abaf-42ea30bddfd2",
+        "accountCustomerType": "registered",
+        "customerId": null,
+        "partyId": "PARTY_064c2fe2-f45e-4bec-b8aa-6f16c0b3af52",
+        "orderNumber": "4100823954",
+        "eCommerceOrderNumber": null,
+        "cartNumber": null,
+        "type": "Order",
+        "site": null,
+        "siteStoreLocId": null,
+        "siteStoreLoc": null,
+        "status": {
+          "id": null,
+          "externalId": null,
+          "isActive": null,
+          "isDefault": null,
+          "statusDesc": "Approved",
+          "statusCode": "APPROVED",
+          "validFrom": null,
+          "validTo": null,
+          "statusChangeDate": "2023-01-08T21:53:44Z",
+          "statusExternalIds": [],
+          "reasonCode": null,
+          "reasonDescription": null
+        },
+        "derivedStatus": {
+          "id": null,
+          "externalId": null,
+          "isActive": null,
+          "isDefault": null,
+          "statusDesc": "OrderProcessInProgress",
+          "statusCode": "ORDER_PROCESS_IN_PROGRESS",
+          "validFrom": null,
+          "validTo": null,
+          "statusChangeDate": "2023-01-08T21:53:44Z",
+          "statusExternalIds": [],
+          "reasonCode": null,
+          "reasonDescription": null
+        },
+        "statusLog": [
+          {
+            "id": null,
+            "externalId": null,
+            "isActive": null,
+            "isDefault": null,
+            "statusDesc": "Approved",
+            "statusCode": "APPROVED",
+            "validFrom": null,
+            "validTo": null,
+            "statusChangeDate": "2023-01-08T21:53:44Z",
+            "statusExternalIds": [],
+            "reasonCode": null,
+            "reasonDescription": null
+          }
+        ],
+        "overallPaymentStatus": {
+          "id": null,
+          "externalId": null,
+          "isActive": null,
+          "isDefault": null,
+          "statusDesc": "Paid",
+          "statusCode": "PAID",
+          "validFrom": null,
+          "validTo": null,
+          "statusChangeDate": null,
+          "statusExternalIds": [],
+          "reasonCode": null,
+          "reasonDescription": null
+        },
+        "placedDate": "2023-01-08T21:53:44Z",
+        "placedChannel": {
+          "channelCode": "OUTLET",
+          "channelName": "Consumer Outlet",
+          "channelInstanceId": null,
+          "channelCountry": null,
+          "channelExternalIds": [
+            {
+              "system": null,
+              "id": "EMPLOYEE"
+            }
+          ],
+          "channelSourceId": "online",
+          "channelSourceCode": "GSSTER"
+        },
+        "productCatalogueChannel": "OUTLET",
+        "fulfilmentSystem": "GSSTER",
+        "locale": "fr_FR",
+        "currency": "EUR",
+        "cancelledDate": null,
+        "completedDate": null,
+        "orderLines": [
+          {
+            "id": "ORDERLINE_4100823954_1",
+            "returnLineID": null,
+            "sequence": 1,
+            "originalSequence": 1,
+            "status": {
+              "id": null,
+              "externalId": null,
+              "isActive": null,
+              "isDefault": null,
+              "statusDesc": "Sold",
+              "statusCode": "SOLD",
+              "validFrom": null,
+              "validTo": null,
+              "statusChangeDate": null,
+              "statusExternalIds": [],
+              "reasonCode": null,
+              "reasonDescription": null
+            },
+            "statusLog": [
+              {
+                "id": null,
+                "externalId": null,
+                "isActive": null,
+                "isDefault": null,
+                "statusDesc": "Sold",
+                "statusCode": "SOLD",
+                "validFrom": null,
+                "validTo": null,
+                "statusChangeDate": null,
+                "statusExternalIds": [],
+                "reasonCode": null,
+                "reasonDescription": null
+              }
+            ],
+            "clearanceStatus": {
+              "id": null,
+              "externalId": null,
+              "isActive": null,
+              "isDefault": null,
+              "statusDesc": "OutletClearance",
+              "statusCode": "OutletClearance",
+              "validFrom": null,
+              "validTo": null,
+              "statusChangeDate": null,
+              "statusExternalIds": [],
+              "reasonCode": null,
+              "reasonDescription": null
+            },
+            "description": null,
+            "quantity": 1,
+            "soldQuantity": 1,
+            "returnedQuantity": 0,
+            "returnRejectedQuantity": 0,
+            "returnExchangedQuantity": 0,
+            "cancelledQuantity": 0,
+            "completedQuantity": 0,
+            "readyForPickupQuantity": 0,
+            "shippedQuantity": 0,
+            "basketQuantity": 0,
+            "originalBasketQuantity": 0,
+            "productId": "PRODUCT_OUTLET_FR_fr_FR_D22578-5352-6067-XXL",
+            "productNumber": "D22578-5352-6067-XXL",
+            "productParent": "D22578-5352-6067",
+            "productName": "Surchemise Worker Utility",
+            "product": null,
+            "isProductMaster": "",
+            "productLocalId": null,
+            "productMissing": "",
+            "productLocalMissing": "",
+            "allProductLocalMissing": "",
+            "productExternalIds": [
+              {
+                "system": "EAN",
+                "id": "8720346597102"
+              },
+              {
+                "system": "ExternalArticleID",
+                "id": "D22578-5352-6067-XXL"
+              }
+            ],
+            "promotions": [],
+            "onSale": "Y",
+            "markdownAmount": 83.97,
+            "markdownAmountBCY": 83.97,
+            "originalMarkdownAmount": 83.97,
+            "originalMarkdownAmountBCY": 83.97,
+            "unitPrice": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 35.98,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "unitPriceBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 35.98,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "fromPrice": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 119.95,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "fromPriceBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 119.95,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "subTotal": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 35.98,
+              "net": 29.98,
+              "tax": 6,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 20.013,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "subTotalBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 35.98,
+              "net": 29.98,
+              "tax": 6,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "originalSubTotal": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 35.98,
+              "net": 29.98,
+              "tax": 6,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 20.013,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "originalSubTotalBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 35.98,
+              "net": 29.98,
+              "tax": 6,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "isOriginalSubTotalChanged": null,
+            "purchasePrice": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 54.4,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "purchasePriceBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 54.4,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "apportionedSubTotal": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 32.39,
+              "net": 26.99,
+              "tax": 5.4,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 20.007,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "apportionedSubTotalBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 32.39,
+              "net": 26.99,
+              "tax": 5.4,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "originalApportionedSubTotal": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 32.39,
+              "net": 26.99,
+              "tax": 5.4,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 20.007,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "originalApportionedSubTotalBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 32.39,
+              "net": 26.99,
+              "tax": 5.4,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "adjustedApportionedSubTotalBCY": null,
+            "isOriginalApportionedSubTotalChanged": null,
+            "productUnitCostBCY": null,
+            "productTotalCostBCY": null,
+            "productMarginBCY": null,
+            "productMarginPercentageBCY": null,
+            "originalProductUnitCostBCY": null,
+            "originalProductTotalCostBCY": null,
+            "originalProductMarginBCY": null,
+            "originalProductMarginPercentageBCY": null,
+            "totalPrice": null,
+            "totalPriceBCY": null,
+            "originalTotalPrice": null,
+            "originalTotalPriceBCY": null,
+            "isOriginalTotalPriceChanged": null,
+            "refundedAmount": null,
+            "refundedAmountBCY": null,
+            "totalDiscounts": null,
+            "totalDiscountsBCY": null,
+            "orderlineUnits": [],
+            "isGift": null,
+            "giftMessage": null,
+            "giftWrapPrice": null,
+            "giftWrapPriceBCY": null,
+            "isDespatched": null,
+            "isDelivered": null,
+            "isReturned": null,
+            "isExchanged": null,
+            "isRefunded": null,
+            "isCancelled": null,
+            "condition": null,
+            "deliveryParcels": [],
+            "returnEventIds": [],
+            "refundEventIds": [],
+            "refundReasonCodes": [],
+            "despatchEventIds": [],
+            "cancelEventIds": [],
+            "completedEventIDs": [],
+            "readyForPickupEventIds": [],
+            "dutyInformation": null,
+            "employee": null,
+            "taxJurisdiction": [
+              {
+                "Type": "country",
+                "TaxCode": "FR-high",
+                "Name": "FR-high",
+                "Rate": "20.0",
+                "amount": {
+                  "priceCode": null,
+                  "priceName": null,
+                  "priceType": null,
+                  "gross": 5.4,
+                  "net": 0,
+                  "tax": 0,
+                  "base": null,
+                  "currencyCode": "EUR",
+                  "taxRate": 0,
+                  "taxRateCode": "",
+                  "exchangRate": null,
+                  "exchangeRateHistoryId": null
+                },
+                "amountBCY": {
+                  "priceCode": null,
+                  "priceName": null,
+                  "priceType": null,
+                  "gross": 5.4,
+                  "net": 0,
+                  "tax": 0,
+                  "base": null,
+                  "currencyCode": "EUR",
+                  "taxRate": 0,
+                  "taxRateCode": "",
+                  "exchangRate": 1,
+                  "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+                },
+                "JurisName": null,
+                "JurisCode": null,
+                "CountryCode": null,
+                "RegionCode": null
+              }
+            ],
+            "depreciatedCostsID": null,
+            "depreciatedCostsHistoryID": null,
+            "exchangeID": null,
+            "originalOrderID": null,
+            "offlineReturn": null,
+            "ecomOrderID": null,
+            "isDigitalOnlyItem": "N",
+            "isGiftCard": "N",
+            "derivedStatus": {
+              "statusCode": "SOLD",
+              "statusChangeDate": "2023-01-08T21:53:44Z"
+            },
+            "derivedStatusLog": [
+              {
+                "statusCode": "SOLD",
+                "statusChangeDate": "2023-01-08T21:53:44Z"
+              }
+            ],
+            "release": null
+          },
+          {
+            "id": "ORDERLINE_4100823954_2",
+            "returnLineID": null,
+            "sequence": 2,
+            "originalSequence": 2,
+            "status": {
+              "id": null,
+              "externalId": null,
+              "isActive": null,
+              "isDefault": null,
+              "statusDesc": "Sold",
+              "statusCode": "SOLD",
+              "validFrom": null,
+              "validTo": null,
+              "statusChangeDate": null,
+              "statusExternalIds": [],
+              "reasonCode": null,
+              "reasonDescription": null
+            },
+            "statusLog": [
+              {
+                "id": null,
+                "externalId": null,
+                "isActive": null,
+                "isDefault": null,
+                "statusDesc": "Sold",
+                "statusCode": "SOLD",
+                "validFrom": null,
+                "validTo": null,
+                "statusChangeDate": null,
+                "statusExternalIds": [],
+                "reasonCode": null,
+                "reasonDescription": null
+              }
+            ],
+            "clearanceStatus": {
+              "id": null,
+              "externalId": null,
+              "isActive": null,
+              "isDefault": null,
+              "statusDesc": "OutletClearance",
+              "statusCode": "OutletClearance",
+              "validFrom": null,
+              "validTo": null,
+              "statusChangeDate": null,
+              "statusExternalIds": [],
+              "reasonCode": null,
+              "reasonDescription": null
+            },
+            "description": null,
+            "quantity": 1,
+            "soldQuantity": 1,
+            "returnedQuantity": 0,
+            "returnRejectedQuantity": 0,
+            "returnExchangedQuantity": 0,
+            "cancelledQuantity": 0,
+            "completedQuantity": 0,
+            "readyForPickupQuantity": 0,
+            "shippedQuantity": 0,
+            "basketQuantity": 0,
+            "originalBasketQuantity": 0,
+            "productId": "PRODUCT_OUTLET_FR_fr_FR_D22594-D248-1855-XXL",
+            "productNumber": "D22594-D248-1855-XXL",
+            "productParent": "D22594-D248-1855",
+            "productName": "Polo Oluv Slim",
+            "product": null,
+            "isProductMaster": "",
+            "productLocalId": null,
+            "productMissing": "",
+            "productLocalMissing": "",
+            "allProductLocalMissing": "",
+            "productExternalIds": [
+              {
+                "system": "EAN",
+                "id": "8720346607733"
+              },
+              {
+                "system": "ExternalArticleID",
+                "id": "D22594-D248-1855-XXL"
+              }
+            ],
+            "promotions": [],
+            "onSale": "Y",
+            "markdownAmount": 41.97,
+            "markdownAmountBCY": 41.97,
+            "originalMarkdownAmount": 41.97,
+            "originalMarkdownAmountBCY": 41.97,
+            "unitPrice": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 17.98,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "unitPriceBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 17.98,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "fromPrice": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 59.95,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "fromPriceBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 59.95,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "subTotal": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 17.98,
+              "net": 14.98,
+              "tax": 3,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 20.026,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "subTotalBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 17.98,
+              "net": 14.98,
+              "tax": 3,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "originalSubTotal": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 17.98,
+              "net": 14.98,
+              "tax": 3,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 20.026,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "originalSubTotalBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 17.98,
+              "net": 14.98,
+              "tax": 3,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "isOriginalSubTotalChanged": null,
+            "purchasePrice": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 27.2,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "purchasePriceBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 27.2,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "apportionedSubTotal": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 16.19,
+              "net": 13.49,
+              "tax": 2.7,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 20.014,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "apportionedSubTotalBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 16.19,
+              "net": 13.49,
+              "tax": 2.7,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "originalApportionedSubTotal": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 16.19,
+              "net": 13.49,
+              "tax": 2.7,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 20.014,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "originalApportionedSubTotalBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 16.19,
+              "net": 13.49,
+              "tax": 2.7,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "adjustedApportionedSubTotalBCY": null,
+            "isOriginalApportionedSubTotalChanged": null,
+            "productUnitCostBCY": null,
+            "productTotalCostBCY": null,
+            "productMarginBCY": null,
+            "productMarginPercentageBCY": null,
+            "originalProductUnitCostBCY": null,
+            "originalProductTotalCostBCY": null,
+            "originalProductMarginBCY": null,
+            "originalProductMarginPercentageBCY": null,
+            "totalPrice": null,
+            "totalPriceBCY": null,
+            "originalTotalPrice": null,
+            "originalTotalPriceBCY": null,
+            "isOriginalTotalPriceChanged": null,
+            "refundedAmount": null,
+            "refundedAmountBCY": null,
+            "totalDiscounts": null,
+            "totalDiscountsBCY": null,
+            "orderlineUnits": [],
+            "isGift": null,
+            "giftMessage": null,
+            "giftWrapPrice": null,
+            "giftWrapPriceBCY": null,
+            "isDespatched": null,
+            "isDelivered": null,
+            "isReturned": null,
+            "isExchanged": null,
+            "isRefunded": null,
+            "isCancelled": null,
+            "condition": null,
+            "deliveryParcels": [],
+            "returnEventIds": [],
+            "refundEventIds": [],
+            "refundReasonCodes": [],
+            "despatchEventIds": [],
+            "cancelEventIds": [],
+            "completedEventIDs": [],
+            "readyForPickupEventIds": [],
+            "dutyInformation": null,
+            "employee": null,
+            "taxJurisdiction": [
+              {
+                "Type": "country",
+                "TaxCode": "FR-high",
+                "Name": "FR-high",
+                "Rate": "20.0",
+                "amount": {
+                  "priceCode": null,
+                  "priceName": null,
+                  "priceType": null,
+                  "gross": 2.7,
+                  "net": 0,
+                  "tax": 0,
+                  "base": null,
+                  "currencyCode": "EUR",
+                  "taxRate": 0,
+                  "taxRateCode": "",
+                  "exchangRate": null,
+                  "exchangeRateHistoryId": null
+                },
+                "amountBCY": {
+                  "priceCode": null,
+                  "priceName": null,
+                  "priceType": null,
+                  "gross": 2.7,
+                  "net": 0,
+                  "tax": 0,
+                  "base": null,
+                  "currencyCode": "EUR",
+                  "taxRate": 0,
+                  "taxRateCode": "",
+                  "exchangRate": 1,
+                  "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+                },
+                "JurisName": null,
+                "JurisCode": null,
+                "CountryCode": null,
+                "RegionCode": null
+              }
+            ],
+            "depreciatedCostsID": null,
+            "depreciatedCostsHistoryID": null,
+            "exchangeID": null,
+            "originalOrderID": null,
+            "offlineReturn": null,
+            "ecomOrderID": null,
+            "isDigitalOnlyItem": "N",
+            "isGiftCard": "N",
+            "derivedStatus": {
+              "statusCode": "SOLD",
+              "statusChangeDate": "2023-01-08T21:53:44Z"
+            },
+            "derivedStatusLog": [
+              {
+                "statusCode": "SOLD",
+                "statusChangeDate": "2023-01-08T21:53:44Z"
+              }
+            ],
+            "release": null
+          },
+          {
+            "id": "ORDERLINE_4100823954_3",
+            "returnLineID": null,
+            "sequence": 3,
+            "originalSequence": 3,
+            "status": {
+              "id": null,
+              "externalId": null,
+              "isActive": null,
+              "isDefault": null,
+              "statusDesc": "Sold",
+              "statusCode": "SOLD",
+              "validFrom": null,
+              "validTo": null,
+              "statusChangeDate": null,
+              "statusExternalIds": [],
+              "reasonCode": null,
+              "reasonDescription": null
+            },
+            "statusLog": [
+              {
+                "id": null,
+                "externalId": null,
+                "isActive": null,
+                "isDefault": null,
+                "statusDesc": "Sold",
+                "statusCode": "SOLD",
+                "validFrom": null,
+                "validTo": null,
+                "statusChangeDate": null,
+                "statusExternalIds": [],
+                "reasonCode": null,
+                "reasonDescription": null
+              }
+            ],
+            "clearanceStatus": {
+              "id": null,
+              "externalId": null,
+              "isActive": null,
+              "isDefault": null,
+              "statusDesc": "OutletClearance",
+              "statusCode": "OutletClearance",
+              "validFrom": null,
+              "validTo": null,
+              "statusChangeDate": null,
+              "statusExternalIds": [],
+              "reasonCode": null,
+              "reasonDescription": null
+            },
+            "description": null,
+            "quantity": 1,
+            "soldQuantity": 1,
+            "returnedQuantity": 0,
+            "returnRejectedQuantity": 0,
+            "returnExchangedQuantity": 0,
+            "cancelledQuantity": 0,
+            "completedQuantity": 0,
+            "readyForPickupQuantity": 0,
+            "shippedQuantity": 0,
+            "basketQuantity": 0,
+            "originalBasketQuantity": 0,
+            "productId": "PRODUCT_OUTLET_FR_fr_FR_D20022-A611-906-XXL",
+            "productNumber": "D20022-A611-906-XXL",
+            "productParent": "D20022-A611-906",
+            "productName": "Sweat À Capuche Graphic Core",
+            "product": null,
+            "isProductMaster": "",
+            "productLocalId": null,
+            "productMissing": "",
+            "productLocalMissing": "",
+            "allProductLocalMissing": "",
+            "productExternalIds": [
+              {
+                "system": "EAN",
+                "id": "8719771756826"
+              },
+              {
+                "system": "ExternalArticleID",
+                "id": "D20022-A611-906-XXL"
+              }
+            ],
+            "promotions": [],
+            "onSale": "Y",
+            "markdownAmount": 44.98,
+            "markdownAmountBCY": 44.98,
+            "originalMarkdownAmount": 44.98,
+            "originalMarkdownAmountBCY": 44.98,
+            "unitPrice": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 44.97,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "unitPriceBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 44.97,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "fromPrice": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 89.95,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "fromPriceBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 89.95,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "subTotal": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 44.97,
+              "net": 37.47,
+              "tax": 7.5,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 20.016,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "subTotalBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 44.97,
+              "net": 37.47,
+              "tax": 7.5,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "originalSubTotal": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 44.97,
+              "net": 37.47,
+              "tax": 7.5,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 20.016,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "originalSubTotalBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 44.97,
+              "net": 37.47,
+              "tax": 7.5,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "isOriginalSubTotalChanged": null,
+            "purchasePrice": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 40.8,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "purchasePriceBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 40.8,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "apportionedSubTotal": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 40.46,
+              "net": 33.72,
+              "tax": 6.74,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 19.988,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "apportionedSubTotalBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 40.46,
+              "net": 33.72,
+              "tax": 6.74,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "originalApportionedSubTotal": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 40.46,
+              "net": 33.72,
+              "tax": 6.74,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 19.988,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "originalApportionedSubTotalBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 40.46,
+              "net": 33.72,
+              "tax": 6.74,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "adjustedApportionedSubTotalBCY": null,
+            "isOriginalApportionedSubTotalChanged": null,
+            "productUnitCostBCY": null,
+            "productTotalCostBCY": null,
+            "productMarginBCY": null,
+            "productMarginPercentageBCY": null,
+            "originalProductUnitCostBCY": null,
+            "originalProductTotalCostBCY": null,
+            "originalProductMarginBCY": null,
+            "originalProductMarginPercentageBCY": null,
+            "totalPrice": null,
+            "totalPriceBCY": null,
+            "originalTotalPrice": null,
+            "originalTotalPriceBCY": null,
+            "isOriginalTotalPriceChanged": null,
+            "refundedAmount": null,
+            "refundedAmountBCY": null,
+            "totalDiscounts": null,
+            "totalDiscountsBCY": null,
+            "orderlineUnits": [],
+            "isGift": null,
+            "giftMessage": null,
+            "giftWrapPrice": null,
+            "giftWrapPriceBCY": null,
+            "isDespatched": null,
+            "isDelivered": null,
+            "isReturned": null,
+            "isExchanged": null,
+            "isRefunded": null,
+            "isCancelled": null,
+            "condition": null,
+            "deliveryParcels": [],
+            "returnEventIds": [],
+            "refundEventIds": [],
+            "refundReasonCodes": [],
+            "despatchEventIds": [],
+            "cancelEventIds": [],
+            "completedEventIDs": [],
+            "readyForPickupEventIds": [],
+            "dutyInformation": null,
+            "employee": null,
+            "taxJurisdiction": [
+              {
+                "Type": "country",
+                "TaxCode": "FR-high",
+                "Name": "FR-high",
+                "Rate": "20.0",
+                "amount": {
+                  "priceCode": null,
+                  "priceName": null,
+                  "priceType": null,
+                  "gross": 6.74,
+                  "net": 0,
+                  "tax": 0,
+                  "base": null,
+                  "currencyCode": "EUR",
+                  "taxRate": 0,
+                  "taxRateCode": "",
+                  "exchangRate": null,
+                  "exchangeRateHistoryId": null
+                },
+                "amountBCY": {
+                  "priceCode": null,
+                  "priceName": null,
+                  "priceType": null,
+                  "gross": 6.74,
+                  "net": 0,
+                  "tax": 0,
+                  "base": null,
+                  "currencyCode": "EUR",
+                  "taxRate": 0,
+                  "taxRateCode": "",
+                  "exchangRate": 1,
+                  "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+                },
+                "JurisName": null,
+                "JurisCode": null,
+                "CountryCode": null,
+                "RegionCode": null
+              }
+            ],
+            "depreciatedCostsID": null,
+            "depreciatedCostsHistoryID": null,
+            "exchangeID": null,
+            "originalOrderID": null,
+            "offlineReturn": null,
+            "ecomOrderID": null,
+            "isDigitalOnlyItem": "N",
+            "isGiftCard": "N",
+            "derivedStatus": {
+              "statusCode": "SOLD",
+              "statusChangeDate": "2023-01-08T21:53:44Z"
+            },
+            "derivedStatusLog": [
+              {
+                "statusCode": "SOLD",
+                "statusChangeDate": "2023-01-08T21:53:44Z"
+              }
+            ],
+            "release": null
+          }
+        ],
+        "previousOrderLines": [],
+        "allOrderLinesEnriched": "",
+        "allOrderLinesEnrichedLocal": "",
+        "orderReturns": [],
+        "totals": {
+          "productSalesTotal": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": "sum_of_prices",
+            "gross": 98.93,
+            "net": 82.43,
+            "tax": 16.5,
+            "base": null,
+            "currencyCode": "EUR",
+            "taxRate": 20.018333333333334,
+            "taxRateCode": "",
+            "exchangRate": 1,
+            "exchangeRateHistoryId": null
+          },
+          "productSalesTotalBCY": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": "sum_of_prices",
+            "gross": 98.93,
+            "net": 82.43,
+            "tax": 16.5,
+            "base": null,
+            "currencyCode": "EUR",
+            "taxRate": 20.016,
+            "taxRateCode": "",
+            "exchangRate": 1,
+            "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+          },
+          "apportionedProductSalesTotal": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": "sum_of_prices",
+            "gross": 89.04,
+            "net": 74.2,
+            "tax": 14.84,
+            "base": null,
+            "currencyCode": "EUR",
+            "taxRate": 20.003,
+            "taxRateCode": "",
+            "exchangRate": 1,
+            "exchangeRateHistoryId": null
+          },
+          "apportionedProductSalesTotalBCY": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": "sum_of_prices",
+            "gross": 89.04,
+            "net": 74.2,
+            "tax": 14.84,
+            "base": null,
+            "currencyCode": "EUR",
+            "taxRate": 20,
+            "taxRateCode": "",
+            "exchangRate": 1,
+            "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+          },
+          "deliveryChargeTotal": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": null,
+            "gross": 4.95,
+            "net": 4.12,
+            "tax": 0.83,
+            "base": null,
+            "currencyCode": "EUR",
+            "taxRate": 20.145,
+            "taxRateCode": "",
+            "exchangRate": null,
+            "exchangeRateHistoryId": null
+          },
+          "deliveryChargeTotalBCY": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": null,
+            "gross": 4.95,
+            "net": 4.12,
+            "tax": 0.83,
+            "base": null,
+            "currencyCode": "EUR",
+            "taxRate": 0,
+            "taxRateCode": "",
+            "exchangRate": 1,
+            "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+          },
+          "adjustedDeliveryChargeTotal": null,
+          "adjustedDeliveryChargeTotalBCY": null,
+          "totalDiscounts": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": "sum_of_prices",
+            "gross": 0,
+            "net": 0,
+            "tax": 0,
+            "base": null,
+            "currencyCode": null,
+            "taxRate": 0,
+            "taxRateCode": "",
+            "exchangRate": null,
+            "exchangeRateHistoryId": null
+          },
+          "totalDiscountsBCY": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": "sum_of_prices",
+            "gross": 0,
+            "net": 0,
+            "tax": 0,
+            "base": null,
+            "currencyCode": null,
+            "taxRate": 0,
+            "taxRateCode": "",
+            "exchangRate": null,
+            "exchangeRateHistoryId": null
+          },
+          "settledTotal": null,
+          "settledTotalBCY": null,
+          "refundedTotal": null,
+          "refundedTotalBCY": null,
+          "orderTotal": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": null,
+            "gross": 93.99,
+            "net": 78.32,
+            "tax": 15.67,
+            "base": null,
+            "currencyCode": "EUR",
+            "taxRate": 20.007,
+            "taxRateCode": "",
+            "exchangRate": null,
+            "exchangeRateHistoryId": null
+          },
+          "orderTotalBCY": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": null,
+            "gross": 93.99,
+            "net": 78.32,
+            "tax": 15.67,
+            "base": null,
+            "currencyCode": "EUR",
+            "taxRate": 0,
+            "taxRateCode": "",
+            "exchangRate": 1,
+            "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+          },
+          "orderTotalTax": null,
+          "orderTotalTaxBCY": null,
+          "finalMarginBCY": null,
+          "finalMarginBCYPercent": null,
+          "logisticsMarginBCY": null,
+          "logisticsMarginBCYPercent": null,
+          "productCostBCY": null,
+          "productMarginBCY": null,
+          "productMarginBCYPercent": null,
+          "totalsModified": false,
+          "modifiedTotalBCY": null
+        },
+        "originalTotals": {
+          "productSalesTotal": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": "sum_of_prices",
+            "gross": 98.93,
+            "net": 82.43,
+            "tax": 16.5,
+            "base": null,
+            "currencyCode": "EUR",
+            "taxRate": 20.018333333333334,
+            "taxRateCode": "",
+            "exchangRate": 1,
+            "exchangeRateHistoryId": null
+          },
+          "productSalesTotalBCY": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": "sum_of_prices",
+            "gross": 98.93,
+            "net": 82.43,
+            "tax": 16.5,
+            "base": null,
+            "currencyCode": "EUR",
+            "taxRate": 20.016,
+            "taxRateCode": "",
+            "exchangRate": 1,
+            "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+          },
+          "apportionedProductSalesTotal": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": "sum_of_prices",
+            "gross": 89.04,
+            "net": 74.2,
+            "tax": 14.84,
+            "base": null,
+            "currencyCode": "EUR",
+            "taxRate": 20.003,
+            "taxRateCode": "",
+            "exchangRate": 1,
+            "exchangeRateHistoryId": null
+          },
+          "apportionedProductSalesTotalBCY": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": "sum_of_prices",
+            "gross": 89.04,
+            "net": 74.2,
+            "tax": 14.84,
+            "base": null,
+            "currencyCode": "EUR",
+            "taxRate": 20,
+            "taxRateCode": "",
+            "exchangRate": 1,
+            "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+          },
+          "deliveryChargeTotal": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": null,
+            "gross": 4.95,
+            "net": 4.12,
+            "tax": 0.83,
+            "base": null,
+            "currencyCode": "EUR",
+            "taxRate": 20.145,
+            "taxRateCode": "",
+            "exchangRate": null,
+            "exchangeRateHistoryId": null
+          },
+          "deliveryChargeTotalBCY": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": null,
+            "gross": 4.95,
+            "net": 4.12,
+            "tax": 0.83,
+            "base": null,
+            "currencyCode": "EUR",
+            "taxRate": 0,
+            "taxRateCode": "",
+            "exchangRate": 1,
+            "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+          },
+          "adjustedDeliveryChargeTotal": null,
+          "adjustedDeliveryChargeTotalBCY": null,
+          "totalDiscounts": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": "sum_of_prices",
+            "gross": 0,
+            "net": 0,
+            "tax": 0,
+            "base": null,
+            "currencyCode": null,
+            "taxRate": 0,
+            "taxRateCode": "",
+            "exchangRate": null,
+            "exchangeRateHistoryId": null
+          },
+          "totalDiscountsBCY": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": "sum_of_prices",
+            "gross": 0,
+            "net": 0,
+            "tax": 0,
+            "base": null,
+            "currencyCode": null,
+            "taxRate": 0,
+            "taxRateCode": "",
+            "exchangRate": null,
+            "exchangeRateHistoryId": null
+          },
+          "settledTotal": null,
+          "settledTotalBCY": null,
+          "refundedTotal": null,
+          "refundedTotalBCY": null,
+          "orderTotal": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": null,
+            "gross": 93.99,
+            "net": 78.32,
+            "tax": 15.67,
+            "base": null,
+            "currencyCode": "EUR",
+            "taxRate": 20.007,
+            "taxRateCode": "",
+            "exchangRate": null,
+            "exchangeRateHistoryId": null
+          },
+          "orderTotalBCY": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": null,
+            "gross": 93.99,
+            "net": 78.32,
+            "tax": 15.67,
+            "base": null,
+            "currencyCode": "EUR",
+            "taxRate": 0,
+            "taxRateCode": "",
+            "exchangRate": 1,
+            "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+          },
+          "orderTotalTax": null,
+          "orderTotalTaxBCY": null,
+          "finalMarginBCY": null,
+          "finalMarginBCYPercent": null,
+          "logisticsMarginBCY": null,
+          "logisticsMarginBCYPercent": null,
+          "productCostBCY": null,
+          "productMarginBCY": null,
+          "productMarginBCYPercent": null,
+          "totalsModified": false,
+          "modifiedTotalBCY": null
+        },
+        "isOriginalTotalsChanged": "N",
+        "taxRate": 20.007,
+        "taxGrossOrNet": "NET",
+        "promotions": [
+          {
+            "promotionId": null,
+            "promotionSource": "VOUCHER",
+            "promotionCode": "CDPOPA-9Zcn-CxF",
+            "promotionType": "percentageDiscountOnOrder",
+            "promotionName": "Your discount is now applied! (10%off)",
+            "discountAmount": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 9.89,
+              "net": 9.89,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "discountAmountBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 9.89,
+              "net": 9.89,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "campaignName": null,
+            "discountPercentage": 10,
+            "couponId": null,
+            "taxJurisdiction": [],
+            "couponExternalPartner": null
+          }
+        ],
+        "payments": [
+          {
+            "paymentReference": null,
+            "paymentMethod": {
+              "type": "paypal",
+              "subtype": null,
+              "reference": "paypal",
+              "cardRef": null,
+              "cardBin": null,
+              "cardToken": null,
+              "bankRef": null,
+              "bankIdentifier": null,
+              "expiryMonth": null,
+              "expiryYear": null,
+              "accountHolderName": null
+            },
+            "paymentTypeCode": "PrePayment",
+            "paymentStatus": {
+              "id": null,
+              "externalId": null,
+              "isActive": null,
+              "isDefault": null,
+              "statusDesc": "PAID",
+              "statusCode": null,
+              "validFrom": null,
+              "validTo": null,
+              "statusChangeDate": null,
+              "statusExternalIds": [],
+              "reasonCode": null,
+              "reasonDescription": null
+            },
+            "paymentProvider": "GSFOFR",
+            "paymentExternalReference": "R9QWDQZ2JRN4Q4C2",
+            "paymentChannel": null,
+            "authorisationCode": null,
+            "authorisedAmount": null,
+            "authorisedAmountBCY": null,
+            "refundedAmount": null,
+            "refundedAmountBCY": null,
+            "refundedDate": null,
+            "paymentAmount": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 93.99,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "paymentAmountBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 93.99,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "amountCaptured": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 0,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "amountCapturedBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 0,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "settledAmount": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 93.99,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": null,
+              "exchangeRateHistoryId": null
+            },
+            "settledAmountBCY": {
+              "priceCode": null,
+              "priceName": null,
+              "priceType": null,
+              "gross": 93.99,
+              "net": 0,
+              "tax": 0,
+              "base": null,
+              "currencyCode": "EUR",
+              "taxRate": 0,
+              "taxRateCode": "",
+              "exchangRate": 1,
+              "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+            },
+            "settlementDate": null,
+            "paymentWalletId": null,
+            "paymentReason": "SUCCESFULL",
+            "paymentReciept": {
+              "receiptId": "R9QWDQZ2JRN4Q4C2",
+              "externalIds": [],
+              "receiptType": null,
+              "receiptProvider": null,
+              "receiptReference": null,
+              "receiptNameContact": null,
+              "receiptEmailContact": null,
+              "receiptBarcode": null,
+              "receiptQRCode": null,
+              "paymentReference": null,
+              "receiptMethod": null,
+              "receiptContentType": null,
+              "receiptContentURL": null
+            },
+            "paymentContact": {
+              "contactType": "G-Star RAW Outlet | Erno\u0027s SAS",
+              "id": null,
+              "externalId": null,
+              "nameContact": null,
+              "phoneContact": null,
+              "emailContact": null,
+              "addressContact": null,
+              "collectionContact": null,
+              "preferredStoreId": null,
+              "memberCardNumber": null,
+              "idNumber": null,
+              "employeeNumber": null,
+              "birthday": null
+            },
+            "requestToken": null,
+            "requestName": null,
+            "paymentDate": "2023-01-08T21:54:02Z",
+            "payeeId": null,
+            "payerId": null,
+            "transactionCharge": null,
+            "transactionChargeBCY": null
+          }
+        ],
+        "customerContact": {
+          "contactType": "registered",
+          "id": "91413f8e-ed03-4015-abaf-42ea30bddfd2",
+          "externalId": null,
+          "nameContact": null,
+          "phoneContact": {
+            "number": "+33649805459",
+            "countryPrefix": null,
+            "countryCode": null,
+            "description": null,
+            "isMobile": null,
+            "isPrimary": null,
+            "source": null,
+            "lookupNumber": null,
+            "isExDirectory": null
+          },
+          "emailContact": {
+            "address": "jcarion@auchan.fr",
+            "description": null,
+            "isPrimary": null,
+            "isVerified": null,
+            "source": null,
+            "emailISP": null,
+            "lookupAddress": null
+          },
+          "addressContact": null,
+          "collectionContact": null,
+          "preferredStoreId": null,
+          "memberCardNumber": 205067266,
+          "idNumber": null,
+          "employeeNumber": null,
+          "birthday": null
+        },
+        "shipping": {
+          "deliveryNumber": null,
+          "status": null,
+          "shipmentId": "-",
+          "courierId": "B2CEFR",
+          "deliveryType": "DELIVERY_TO_ME",
+          "shipmentStatusLog": [],
+          "deliveryStatusLog": [],
+          "deliveryCountry": "FR",
+          "deliveryContact": {
+            "contactType": "Delivery Address",
+            "id": null,
+            "externalId": null,
+            "nameContact": null,
+            "phoneContact": {
+              "number": "+33649805459",
+              "countryPrefix": null,
+              "countryCode": null,
+              "description": null,
+              "isMobile": null,
+              "isPrimary": null,
+              "source": null,
+              "lookupNumber": null,
+              "isExDirectory": null
+            },
+            "emailContact": null,
+            "addressContact": {
+              "address": {
+                "metadata": null,
+                "flat": null,
+                "houseNameNumber": null,
+                "addressName": null,
+                "addressLine1": "389 chemin de la croix de warcq",
+                "addressLine2": null,
+                "addressLine3": null,
+                "addressLine4": null,
+                "townCity": "Tournes",
+                "area": null,
+                "state": null,
+                "postcode": "08090",
+                "country": "France",
+                "countryCode": "FR",
+                "lat": null,
+                "long": null,
+                "description": null,
+                "isPrimary": null,
+                "isDeliveryAddress": null,
+                "isBillingAddress": null,
+                "source": null,
+                "postalOutcode": null,
+                "lookupPostcode": "08090",
+                "postBox": null,
+                "companyName": null,
+                "contactName": null,
+                "contactPhone": null,
+                "contactFax": null,
+                "suite": null,
+                "jobTitle": null,
+                "id": null,
+                "branch": null,
+                "externalId": null
+              },
+              "timeZoneLocation": "Europe/Paris",
+              "formattedAddress": "389 chemin de la croix de warcq, Tournes, France, 08090"
+            },
+            "collectionContact": {
+              "id": null,
+              "formattedAddress": null,
+              "operator": null,
+              "customerId": null,
+              "latitude": null,
+              "longitude": null
+            },
+            "preferredStoreId": null,
+            "memberCardNumber": null,
+            "idNumber": null,
+            "employeeNumber": null,
+            "birthday": null
+          },
+          "deliveryMethod": "PPLUSFML",
+          "origin": null,
+          "addressType": null,
+          "storeId": null,
+          "earliestCollectionDate": null,
+          "earliestDeliveryDate": null,
+          "requestedDeliveryDate": null,
+          "estimatedDeliveryDate": null,
+          "latestDeliveryDate": null,
+          "actualDeliveryStartDate": null,
+          "actualDeliveryCompletedDate": null,
+          "deliveryAttempts": null,
+          "latestAttemptedDeliveryDate": null,
+          "specialInstructions": null,
+          "orderItemGroup": null,
+          "deliveryParcels": [],
+          "promotionCode": null,
+          "promotionCoupon": null,
+          "amount": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": null,
+            "gross": 4.95,
+            "net": 4.12,
+            "tax": 0.83,
+            "base": null,
+            "currencyCode": "EUR",
+            "taxRate": 20.145,
+            "taxRateCode": "",
+            "exchangRate": null,
+            "exchangeRateHistoryId": null
+          },
+          "amountBCY": {
+            "priceCode": null,
+            "priceName": null,
+            "priceType": null,
+            "gross": 4.95,
+            "net": 4.12,
+            "tax": 0.83,
+            "base": null,
+            "currencyCode": "EUR",
+            "taxRate": 0,
+            "taxRateCode": "",
+            "exchangRate": 1,
+            "exchangeRateHistoryId": "EXCHANGERATE_EUR_EUR_2023-01-08"
+          },
+          "taxJurisdiction": [],
+          "external_ship_to_number": "0003012656",
+          "derivedStatus": null,
+          "shipmentStatus": null,
+          "deliveryStatus": null
+        },
+        "returnType": null,
+        "docType": "Order",
+        "merchantReferenceId": "paypal",
+        "timestamp": "1673214824",
+        "timeDate": "2023-01-08T21:53:44Z",
+        "comments": null,
+        "hasReturns": null,
+        "hasCancelled": null,
+        "returnReferenceNo": null,
+        "sap_ids": [
+          {
+            "name": "SOLD_TO",
+            "val": "DESTOUTNL"
+          },
+          {
+            "name": "SHIP_TO",
+            "val": "0003012656"
+          }
+        ],
+        "externalSoldToCode": "DESTOUTNL",
+        "receiptExternalIds": {
+          "name": "EPOS_ORDER_NUMBER_ON_RECEIPT",
+          "val": null
+        },
+        "receiptNumber": null,
+        "reservationId": "750afee6-b036-42f2-8bf9-1551e1a82180",
+        "bGeniusId": null,
+        "paidOn": "2023-01-08T21:54:02Z",
+        "orderInvoice": {
+          "name": null,
+          "invoiceNumber": null,
+          "address": {
+            "name": "Invoice Address",
+            "title": null,
+            "givenName": "Jeremy",
+            "middleName": null,
+            "familyName": "Carion",
+            "phoneNumber": "+33649805459",
+            "companyName": "Invoice Address",
+            "postcode": "08090",
+            "stateOrProvince": {
+              "name": null,
+              "isoCode": null,
+              "isoShortCode": null,
+              "locale": null
+            },
+            "streetName": "389 chemin de la croix de warcq",
+            "building": null,
+            "houseNumber": null,
+            "houseNumberSuffix": null,
+            "city": "Tournes",
+            "country": {
+              "name": "France",
+              "isoCode": "FR",
+              "isoShortCode": null,
+              "locale": "fr_FR"
+            }
+          },
+          "receiverTaxId": null
+        },
+        "storeID": null,
+        "metadata": null,
+        "isDerived": null,
+        "derivedStatusLog": [
+          {
+            "statusCode": "ORDER_PROCESS_IN_PROGRESS",
+            "statusChangeDate": "2023-01-08T21:53:44Z"
+          }
+        ],
+        "salesClassification": "DC",
+        "clickref": null,
+        "utmSource": null,
+        "utmMedium": null,
+        "campaignId": null,
+        "thresholdCustomerType": null,
+        "userAgent": "Mozilla/5.0 (Linux; Android 12; CPH2009) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Mobile Safari/537.36",
+        "version": null,
+        "release": null,
+        "analyticsBlocked": "N"
+      }
+    }
+  },
+  {
+    "EntityId": "SalesOrder_Hybris_4100823954",
+    "EventId": "SalesOrderAcknowledged_SalesOrder_Hybris_4100823954_2023-01-08T21:58:59Z",
+    "EventName": "SalesOrderAcknowledged",
+    "EventOccurredTimestampUTC": "2023-01-08T21:58:59+00:00",
+    "TriggerEvent": {
+      "SalesOrder": {
+        "id": "ORDER_4100823954",
+        "orderNumber": "4100823954",
+        "status": {
+          "statusDesc": "AcknowledgeSucceeded",
+          "statusCode": "ACKNOWLEDGE_SUCCEEDED",
+          "statusChangeDate": "2023-01-08T21:59:06.136747895Z"
+
+        },
+        "timestamp": "1673215139",
+        "timeDate": "2023-01-08T21:58:59Z"
+      }
+    }
+  },
+  {
+    "EntityId": "SalesOrder_Hybris_4100823954",
+    "EventId": "SalesOrderItemsBackOrderedFromNode_SalesOrder_Hybris_4100823954_2023-01-09T11:38:49Z",
+    "EventName": "SalesOrderItemsBackSalesOrderedFromNode",
+    "EventOccurredTimestampUTC": "2023-01-09T11:38:49+00:00",
+    "TriggerEvent": {
+      "SalesOrder": {
+        "id": "ORDER_4100823954",
+        "orderNumber": "4100823954",
+        "status": {
+          "statusDesc": "BackOrderedFromNode",
+          "statusCode": "BACKORDERED_FROM_NODE",
+          "statusChangeDate": "2023-01-09T11:38:50.516605826Z"
+        },
+        "statusLog": [
+          {
+            "statusDesc": "BackOrderedFromNode",
+            "statusCode": "BACKORDERED_FROM_NODE",
+            "statusChangeDate": "2023-01-09T11:38:49Z"
+          }
+        ],
+        "orderLines": [
+          {
+            "id": "ORDERLINE_4100823954_2",
+            "sequence": 2,
+            "status": {
+              "statusDesc": "BackOrderedFromNode",
+              "statusCode": "BACKORDERED_FROM_NODE",
+              "statusChangeDate": "2023-01-09T11:38:50.516612647Z",
+              "statusExternalIds": []
+            },
+            "quantity": 1,
+            "product": {
+              "EAN": "8720346607733"
+            }
+          }
+        ],
+        "timestamp": "1673264329",
+        "timeDate": "2023-01-09T11:38:49Z"
+      }
+    }
+  },
+  {
+    "EntityId": "SalesOrder_Hybris_4100823954",
+    "EventId": "SalesSalesOrder_Hybris_ITEMS_SHIPMENT_PICKED_SalesOrder_HybrisSHIPMENT_4100823954_105339606_2023-01-09T11:39:00.629732713Z",
+    "EventName": "SalesOrderItemsPickedForShipping",
+    "EventOccurredTimestampUTC": "2023-01-09T11:39:00.629522+00:00",
+    "TriggerEvent": {
+      "SalesOrder": {
+        "id": "ORDER_4100823954",
+        "orderNumber": "4100823954",
+        "status": {
+          "statusDesc": "ShipmentInProgress",
+          "statusCode": "SHIPMENT_IN_PROGRESS",
+          "statusChangeDate": "2023-01-09T11:39:01.115544493Z"
+        },
+        "orderLines": [
+          {
+            "id": "ORDERLINE_4100823954_3",
+            "sequence": 3,
+            "status": {
+              "statusDesc": "ShipmentPicked",
+              "statusCode": "SHIPMENT_PICKED",
+              "statusChangeDate": "2023-01-09T11:39:01.115557375Z"
+            },
+            "shippedQuantity": 1,
+            "productExternalIds": [
+              {
+                "system": "EAN",
+                "id": "8719771756826"
+              }
+            ],
+            "deliveryParcels": [
+              {
+                "shipmentId": "ORDERSHIPMENT_4100823954_105339606",
+                "deliveryId": "ORDERDELIVERY_4100823954_1Z7R78926837377015",
+                "itemQty": 1
+              }
+            ]
+          },
+          {
+            "id": "ORDERLINE_4100823954_1",
+            "sequence": 1,
+            "status": {
+              "statusDesc": "ShipmentPicked",
+              "statusCode": "SHIPMENT_PICKED",
+              "statusChangeDate": "2023-01-09T11:39:01.115554566Z"
+            },
+            "shippedQuantity": 1,
+            "productExternalIds": [
+              {
+                "system": "EAN",
+                "id": "8720346597102"
+              }
+            ],
+            "deliveryParcels": [
+              {
+                "shipmentId": "ORDERSHIPMENT_4100823954_105339606",
+                "deliveryId": "ORDERDELIVERY_4100823954_1Z7R78926837377015",
+                "itemQty": 1
+              }
+            ]
+          }
+        ],
+        "shipping": {
+          "shipmentStatusLog": [
+            {
+              "statusDesc": "ShipmentPicked",
+              "statusCode": "SHIPMENT_PICKED",
+              "statusChangeDate": "2023-01-09T11:39:00.629560107Z"
+            }
+          ],
+          "deliveryParcels": [
+            {
+              "shipmentId": "ORDERSHIPMENT_4100823954_105339606",
+              "shipmentNumber": "105339606",
+              "deliveryId": "ORDERDELIVERY_4100823954_1Z7R78926837377015",
+              "origin": "0003024584",
+              "shipmentType": "STORE_PICKED",
+              "carrierName": "UPS",
+              "trackingNumber": "1Z7R78926837377015",
+              "trackingUrl": "http://wwwapps.ups.com/WebTracking/track?trackNums\u003d1Z7R78926837377015\u0026track\u003dTrack",
+              "itemQty": 2,
+              "despatchTimetamp": "2023-01-09T11:39:00.629596807Z",
+              "status": "SHIPMENT_PICKED"
+            }
+          ],
+          "derivedStatus": {
+            "statusCode": "IN_PROGRESS",
+            "statusChangeDate": "2023-01-09T11:39:00.629624821Z"
+          },
+          "shipmentStatus": {
+            "statusCode": "SHIPMENT_PICKED",
+            "statusChangeDate": "2023-01-09T11:39:00.629560107Z"
+          }
+        },
+        "timestamp": "1673264340",
+        "timeDate": "2023-01-09T11:39:00.629357212Z"
+      }
+    }
+  },
+  {
+    "EntityId": "SalesOrder_Hybris_4100823954",
+    "EventId": "SalesSalesOrder_Hybris_ITEMS_SHIPMENT_SHIPPED_SalesOrder_HybrisSHIPMENT_4100823954_105339606_2023-01-09T11:39:00Z",
+    "EventName": "SalesOrderItemsShippedFromStore",
+    "EventOccurredTimestampUTC": "2023-01-09T11:39:01+00:00",
+    "TriggerEvent": {
+      "SalesOrder": {
+        "id": "ORDER_4100823954",
+        "orderNumber": "4100823954",
+        "status": {
+          "statusDesc": "ShipmentInProgress",
+          "statusCode": "SHIPMENT_IN_PROGRESS",
+          "statusChangeDate": "2023-01-09T11:40:06.105576395Z"
+        },
+        "orderLines": [
+          {
+            "id": "ORDERLINE_4100823954_3",
+            "sequence": 3,
+            "status": {
+              "statusDesc": "ShipmentShipped",
+              "statusCode": "SHIPMENT_SHIPPED",
+              "statusChangeDate": "2023-01-09T11:40:06.105590427Z"
+            },
+            "statusLog": [],
+            "shippedQuantity": 1,
+            "productExternalIds": [
+              {
+                "system": "EAN",
+                "id": "8719771756826"
+              }
+            ],
+            "deliveryParcels": [
+              {
+                "shipmentId": "ORDERSHIPMENT_4100823954_105339606",
+                "deliveryId": "ORDERDELIVERY_4100823954_1Z7R78926837377015",
+                "itemQty": 1
+              }
+            ]
+          },
+          {
+            "id": "ORDERLINE_4100823954_1",
+            "sequence": 1,
+            "status": {
+              "statusDesc": "ShipmentShipped",
+              "statusCode": "SHIPMENT_SHIPPED",
+              "statusChangeDate": "2023-01-09T11:40:06.105587652Z"
+            },
+            "shippedQuantity": 1,
+            "productExternalIds": [
+              {
+                "system": "EAN",
+                "id": "8720346597102"
+              }
+            ],
+            "deliveryParcels": [
+              {
+                "shipmentId": "ORDERSHIPMENT_4100823954_105339606",
+                "deliveryId": "ORDERDELIVERY_4100823954_1Z7R78926837377015",
+                "itemQty": 1
+              }
+            ]
+          }
+        ],
+        "shipping": {
+          "shipmentStatusLog": [
+            {
+              "statusDesc": "ShipmentShipped",
+              "statusCode": "SHIPMENT_SHIPPED",
+              "statusChangeDate": "2023-01-09T11:39:00Z"
+            }
+          ],
+          "deliveryParcels": [
+            {
+              "shipmentId": "ORDERSHIPMENT_4100823954_105339606",
+              "shipmentNumber": "105339606",
+              "deliveryId": "ORDERDELIVERY_4100823954_1Z7R78926837377015",
+              "origin": "0003024584",
+              "shipmentType": "STORE_SHIPMENT",
+              "carrierName": "UPS",
+              "trackingNumber": "1Z7R78926837377015",
+              "trackingUrl": "http://wwwapps.ups.com/WebTracking/track?trackNums\u003d1Z7R78926837377015\u0026track\u003dTrack",
+              "itemQty": 2,
+              "despatchTimetamp": "2023-01-09T11:39:00Z",
+              "status": "SHIPMENT_SHIPPED"
+            }
+          ],
+          "derivedStatus": {
+            "statusCode": "IN_PROGRESS",
+            "statusChangeDate": "2023-01-09T11:40:05.560488834Z"
+          },
+          "shipmentStatus": {
+            "statusCode": "SHIPMENT_SHIPPED",
+            "statusChangeDate": "2023-01-09T11:39:00Z"
+          }
+        },
+        "timestamp": "1673264340",
+        "timeDate": "2023-01-09T11:39:00Z"
+      }
+    }
+  },
+  {
+    "EntityId": "SalesOrder_Hybris_4100823954",
+    "EventId": "SalesSalesOrder_Hybris_ITEMS_ARRIVED_AT_CARRIER_SalesOrder_HybrisDELIVERY_4100823954_1Z7R78926837377015_2023-01-10T16:19:33Z",
+    "EventName": "SalesOrderItemsArrivedAtCarrier",
+    "EventOccurredTimestampUTC": "2023-01-10T16:19:33+00:00",
+    "TriggerEvent": {
+      "SalesOrder": {
+        "id": "ORDER_4100823954",
+        "orderNumber": "4100823954",
+        "status": {
+          "statusDesc": "ShipmentInProgress",
+          "statusCode": "SHIPMENT_IN_PROGRESS",
+          "statusChangeDate": "2023-01-10T16:19:34.3752816Z"
+        },
+        "shipping": {
+          "deliveryStatusLog": [
+            {
+              "statusDesc": "ArrivedAtCarrier",
+              "statusCode": "ARRIVED_AT_CARRIER",
+              "statusChangeDate": "2023-01-10T16:19:33Z"
+            }
+          ],
+          "deliveryParcels": [
+            {
+              "deliveryId": "ORDERDELIVERY_4100823954_1Z7R78926837377015",
+              "carrierName": "UPS",
+              "trackingNumber": "1Z7R78926837377015",
+              "itemQty": 0,
+              "despatchTimetamp": "2023-01-10T16:19:33Z",
+              "status": "ARRIVED_AT_CARRIER"
+            }
+          ],
+          "derivedStatus": {
+            "statusCode": "IN_PROGRESS",
+            "statusChangeDate": "2023-01-10T16:19:33.714433554Z"
+          },
+          "deliveryStatus": {
+            "statusCode": "ARRIVED_AT_CARRIER",
+            "statusChangeDate": "2023-01-10T16:19:33Z"
+          }
+        },
+        "timestamp": "1673367573",
+        "timeDate": "2023-01-10T16:19:33Z"
+      }
+    }
+  },
+  {
+    "EntityId": "SalesOrder_Hybris_4100823954",
+    "EventId": "SalesOrderCompleted_SalesOrder_Hybris_4100823954_2023-01-11T15:07:22Z",
+    "EventName": "SalesOrderPlacementCompleted",
+    "EventOccurredTimestampUTC": "2023-01-11T15:07:23+00:00",
+    "TriggerEvent": {
+      "SalesOrder": {
+        "id": "ORDER_4100823954",
+        "orderNumber": "4100823954",
+        "status": {
+          "statusDesc": "CompletionSucceeded",
+          "statusCode": "COMPLETION_SUCCEEDED",
+          "statusChangeDate": "2023-01-11T15:17:14.855781427Z"
+        },
+        "orderLines": [
+          {
+            "id": "ORDERLINE_4100823954_1",
+            "sequence": 1,
+            "status": {
+              "statusDesc": "Completed",
+              "statusCode": "COMPLETED",
+              "statusChangeDate": "2023-01-11T15:17:14.855795733Z"
+            },
+            "completedQuantity": 1
+          },
+          {
+            "id": "ORDERLINE_4100823954_2",
+            "sequence": 2,
+            "status": {
+              "statusDesc": "Completed",
+              "statusCode": "COMPLETED",
+              "statusChangeDate": "2023-01-11T15:17:14.855798213Z"
+            },
+            "completedQuantity": 1
+          },
+          {
+            "id": "ORDERLINE_4100823954_3",
+            "sequence": 3,
+            "status": {
+              "statusDesc": "Completed",
+              "statusCode": "COMPLETED",
+              "statusChangeDate": "2023-01-11T15:17:14.855800176Z"
+            },
+            "completedQuantity": 1
+          }
+        ],
+        "timestamp": "1673449642",
+        "timeDate": "2023-01-11T15:07:22Z"
+      }
+    }
+  },
+  {
+    "EntityId": "SalesOrder_Hybris_4100823954",
+    "EventId": "SalesSalesOrder_Hybris_ITEMS_SHIPMENT_SHIPPED_SalesOrder_HybrisSHIPMENT_4100823954_105340946_2023-01-11T15:07:22Z",
+    "EventName": "SalesOrderItemsShippedFromStore",
+    "EventOccurredTimestampUTC": "2023-01-11T15:07:23+00:00",
+    "TriggerEvent": {
+      "SalesOrder": {
+        "id": "ORDER_4100823954",
+        "orderNumber": "4100823954",
+        "status": {
+          "statusDesc": "ShipmentInProgress",
+          "statusCode": "SHIPMENT_IN_PROGRESS",
+          "statusChangeDate": "2023-01-12T10:58:33.708505549Z"
+        },
+        "orderLines": [
+          {
+            "id": "ORDERLINE_4100823954_2",
+            "sequence": 2,
+            "status": {
+              "statusDesc": "ShipmentShipped",
+              "statusCode": "SHIPMENT_SHIPPED",
+              "statusChangeDate": "2023-01-12T10:58:33.708525668Z"
+            },
+            "shippedQuantity": 1,
+            "productExternalIds": [
+              {
+                "system": "EAN",
+                "id": "8720346607733"
+              }
+            ],
+            "deliveryParcels": [
+              {
+                "shipmentId": "ORDERSHIPMENT_4100823954_105340946",
+                "deliveryId": "ORDERDELIVERY_4100823954_1Z7R78926825300977",
+                "itemQty": 1
+              }
+            ]
+          }
+        ],
+        "shipping": {
+          "shipmentStatusLog": [
+            {
+              "statusDesc": "ShipmentShipped",
+              "statusCode": "SHIPMENT_SHIPPED",
+              "statusChangeDate": "2023-01-11T15:07:22Z"
+            }
+          ],
+          "deliveryParcels": [
+            {
+              "shipmentId": "ORDERSHIPMENT_4100823954_105340946",
+              "shipmentNumber": "105340946",
+              "deliveryId": "ORDERDELIVERY_4100823954_1Z7R78926825300977",
+              "origin": "0003029530",
+              "shipmentType": "STORE_SHIPMENT",
+              "carrierName": "UPS",
+              "trackingNumber": "1Z7R78926825300977",
+              "trackingUrl": "http://wwwapps.ups.com/WebTracking/track?trackNums\u003d1Z7R78926825300977\u0026track\u003dTrack",
+              "itemQty": 1,
+              "despatchTimetamp": "2023-01-11T15:07:22Z",
+              "status": "SHIPMENT_SHIPPED"
+            }
+          ],
+          "derivedStatus": {
+            "statusCode": "IN_PROGRESS",
+            "statusChangeDate": "2023-01-12T10:58:33.298386367Z"
+          },
+          "shipmentStatus": {
+            "statusCode": "SHIPMENT_SHIPPED",
+            "statusChangeDate": "2023-01-11T15:07:22Z"
+          }
+        },
+        "timestamp": "1673449642",
+        "timeDate": "2023-01-11T15:07:22Z"
+      }
+    }
+  },
+  {
+    "EntityId": "SalesOrder_Hybris_4100823954",
+    "EventId": "SalesSalesOrder_Hybris_ITEMS_SHIPMENT_PICKED_SalesOrder_HybrisSHIPMENT_4100823954_105340946_2023-01-11T15:07:23.081917015Z",
+    "EventName": "SalesOrderItemsPickedForShipping",
+    "EventOccurredTimestampUTC": "2023-01-11T15:07:23.081684+00:00",
+    "TriggerEvent": {
+      "SalesOrder": {
+        "id": "ORDER_4100823954",
+        "orderNumber": "4100823954",
+        "status": {
+          "statusDesc": "ShipmentInProgress",
+          "statusCode": "SHIPMENT_IN_PROGRESS",
+          "statusChangeDate": "2023-01-11T15:07:23.4269618Z"
+        },
+        "orderLines": [
+          {
+            "id": "ORDERLINE_4100823954_2",
+            "sequence": 2,
+            "status": {
+              "statusDesc": "ShipmentPicked",
+              "statusCode": "SHIPMENT_PICKED",
+              "statusChangeDate": "2023-01-11T15:07:23.426978652Z"
+            },
+            "shippedQuantity": 1,
+            "productExternalIds": [
+              {
+                "system": "EAN",
+                "id": "8720346607733"
+              }
+            ],
+            "deliveryParcels": [
+              {
+                "shipmentId": "ORDERSHIPMENT_4100823954_105340946",
+                "deliveryId": "ORDERDELIVERY_4100823954_1Z7R78926825300977",
+                "itemQty": 1
+              }
+            ]
+          }
+        ],
+        "shipping": {
+          "shipmentStatusLog": [
+            {
+              "statusDesc": "ShipmentPicked",
+              "statusCode": "SHIPMENT_PICKED",
+              "statusChangeDate": "2023-01-11T15:07:23.081697012Z"
+            }
+          ],
+          "deliveryParcels": [
+            {
+              "shipmentId": "ORDERSHIPMENT_4100823954_105340946",
+              "shipmentNumber": "105340946",
+              "deliveryId": "ORDERDELIVERY_4100823954_1Z7R78926825300977",
+              "origin": "0003029530",
+              "shipmentType": "STORE_PICKED",
+              "carrierName": "UPS",
+              "trackingNumber": "1Z7R78926825300977",
+              "trackingUrl": "http://wwwapps.ups.com/WebTracking/track?trackNums\u003d1Z7R78926825300977\u0026track\u003dTrack",
+              "itemQty": 1,
+              "despatchTimetamp": "2023-01-11T15:07:23.081747219Z",
+              "status": "SHIPMENT_PICKED"
+            }
+          ],
+          "derivedStatus": {
+            "statusCode": "IN_PROGRESS",
+            "statusChangeDate": "2023-01-11T15:07:23.081787619Z"
+          },
+          "shipmentStatus": {
+            "statusCode": "SHIPMENT_PICKED",
+            "statusChangeDate": "2023-01-11T15:07:23.081697012Z"
+          }
+        },
+        "timestamp": "1673449643",
+        "timeDate": "2023-01-11T15:07:23.081664775Z"
+      }
+    }
+  },
+  {
+    "EntityId": "SalesOrder_Hybris_4100823954",
+    "EventId": "SalesSalesOrder_Hybris_ITEMS_OUT_FOR_DELIVERY_SalesOrder_HybrisDELIVERY_4100823954_1Z7R78926837377015_2023-01-12T07:16:50Z",
+    "EventName": "SalesOrderItemsOutForDelivery",
+    "EventOccurredTimestampUTC": "2023-01-12T07:16:50+00:00",
+    "TriggerEvent": {
+      "SalesOrder": {
+        "id": "ORDER_4100823954",
+        "orderNumber": "4100823954",
+        "status": {
+          "statusDesc": "ShipmentInProgress",
+          "statusCode": "SHIPMENT_IN_PROGRESS",
+          "statusChangeDate": "2023-01-12T07:16:51.078460067Z"
+        },
+        "shipping": {
+          "deliveryStatusLog": [
+            {
+              "statusDesc": "OutForDelivery",
+              "statusCode": "OUT_FOR_DELIVERY",
+              "statusChangeDate": "2023-01-12T07:16:50Z"
+            }
+          ],
+          "deliveryParcels": [
+            {
+              "deliveryId": "ORDERDELIVERY_4100823954_1Z7R78926837377015",
+              "carrierName": "UPS",
+              "trackingNumber": "1Z7R78926837377015",
+              "itemQty": 0,
+              "despatchTimetamp": "2023-01-12T07:16:50Z",
+              "status": "OUT_FOR_DELIVERY"
+            }
+          ],
+          "derivedStatus": {
+            "statusCode": "IN_PROGRESS",
+            "statusChangeDate": "2023-01-12T07:16:50.651600766Z"
+          },
+          "deliveryStatus": {
+            "statusCode": "OUT_FOR_DELIVERY",
+            "statusChangeDate": "2023-01-12T07:16:50Z"
+          }
+        },
+        "timestamp": "1673507810",
+        "timeDate": "2023-01-12T07:16:50Z"
+      }
+    }
+  },
+  {
+    "EntityId": "SalesOrder_Hybris_4100823954",
+    "EventId": "SalesSalesOrder_Hybris_ITEMS_DELIVERED_SalesOrder_HybrisDELIVERY_4100823954_1Z7R78926837377015_2023-01-12T11:14:34Z",
+    "EventName": "SalesOrderItemsDelivered",
+    "EventOccurredTimestampUTC": "2023-01-12T11:14:34+00:00",
+    "TriggerEvent": {
+      "SalesOrder": {
+        "id": "ORDER_4100823954",
+        "orderNumber": "4100823954",
+        "status": {
+          "statusDesc": "ShipmentCompleted",
+          "statusCode": "SHIPMENT_COMPLETED",
+          "statusChangeDate": "2023-01-12T11:19:06.81449306Z"
+        },
+        "shipping": {
+          "deliveryStatusLog": [
+            {
+              "statusDesc": "Delivered",
+              "statusCode": "DELIVERED",
+              "statusChangeDate": "2023-01-12T11:14:34Z"
+            }
+          ],
+          "deliveryParcels": [
+            {
+              "deliveryId": "ORDERDELIVERY_4100823954_1Z7R78926837377015",
+              "carrierName": "UPS",
+              "trackingNumber": "1Z7R78926837377015",
+              "itemQty": 0,
+              "despatchTimetamp": "2023-01-12T11:14:34Z",
+              "status": "DELIVERED"
+            }
+          ],
+          "derivedStatus": {
+            "statusCode": "DELIVERED",
+            "statusChangeDate": "2023-01-12T11:19:06.414315698Z"
+          },
+          "deliveryStatus": {
+            "statusCode": "DELIVERED",
+            "statusChangeDate": "2023-01-12T11:14:34Z"
+          }
+        },
+        "timestamp": "1673522074",
+        "timeDate": "2023-01-12T11:14:34Z"
+      }
+    }
+  },
+  {
+    "EntityId": "SalesOrder_Hybris_4100823954",
+    "EventId": "SalesSalesOrder_Hybris_ITEMS_PICKED_UP_SalesOrder_HybrisDELIVERY_4100823954_1Z7R78926825300977_2023-01-12T11:34:44Z",
+    "EventName": "SalesOrderItemsPickedUp",
+    "EventOccurredTimestampUTC": "2023-01-12T11:34:44+00:00",
+    "TriggerEvent": {
+      "SalesOrder": {
+        "id": "ORDER_4100823954",
+        "orderNumber": "4100823954",
+        "status": {
+          "statusDesc": "ShipmentCompleted",
+          "statusCode": "SHIPMENT_COMPLETED",
+          "statusChangeDate": "2023-01-12T11:34:45.714068964Z"
+        },
+        "shipping": {
+          "deliveryStatusLog": [
+            {
+              "statusDesc": "PickedUp",
+              "statusCode": "PICKED_UP",
+              "statusChangeDate": "2023-01-12T11:34:44Z"
+            }
+          ],
+          "deliveryParcels": [
+            {
+              "deliveryId": "ORDERDELIVERY_4100823954_1Z7R78926825300977",
+              "carrierName": "UPS",
+              "trackingNumber": "1Z7R78926825300977",
+              "itemQty": 0,
+              "despatchTimetamp": "2023-01-12T11:34:44Z",
+              "status": "PICKEDUP"
+            }
+          ],
+          "derivedStatus": {
+            "statusCode": "DELIVERED",
+            "statusChangeDate": "2023-01-12T11:34:45.203938812Z"
+          },
+          "deliveryStatus": {
+            "statusCode": "PICKED_UP",
+            "statusChangeDate": "2023-01-12T11:34:44Z"
+          }
+        },
+        "timestamp": "1673523284",
+        "timeDate": "2023-01-12T11:34:44Z"
+      }
+    }
+  },
+  {
+    "EntityId": "SalesOrder_Hybris_4100823954",
+    "EventId": "SalesSalesOrder_Hybris_ITEMS_ARRIVED_AT_CARRIER_SalesOrder_HybrisDELIVERY_4100823954_1Z7R78926825300977_2023-01-12T18:23:32Z",
+    "EventName": "SalesOrderItemsArrivedAtCarrier",
+    "EventOccurredTimestampUTC": "2023-01-12T18:23:32+00:00",
+    "TriggerEvent": {
+      "SalesOrder": {
+        "id": "ORDER_4100823954",
+        "orderNumber": "4100823954",
+        "status": {
+          "statusDesc": "ShipmentInProgress",
+          "statusCode": "SHIPMENT_IN_PROGRESS",
+          "statusChangeDate": "2023-01-12T18:23:33.337799985Z"
+
+        },
+        "shipping": {
+          "deliveryStatusLog": [
+            {
+              "statusDesc": "ArrivedAtCarrier",
+              "statusCode": "ARRIVED_AT_CARRIER",
+              "statusChangeDate": "2023-01-12T18:23:32Z"
+            }
+          ],
+          "deliveryParcels": [
+            {
+              "deliveryId": "ORDERDELIVERY_4100823954_1Z7R78926825300977",
+              "carrierName": "UPS",
+              "trackingNumber": "1Z7R78926825300977",
+              "itemQty": 0,
+              "despatchTimetamp": "2023-01-12T18:23:32Z",
+              "status": "ARRIVED_AT_CARRIER"
+            }
+          ],
+          "derivedStatus": {
+            "statusCode": "IN_PROGRESS",
+            "statusChangeDate": "2023-01-12T18:23:33.076851227Z"
+          },
+          "deliveryStatus": {
+            "statusCode": "ARRIVED_AT_CARRIER",
+            "statusChangeDate": "2023-01-12T18:23:32Z"
+          }
+        },
+        "timestamp": "1673547812",
+        "timeDate": "2023-01-12T18:23:32Z"
+      }
+    }
+  },
+  {
+    "EntityId": "SalesOrder_Hybris_4100823954",
+    "EventId": "SalesSalesOrder_Hybris_ITEMS_OUT_FOR_DELIVERY_SalesOrder_HybrisDELIVERY_4100823954_1Z7R78926825300977_2023-01-13T08:23:21Z",
+    "EventName": "SalesOrderItemsOutForDelivery",
+    "EventOccurredTimestampUTC": "2023-01-13T08:23:21+00:00",
+    "TriggerEvent": {
+      "SalesOrder": {
+        "id": "ORDER_4100823954",
+        "orderNumber": "4100823954",
+        "status" : {
+          "statusDesc": "ShipmentInProgress",
+          "statusCode": "SHIPMENT_IN_PROGRESS",
+          "statusChangeDate": "2023-01-13T08:23:22.320630494Z"
+        },
+        "shipping": {
+          "deliveryStatusLog": [
+            {
+              "statusDesc": "OutForDelivery",
+              "statusCode": "OUT_FOR_DELIVERY",
+              "statusChangeDate": "2023-01-13T08:23:21Z"
+            }
+          ],
+          "deliveryParcels": [
+            {
+
+              "deliveryId": "ORDERDELIVERY_4100823954_1Z7R78926825300977",
+              "carrierName": "UPS",
+              "trackingNumber": "1Z7R78926825300977",
+              "itemQty": 0,
+              "despatchTimetamp": "2023-01-13T08:23:21Z",
+              "status": "OUT_FOR_DELIVERY"
+            }
+          ],
+          "derivedStatus": {
+            "statusCode": "IN_PROGRESS",
+            "statusChangeDate": "2023-01-13T08:23:22.091358474Z"
+          },
+          "deliveryStatus": {
+            "statusCode": "OUT_FOR_DELIVERY",
+            "statusChangeDate": "2023-01-13T08:23:21Z"
+          }
+        },
+        "timestamp": "1673598201",
+        "timeDate": "2023-01-13T08:23:21Z"
+      }
+    }
+  },
+  {
+    "EntityId": "SalesOrder_Hybris_4100823954",
+    "EventId": "SalesSalesOrder_Hybris_ITEMS_DELIVERED_SalesOrder_HybrisDELIVERY_4100823954_1Z7R78926825300977_2023-01-13T10:45:46Z",
+    "EventName": "SalesOrderItemsDelivered",
+    "EventOccurredTimestampUTC": "2023-01-13T10:45:46+00:00",
+    "TriggerEvent": {
+      "SalesOrder": {
+        "id": "ORDER_4100823954",
+        "orderNumber": "4100823954",
+        "status": {
+          "statusDesc": "ShipmentCompleted",
+          "statusCode": "SHIPMENT_COMPLETED",
+          "statusChangeDate": "2023-01-13T11:22:37.815923789Z"
+        },
+        "shipping": {
+          "deliveryStatusLog": [
+            {
+              "statusDesc": "Delivered",
+              "statusCode": "DELIVERED",
+              "statusChangeDate": "2023-01-13T10:45:46Z"
+            }
+          ],
+          "deliveryParcels": [
+            {
+              "deliveryId": "ORDERDELIVERY_4100823954_1Z7R78926825300977",
+              "carrierName": "UPS",
+              "trackingNumber": "1Z7R78926825300977",
+              "itemQty": 0,
+              "despatchTimetamp": "2023-01-13T10:45:46Z",
+              "status": "DELIVERED"
+            }
+          ],
+          "derivedStatus": {
+            "statusCode": "DELIVERED",
+            "statusChangeDate": "2023-01-13T11:22:37.286194882Z"
+          },
+          "deliveryStatus": {
+            "statusCode": "DELIVERED",
+            "statusChangeDate": "2023-01-13T10:45:46Z"
+          }
+        },
+        "timestamp": "1673606746",
+        "timeDate": "2023-01-13T10:45:46Z"
+      }
+    }
+  }
+]

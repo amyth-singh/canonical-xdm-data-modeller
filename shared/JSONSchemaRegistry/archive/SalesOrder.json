@@ -1,0 +1,54 @@
+{
+  "$id": "SalesOrder",
+  "description": "Sales Order Model",
+  "type": "object",
+  "properties": {
+    "OrderId": {"type": "string"},
+    "Header": {
+      "HeaderId": {"type": "string"},
+      "OrderId:": {"type": "string"},
+      "CustomerID": {"type": "string"},
+      "HeaderIds": [{"$ref": "./components/Entity.json"}],
+      "PartyIds": [{"$ref": "./components/Entity.json"}],
+      "Status": [{"$ref": "./components/Status.json"}],
+      "Times": [{"$ref": "./components/Time.json"}],
+      "Locations": [{"$ref": "./components/CustomAttribute.json"}],
+      "Qtys": [{"$ref": "./components/Measure.json"}],
+      "Totals": [{"$ref": "./components/Price.json"}],
+      "Contacts": [{"$ref": "./components/CustomAttribute.json"}],
+      "PaymentAtts": [{"$ref": "./components/CustomAttribute.json"}],
+      "FulfilmentAtts": [{"$ref": "./components/CustomAttribute.json"}],
+      "FinanceAtts": [{"$ref": "./components/CustomAttribute.json"}],
+      "OccasionAtts": [{"$ref": "./components/CustomAttribute.json"}],
+      "SupplierAtts": [{"$ref": "./components/CustomAttribute.json"}],
+      "NotesTagsAtts": [{"$ref": "./components/CustomAttribute.json"}],
+      "SalesOrderLinks": [{"$ref": "./components/Link.json"}],
+      "CustomAtts": [{"$ref": "./components/CustomAttribute.json"}]
+    },
+    "Lines": [{
+      "LineId": {"type": "string"},
+      "HeaderId": {"type": "string"},
+      "OrderId:": {"type": "string"},
+      "CustomerID": {"type": "string"},
+      "ProductId": {"type": "string"},
+      "LineIds": [{"$ref": "./components/Entity.json"}],
+      "PartyIds": [{"$ref": "./components/Entity.json"}],
+      "Type": [{"$ref": "./components/Type.json"}],
+      "Status": [{"$ref": "./components/Status.json"}],
+      "Times": [{"$ref": "./components/Time.json"}],
+      "Locations": [{"$ref": "./components/Channel.json#/ChannelObject"}],
+      "Qtys": [{"$ref": "./components/Measure.json"}],
+      "Discounts": [{"$ref": "./components/Discount.json"}],
+      "Prices": [{"$ref": "./components/Price.json"}],
+      "Totals": [{"$ref": "./components/Price.json"}],
+      "FulfilmentAtts": [{"$ref": "./components/CustomAttribute.json"}],
+      "FinanceAtts": [{"$ref": "./components/CustomAttribute.json"}],
+      "ProductAtts": [{"$ref": "./components/CustomAttribute.json"}]
+    }]
+  },
+  "required": [
+    "OrderId",
+    "Header",
+    "Lines"
+  ]
+}

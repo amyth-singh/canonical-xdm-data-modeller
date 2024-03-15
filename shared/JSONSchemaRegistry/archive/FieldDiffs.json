@@ -1,0 +1,14 @@
+{
+    "$id": "FieldDiff",
+    "description": "XDM Event 'FieldDiff' definition (e.g CDC)",
+    "type": "object",
+    "properties": {
+      "Name": {"type": "string"},
+      "ValBefore": {"type": "string"},    
+      "ValAfter": {"type": "string"}
+    },
+    "required": [
+      "Name",
+      "ValAfter"
+    ]
+}

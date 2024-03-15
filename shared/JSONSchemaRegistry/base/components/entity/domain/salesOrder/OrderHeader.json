@@ -1,0 +1,329 @@
+{
+  "type": "object",
+  "unevaluatedProperties": false,
+  "allOf": [
+    {
+      "$ref": "../../common/Entity.json#/EntityHeader"
+    },
+    {
+      "properties": {
+        "Ids": {
+          "$ref": "./OrderIds.json#/OrderIdsProperties",
+          "description": "The (required) common set of order Ids at the order level across all lines, not all a required individually, only what can be mapped & derived"
+        },
+        "Channels": {
+          "type": "object",
+          "description": "The collection of channels related to the order.  Typically explicitly defined at this level, however, not always and thus is inferred from lines according to specific logic.",
+          "unevaluatedProperties": false,
+          "properties": {
+            "SalesChannel": {
+              "description": "The channel/touchpoint of the original sale/purchase of the order",
+              "$ref": "../../common/Channel.json#/ChannelProperties"
+            },
+            "ReturnChannel": {
+              "description": "The channel/touchpoint of the return/refund of the order",
+              "$ref": "../../common/Channel.json#/ChannelProperties"
+            },
+            "ExchangeChannel": {
+              "description": "The channel/touchpoint of the exchange of the order",
+              "$ref": "../../common/Channel.json#/ChannelProperties"
+            },
+            "FulfilmentChannel": {
+              "description": "The channel/touchpoint of the fulfilment of the order",
+              "$ref": "../../common/Channel.json#/ChannelProperties"
+            }
+          }
+        },
+        "Locations": {
+          "type": "object",
+          "description": "",
+          "unevaluatedProperties": false,
+          "properties": {
+            "SalesLocation": {
+              "description": "The location of the original sale/purchase of the order",
+              "$ref": "../../common/Location.json#/LocationProperties"
+            },
+            "ReturnLocation": {
+              "description": "The location of the return of the order",
+              "$ref": "../../common/Location.json#/LocationProperties"
+            },
+            "ExchangeLocation": {
+              "description": "The location of the exchange of the order",
+              "$ref": "../../common/Location.json#/LocationProperties"
+            }
+          }
+        },
+        "Qtys": {
+          "type": "object",
+          "description": "The (required) collection of (possible) AGGREGATE quantities, as an aggregate of all line level quantities rolled up to header level, across the lifecycle of this order.  Actual usage and ability to populate depends on the richness of the sources.  Almost always a derived / enriched from child lines",
+          "unevaluatedProperties": false,
+          "properties": {
+            "QtyNet": {
+              "description": "The full aggregate 'net' (current) qty, at the order level across all lines, of product sold, net AFTER any subsequent retractions and adjustments post sale (e.g cancels, returns etc), at a point in time (e.g event time, latest entity time), ultimately the sellable billable qty in the end.  Can be explicit from source and also derived (e.g multiple lines qith qty 1 agg up to > 1)",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtySold": {
+              "description": "The full aggregate 'gross' (as sold / original) qty, at the order level across all lines, of product sold, gross BEFORE any subsequent retractions and adjustments (e.g cancels, returns etc), at a point in time of the sale (immutable thereafter), ultimately the 'as sold'  billable qty.  Always explicit from source but needs to be mapped from the 'first' event or derived equiv",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyPaid": {
+              "description": "The aggregate quantity paid, at the order level across all lines, at the time at a point in time (e.g event time, latest entity time)",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyCancelled": {
+              "description": "The aggregate quantity cancelled, at the order level across all lines, at the time at a point in time (e.g event time, latest entity time).  This is a '-' number to support a ledger styled approach to accounting.",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyVoided": {
+              "description": "The aggregate quantity voided, at the order level across all lines, at the time at a point in time (e.g event time, latest entity time).   This is a '-' number to support a ledger styled approach to accounting.",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyReturned": {
+              "description": "The aggregate quantity returned (but not exchanged), at the order level across all lines, at the time at a point in time (e.g event time, latest entity time).  This is a '-' number to support a ledger styled approach to accounting.",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyExchanged": {
+              "description": "The aggregate quantity exchanged (but not returned), at the order level across all lines, at the time at a point in time (e.g event time, latest entity time)",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyRefunded": {
+              "description": "The aggregate quantity refunded (i.e refund payment - note: some returns/cancellation may or may not get refunded so can be different to them), at the order level across all lines, at the time at a point in time (e.g event time, latest entity time)",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyShipped": {
+              "description": "The aggregate quantity shipped, at the order level across all lines, at the time at a point in time (e.g event time, latest entity time)",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyFulfilled": {
+              "description": "The aggregate quantity fulfilled, for this aggregate , at the time at a point in time (e.g event time, latest entity time) - context dependant to the fulfilment options (e.g delivered to customer, picked-up) - ultimately with end recipient",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyCompleted": {
+              "description": "The aggregate quantity 'completed' (context dependant), at the order level across all lines, at the time at a point in time (e.g event time, latest entity time)",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyLines": {
+              "description": "The number of sales lines across the order",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyPayments": {
+              "description": "The number of payment lines across the order",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            }
+          }
+        },
+        "Currency": {
+          "type": "object",
+          "description": "The collection of currencies involved in this order",
+          "unevaluatedProperties": false,
+          "properties": {
+            "LCY": {
+              "description": "The local currency native to the order / transaction",
+              "$ref": "../../common/Currency.json#/CurrencyProperties"
+            },
+            "BCY": {
+              "description": "The home / base currency to the client company, aligned to the 'normalised' currency e.g for reporting",
+              "$ref": "../../common/Currency.json#/CurrencyProperties"
+            }
+          }
+        },
+        "ExchangeRates": {
+          "type": "object",
+          "description": "The collection of (possible) exchange rates, across the lifecycle of this order.  Actual usage and ability to populate depends on the richness of the sources.  Some can be derived, while others are typically provided",
+          "unevaluatedProperties": false,
+          "properties": {
+            "SaleRate": {
+              "description": "The exchange rate used on this line at the time of sale",
+              "$ref": "../../common/ExchangeRate.json#/ExchangeRateProperties"
+            },
+            "RefundRate": {
+              "description": "The exchange rate used on this line at the time of refund",
+              "$ref": "../../common/ExchangeRate.json#/ExchangeRateProperties"
+            }
+          }
+        },
+        "Totals": {
+          "type": "object",
+          "description": "The (required) collection of possible AGGREGATE totals, both selling and cost related, as an aggregate of all line level quantities rolled up to order level.  Actual usage and ability to populate depends on the richness of the sources.  Almost always a derived / enriched from child lines",
+          "unevaluatedProperties": false,
+          "properties": {
+            "SaleTotals": {
+              "type": "object",
+              "description": "A collection of possible order level totals, in both original and current form, and considering gorss and net positions WRT adjustments",
+              "unevaluatedProperties": true,
+              "properties": {
+                "GrandTotal": {
+                  "description": "An order level total, the overall 'net' final amount due AFTER ALL ADJUSTMENT, and the final amount to be paid for",
+                  "$ref": "../../common/PriceOrigCurr.json#/PriceOrigCurrProperties"
+                },
+                "ProductTotal": {
+                  "description": "An order level total, the 'net' final product sold amount AFTER ALL PRODUCT ADJUSTMENTS (i.e after product discounts, but not including shipping, other charges etc)",
+                  "$ref": "../../common/PriceOrigCurr.json#/PriceOrigCurrProperties"
+                },
+                "ProductTotalBeforeAdjustments": {
+                  "description": "An order level total, the 'gross' final product sold amount BEFORE ANY PRODUCT ADJUSTMENTS (i.e before product discounts, not including shipping, other charges etc)",
+                  "$ref": "../../common/PriceOrigCurr.json#/PriceOrigCurrProperties"
+                },
+                "DiscountsTotal": {
+                  "description": "An order level total, for the total amount of discounts applied across header and lines (a negative value)",
+                  "$ref": "../../common/PriceOrigCurr.json#/PriceOrigCurrProperties"
+                },
+                "RefundsTotal": {
+                  "description": "An order level total, for the total amount of refunds from returns (a negative value)",
+                  "$ref": "../../common/PriceOrigCurr.json#/PriceOrigCurrProperties"
+                },
+                "ShippingTotal": {
+                  "description": "An order level total, the 'net' total for fulfilment/shipping charges, AFTER any adjustments e.g free shipping",
+                  "$ref": "../../common/PriceOrigCurr.json#/PriceOrigCurrProperties"
+                },
+                "ShippingTotalBeforeAdjustments": {
+                  "description": "An order level total, the 'gross' total for fulfilment/shipping charges, BEFORE any adjustments e.g free shipping",
+                  "$ref": "../../common/PriceOrigCurr.json#/PriceOrigCurrProperties"
+                },
+                "ChargesTotal": {
+                  "description": "An order level total, for any other/extra charges above shipping",
+                  "$ref": "../../common/PriceOrigCurr.json#/PriceOrigCurrProperties"
+                },
+                "TaxesTotal": {
+                  "description": "An order level total, for the total tax due across all lines on the order taking into account tax policies and duties for shipping",
+                  "$ref": "../../common/PriceOrigCurr.json#/PriceOrigCurrProperties"
+                },
+                "PaidTotal": {
+                  "description": "",
+                  "$ref": "../../common/PriceOrigCurr.json#/PriceOrigCurrProperties"
+                }
+              }
+            },
+            "CostTotals": {
+              "type": "object",
+              "description": "",
+              "unevaluatedProperties": true,
+              "properties": {
+                "ProductCostTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "LogisticsCostTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "MarketingCostTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "CommissionTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                }
+              }
+            },
+            "MarginTotals": {
+              "type": "object",
+              "description": "",
+              "unevaluatedProperties": true,
+              "properties": {
+                "ProductMarginTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                }
+              }
+            }
+          },
+          "required": [
+            "SaleTotals"
+          ]
+        },
+        "MarketingAtts": {
+          "type": "object",
+          "description": "The collection of marketing options/attributes",
+          "unevaluatedProperties": false,
+          "properties": {
+            "CampaignCode": {
+              "description": "The code of the campaign that was attributed to this order",
+              "type": "string"
+            },
+            "SourceCode": {
+              "description": "The code of the source that was attributed to this order",
+              "type": "string"
+            },
+            "ExtAtts": {
+              "type": "array",
+              "description": "The collection (array) of extra extension fulfillment options/attributes.",
+              "items": {
+                "$ref": "../../common/CustomAtt.json#/CustomAttProperties"
+              }
+            }
+          }
+        },
+        "FulfillmentAtts": {
+          "type": "object",
+          "description": "The collection of fulfillment options/attributes (fulfillment options e.g delivery method, NOT the fulfillment lines e.g delivery themselves), controlling fulfillment of the line.  Typically sits at the header level.",
+          "unevaluatedProperties": false,
+          "properties": {
+            "FulfilFromLocation": {
+              "description": "The location to fulfil the whole order from, at order level",
+              "$ref": "../../common/Location.json#/LocationProperties"
+            },
+            "FulfilToLocation": {
+              "description": "The location to fulfil the whole order to, in the case of collect from sotre or click and collect optons, at order level",
+              "$ref": "../../common/Location.json#/LocationProperties"
+            },
+            "FulfilmentMethodCode": {
+              "description": "The chosen fulfilment method for the order, typically by the customer e.g DeliverToCustomer, DeliverToStore",
+              "type": "string"
+            },
+            "FulfilmentOptionId": {
+              "description": "The chosen fulfilment option number for the order, typically by the customer e.g 001",
+              "type": "string"
+            },
+            "FulfilmentOptionCode": {
+              "description": "The chosen fulfilment option code for the order, typically by the customer e.g NextDayDelivery",
+              "type": "string"
+            },
+            "FulfilmentSplitOptionCode": {
+              "description": "The delivery group code e.g Split, NoSplit",
+              "type": "string",
+              "enum": [
+                "Split",
+                "NoSplit",
+                "Undefined"
+              ]
+            },
+            "ExtAtts": {
+              "type": "array",
+              "description": "The collection (array) of extra extension fulfillment options/attributes.",
+              "items": {
+                "$ref": "../../common/CustomAtt.json#/CustomAttProperties"
+              }
+            }
+          }
+        },
+        "PaymentAtts": {
+          "type": "array",
+          "description": "The collection (array) of payment options/attributes (payment options from customer e.g method, not the payment transactions themselves), controlling payment processing for the product purchased.  Typically sits at the header level, but sometimes also a line level",
+          "items": {
+            "$ref" : "../../common/CustomAtt.json#/CustomAttProperties"
+          }
+        },
+        "FinanceAtts": {
+          "type": "array",
+          "description": "The collection of finance (e.g tax, commission) options/attributes, of the product purchased",
+          "items": {
+            "$ref" : "../../common/CustomAtt.json#/CustomAttProperties"
+          }
+        },
+        "Lineage": {
+          "$ref": "../../common/EventLineage.json#/EventLineageProperties",
+          "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+        }
+      },
+      "required": [
+        "SalesOrderNumber",
+        "SalesOrderLineNumber",
+        "ProductAtts",
+        "Qtys",
+        "Totals"
+      ]
+    }
+  ]
+}

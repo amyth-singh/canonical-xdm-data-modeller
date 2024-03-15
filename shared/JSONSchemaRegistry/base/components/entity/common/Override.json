@@ -1,0 +1,59 @@
+{
+  "OverrideObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/OverrideProperties"
+    }
+  },
+  "OverrideProperties": {
+    "type": "object",
+    "unevaluatedProperties": false,
+    "properties": {
+      "OverrideId": {
+        "type": "string",
+        "description": "The canonical (synthetic) Xfuze Override id if identifiable and has some unique key e.g Override_D365_987654"
+      },
+      "OverrideKey": {
+        "type": "string",
+        "description": "The native override number if identifiable and has some unique key e.g 987654"
+      },
+      "IsAutomaticApproval": {
+        "type": "string",
+        "description": "Is this an automatic override approval? e.g Y",
+        "enum": ["Y","N","U"]
+      },
+      "UserId": {
+        "type": "string",
+        "description": "The userId overriding this instance"
+      },
+      "OriginalUserId": {
+        "type": "string",
+        "description": "The original userId on the original transaction"
+      },
+      "OverrideType": {
+        "type": "string",
+        "description": "The type of the override e.g Price, Discount, Payment etc"
+      },
+      "OverrideReasonCode": {
+        "type": "string",
+        "description": "The reason code for the override"
+      },
+      "OverrideReasonDesc": {
+        "type": "string",
+        "description": "The reason description for the override"
+      },
+      "OriginalValue": {
+        "type": "string",
+        "description": "The original value before the override e.g original price"
+      },
+      "Value": {
+        "type": "string",
+        "description": "The new overridden value post the override e.g adjusted price"
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

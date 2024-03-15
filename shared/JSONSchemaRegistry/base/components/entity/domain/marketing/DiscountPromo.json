@@ -1,0 +1,101 @@
+{
+  "type": "object",
+  "unevaluatedProperties": false,
+  "allOf": [
+    {
+      "$ref": "../../common/Entity.json#/EntityHeader"
+    },
+    {
+      "properties": {
+        "DiscountId": {
+          "type": "string",
+          "description": "The 'natural' sales order number, that this discount line is linked and applied to"
+        },
+        "DiscountNumber": {
+          "type": "string",
+          "description": "The 'natural' sales order number, that this discount line is linked and applied to"
+        },
+        "DiscountCode": {
+          "type": "string",
+          "description": "The unique code of the Discount / Promo / Coupon e.g AD020"
+        },
+        "AllowedApplyLevel": {
+          "type": "string",
+          "description": "The level that the Discount can be applied",
+          "enum": [
+            "Header","Line","Both"
+          ]
+        },
+        "DiscountType": {
+          "type": "string",
+          "description": "The specific type of the discount e.g BuyOneGetOneFree, BuyOneGetOneFree",
+          "enum": [
+            "BuyOneGetOneFree",
+            "BuyOneGetDiscount",
+            "PercentageDiscount",
+            "FixedAmountOffDiscount",
+            "QuantityDiscount",
+            "LoyaltyPoints",
+            "SeasonalSale",
+            "FlashSale",
+            "ClearanceSale",
+            "BundleDeal",
+            "FreeShipping",
+            "FreeGiftWithPurchase",
+            "RebateOffer",
+            "Sampling",
+            "BuyOneGetOneFree",
+            "FirstTimeCustomerDiscount",
+            "ReferralDiscount",
+            "PriceMatchGuarantee",
+            "TradeInDiscount"
+          ]
+        },
+        "DiscountPurpose": {
+          "type": "string",
+          "description": "The purpose of the Discount e.g Promotion, Campaign, Goodwill etc"
+        },
+        "DiscountName": {
+          "type": "string",
+          "description": "The name of the discount applied in this discount line"
+        },
+        "DiscountDesc": {
+          "type": "string",
+          "description": "The name of the discount applied in this discount line"
+        },
+        "DiscountPercentage": {
+          "type": "number",
+          "description": "The percenatge discounted, if applicable e.g 10 or 10.00 for 10%"
+        },
+        "GLCode": {
+          "type": "string",
+          "description": "A GL code associated with this Discount"
+        },
+        "IsManualAllowed": {
+          "type": "string",
+          "description": "Is this allowed to be used manually? e.g Y"
+        },
+        "ReasonCode": {
+          "type": "string",
+          "description": "The reason code for the creation of this Discount e.g promoX, campaignY"
+        },
+        "ReasonDesc": {
+          "type": "string",
+          "description": "The reason description for the creation of this Discount"
+        },
+        "EventId": {
+          "type": "string",
+          "description": "The Xfuze EventId that was the source of this discount"
+        },
+        "AsOf": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp at which the Discount was valid 'as of', if known and applicable"
+        }
+      },
+      "required": [
+        "DiscountCode"
+      ]
+    }
+  ]
+}

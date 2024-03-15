@@ -1,0 +1,61 @@
+{
+  "OrgNameObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/OrgNameProperties"
+    }
+  },
+  "OrgNameProperties": {
+    "type": "object",
+    "required": [
+      "OrgName","OrgNameType"
+    ],
+    "unevaluatedProperties": false,
+    "properties": {
+      "OrgNameId": {
+        "type": "string",
+        "description": "The canonical (synthetic) Xfuze name id for the name if identifiable and has some unique key e.g OrgName_D365_55555"
+      },
+      "OrgNameKey": {
+        "type": "string",
+        "description": "The native name key / number of the name master, if identifiable and thus has some unique key e.g 55555"
+      },
+      "OrgName": {
+        "type": "string",
+        "description": "The standard org name (organisation as top level) managing/owning/running this location"
+      },
+      "OrgCode": {
+        "type": "string",
+        "description": "The standard org code (organisation as top level) for this location"
+      },
+      "TradingOrgName": {
+        "type": "string",
+        "description": "The official trading name (organisation as top level) the org trades as"
+      },
+      "CommonOrgName": {
+        "type": "string",
+        "description": "The common trading name (organisation as top level) the org trades as"
+      },
+      "CompanyName": {
+        "type": "string",
+        "description": "The standard company name (company under the top level organisation) name for this location"
+      },
+      "CompanyCode": {
+        "type": "string",
+        "description": "The standard company code (company under the top level organisation) for this location"
+      },
+      "TradingCompanyName": {
+        "type": "string",
+        "description": "The official trading company name (company under the top level organisaton) the org trades as"
+      },
+      "CommonCompanyName": {
+        "type": "string",
+        "description": "The common trading company name (company under the top level organisaton) the org trades as"
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

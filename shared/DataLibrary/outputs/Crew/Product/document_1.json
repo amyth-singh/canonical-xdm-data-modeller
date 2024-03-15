@@ -1,0 +1,508 @@
+{
+ "CompositeEntityId": "ProductStyle_500_2403",
+ "CompositeEntityType": "ProductStyle",
+ "DomainEvent": {
+  "TriggerEntity": {
+   "ProductVariant": {
+    "Classifications": {
+     "CrewProductType": {
+      "Code": "5502",
+      "Desc": "T-Shirt"
+     },
+     "EndUse": {
+      "Code": ""
+     },
+     "Gender": {
+      "Code": ""
+     },
+     "Phase": {
+      "Code": "HI SUMMER"
+     },
+     "ProductArea": {
+      "Code": ""
+     },
+     "ProductGroup": {
+      "Code": "500",
+      "Desc": "Menswear"
+     },
+     "ProductSegment": {
+      "Code": ""
+     },
+     "ProductType": {
+      "Code": ""
+     },
+     "Range": {
+      "Code": "Range test"
+     },
+     "Season": {
+      "Code": "SPRING SUMMER 2013"
+     },
+     "Style": {
+      "Code": "M05-2513",
+      "Desc": ""
+     },
+     "Template": {
+      "Code": ""
+     }
+    },
+    "CompositeEntityId": "ProductStyle_500_2403",
+    "CompositeEntityType": "ProductStyle",
+    "CoreAtts": {
+     "Description": "CREW CLASSIC TEE"
+    },
+    "DigitalAttributes": {
+     "Bundles": {
+      "Outfit1": {
+       "BundleID": "Bundle_5052123488093_Outfit1"
+      },
+      "Outfit2": {
+       "BundleID": "Bundle_5052123488093_Outfit2"
+      },
+      "Outfit3": {
+       "BundleID": "Bundle_5052123488093_Outfit3"
+      },
+      "Outfit4": {
+       "BundleID": "Bundle_5052123488093_Outfit4"
+      }
+     },
+     "Images": {
+      "Model": {
+       "Height": "",
+       "Wears": ""
+      }
+     },
+     "Web": {
+      "WebDescription": {
+       "WebDescriptionLong": "",
+       "WebDescriptionShort": ""
+      },
+      "WebExclusive": "U"
+     }
+    },
+    "EntityId": "ProductVariant_500_2403_XS",
+    "EntityType": "ProductVariant",
+    "InventoryLogistics": {
+     "Distribution": {
+      "Packaging": {
+       "PackagingCode": ""
+      }
+     },
+     "InventoryManagement": {
+      "Stock": {
+       "IsReturnable": "U",
+       "StockAge": {
+        "Amount": null,
+        "UnitMeasure": "Days"
+       }
+      }
+     },
+     "Supplier": {
+      "ProfileName": {
+       "FullName": "SREE SANTOSH EXPORTS",
+       "NameType": "Organisation"
+      }
+     },
+     "TradeClassification": {
+      "HS": {
+       "HSCode": ""
+      }
+     }
+    },
+    "ParentEntityId": "ProductOption_500_2403",
+    "ParentEntityType": "ProductOption",
+    "PhysicalAttributes": {
+     "Colour": {
+      "ColourCode": "WHTSTRP",
+      "ColourDescription": "",
+      "ColourGroup": "Colour Group Test"
+     },
+     "Garment": {
+      "Bottoms": {
+       "Waistband": {
+        "WaistbandPosition": ""
+       }
+      },
+      "Fabric": {
+       "FabricType": "",
+       "Pattern": {
+        "PatternType": ""
+       }
+      },
+      "Feature": {
+       "Fastening": {
+        "FasteningType": ""
+       },
+       "Padding": {
+        "PaddingType": ""
+       },
+       "WaterResistance": {
+        "WaterResistanceType": ""
+       },
+       "Wiring": {
+        "WiringType": ""
+       }
+      },
+      "Footwear": {
+       "Composition": {
+        "Lining": {
+         "LiningCompositionType": ""
+        },
+        "Main": {
+         "MainCompositionType": ""
+        },
+        "Sole": {
+         "SoleCompositionType": ""
+        }
+       },
+       "Heel": {
+        "HeelType": "",
+        "Height": {
+         "HeelHeightType": ""
+        }
+       },
+       "Toe": {
+        "Style": {
+         "ToeStyleType": ""
+        }
+       }
+      },
+      "Style": {
+       "Fit": {
+        "FitType": ""
+       },
+       "Length": {
+        "LengthType": ""
+       },
+       "StyleCode": "M05-2513",
+       "StyleType": ""
+      },
+      "Tops": {
+       "Neckline": {
+        "NecklineType": ""
+       },
+       "Sleeve": {
+        "Length": {
+         "SleeveLengthType": ""
+        }
+       }
+      }
+     },
+     "Measurements": {
+      "Dimensions": {
+       "Depth": {
+        "Amount": null,
+        "UnitMeasure": "cm"
+       },
+       "Height": {
+        "Amount": null,
+        "UnitMeasure": "cm"
+       },
+       "Length": {
+        "Amount": null,
+        "UnitMeasure": "cm"
+       },
+       "Width": {
+        "Amount": null,
+        "UnitMeasure": "cm"
+       }
+      },
+      "StandardSize": {
+       "SizeCode": "XS"
+      },
+      "Volume": {
+       "Amount": null,
+       "UnitMeasure": "mL"
+      },
+      "Weight": {
+       "Amount": null,
+       "UnitMeasure": "KG"
+      }
+     }
+    },
+    "PricingFinancial": {
+     "CostPrices": {
+      "CostPrice": {
+       "BCY": {
+        "ExTax": null
+       }
+      }
+     },
+     "PriceClassification": {
+      "IsHighValue": "U",
+      "IsMarkdown": "U",
+      "PriceLevel": {
+       "PriceLevelCode": ""
+      }
+     },
+     "Taxes": {
+      "SalesTax": {
+       "TaxCode": "H",
+       "TaxSchemeCode": "VAT"
+      }
+     }
+    },
+    "RegulatoryCompliance": {
+     "Environmental": {
+      "EcoFriendly": {
+       "Code": "Eco Friendly Test"
+      }
+     },
+     "SafetyAndStandards": {
+      "Care": {
+       "DryingInstructions": "",
+       "IroningInstructions": "",
+       "WashingInstructions": ""
+      },
+      "DangerousGoods": {
+       "Code": ""
+      },
+      "Labels": {
+       "WashcareLabel": {
+        "LabelContent": ""
+       }
+      }
+     },
+     "SupplyChain": {
+      "CountryOfOrigin": {
+       "ISO3": "IND"
+      }
+     }
+    },
+    "Status": {
+     "AvailabilityStatus": {
+      "StatusCode": "Y"
+     }
+    },
+    "Times": {
+     "ConcessionLiveOn": null,
+     "CreatedOn": {
+      "DateId": "Dates_20230104",
+      "DateKey": 20230104,
+      "DateLocal": "2023-01-04",
+      "DateTimeKey": 20230104120000000,
+      "DateUTC": "2023-01-04",
+      "HourId": "Hours_2023010412",
+      "HourKey": 2023010412,
+      "HourLocal": 12,
+      "HourUTC": 12,
+      "Local": "2023-01-04T12:00:00.000+00:00",
+      "Millis": 1672833600000,
+      "RawValue": "01/04/2023 12:00:00",
+      "TimeZone": "Europe/London",
+      "TimeZoneOffset": "+00:00",
+      "UTC": "2023-01-04T12:00:00.000Z",
+      "YearDay": 2023004,
+      "YearIsoWeek": 202301,
+      "YearMonth": 202301,
+      "YearWeek": 202300
+     },
+     "UpdatedOn": {
+      "DateId": "Dates_20231109",
+      "DateKey": 20231109,
+      "DateLocal": "2023-11-09",
+      "DateTimeKey": 20231109135856000,
+      "DateUTC": "2023-11-09",
+      "HourId": "Hours_2023110913",
+      "HourKey": 2023110913,
+      "HourLocal": 13,
+      "HourUTC": 13,
+      "Local": "2023-11-09T13:58:56.000+00:00",
+      "Millis": 1699538336000,
+      "RawValue": "11/09/2023 13:58:56",
+      "TimeZone": "Europe/London",
+      "TimeZoneOffset": "+00:00",
+      "UTC": "2023-11-09T13:58:56.000Z",
+      "YearDay": 2023313,
+      "YearIsoWeek": 202345,
+      "YearMonth": 202311,
+      "YearWeek": 202344
+     }
+    },
+    "Type": {
+     "TypeCode": "ProductVariant",
+     "TypeDesc": "Daily Product Variant Catalogue"
+    },
+    "XRefIds": [
+     {
+      "Code": "SKU",
+      "Id": "1000238",
+      "SystemCode": "Retail247"
+     },
+     {
+      "Code": "EAN",
+      "Id": "5052123488093",
+      "SystemCode": "Retail247"
+     },
+     {
+      "Code": "Product Code",
+      "Id": "",
+      "SystemCode": "Retail247"
+     },
+     {
+      "Code": "SKU ID",
+      "Id": "",
+      "SystemCode": "Retail247"
+     },
+     {
+      "Code": "John Lewis Product Code",
+      "Id": "",
+      "SystemCode": "Retail247"
+     }
+    ]
+   }
+  }
+ },
+ "EntityId": "ProductVariant_500_2403_XS",
+ "EntityType": "ProductVariant",
+ "EventId": "ProductVariantPublished_ProductVariant_500_2403_XS_20231109135856000",
+ "EventMetadata": {
+  "EntityAtts": {
+   "Origin": {
+    "CompositeEntityId": "500_2403",
+    "EntityId": "500_2403_XS",
+    "ParentEntityId": "500_2403"
+   },
+   "Xfuze": {
+    "CompositeEntityId": "ProductStyle_500_2403",
+    "CompositeEntityType": "ProductStyle",
+    "EntityDomain": "Product",
+    "EntityId": "ProductVariant_500_2403_XS",
+    "EntityType": "ProductVariant",
+    "IsSensitive": "N",
+    "ParentEntityId": "ProductOption_500_2403",
+    "ParentEntityType": "ProductOption"
+   }
+  },
+  "EventAtts": {
+   "Origin": {
+    "CorrelationId": "test",
+    "EnvCode": "test",
+    "EventId": "test",
+    "SourceSubSystem": "test",
+    "SourceSystem": "test"
+   },
+   "Xfuze": {
+    "ClientCode": "test",
+    "ConnectorInstance": "test",
+    "ConnectorType": "csv-client",
+    "EnvCode": "test",
+    "EventCategory": "Product",
+    "EventChangePattern": "FullSnapshot",
+    "EventClass": "TriggerEvent",
+    "EventId": "ProductVariantPublished_ProductVariant_500_2403_XS_20231109135856000",
+    "EventName": "ProductVariantPublished"
+   }
+  },
+  "IngestAtts": {
+   "File": {
+    "BytesOffsetInOriginalFile": 4779,
+    "ChangeTimestampUTC": "2023-12-06T12:58:27.181Z",
+    "Name": "complete_crew_origin_product_data_2_tabs_5 records.csv",
+    "ObjectNotificationPayload": "{\"kind\":\"storage#object\",\"id\":\"xfuze-dev-testbucket/tmp/complete_crew_origin_product_data_2_tabs_5 records.csv/1701867507176589\",\"selfLink\":\"https://www.googleapis.com/storage/v1/b/xfuze-dev-testbucket/o/tmp%2Fcomplete_crew_origin_product_data_2_tabs_5%20records.csv\",\"name\":\"tmp/complete_crew_origin_product_data_2_tabs_5 records.csv\",\"bucket\":\"xfuze-dev-testbucket\",\"generation\":\"1701867507176589\",\"metageneration\":\"1\",\"contentType\":\"text/csv\",\"timeCreated\":\"2023-12-06T12:58:27.181Z\",\"updated\":\"2023-12-06T12:58:27.181Z\",\"storageClass\":\"STANDARD\",\"timeStorageClassUpdated\":\"2023-12-06T12:58:27.181Z\",\"size\":\"5674\",\"md5Hash\":\"HaD/9JTeP4m/fLOwD1b3yA==\",\"mediaLink\":\"https://storage.googleapis.com/download/storage/v1/b/xfuze-dev-testbucket/o/tmp%2Fcomplete_crew_origin_product_data_2_tabs_5%20records.csv?generation=1701867507176589\\u0026alt=media\",\"crc32c\":\"fW/yog==\",\"etag\":\"CI2p4cHu+oIDEAE=\"}",
+    "OriginalFileSizeBytes": 5674,
+    "OriginalRowSizeBytes": 894,
+    "Path": "tmp/complete_crew_origin_product_data_2_tabs_5 records.csv",
+    "URI": "gs://xfuze-dev-testbucket/tmp/complete_crew_origin_product_data_2_tabs_5 records.csv"
+   },
+   "Stream": {
+    "ChannelName": "xfuze-dev-testgcs-subscription",
+    "ChannelURI": "projects/xfuze-platform-dev/subscriptions/xfuze-dev-testgcs-subscription",
+    "ExternalMessageId": "xfuze-dev-testbucket/tmp/complete_crew_origin_product_data_2_tabs_5 records.csv/1701867507176589",
+    "Offset": "test",
+    "Partition": "test",
+    "PublishTimestampUTC": "2023-12-06T12:58:27.181Z"
+   }
+  },
+  "PayloadAtts": {
+   "Origin": {
+    "DataPayloadHash": "test-hash",
+    "EventPayloadHash": "test-hash",
+    "HashScheme": "test"
+   },
+   "Xfuze": {
+    "DataPayloadHash": null,
+    "EventPayloadHash": "f4de389b2a67aab87be0a5dd006268e8"
+   }
+  },
+  "PrivacyAtts": {
+   "Origin": {
+    "IsEncrypted": false
+   },
+   "Xfuze": {
+    "IsSensitiveEntity": "N"
+   }
+  },
+  "TimeAtts": {
+   "Origin": {
+    "Times": {
+     "EventOccurredTimestamp": "11/09/2023 13:58:56"
+    }
+   },
+   "Xfuze": {
+    "TimeZones": {
+     "EventTimeZone": {
+      "TimeZone": "Europe/London",
+      "TimeZoneOffset": "+00:00"
+     },
+     "HomeTimeZone": {
+      "TimeZone": "Europe/London",
+      "TimeZoneOffset": "+00:00"
+     }
+    },
+    "Times": {
+     "EventOccurredTimestamp": {
+      "DateId": "Dates_20231109",
+      "DateKey": 20231109,
+      "DateLocal": "2023-11-09",
+      "DateTimeKey": 20231109135856000,
+      "DateUTC": "2023-11-09",
+      "HourId": "Hours_2023110913",
+      "HourKey": 2023110913,
+      "HourLocal": 13,
+      "HourUTC": 13,
+      "Local": "2023-11-09T13:58:56.000+00:00",
+      "Millis": 1699538336000,
+      "RawValue": "11/09/2023 13:58:56",
+      "TimeZone": "Europe/London",
+      "TimeZoneOffset": "+00:00",
+      "UTC": "2023-11-09T13:58:56.000Z",
+      "YearDay": 2023313,
+      "YearIsoWeek": 202345,
+      "YearMonth": 202311,
+      "YearWeek": 202344
+     },
+     "EventOccurredType": "TrueTime",
+     "EventReceivedTimestamp": {
+      "DateId": "Dates_20231206",
+      "DateKey": 20231206,
+      "DateLocal": "2023-12-06",
+      "DateTimeKey": 20231206125827000,
+      "DateUTC": "2023-12-06",
+      "HourId": "Hours_2023120612",
+      "HourKey": 2023120612,
+      "HourLocal": 12,
+      "HourUTC": 12,
+      "Local": "2023-12-06T12:58:27.181+00:00",
+      "Millis": 1701867507181,
+      "RawValue": "2023-12-06T12:58:27.181Z",
+      "TimeZone": "Europe/London",
+      "TimeZoneOffset": "+00:00",
+      "UTC": "2023-12-06T12:58:27.181Z",
+      "YearDay": 2023340,
+      "YearIsoWeek": 202349,
+      "YearMonth": 202312,
+      "YearWeek": 202348
+     }
+    }
+   }
+  }
+ },
+ "EventName": "ProductVariantPublished",
+ "EventOccurredDateLocal": "2023-11-09",
+ "EventOccurredDateUTC": "2023-11-09",
+ "EventOccurredTimestampLocal": "2023-11-09T13:58:56.000+00:00",
+ "EventOccurredTimestampUTC": "2023-11-09T13:58:56.000Z",
+ "EventReceivedTimestampUTC": "2023-11-09T13:58:56.000Z",
+ "ParentEntityId": "ProductOption_500_2403",
+ "ParentEntityType": "ProductOption"
+}

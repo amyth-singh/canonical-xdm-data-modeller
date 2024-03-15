@@ -1,0 +1,60 @@
+cid
+
+888 account unique identifier
+
+selfExclusionStartDate
+
+Self-Exclusion Start Date
+
+null if selfExclusionFlag = N
+selfExclusionEndDate
+
+Self-Exclusion End Date
+
+null if selfExclusionFlag = N
+selfExclusionStatusUpdateDate
+
+Self-Exclusion Status Update Date in System
+
+selfExclusionPeriod
+
+Self-Exclusion Period
+
+null if selfExclusionFlag = N
+selfExclusionStatus
+
+Self-Exclusion Status
+
+selfExclusionLevelId
+
+Self-Exclusion Level Id
+
+null if selfExclusionFlag = N
+selfExclusionRequestedBy
+
+Self-Exclusion Requested By
+
+null if selfExclusionFlag = N
+SEOriginalPlayerId
+
+if 888 (then same as cid); if WH then received value from WH
+
+null if selfExclusionFlag = N
+SEOriginalSystem
+
+888 or WH
+
+null if selfExclusionFlag = N
+SEOriginalBrandId
+
+null if selfExclusionFlag = N
+SEOriginalBrandName
+
+null if selfExclusionFlag = N
+SEOriginalEvent
+
+the OriginalEvent received from crossBrand DB; if initiator is 888 then will be null
+
+null if selfExclusionFlag = N
+sequentialNumber
+

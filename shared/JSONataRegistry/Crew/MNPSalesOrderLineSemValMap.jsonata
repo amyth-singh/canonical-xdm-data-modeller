@@ -1,0 +1,53 @@
+(
+
+  /* #### START: SETUP REGRESSION TESTS #### */
+  /* --------------------------------------- */
+
+  /* Create some sub data components for ease of test use / reuse */
+
+  $xdmEvents := [$];
+
+  /* EventMetadata */
+  /* EventMetadata.EventAtts */
+  $eventAttsSummary := $xdmEvents.(
+	{
+    	"EntityId"		: EntityId,
+    	"EventId"		: EventId,
+    	"EventAtts"		: EventMetadata.EventAtts
+    }
+  );
+
+  $entityAttsSummary := $xdmEvents.(
+	{
+    	"EntityId"		: EntityId,
+    	"EventId"		: EventId,
+    	"EventAtts"		: EventMetadata.EntityAtts
+    }
+  );
+
+  /* EventMetadata.TimeAtts */
+  $timeAttsSummary := $xdmEvents.(
+	{
+    	"EntityId"		: EntityId,
+    	"EventId"		: EventId,
+    	"EventAtts"		: EventMetadata.TimeAtts
+    }
+  );
+
+  /* SalesOrderLine.XRefIds */
+  $lineIdsSummary := $xdmEvents.(
+	{
+    	"HeaderId": DomainEvent.TriggerEntity.SalesOrderLine.LineIds.OrderKey,
+    	"Type": DomainEvent.TriggerEntity.SalesOrderLine.Type,
+    	"LineIds": DomainEvent.TriggerEntity.SalesOrderLine.LineIds,
+    	"XRefIds": DomainEvent.TriggerEntity.SalesOrderLine.XRefIds
+    }
+  );
+
+
+
+ $timeAttsSummary
+
+
+
+)

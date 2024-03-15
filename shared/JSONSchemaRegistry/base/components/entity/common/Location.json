@@ -1,0 +1,61 @@
+{
+  "LocationObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/LocationProperties"
+    }
+  },
+  "LocationProperties": {
+    "type": "object",
+    "unevaluatedProperties": false,
+    "properties": {
+      "LocationId": {
+        "type": "string",
+        "description": "The canonical (synthetic) SDV location ID format Location_[sourceSystem]_[LocationNumber] e.g Location_D365_010"
+      },
+      "LocationNodeId": {
+        "type": "string",
+        "description": "The specific node id in the location hierarchy"
+      },
+      "LocationKey": {
+        "type": "string",
+        "description": "The 'native' location number of the location like a storeNumber e.g 010"
+      },
+      "LocationType": {
+        "type": "string",
+        "description": "The (core) type of the location e.g Warehouse, Store, Transit, Online"
+      },
+      "LocationShortName": {
+        "type": "string",
+        "description": "The (short / default) name of the location e.g GBC DC"
+      },
+      "LocationName": {
+        "$ref": "./OrgName.json#/OrgNameProperties",
+        "description": "The full name details of the location if applicable"
+      },
+      "HierarchyNode": {
+        "$ref": "./HierarchyNode.json#/HierarchyNodeProperties",
+        "description": "The specific hierarchy details of this location itself"
+      },
+      "Hierarchy": {
+        "$ref": "./HierarchyNodes.json#/HierarchyNodesProperties",
+        "description": "The hierarchy (breadcrumbs) of the location in its hierarchy, typically L1 to L5"
+      },
+      "LocationAddress": {
+        "$ref": "./Address.json#/AddressProperties",
+        "description": "The physical address details of the location"
+      },
+      "LocationAtts": {
+        "type": "array",
+        "description": "A collection (array) of extended location attributes",
+        "items": {
+          "$ref" : "./CustomAtt.json#/CustomAttProperties"
+        }
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

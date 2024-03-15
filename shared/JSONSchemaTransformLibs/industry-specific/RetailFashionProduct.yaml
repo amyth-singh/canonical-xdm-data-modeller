@@ -1,0 +1,28 @@
+process:
+  - inputSchema: base/product/ProductEvent.json
+    outputSchema: industry-specific/RetailFashion/Product.json
+    
+transformations:
+  - file: base/components/entity/domain/product/PhysicalAttributes.json
+    transforms:
+      - path: properties
+        expression: >
+          $merge([$,
+                  {"$ref": "./RetailFashionProduct.json#/GarmentObject"}
+                 ])
+  - file: base/components/entity/domain/product/DigitalAttributes.json
+    transforms:
+      - path: properties.Images.properties
+        expression: >
+          $merge([$,
+                  {"$ref": "./RetailFashionProduct.json#/ImageModelObject"}
+                 ])
+  - file: base/components/entity/domain/product/DigitalAttributes.json
+    transforms:
+      - path: properties.SafetyAndStandards.properties.Care.properties
+        expression: >
+          $merge([$,
+                  {"$ref": "./RetailFashionProduct.json#/GarmentCareInstructionProperties"}
+                 ])
+
+                 

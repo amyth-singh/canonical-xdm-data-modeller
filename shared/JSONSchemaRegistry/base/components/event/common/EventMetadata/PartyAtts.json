@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xfuze.io/xdm/schema/components/event/common/EventHeader/EventMetadata/PartyAtts",
+  "description": "XDM Schema for the common event component 'EventHeader/EventMetadata/PartyAtts'",
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "Xfuze": {
+      "type": "object",
+      "description": "The (optional) Xfuze derived / enriched attributes that define the context of the (primary) party involved in this particular instance of the event",
+      "unevaluatedProperties": false,
+      "properties": {
+        "PartyId": {
+          "type": "string",
+          "description": "The (optional) canonical top level PartyId, identifying the physical party (e.g person, organisation, group), as the single ID source of truth across systems - typically only derivable by the EventProcessors e.g Party_69a79ae0-1d10-46b3-8dd2-7455c622aae2"
+        },
+        "SystemPartyId": {
+          "type": "string",
+          "description": "The (required) canonical party Id, for a given system, uniquely identifying the party within that specific system (as opposed to across systems which is the case for the above PartyId) e.g Party_SFCC_123456789"
+        },
+        "SystemAccountId": {
+          "type": "string",
+          "description": "The (optional) canonical top level AccountId of the account this event relates to e.g Account_SFCC_987654321"
+        },
+        "PartyRoleTypeCode": {
+          "type": "string",
+          "description": "The (required) type of behavioural role of the party with respect to the involvement in this event e.g Customer.  A party can assume multiple roles, this role is the one WRT this specific event"
+        },
+        "PartyRoleSubTypeCode": {
+          "type": "string",
+          "description": "The (optional) sub type of the top level role of the party with respect to the involvement in this event to further refine the top level role to be more accurate and specific e.g Purchaser, Recipient, DeliveryRecipient etc.  "
+        },
+        "PartyStatusCode": {
+          "type": "string",
+          "description": "The (optional) canonical status of the party as was at the time of this event e.g Registered"
+        },
+        "InvolvedReasonCode": {
+          "type": "string",
+          "description": "The (optional) canonical reason code as to they this party was involved in the event e.g Purchaser"
+        }
+      },
+      "required": [
+        "SystemPartyId"
+      ]
+    },
+    "Origin": {
+      "type": "object",
+      "description": "The 'origin' source / raw attributes provided as input and that were consumed as part of producing the companion 'Xfuze' representations",
+      "unevaluatedProperties": false,
+      "properties": {
+        "SystemPartyId": {
+          "type": "string",
+          "description": "Raw form (as provided) of the input SystemPartyId (e.g CustomerId) from the source, used in transforming to 'Xfuze' representations e.g 123456789"
+        },
+        "SystemAccountId": {
+          "type": "string",
+          "description": "Raw form (as provided) of the input SystemPartyId (e.g CustomerAccountId) from the source, used in transforming to 'Xfuze' representations to e.g Account_SFCC_987654321"
+        },
+        "PartyRoleTypeCode": {
+          "type": "string",
+          "description": "Raw form (as provided) of the input PartyRoleTypeCode (e.g Customer or Employee, but more often derived by Xfuze then supplied as input) from the source, used in transforming to 'Xfuze' representations"
+        },
+        "PartyStatusCode": {
+          "type": "string",
+          "description": "Raw form (as provided) of the input PartyStatusCode (e.g Customer or Employee Status codes)  from the source, used in transforming to 'Xfuze' representations e.g Registered"
+        }
+      }
+    }
+  }
+}

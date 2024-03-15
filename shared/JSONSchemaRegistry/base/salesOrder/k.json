@@ -1,0 +1,159 @@
+{
+  "DomainEvent": {
+  },
+  "EntityId": "SalesOrder::Sale_PMC_A0001191",
+  "EntityType": "SalesOrder::Sale",
+  "EventId": "SalesOrderSaleCompleted_SalesOrder::Sale_PMC_A0001191_2023-04-14T08:21:28.793Z",
+  "EventMetadata": {
+    "EntityAtts": {
+      "Origin": {
+        "EntityId": "A0001191",
+        "ParentEntityId": "A0001191"
+      },
+      "Xfuze": {
+        "EntityClass": "Composite",
+        "EntityDomain": "Sales",
+        "EntityId": "SalesOrder::Sale_PMC_A0001191",
+        "EntitySubType": null,
+        "EntityType": "SalesOrder::Sale",
+        "EntityVariation": "Retail",
+        "IsSensitive": "N",
+        "ParentEntityId": "SalesOrder::Sale_PMC_A0001191",
+        "ParentEntityType": "SalesOrder::Sale"
+      }
+    },
+    "EventAtts": {
+      "Origin": {
+        "CorrelationId": "7588ede7-36ac-45a0-90d4-e2f41da7510f",
+        "EventId": "7588ede7-36ac-45a0-90d4-e2f41da7510f",
+        "EventName": null,
+        "SourceFormatType": "JSON",
+        "SourceSubSystem": "OrderAPI",
+        "SourceSystem": "PMC"
+      },
+      "Xfuze": {
+        "BizCapabilityL0": "Sell",
+        "BizCapabilityL1": "Sell \u0026 Serve",
+        "BizCapabilityL2": "Take Sale",
+        "ClientCode": "Crew",
+        "EventCategory": "Sales",
+        "EventChangePattern": "FullSnapshot",
+        "EventClass": "TriggerEvent",
+        "EventId": "SalesOrderSaleCompleted_SalesOrder::Sale_PMC_A0001191_2023-04-14T08:21:28.793Z",
+        "EventName": "SalesOrderSaleCompleted",
+        "EventValueStream": "Order2Cash",
+        "IsDerivedEvent": "N",
+        "Note": "(Any context note like test)"
+      }
+    },
+    "IngestAtts": {
+      "Xfuze": {
+        "API": {
+          "Name": "/PMC/OrderAPI",
+          "PatternType": "Scheduled Poll",
+          "Resource": "/PMC/OrderAPI/Orders/123",
+          "URI": "http://pmc.org/OrderAPI"
+        }
+      }
+    },
+    "LocationAtts": {
+      "Xfuze": {
+        "LocationId": "Location_f37f4592-da7e-4e59-bddc-6f6f2e17d3eb",
+        "LocationNumber": "189"
+      }
+    },
+    "PartyAtts": {
+      "Origin": {
+        "SystemPartyId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+      },
+      "Xfuze": {
+        "PartyRoleSubTypeCode": "Seller",
+        "PartyRoleTypeCode": "Employee",
+        "SystemPartyId": "Party_9eda50c9-71c0-444d-878b-25c1c718fb12"
+      }
+    },
+    "PayloadAtts": {
+      "Origin": {
+        "DataPayloadHash": "4bs34a6b6e25dd36ab5206beecf71e48",
+        "EventPayloadHash": "9p23eed6cc74bc5e1d8fdf8d90f440a3",
+        "HashScheme": "MD5"
+      },
+      "Xfuze": {
+        "DataPayloadHash": "3c906a6b6e25dd36ab5206beecf71e48",
+        "EventPayloadHash": "8e59eed6cc74bc5e1d8fdf8d90f440a3",
+        "HashScheme": "MD5"
+      }
+    },
+    "PrivacyAtts": {
+      "Origin": {
+        "IsEncrypted": "N"
+      },
+      "Xfuze": {
+        "EncryptionKeyHost": null,
+        "EncryptionKeyURI": null,
+        "IsEncrypted": "Y",
+        "IsSensitiveEntity": "Y",
+        "SensitiveFieldPaths": [
+          "userName"
+        ]
+      }
+    },
+    "ProductAtts": {
+      "Xfuze": {
+        "InvolvedReasonCode": "SoldProduct",
+        "ProductIds": [
+          "ProductVariant_Retail247Origin_1201764",
+          "ProductVariant_Retail247Origin_1201761",
+          "ProductVariant_Retail247Origin_1207940"
+        ],
+        "ProductSkus": [
+          "1201764",
+          "1201761",
+          "1207940"
+        ]
+      }
+    },
+    "TimeAtts": {
+      "Origin": {
+        "Times": {
+          "EventOccurredTimestamp": "2023-04-14T08:21:28.793Z"
+        }
+      },
+      "Xfuze": {
+        "TimeZones": {
+          "EventTimeZone": {
+            "TimeZone": "Europe/London",
+            "TimeZoneOffset": "UTC +1"
+          },
+          "HomeTimeZone": {
+            "TimeZone": "Europe/London",
+            "TimeZoneOffset": "UTC +1"
+          },
+          "PartyTimeZone": {
+            "TimeZone": "Europe/London",
+            "TimeZoneOffset": "UTC +1"
+          }
+        },
+        "Times": {
+          "EventOccurredTimestamp": {
+            "Local": "2023-04-14T08:21:28.793Z",
+            "Millis": 1698767979497,
+            "UTC": "2023-04-14T08:21:28.793Z"
+          },
+          "EventOccurredType": null,
+          "EventReceivedTimestamp": {
+            "Local": "2023-10-31T15:59:39.497Z",
+            "Millis": 1698767979497,
+            "UTC": "2023-10-31T15:59:39.497Z"
+          }
+        }
+      }
+    }
+  },
+  "EventOccurredTimestampLocal": "2023-04-14T08:21:28.793Z",
+  "EventOccurredTimestampUTC": "2023-04-14T08:21:28.793Z",
+  "ParentEntityId": "SalesOrder::Sale_PMC_A0001191",
+  "ParentEntityType": "SalesOrder::Sale",
+  "CompositeEntityId": "SalesOrder::Sale_PMC_A0001191",
+  "CompositeEntityType": "SalesOrder::Sale"
+}

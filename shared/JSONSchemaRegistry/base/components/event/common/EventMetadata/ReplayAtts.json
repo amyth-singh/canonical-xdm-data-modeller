@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xfuze.io/xdm/schema/components/event/common/EventHeader/EventMetadata/ReplayAtts",
+  "description": "XDM Schema for the common event component 'EventHeader/EventMetadata/ReplayAtts'",
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "Xfuze": {
+      "type": "object",
+      "description": "The Xfuze derived / enriched attributes that define the schema and transforms and metadata used in generating this transform",
+      "unevaluatedProperties": false,
+      "properties": {
+        "IsReplayed": {
+          "type": ["string","null"]
+        },
+        "ReplayStatusCode": {
+          "type": ["string","null"]
+        },
+        "ReplayStatusReason": {
+          "type": ["string","null"]
+        },
+        "ReplayCount": {
+          "type": ["string","null"]
+        },
+        "LastEventId": {
+          "type": ["string","null"]
+        },
+        "LastEventOccurredTimestampUTC": {
+          "type": ["string","null"]
+        }
+      }
+    },
+    "Origin": {
+      "type": "object",
+      "description": "The 'origin' source / raw attributes provided as input and that were consumed as part of producing the companion 'Xfuze' representations",
+      "unevaluatedProperties": false,
+      "properties": {
+        "IsReplayed": {
+          "type": ["string","null"]
+        },
+        "ReplayStatusCode": {
+          "type": ["string","null"]
+        },
+        "ReplayStatusReason": {
+          "type": ["string","null"]
+        },
+        "ReplayCount": {
+          "type": ["string","null"]
+        },
+        "LastEventId": {
+          "type": ["string","null"]
+        },
+        "LastEventOccurredTimestampUTC": {
+          "type": ["string","null"]
+        }
+      }
+    }
+  }
+}

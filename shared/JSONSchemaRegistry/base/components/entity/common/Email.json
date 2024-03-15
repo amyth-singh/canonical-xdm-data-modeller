@@ -1,0 +1,100 @@
+{
+  "EmailObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/EmailProperties"
+    }
+  },
+  "EmailProperties": {
+    "type": "object",
+    "required": [
+      "EmailAddress"
+    ],
+    "unevaluatedProperties": false,
+    "properties": {
+      "EmailId": {
+        "type": "string",
+        "description": "The canonical (synthetic) Xfuze email id for the email if identifiable and has some unique key e.g Email_D365_987654"
+      },
+      "EmailKey": {
+        "type": "string",
+        "description": "The native email number of the email master if identifiable and has some unique key e.g 987654"
+      },
+      "EmailType": {
+        "type": "string",
+        "description": "The type of the email",
+        "enum": [
+          "Residential",
+          "Business",
+          "Billing",
+          "Shipping",
+          "Mailing",
+          "Postal",
+          "POBox",
+          "Physical",
+          "Service",
+          "Forwarding",
+          "Temporary",
+          "Work",
+          "Home",
+          "Other"
+        ]
+      },
+      "EmailPurpose": {
+        "type": "string",
+        "description": "The purpose of the usage of the email",
+        "enum": [
+          "Billing",
+          "Invoice",
+          "Delivery",
+          "Contact",
+          "Customer",
+          "Shipping",
+          "ReturnExchange",
+          "Store",
+          "Warehouse",
+          "Marketing",
+          "LegitimateInterest",
+          "Supplier",
+          "Franchisee",
+          "Employee",
+          "PhysicalEvent",
+          "DropOff",
+          "Collection",
+          "LogisticsPoint",
+          "Other"
+        ]
+      },
+      "EmailAddress": {
+        "type": "string",
+        "description": "The actual email email",
+        "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+      },
+      "IsPrimary": {
+        "type": "string",
+        "description": "Is this email a primary one? e.g Y",
+        "enum": [
+          "Y","N","U"
+        ]
+      },
+      "IsVerified": {
+        "type": "string",
+        "description": "Is this email verified by an official email lookup / validator? e.g Y",
+        "enum": [
+          "Y","N","U"
+        ]
+      },
+      "IsEncrypted": {
+        "type": "string",
+        "description": "Is this email encrypted? e.g Y",
+        "enum": [
+          "Y","N","U"
+        ]
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

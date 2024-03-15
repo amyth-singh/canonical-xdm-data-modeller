@@ -1,0 +1,35 @@
+{
+  "HierarchyNodesObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/HierarchyNodesProperties"
+    }
+  },
+  "HierarchyNodesProperties": {
+    "type": "object",
+    "description": "A generic collection (array) of hierarchy nodes representing an arbitrary hierarchy",
+    "unevaluatedProperties": false,
+    "properties": {
+      "HierarchyId": {
+        "type": "string",
+        "description": "The Hierarchy Id, in Xfuze canonical form, identifying this hierarchy collection amongst other collections, in the form of Hierarchy::[type]_[sourceSystem]_[HierarchyKey] e.g Location_Crew_1234567"
+      },
+      "HierarchyKey": {
+        "type": "string",
+        "description": "The 'natural' hierarchy collection key/number if identifiable"
+      },
+      "NumNodes": {
+        "type": "number",
+        "description": "The number of nodes in the collection"
+      },
+      "Nodes": {
+        "type": "array",
+        "description": "The collection of hierarchy nodes making up the hierarchy",
+        "items": {
+          "$ref": "./HierarchyNode.json#/HierarchyNodeObject"
+        }
+      }
+    },
+    "required": ["Nodes","NumNodes"]
+  }
+}

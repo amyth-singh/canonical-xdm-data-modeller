@@ -1,0 +1,73 @@
+[{
+  "EntityId": "SalesOrder_Hybris_4100828062",
+  "EventId": "SalesOrderCreated_4100828062",
+  "EventName": "SalesOrderPlaced",
+  "EventOccurredTimestampUTC": "2023-01-19T08:19:54+00:00",
+  "DomainEvent": "1"
+}, {
+  "EntityId": "SalesOrder_Hybris_4100828062",
+  "EventId": "SalesOrderAcknowledged_SalesOrder_Hybris_4100828062_2023-01-19T08:23:01Z",
+  "EventName": "SalesOrderAcknowledged",
+  "EventOccurredTimestampUTC": "2023-01-19T08:23:01+00:00",
+  "DomainEvent": "1"
+}, {
+  "EntityId": "SalesOrder_Hybris_4100828062",
+  "EventId": "SalesSalesOrder_Hybris_ITEMS_SHIPMENT_PICKED_SalesOrder_HybrisSHIPMENT_4100828062_63871830_2023-01-20T13:00:12.825786112Z",
+  "EventName": "SalesOrderItemsPickedForShipping",
+  "EventOccurredTimestampUTC": "2023-01-20T13:00:12.825612+00:00",
+  "DomainEvent": "1"
+}, {
+  "EntityId": "SalesOrder_Hybris_4100828062",
+  "EventId": "SalesSalesOrder_Hybris_ITEMS_CREATED_SalesOrder_HybrisDELIVERY_4100828062_PK43BG0430879470108360G_2023-01-20T13:08:13Z",
+  "EventName": "SalesOrderItemsCreated",
+  "EventOccurredTimestampUTC": "2023-01-20T13:08:13+00:00",
+  "DomainEvent": "1"
+}, {
+  "EntityId": "SalesOrder_Hybris_4100828062",
+  "EventId": "SalesSalesOrder_Hybris_ITEMS_SHIPMENT_SHIPPED_SalesOrder_HybrisSHIPMENT_4100828062_63871830_2023-01-20T13:08:15Z",
+  "EventName": "SalesOrderItemsReadyToShip",
+  "EventOccurredTimestampUTC": "2023-01-20T13:08:15+00:00",
+  "DomainEvent": "1"
+}, {
+  "EntityId": "SalesOrder_Hybris_4100828062",
+  "EventId": "SalesOrderCompleted_SalesOrder_Hybris_4100828062_2023-01-20T13:10:56Z",
+  "EventName": "SalesOrderPlacementCompleted",
+  "EventOccurredTimestampUTC": "2023-01-20T13:10:57+00:00",
+  "DomainEvent": "1"
+}, {
+  "EntityId": "SalesOrder_Hybris_4100828062",
+  "EventId": "SalesSalesOrder_Hybris_ITEMS_IN_TRANSIT_SalesOrder_HybrisDELIVERY_4100828062_PK43BG0430879470108360G_2023-01-20T15:08:13Z",
+  "EventName": "SalesOrderItemsInTransit",
+  "EventOccurredTimestampUTC": "2023-01-20T15:08:13+00:00",
+  "DomainEvent": "1"
+}, {
+  "EntityId": "SalesOrder_Hybris_4100828062",
+  "EventId": "SalesSalesOrder_Hybris_ITEMS_INVESTIGATING_SalesOrder_HybrisDELIVERY_4100828062_PK43BG0430879470108360G_2023-01-30T09:06:51Z",
+  "EventName": "SalesOrderItemsInvestigating",
+  "EventOccurredTimestampUTC": "2023-01-30T09:06:51+00:00",
+  "DomainEvent": "1"
+}, {
+  "EntityId": "SalesOrder_Hybris_4100828062",
+  "EventId": "SalesSalesOrder_Hybris_ITEMS_ARRIVED_AT_CARRIER_SalesOrder_HybrisDELIVERY_4100828062_PK43BG0430879470108360G_2023-01-30T12:39:00Z",
+  "EventName": "SalesOrderItemsArrivedAtCarrier",
+  "EventOccurredTimestampUTC": "2023-01-30T12:39:00+00:00",
+  "DomainEvent": "1"
+}, {
+  "EntityId": "SalesOrder_Hybris_4100828062",
+  "EventId": "SalesSalesOrder_Hybris_ITEMS_ARRIVED_AT_CARRIER_SalesOrder_HybrisDELIVERY_4100828062_PK43BG0430879470108360G_2023-01-31T08:23:00Z",
+  "EventName": "SalesOrderItemsArrivedAtCarrier",
+  "EventOccurredTimestampUTC": "2023-01-31T08:23:00+00:00",
+  "DomainEvent": "1"
+}, {
+  "EntityId": "SalesOrder_Hybris_4100828062",
+  "EventId": "SalesSalesOrder_Hybris_ITEMS_OUT_FOR_DELIVERY_SalesOrder_HybrisDELIVERY_4100828062_PK43BG0430879470108360G_2023-01-31T08:23:00Z",
+  "EventName": "SalesOrderItemsOutForDelivery",
+  "EventOccurredTimestampUTC": "2023-01-31T08:23:00+00:00",
+  "DomainEvent": "1"
+}, {
+  "EntityId": "SalesOrder_Hybris_4100828062",
+  "EventId": "SalesSalesOrder_Hybris_ITEMS_DELIVERED_SalesOrder_HybrisDELIVERY_4100828062_PK43BG0430879470108360G_2023-01-31T12:47:00Z",
+  "EventName": "SalesOrderItemsDelivered",
+  "EventOccurredTimestampUTC": "2023-01-31T12:47:00+00:00",
+  "DomainEvent": "1"
+}]

@@ -1,0 +1,66 @@
+{
+    "type": "object",
+    "unevaluatedProperties": false,
+    "properties": {
+      "Availability": {
+        "type": "object",
+        "unevaluatedProperties": false,
+        "properties": {
+          "OnHand": {"$ref": "./StockLevel.json"}
+        }
+      },
+      "Allocation": {
+        "type": "object",
+        "unevaluatedProperties": false,
+        "properties": {
+          "Allocated": {"$ref": "./StockLevel.json"},
+          "BackOrder": {"$ref": "./StockLevel.json"},
+          "Unallocated": {"$ref": "./StockLevel.json"}
+        }
+      },
+      "Condition": {
+        "type": "object",
+        "unevaluatedProperties": false,
+        "properties": {
+          "Good Condition": {"$ref": "./StockLevel.json"},
+          "Damaged": {"$ref": "./StockLevel.json"},
+          "Expired": {"$ref": "./StockLevel.json"},
+          "Quarantined": {"$ref": "./StockLevel.json"}
+        }
+      },
+      "Fulfilment": {
+        "type": "object",
+        "unevaluatedProperties": false,
+        "properties": {
+          "Picking": {"$ref": "./StockLevel.json"},
+          "Packed": {"$ref": "./StockLevel.json"},
+          "Shipped": {"$ref": "./StockLevel.json"}
+        }
+      },
+      "Return": {
+        "type": "object",
+        "unevaluatedProperties": false,
+        "properties": {
+          "ExpectedReturns": {"$ref": "./StockLevel.json"},
+          "ReceivedReturns": {"$ref": "./StockLevel.json"}
+        }
+      },
+      "Transit": {
+        "type": "object",
+        "unevaluatedProperties": false,
+        "properties": {
+          "Inbound": {"$ref": "./StockLevel.json"},
+          "Outbound": {"$ref": "./StockLevel.json"}
+        }
+      },
+      "Hold": {
+        "type": "object",
+        "unevaluatedProperties": false,
+        "properties": {
+          "On Hold": {"$ref": "./StockLevel.json"},
+          "Reserved": {"$ref": "./StockLevel.json"}
+        }
+      }
+    }
+  }
+  

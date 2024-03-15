@@ -1,0 +1,12 @@
+{
+    "allOf": [
+        {
+            "$ref": "../../common/Measure.json#/MeasureObject"
+        },
+        {
+            "required": [
+                "Total"
+            ]
+        }
+    ]
+}

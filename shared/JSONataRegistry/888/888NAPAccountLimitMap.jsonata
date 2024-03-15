@@ -1,0 +1,596 @@
+(
+  /*
+    Desc: 888 / NAP Mapper
+    Author: Kurt Maile
+    Status: In Dev
+    Other Comments:
+
+    Todo:
+     Look at the actual event resource itself not just the Order resource.
+
+  */
+
+  $upperTrim := $string ~> $trim ~> $uppercase;
+  $cleanStr := $string ~> $trim;
+  $cleanNum := function($num){$type($num) = "number" ? $num : $type($num) = "string" ? $contains($num,/^-?\d+(\.\d+)?$/) ? $number($num) : null};
+  $dateTimeRegexMap := {"[Y0001]-[M01]-[D01] [H01]:[m01]:[s01] [P]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]) (AM|PM)$/,
+                        "[M01]/[D01]/[Y0001]":/^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/[1-9][0-9]{3}$/,
+                        "ISO8601":/^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d)(\.\d+)?([+-]([01]\d|2[0-3]):([0-5]\d)|Z)$/
+                       };
+  $dateTimeFormatValidator := function($datetime,$dateTimeFormat){$exists($dateTimeFormat) ? $contains($datetime,$lookup($dateTimeRegexMap,$dateTimeFormat)): $contains($datetime,$lookup($dateTimeRegexMap,"ISO8601"))};
+  $stringBoolMap := {"Y":"Y","1":"Y","TRUE":"Y","N":"N","0":"N","FALSE":"Y"};
+  $stringBool := function($value){$exists($value)?$lookup($stringBoolMap, $upperTrim($value)):""};
+  $reverseBool := function($value){$value = "Y" ? "N" : $value = "N" ? "Y" : "U"};
+  $reverseStringBool := $stringBool ~> $reverseBool;
+  $buildEntityID := function($entityCode,$system,$rawEntityId){$replace($entityCode,".","_") & "_" & $system & "_" & $rawEntityId};
+  $buildAttributeID := function($entityID,$AttributeCode,$AttributeId){$entityID & "_" & $replace($AttributeCode,".","_") & ($AttributeId = "" ? "" : "_" & $AttributeId)};
+
+ 
+  /* ------------ START OF RAW INPUT DATA ------------ (Injected inn e.g Go / Dataform supplied) */
+  
+  /* Raw input data (injected config) enabling xdm derived values and actiing as templates */
+  $rawSourceSystem := "NAP";
+  $rawSourceSystemOrg := "888";
+  $rawSourceSystemFull := $rawSourceSystemOrg & "::" & $rawSourceSystem;
+  $rawSourceTimeZone := "Europe/London";
+  $rawEventId := eventId; /*  TODO: 'id' for an event is the id, but sample is resource only so far*/
+  $rawEventName := eventName;
+  $rawEventNameList := [ /* Full lookup list and mappings can expect for 'Order' events from shopify with XF mappings*/
+    {"systemCode": "account_details_updated",                "xfuzeCode": "DepositLimitChanged"}
+  ];
+  /* Lookup func for above */
+  $rawEventXrefFn := function($rawName) {
+    $rawEventNameList[systemCode = $trim($rawName)].xfuzeCode
+  };
+
+  $rawEntityId := $cleanStr(account_id); /* TODO: also 'subject_id' on the event*/
+  $rawEntityType := NULL;  /* TODO: 'subject_type' on the event */
+  $rawParentEntityId := (cust_id != null ? $cleanStr(cust_id) : NULL);
+  $rawEntityPartyId := (cust_id != null ? $cleanStr(cust_id) : NULL);
+  $rawEntityParentId := (cust_id != null ? $cleanStr(cust_id) : NULL);
+  $rawEntitySalesStaffId := (cust_id != null ? $cleanStr(user_id) : NULL);
+  $rawLocationId := (loction_id != null ? $cleanStr(loction_id) : NULL);
+  $rawEntityLastUpdatedOn := updated_at;
+  $rawEntityCreatedOn := created_at;
+  /* Raw but mapped for derived event metadata usage */
+  $rawEventOccurredTimestamp := eventDate;  /* clean update timestamp best for true world ordering. Not UTC yet */
+  $rawEventProcessedTimestamp := null;     /* EPT is only set when centrally processed by event processors */
+  $rawEventReceivedTimestamp := null;      /* noth*/
+  $clientCode := "888-WH";
+  /* ------------ END OF RAW INPUT DATA ------------ */
+
+
+  /* ------------ START OF XFUZE COMMON DERIVED CONSTS & BASE FIELDS ------------ */
+
+  /* Xfuze common event and entity constants used in derived mappings*/
+  $event_eventCategory := "Customer";
+  $event_entityType := "AccountLimit";
+  $event_defaultEventVerb := "Updated";
+  $event_eventValueStream := "ResponsibleGaming";
+  $event_eventType:= "TriggerEvent";
+  $event_eventPriority:= "5";
+
+  $entity_entityIdType := "System"; /* system mappings at this stage by connectors not merged xfuze*/
+  $entity_parentEntityType := "PartyRole_Customer";
+  $entity_entityTypeCustomer := "PartyRole_Customer";
+  $entity_entityIsSensitive := "N";
+
+  $party_partyId := NULL;
+  $party_partyType := "Individual";
+  $party_partyRoleId := $entity_entityTypeCustomer  & "_" & $rawSourceSystem & "_" & $rawEntityParentId;
+  $party_rawPartyRoleId := $cleanStr(cust_id);
+
+
+  /* Xfuze event and entity derived values */
+  $event_eventName := ($rawEventXrefFn($rawEventName) = null ? $event_entityType &  $event_defaultEventVerb : $rawEventXrefFn($rawEventName)); /* convert to Xfuze eventName?*/
+  $event_entityId := ($event_entityType & "_" & $rawSourceSystem & "_" & $rawEntityId);
+  $event_parentEntityId := ($rawEntityParentId != null ? $entity_entityTypeCustomer  & "_" & $rawSourceSystem & "_" & $rawEntityParentId : NULL); /* Customer is parent of order*/
+  $event_eventOccurredType = "TrueTime";
+  $event_eventOccurredLocalTimeZone = $rawSourceTimeZone;
+  $event_eventOccurredTimestamp := ($rawEventOccurredTimestamp = null ? $rawEventReceivedTimestamp : $rawEventOccurredTimestamp);
+  $event_eventProcessedTimestamp := ($rawEventOccurredTimestamp = null ? $rawEventReceivedTimestamp : $rawEventOccurredTimestamp);
+  $event_eventReceivedTimestamp := ($rawEventOccurredTimestamp = null ? $rawEventReceivedTimestamp : $rawEventOccurredTimestamp);
+  $event_eventId := $event_eventName & "_" & $event_entityId & "_" & $event_eventOccurredTimestamp;
+  $partyIds_customerId := $entity_entityTypeCustomer  & "_" & $rawSourceSystem & "_" & $rawEntityParentId;
+  $attMetadata_asOf := $event_eventOccurredTimestamp;
+
+  /* from james W */
+  $buildEntityID := function($entityCode,$system,$rawEntityId){$replace($entityCode,".","_") & "_" & $system & "_" & $rawEntityId};
+  $buildAttributeID := function($entityID,$AttributeCode,$AttributeId){$entityID & "_" & $replace($AttributeCode,".","_") & ($exists($AttributeId) ? "_" & $AttributeId : "")};
+  $buildEventID := function($entityType,$eventVerb,$entityId,$eventOccurredTimestamp){$entityType & "_" & $eventVerb & "_" & $entityId & "_" & $eventOccurredTimestamp};
+
+
+  /* ------------ END OF XFUZE COMMON DERIVED CONSTS & BASE FIELDS ------------ */
+
+  /* ------------ START OF XFUZE ENTITY SPECIFIC DERIVED CONSTS & BASE FIELDS ------------ */
+
+  /* common Xfuze funcs*/
+  $getDateDimFn := function($dt,$isUTC,$tz,$format) {$exists($dt) ? $dateTimeFormatValidator($dt,$format) ?
+    {
+          "DateId": $fromMillis($toMillis($dt,$format),"[Y0001][M01][D01]"),
+          "TimestampUTC": ($isUTC ? $dt : NULL),
+          "DateUTC": ($isUTC ? $dt : NULL), /* TODO convert to date */
+          "TimeZone": ($tz != null ? $tz : $rawSourceTimeZone),
+          "DateTimeLocal": $fromMillis($toMillis($dt,$format)),
+          "DateLocal": $fromMillis($toMillis($dt,$format),"[Y0001]-[M01]-[D01]"),
+          "HourId": $fromMillis($toMillis($dt,$format),"[H01]"),
+          "Millis": $toMillis($dt,$format)
+    }
+    : NULL
+  };
+
+/* ------------ END OF XFUZE ENTITY SPECIFIC DERIVED CONSTS & BASE FIELDS ------------ */
+
+/* ------------ START OF XFUZE ENTITY SPECIFIC QUERY FUNCTIONS ------------ */
+
+  $filterHeaderTotalsByPriceName := function($prcName) {
+    $prcName != null
+      ? **.Header.Totals[PriceName = $prcName].{PriceCode : PriceIncTax}
+      : **.Header.Totals[].{PriceCode : PriceIncTax}
+  };
+
+  /* MAP: AccountLimit.Atts.Code= "Scope" */
+  $rawAccountLimitScopeList := [ /* Full lookup list and mappings can expect for 'Order' events from shopify with XF mappings*/
+    {"systemCode": "SB",                "xfuzeCode": "Sportsbook"}
+  ];
+  /* Lookup func for above */
+  $mapRawAccountLimitScopeXrefFn := function($rawName) {
+    $rawAccountLimitScopeList[systemCode = $trim($rawName)].xfuzeCode
+  };
+
+
+  /* MAP: AccountLimit.Status.StatusCode */
+  $rawAccountLimitStatusList := [ /* Full lookup list and mappings can expect for 'Order' events from shopify with XF mappings*/
+    {"systemCode": "A",                "xfuzeCode": "Active"}
+  ];
+  /* Lookup func for above */
+  $mapRawAccountLimitStatusXrefFn := function($rawName) {
+    $rawAccountLimitStatusList[systemCode = $trim($rawName)].xfuzeCode
+  };
+
+    /* MAP: AccountLimit.Status.StatusCode */
+  $rawAccountLimitAvailabilityStatusList := [ /* Full lookup list and mappings can expect for 'Order' events from shopify with XF mappings*/
+    {"systemCode": "LR",                "xfuzeCode": "LimitReached"}
+  ];
+  /* Lookup func for above */
+  $mapRawAccountLimitAvailabilityStatusXrefFn := function($rawName) {
+    $rawAccountLimitAvailabilityStatusList[systemCode = $trim($rawName)].xfuzeCode
+  };
+
+      /* MAP: AccountLimit.Type.TypeCode */
+  $rawAccountLimitTypeList := [ /* Full lookup list and mappings can expect for 'Order' events from shopify with XF mappings*/
+    {"systemCode": "DEP",                "xfuzeCode": "Deposit"}
+  ];
+  /* Lookup func for above */
+  $mapRawAccountLimitTypeXrefFn := function($rawName) {
+    $rawAccountLimitTypeList[systemCode = $trim($rawName)].xfuzeCode
+  };
+
+        /* MAP: AccountLimit.Type.SubTypeCode */
+  $rawAccountLimitSubTypeList := [ /* Full lookup list and mappings can expect for 'Order' events from shopify with XF mappings*/
+    {"systemCode": "PDL",                "xfuzeCode": "PesonalDepositLimit"}
+  ];
+  /* Lookup func for above */
+  $mapRawAccountLimitSubTypeXrefFn := function($rawName) {
+    $rawAccountLimitSubTypeList[systemCode = $trim($rawName)].xfuzeCode
+  };
+
+  /* MAP: AccountLimit.LimitAmount.CurrencyCode */
+  $rawAccountLimitCurrencyCodeList := [ /* Full lookup list and mappings can expect for 'Order' events from shopify with XF mappings*/
+    {"systemCode": "GB",                "xfuzeCode": "GBP"}
+  ];
+  /* Lookup func for above */
+  $mapRawAccountLimitCurrencyCodeXrefFn := function($rawName) {
+    $rawAccountLimitCurrencyCodeList[systemCode = $trim($rawName)].xfuzeCode
+  };
+
+    /* MAP: AccountLimit.LimitPeriodAtts.LimitPeriodClass */
+  $rawAccountLimitPeriodClassList := [ /* Full lookup list and mappings can expect for 'Order' events from shopify with XF mappings*/
+    {"systemCode": "D",                "xfuzeCode": "Daily"},
+    {"systemCode": "W",                "xfuzeCode": "Weekly"},
+    {"systemCode": "M",                "xfuzeCode": "Monthly"},
+    {"systemCode": "Q",                "xfuzeCode": "Quarterly"},
+    {"systemCode": "Y",                "xfuzeCode": "Yearly"}
+
+  ];
+  /* Lookup func for above */
+  $mapRawAccountLimitPeriodClassXrefFn := function($rawName) {
+    $rawAccountLimitPeriodClassList[systemCode = $trim($rawName)].xfuzeCode
+  };
+
+  /* MAP: AccountLimit.LimitPeriodAtts.LimitPeriodTimeUnitType */
+  $rawAccountLimitPeriodTimeUnitTypeList := [ /* Full lookup list and mappings can expect for 'Order' events from shopify with XF mappings*/
+    {"systemCode": "N",                "xfuzeCode": "Minute"},
+    {"systemCode": "H",                "xfuzeCode": "Hour"},
+    {"systemCode": "D",                "xfuzeCode": "Day"},
+    {"systemCode": "W",                "xfuzeCode": "Week"},
+    {"systemCode": "M",                "xfuzeCode": "Month"},
+    {"systemCode": "Q",                "xfuzeCode": "Quarter"},
+    {"systemCode": "Y",                "xfuzeCode": "Year"}
+  ];
+  /* Lookup func for above */
+  $mapRawAccountLimitPeriodTimeUnitTypeXrefFn := function($rawName) {
+    $rawAccountLimitPeriodTimeUnitTypeList[systemCode = $trim($rawName)].xfuzeCode
+  };
+
+    /* MAP: AccountLimit.LimitPeriodAtts.LimitPeriodTimeWindowType */
+  $rawAccountLimitWindowTypeList := [ /* Full lookup list and mappings can expect for 'Order' events from shopify with XF mappings*/
+    {"systemCode": "SL",                "xfuzeCode": "Sliding"},
+    {"systemCode": "CA",                "xfuzeCode": "Calendar"}
+  ];
+  /* Lookup func for above */
+  $mapRawAccountLimitWindowTypeXrefFn := function($rawName) {
+    $rawAccountLimitWindowTypeList[systemCode = $trim($rawName)].xfuzeCode
+  };
+
+
+
+/* ------------ END OF XFUZE ENTITY SPECIFIC QUERY FUNCTIONS ------------ */
+
+/* ------------ START OF XFUZE ENTITY SPECIFIC DERIVED CONSTS & BASE FIELDS ------------ */
+
+$limitEntityFullCodeFn := function($rawScope,$rawType,$rawSubtype,$sep) {
+  "Customer"
+    & $sep & "Accounts"
+    & $sep & "AccountLimits"
+    & $sep & $mapRawAccountLimitScopeXrefFn($rawScope)
+    & $sep & $mapRawAccountLimitTypeXrefFn($rawType)
+    & $sep & $mapRawAccountLimitSubTypeXrefFn($rawSubtype)
+};
+
+{
+  "EventId": $event_eventId,
+  "EntityId": $event_entityId,
+  "ParentEntityId": $event_parentEntityId,
+  "EventMetadata": {
+    "EventAtts": {
+      "EventId": $event_eventId,
+      "EventCategory": $event_eventCategory,
+      "EventName": $event_eventName,
+      "RawEventId": $rawEventId,
+      "RawEventName": $rawEventName,
+      "RawSourceSystem": $rawSourceSystem,
+      "RawSourceSystemOrg": $rawSourceSystemOrg,
+      "EventType": $event_eventType,
+      "EventValueStream": $event_eventValueStream,
+      "EventPriority": $event_eventPriority,
+      "ClientCode": $clientCode,
+      "CustomAtts": NULL
+    },
+    "EntityAtts": {
+      "EntityId": $event_entityId,
+      "EntityType": $event_entityType,
+      "RawEntityId": $rawEntityId,
+      "ParentEntityId": $event_parentEntityId,
+      "ParentEntityType": $entity_parentEntityType,
+      "RawParentEntityId": $rawParentEntityId,
+      "IsSensitive": $entity_entityIsSensitive,
+      "MetaModellerURN": NULL,
+      "MetaModellerVersion": NULL,
+      "CustomAtts": NULL
+    },
+    "TimeAtts": {
+      "EventOccurredTimestamp": $event_eventOccurredTimestamp,
+      "EventOccurredDateDim": $getDateDimFn($event_eventOccurredTimestamp,false,$rawSourceTimeZone),
+      "EventOccurredType": "TrueTime",
+      "EventOccurredLocalTimeZone": $event_eventOccurredLocalTimeZone,
+      "EventReceivedTimestamp": $event_eventReceivedTimestamp,
+      "EventReceivedDateDim": $getDateDimFn($event_eventReceivedTimestamp,true),
+      "ExternalEventReceivedTimestamp": NULL,
+      "ExternalEventReceivedDateDim": NULL,
+      "EventProcessedDateDim": NULL,
+      "EventProcessedTimestamp": NULL,
+      "CustomTimeAtts": NULL
+    },
+    "PartyAtts": {
+      "PartyId": $party_partyId, /* Not determined until stateful event processing */
+      "PartyType": $party_partyType, /* Not determined until stateful event processing */
+      "RawPartyId": $rawEntityPartyId,
+      "PartyRoleId": $party_partyRoleId,
+      "PartyRoleType": $party_partyRoleType,
+      "RawPartyRoleId": $party_rawPartyRoleId,
+      "InvolvedReasonCode" : "AccountLimitChanger",
+      "ClientDeviceDetails": $string(client_details),
+      "CustomAtts": NULL
+    },
+    "LocationAtts": ($rawLocationId = null ? NULL :  { /* TODO: not quite excluding properly*/
+      "LocationId": NULL,
+      "LocationType": NULL,
+      "RawLocationId": NULL,
+      "InvolvedReasonCode": "UserInteraction",
+      "GeoJSON": NULL,
+      "Latitude": NULL,
+      "Longitude" : NULL,
+      "CustomAtts": NULL
+    }),
+    /* TODO below */
+    "DeltaFieldAtts":  NULL, /* TODO, enrichement step needs before and after*/
+    "FeatureAtts":  NULL, /* TODO, add key data features like orderTotal etc for event based analysis*/
+    "SensitiveFieldsAtts":  NULL, /* e.g jsonata to each sensitive element? */
+    "IngestAtts":  NULL, /* e.g from kafka, pubsub */
+    "DeliveryAtts":  NULL
+  },
+  "EventPayload": {
+    "TriggerEntity": {
+      "EntityId": $event_entityId,
+      "EntityType" : "Customer.Accounts.Limits",
+      "Limits": account_limits#$i[].(
+        {
+          "ParentEntityId": $event_entityId,
+          "EntityId": $buildAttributeID($event_entityId, $limitEntityFullCodeFn($cleanStr(limit_scope),$cleanStr(limit_type),$cleanStr(limit_subtype),"."),$.id),
+          "Type" : {
+              "AttHeader": {
+                "Id": $buildAttributeID($event_entityId, "Limits.Sportsbook.Deposit.PersonalDepositLimit",$.id),
+                "RawID": $cleanStr(limit_type),
+                "Class": "AccountLimit",
+                "Code": $limitEntityFullCodeFn($cleanStr(limit_scope),$cleanStr(limit_type),$cleanStr(limit_subtype),"."), /* Limits.[Scope].[Type].[SubType].Status */
+                "Name": "PersonalDepositLimit",
+                "Desc": "User facing personal deposit limit for sportsbook offering"
+              },
+              "TypeCode": $mapRawAccountLimitTypeXrefFn($cleanStr(limit_type)),
+              "SubTypeCode": $mapRawAccountLimitSubTypeXrefFn($cleanStr(limit_subtype)),
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsAnonymised": NULL,
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf,
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystemFull,
+                    "RawSourceId": "limit_type",
+                    "RawSourceVal": $string(limit_type)
+                  }
+                ]
+              }
+            },
+            "Status": [
+              {
+                "AttHeader": {
+                  "Id": $buildAttributeID($event_entityId, $limitEntityFullCodeFn($cleanStr(limit_scope),$cleanStr(limit_type),$cleanStr(limit_subtype),".") & ".LimitStatus",$.id),
+                  "RawID": $cleanStr(limit_status),
+                  "Class": "AccountLimit",
+                  "Code": $limitEntityFullCodeFn($cleanStr(limit_scope),$cleanStr(limit_type),$cleanStr(limit_subtype),".") & ".LimitStatus", /* Limits.[Scope].[Type].[SubType].LimitStatus */
+                  "Name": "LimitStatus",
+                  "Desc": "Limit Status related to the overall lifecycle of this specific limit, independant of deposits"
+                },
+                "StatusValue": $mapRawAccountLimitStatusXrefFn($cleanStr(limit_status)), /* Map to canonical */
+                "ReasonCode": NULL,
+                "ReasonDesc": $cleanStr(limit_status_reason),
+                "AttMetadata": {
+                  "RawChangeTrackingHash": NULL,
+                  "IsAnonymised": NULL,
+                  "SecuringKeyId": NULL,
+                  "AsOf": $attMetadata_asOf,
+                  "EventId": $event_eventId,
+                  "RawSourceAtts": [
+                    {
+                      "RawSourceSystem": $rawSourceSystemFull,
+                      "RawSourceId": "limit_status",
+                      "RawSourceVal": $string(limit_status)
+                    },
+                    {
+                      "RawSourceSystem": $rawSourceSystemFull,
+                      "RawSourceId": "limit_status_reason",
+                      "RawSourceVal": $string(limit_status_reason)
+                    }
+                  ]
+                }
+              },
+              {
+                "AttHeader": {
+                  "Id": $buildAttributeID($event_entityId, $limitEntityFullCodeFn($cleanStr(limit_scope),$cleanStr(limit_type),$cleanStr(limit_subtype),".")& ".AvailabilityStatus",$.id),
+                  "RawID": $cleanStr(limit_availability_status),
+                  "Class": "AccountLimit",
+                  "Code": $limitEntityFullCodeFn($cleanStr(limit_scope),$cleanStr(limit_type),$cleanStr(limit_subtype),".") & ".AvailabilityStatus", /* Limits.[Scope].[Type].[SubType].Status */
+                  "Name": "AvailabilityStatus",
+                  "Desc": "Limit Status related to availability to bet based on this specific limit"
+                },
+                "StatusValue": $mapRawAccountLimitAvailabilityStatusXrefFn($cleanStr(limit_availability_status)), /* Map to canonical */
+                "ReasonCode": NULL,
+                "ReasonDesc": $cleanStr(limit_availability_status_reason),
+                "AttMetadata": {
+                  "RawChangeTrackingHash": NULL,
+                  "IsAnonymised": NULL,
+                  "SecuringKeyId": NULL,
+                  "AsOf": $attMetadata_asOf,
+                  "EventId": $event_eventId,
+                  "RawSourceAtts": [
+                    {
+                      "RawSourceSystem": $rawSourceSystemFull,
+                      "RawSourceId": "limit_availability_status",
+                      "RawSourceVal": $string(limit_availability_status)
+                    },
+                    {
+                      "RawSourceSystem": $rawSourceSystemFull,
+                      "RawSourceId": "limit_availability_status_reason",
+                      "RawSourceVal": $string(limit_availability_status_reason)
+                    }
+                  ]
+                }
+              }
+            ], /* End of Status[] */
+            "LimitAmounts" : [
+              {
+                "AttHeader": {
+                  "Id": $buildAttributeID($event_entityId, $limitEntityFullCodeFn($cleanStr(limit_scope),$cleanStr(limit_type),$cleanStr(limit_subtype),".")& ".LimitAmounts.ThresholdLimit",$.id),
+                  "RawId": NULL,
+                  "Class": "AccountLimit",
+                  "Code": $limitEntityFullCodeFn($cleanStr(limit_scope),$cleanStr(limit_type),$cleanStr(limit_subtype),".")& ".LimitAmounts.ThresholdLimit",
+                  "Name": "ThresholdLimit",
+                  "Desc": "The defined upper limit 'threshold' that forms the ceiling of this account level limit type "
+                },
+                "AmountType": "Money",
+                "Amount": $cleanNum(limit_amount),
+                "CurrencyCode": $mapRawAccountLimitCurrencyCodeXrefFn($cleanStr(limit_ccy)),
+                "AttMetadata": {
+                  "RawChangeTrackingHash": NULL,
+                  "IsAnonymised": NULL,
+                  "SecuringKeyId": NULL,
+                  "AsOf": $attMetadata_asOf,
+                  "EventId": $event_eventId,
+                  "RawSourceAtts": [
+                    {
+                      "RawSourceSystem": $rawSourceSystemFull,
+                      "RawSourceId": "limit_amount",
+                      "RawSourceVal": $string(limit_amount)
+                    },
+                    {
+                      "RawSourceSystem": $rawSourceSystemFull,
+                      "RawSourceId": "limit_ccy",
+                      "RawSourceVal": $string(limit_ccy)
+                    }
+                  ]
+                }
+              },
+              {
+                "AttHeader": {
+                  "Id": $buildAttributeID($event_entityId, $limitEntityFullCodeFn($cleanStr(limit_scope),$cleanStr(limit_type),$cleanStr(limit_subtype),".")& ".LimitAmounts.CurrentAggregateAmount",$.id),
+                  "RawId": NULL,
+                  "Class": "AccountLimit",
+                  "Code": $limitEntityFullCodeFn($cleanStr(limit_scope),$cleanStr(limit_type),$cleanStr(limit_subtype),".")& ".LimitAmounts.CurrentAggregateAmount",
+                  "Name": "CurrentAggregateAmount",
+                  "Desc": NULL
+                },
+                "AmountType": "Money",
+                "Amount": $cleanNum(limit_agg_amount),
+                "CurrencyCode": $mapRawAccountLimitCurrencyCodeXrefFn($cleanStr(limit_ccy)),
+                "AttMetadata": {
+                  "RawChangeTrackingHash": NULL,
+                  "IsAnonymised": NULL,
+                  "SecuringKeyId": NULL,
+                  "AsOf": $attMetadata_asOf,
+                  "EventId": $event_eventId,
+                  "RawSourceAtts": [
+                    {
+                      "RawSourceSystem": $rawSourceSystemFull,
+                      "RawSourceId": "limit_agg_amount",
+                      "RawSourceVal": $string(limit_agg_amount)
+                    },
+                    {
+                      "RawSourceSystem": $rawSourceSystemFull,
+                      "RawSourceId": "limit_ccy",
+                      "RawSourceVal": $string(limit_ccy)
+                    }
+                  ]
+                }
+              },
+              {
+                "AttHeader": {
+                  "Id": $buildAttributeID($event_entityId, $limitEntityFullCodeFn($cleanStr(limit_scope),$cleanStr(limit_type),$cleanStr(limit_subtype),".")& ".LimitAmounts.CurrentRemainingAmount",$.id),
+                  "RawId": NULL,
+                  "Class": "AccountLimit",
+                  "Code": $limitEntityFullCodeFn($cleanStr(limit_scope),$cleanStr(limit_type),$cleanStr(limit_subtype),".")& ".LimitAmounts.CurrentRemainingAmount",
+                  "Name": "CurrentRemainingAmount",
+                  "Desc": NULL
+                },
+                "AmountType": "Money",
+                "Amount": $cleanNum(limit_remaining_amount),
+                "CurrencyCode": $mapRawAccountLimitCurrencyCodeXrefFn($cleanStr(limit_ccy)),
+                "AttMetadata": {
+                  "RawChangeTrackingHash": NULL,
+                  "IsAnonymised": NULL,
+                  "SecuringKeyId": NULL,
+                  "AsOf": $attMetadata_asOf,
+                  "EventId": $event_eventId,
+                  "RawSourceAtts": [
+                    {
+                      "RawSourceSystem": $rawSourceSystemFull,
+                      "RawSourceId": "limit_remaining_amount",
+                      "RawSourceVal": $string(limit_remaining_amount)
+                    },
+                    {
+                      "RawSourceSystem": $rawSourceSystemFull,
+                      "RawSourceId": "limit_ccy",
+                      "RawSourceVal": $string(limit_ccy)
+                    }
+                  ]
+                }
+              }
+            ],
+            "LimitPeriodAtts" : [
+               {
+                "AttHeader": {
+                  "Id": $buildAttributeID($event_entityId, $limitEntityFullCodeFn($cleanStr(limit_scope),$cleanStr(limit_type),$cleanStr(limit_subtype),".")& ".LimitPeriodAtts.",$.id),
+                  "RawId": $cleanStr(limit_period_class),
+                  "Class": "AccountLimit",
+                  "Code": $limitEntityFullCodeFn($cleanStr(limit_scope),$cleanStr(limit_type),$cleanStr(limit_subtype),".")& ".LimitPeriodAtts",
+                  "Name": "LimitPeriodAtts",
+                  "Desc": NULL},
+                "IsArray": "Y",
+                "AttType": NULL,
+                "AttValue": NULL,
+                "AttValues": [
+                  {
+                    "AttType": "STRING",
+                    "RawId": "account_limits.limit_period_class",
+                    "AttKey": "LimitPeriodClass",
+                    "AttValue": $mapRawAccountLimitPeriodClassXrefFn($cleanStr(limit_period_class))
+                  },
+                  {
+                    "AttType": "STRING",
+                    "RawId": "account_limits.limit_period_name_default",
+                    "AttKey": "LimitPeriodNameDefault",
+                    "AttValue": $cleanStr(limit_period_name_default)
+                  },
+                  {
+                    "AttType": "INT",
+                    "RawId": "account_limits.limit_period_time_qty",
+                    "AttKey": "LimitPeriodTimeUnitQty",
+                    "AttValue": $cleanStr(limit_period_time_qty)
+                  },
+                  {
+                    "AttType": "STRING",
+                    "RawId": "account_limits.limit_period_time_unit",
+                    "AttKey": "LimitPeriodTimeUnitType",
+                    "AttValue": $mapRawAccountLimitPeriodTimeUnitTypeXrefFn($cleanStr(limit_period_time_unit))
+                  },
+                  {
+                    "AttType": "STRING",
+                    "RawId": "account_limits.limit_period_window_unit",
+                    "AttKey": "LimitPeriodTimeWindowType",
+                    "AttValue": $mapRawAccountLimitWindowTypeXrefFn($cleanStr(limit_period_window_type))
+                  }
+                ],
+                "AttMetadata": {
+                  "RawChangeTrackingHash": NULL,
+                  "IsAnonymised": NULL,
+                  "SecuringKeyId": NULL,
+                  "AsOf": $attMetadata_asOf,
+                  "EventId": $event_eventId,
+                  "RawSourceAtts": [
+                    {
+                      "RawSourceSystem": $rawSourceSystemFull,
+                      "RawSourceId": "limit_period_class",
+                      "RawSourceVal": $string(limit_period_class)
+                    },
+                    {
+                      "RawSourceSystem": $rawSourceSystemFull,
+                      "RawSourceId": "limit_period_class",
+                      "RawSourceVal": $string(limit_period_name_default)
+                    },
+                    {
+                      "RawSourceSystem": $rawSourceSystemFull,
+                      "RawSourceId": "limit_period_time_qty",
+                      "RawSourceVal": $string(limit_period_time_qty)
+                    },
+                    {
+                      "RawSourceSystem": $rawSourceSystemFull,
+                      "RawSourceId": "limit_period_time_unit",
+                      "RawSourceVal": $string(limit_period_time_unit)
+                    },
+                    {
+                      "RawSourceSystem": $rawSourceSystemFull,
+                      "RawSourceId": "limit_period_window_type",
+                      "RawSourceVal": $string(limit_period_window_type)
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        )
+    }
+  }
+}    
+)

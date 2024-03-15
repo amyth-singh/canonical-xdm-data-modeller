@@ -1,0 +1,8 @@
+process:
+  - inputSchema: base/salesOrder/SalesOrderEventSchema.json
+    outputSchema: client-specific/crew/salesOrder/CrewSalesOrderSchema.json
+    test:
+      inputDocument: ../../shared/DataLibrary/outputs/Crew/Sales/PMCSalesOrderTriggerEvent_SALE.json
+      result: ../../tests/CrewSalesOrderSchema_TestResults.json
+
+

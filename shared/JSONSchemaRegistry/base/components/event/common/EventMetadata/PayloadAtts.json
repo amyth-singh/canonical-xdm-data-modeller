@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xfuze.io/xdm/schema/components/event/common/EventHeader/EventMetadata/PayloadAtts",
+  "description": "XDM Schema for the common event component 'EventHeader/EventMetadata/PayloadAtts'",
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "Xfuze": {
+      "type": "object",
+      "description": "The Xfuze derived / enriched attributes that define various hashing values of the payloads, for deduping and change detection",
+      "unevaluatedProperties": false,
+      "properties": {
+        "DataPayloadHash": {
+          "type": "string",
+          "description": "The hash of the 'Data / Domain Objects' part of the Xfuze payload only, excluding EventHeader details e.g ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+        },
+        "EventPayloadHash": {
+          "type": "string",
+          "description": "The hash of the 'Full Event' of the Xfuze payload, including EventHeader e.g cd5453f8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+        },
+        "HashScheme": {
+          "type": "string",
+          "description": "The hash scheme used to hash the payload partse.g SHA256, MD5",
+          "enum": [
+            "SHA256",
+            "MD5",
+            "BASE64"
+          ]
+        }
+      }
+    },
+    "Origin": {
+      "type": "object",
+      "description": "The 'origin' source / raw attributes provided as input and that were consumed as part of producing the companion 'Xfuze' representations",
+      "required": [
+        "DataPayloadHash"
+      ],
+      "unevaluatedProperties": false,
+      "properties": {
+        "DataPayloadHash": {
+          "type": "string",
+          "description": "The hash of the Origins 'Data / Domain Objects' part of the Xfuze payload only, excluding EventHeader details e.g ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+        },
+        "EventPayloadHash": {
+          "type": "string",
+          "description": "The hash of the Origins 'Full Event' payload, if applicable e.g cd5453f8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+        },
+        "HashScheme": {
+          "type": "string",
+          "description": "The hash scheme used to hash the origin payload partse.g SHA256, MD5",
+          "enum": [
+            "SHA256",
+            "MD5",
+            "BASE64",
+            "Other"
+          ]
+        }
+      }
+    }
+  }
+}

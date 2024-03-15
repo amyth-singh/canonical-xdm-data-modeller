@@ -1,0 +1,3532 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/object1697535411.json",
+  "title": "Root",
+  "type": "object",
+  "properties": {
+    "DomainEvent": {
+      "$id": "#root/DomainEvent",
+      "title": "Domainevent",
+      "type": "object",
+      "properties": {
+        "TriggerEntity": {
+          "$id": "#root/DomainEvent/TriggerEntity",
+          "title": "Triggerentity",
+          "type": "object",
+          "properties": {
+            "EntityId": {
+              "$id": "#root/DomainEvent/TriggerEntity/EntityId",
+              "title": "Entityid",
+              "type": "string",
+              "default": "",
+              "examples": [
+                "SalesOrder::Sale_PMC_A0001191"
+              ],
+              "pattern": "^.*$"
+            },
+            "EntityType": {
+              "$id": "#root/DomainEvent/TriggerEntity/EntityType",
+              "title": "Entitytype",
+              "type": "string",
+              "default": "",
+              "examples": [
+                "SalesOrder::Sale"
+              ],
+              "pattern": "^.*$"
+            },
+            "Header": {
+              "$id": "#root/DomainEvent/TriggerEntity/Header",
+              "title": "Header",
+              "type": "object",
+              "properties": {
+                "Channels": {
+                  "$id": "#root/DomainEvent/TriggerEntity/Header/Channels",
+                  "title": "Channels",
+                  "type": "object",
+                  "properties": {
+                    "SalesChannel": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Channels/SalesChannel",
+                      "title": "Saleschannel",
+                      "type": "object",
+                      "properties": {
+                        "Touchpoint": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Channels/SalesChannel/Touchpoint",
+                          "title": "Touchpoint",
+                          "type": "object",
+                          "properties": {
+                            "BusinessSystem": {
+                              "$id": "#root/DomainEvent/TriggerEntity/Header/Channels/SalesChannel/Touchpoint/BusinessSystem",
+                              "title": "Businesssystem",
+                              "type": "string",
+                              "default": "",
+                              "examples": [
+                                "eBasket"
+                              ],
+                              "pattern": "^.*$"
+                            },
+                            "DeviceId": {
+                              "$id": "#root/DomainEvent/TriggerEntity/Header/Channels/SalesChannel/Touchpoint/DeviceId",
+                              "title": "Deviceid",
+                              "type": "string",
+                              "default": "",
+                              "examples": [
+                                "3d56c68cd0dbdbbc"
+                              ],
+                              "pattern": "^.*$"
+                            },
+                            "ExternalDeviceId": {
+                              "$id": "#root/DomainEvent/TriggerEntity/Header/Channels/SalesChannel/Touchpoint/ExternalDeviceId",
+                              "title": "Externaldeviceid",
+                              "type": "null",
+                              "default": null
+                            },
+                            "ExternalTerminalId": {
+                              "$id": "#root/DomainEvent/TriggerEntity/Header/Channels/SalesChannel/Touchpoint/ExternalTerminalId",
+                              "title": "Externalterminalid",
+                              "type": "string",
+                              "default": "",
+                              "examples": [
+                                ""
+                              ],
+                              "pattern": "^.*$"
+                            },
+                            "TerminalId": {
+                              "$id": "#root/DomainEvent/TriggerEntity/Header/Channels/SalesChannel/Touchpoint/TerminalId",
+                              "title": "Terminalid",
+                              "type": "string",
+                              "default": "",
+                              "examples": [
+                                "18968"
+                              ],
+                              "pattern": "^.*$"
+                            }
+                          }
+                        }
+                      ,
+                        "Type": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Channels/SalesChannel/Type",
+                          "title": "Type",
+                          "type": "object",
+                          "properties": {
+                            "Code": {
+                              "$id": "#root/DomainEvent/TriggerEntity/Header/Channels/SalesChannel/Type/Code",
+                              "title": "Code",
+                              "type": "string",
+                              "default": "",
+                              "examples": [
+                                "RetailStore"
+                              ],
+                              "pattern": "^.*$"
+                            }
+                          }
+                        }
+
+                      }
+                    }
+
+                  }
+                }
+              ,
+                "CurrencyExchangeRates": {
+                  "$id": "#root/DomainEvent/TriggerEntity/Header/CurrencyExchangeRates",
+                  "title": "Currencyexchangerates",
+                  "type": "object",
+                  "properties": {
+                    "BCY": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/CurrencyExchangeRates/BCY",
+                      "title": "Bcy",
+                      "type": "string",
+                      "default": "",
+                      "examples": [
+                        "GBP"
+                      ],
+                      "pattern": "^.*$"
+                    },
+                    "LCY": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/CurrencyExchangeRates/LCY",
+                      "title": "Lcy",
+                      "type": "string",
+                      "default": "",
+                      "examples": [
+                        "EUR"
+                      ],
+                      "pattern": "^.*$"
+                    },
+                    "SalesFx": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/CurrencyExchangeRates/SalesFx",
+                      "title": "Salesfx",
+                      "type": "object",
+                      "properties": {
+                        "Rate": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/CurrencyExchangeRates/SalesFx/Rate",
+                          "title": "Rate",
+                          "type": "null",
+                          "default": null
+                        }
+                      }
+                    }
+
+                  }
+                }
+              ,
+                "EntityId": {
+                  "$id": "#root/DomainEvent/TriggerEntity/Header/EntityId",
+                  "title": "Entityid",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "SalesOrderHeader_PMC_A0001191"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "HeaderId": {
+                  "$id": "#root/DomainEvent/TriggerEntity/Header/HeaderId",
+                  "title": "Headerid",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "SalesOrderHeader_PMC_A0001191"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "Locations": {
+                  "$id": "#root/DomainEvent/TriggerEntity/Header/Locations",
+                  "title": "Locations",
+                  "type": "object",
+                  "properties": {
+                    "SalesLocation": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Locations/SalesLocation",
+                      "title": "Saleslocation",
+                      "type": "object",
+                      "properties": {
+                        "Company": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Locations/SalesLocation/Company",
+                          "title": "Company",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "Crew Clothing"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "Hierarchy": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Locations/SalesLocation/Hierarchy",
+                          "title": "Hierarchy",
+                          "type": "object",
+                          "properties": {
+                            "L0": {
+                              "$id": "#root/DomainEvent/TriggerEntity/Header/Locations/SalesLocation/Hierarchy/L0",
+                              "title": "L0",
+                              "type": "string",
+                              "default": "",
+                              "examples": [
+                                "{\"isOverride\":true,\"name\":\"PMC Abingdon\",\"nodeId\":\"NODE::f37f4592-da7e-4e59-bddc-6f6f2e17d3eb\",\"nodeType\":\"STORE\",\"parentId\":\"NODE::0682036f-579b-42df-83a2-e5242ef4faf3\",\"status\":true}"
+                              ],
+                              "pattern": "^.*$"
+                            },
+                            "L1": {
+                              "$id": "#root/DomainEvent/TriggerEntity/Header/Locations/SalesLocation/Hierarchy/L1",
+                              "title": "L1",
+                              "type": "string",
+                              "default": "",
+                              "examples": [
+                                "{\"isOverride\":false,\"name\":\"Stores\",\"nodeId\":\"NODE::0682036f-579b-42df-83a2-e5242ef4faf3\",\"nodeType\":\"STORE_GROUP\",\"parentId\":\"NODE::4d385484-9a44-4809-b83f-2ea142078599\",\"status\":true}"
+                              ],
+                              "pattern": "^.*$"
+                            },
+                            "L2": {
+                              "$id": "#root/DomainEvent/TriggerEntity/Header/Locations/SalesLocation/Hierarchy/L2",
+                              "title": "L2",
+                              "type": "string",
+                              "default": "",
+                              "examples": [
+                                "{\"isOverride\":true,\"name\":\"UK\",\"nodeId\":\"NODE::4d385484-9a44-4809-b83f-2ea142078599\",\"nodeType\":\"TRADING_REGION\",\"parentId\":\"NODE::92a82e7c-e106-4c2c-af6a-7965ad711206\",\"status\":true}"
+                              ],
+                              "pattern": "^.*$"
+                            },
+                            "L3": {
+                              "$id": "#root/DomainEvent/TriggerEntity/Header/Locations/SalesLocation/Hierarchy/L3",
+                              "title": "L3",
+                              "type": "string",
+                              "default": "",
+                              "examples": [
+                                "{\"isOverride\":true,\"name\":\"Crew Clothing\",\"nodeId\":\"NODE::92a82e7c-e106-4c2c-af6a-7965ad711206\",\"nodeType\":\"COMPANY\",\"parentId\":\"NODE::05b41253-65e1-4d7e-ae9c-da1a34841f3c\",\"status\":true}"
+                              ],
+                              "pattern": "^.*$"
+                            },
+                            "L4": {
+                              "$id": "#root/DomainEvent/TriggerEntity/Header/Locations/SalesLocation/Hierarchy/L4",
+                              "title": "L4",
+                              "type": "string",
+                              "default": "",
+                              "examples": [
+                                "{\"checked\":true,\"isOverride\":false,\"name\":\"Crew Clothing\",\"nodeId\":\"NODE::05b41253-65e1-4d7e-ae9c-da1a34841f3c\",\"nodeType\":\"ORGANIZATION\",\"parentId\":\"\",\"status\":true}"
+                              ],
+                              "pattern": "^.*$"
+                            }
+                          }
+                        }
+                      ,
+                        "Id": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Locations/SalesLocation/Id",
+                          "title": "Id",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "Location_f37f4592-da7e-4e59-bddc-6f6f2e17d3eb"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "Name": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Locations/SalesLocation/Name",
+                          "title": "Name",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "PMC Abingdon"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "Number": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Locations/SalesLocation/Number",
+                          "title": "Number",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "189"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "OrgCode": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Locations/SalesLocation/OrgCode",
+                          "title": "Orgcode",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "H6jdoJ"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "OrgName": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Locations/SalesLocation/OrgName",
+                          "title": "Orgname",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "Crew Clothing"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "StoreNumber": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Locations/SalesLocation/StoreNumber",
+                          "title": "Storenumber",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "189"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "SubsidiaryId": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Locations/SalesLocation/SubsidiaryId",
+                          "title": "Subsidiaryid",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "1"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "TradingRegion": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Locations/SalesLocation/TradingRegion",
+                          "title": "Tradingregion",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "UK"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "Type": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Locations/SalesLocation/Type",
+                          "title": "Type",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "STORE"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      }
+                    }
+
+                  }
+                }
+              ,
+                "PartyIds": {
+                  "$id": "#root/DomainEvent/TriggerEntity/Header/PartyIds",
+                  "title": "Partyids",
+                  "type": "object",
+                  "properties": {
+                    "SalesStaff": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/PartyIds/SalesStaff",
+                      "title": "Salesstaff",
+                      "type": "object",
+                      "properties": {
+                        "Id": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/PartyIds/SalesStaff/Id",
+                          "title": "Id",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "PartyRole_SalesStaff_PMC_9eda50c9-71c0-444d-878b-25c1c718fb12"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "Name": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/PartyIds/SalesStaff/Name",
+                          "title": "Name",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "taylorm"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      }
+                    }
+
+                  }
+                }
+              ,
+                "Qtys": {
+                  "$id": "#root/DomainEvent/TriggerEntity/Header/Qtys",
+                  "title": "Qtys",
+                  "type": "object",
+                  "properties": {
+                    "QtyLines": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Qtys/QtyLines",
+                      "title": "Qtylines",
+                      "type": "object",
+                      "properties": {
+                        "Amount": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Qtys/QtyLines/Amount",
+                          "title": "Amount",
+                          "type": "integer",
+                          "examples": [
+                            3
+                          ],
+                          "default": 0
+                        }
+                      }
+                    }
+                  ,
+                    "QtyNet": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Qtys/QtyNet",
+                      "title": "Qtynet",
+                      "type": "object",
+                      "properties": {
+                        "Amount": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Qtys/QtyNet/Amount",
+                          "title": "Amount",
+                          "type": "integer",
+                          "examples": [
+                            3
+                          ],
+                          "default": 0
+                        }
+                      }
+                    }
+                  ,
+                    "QtyPayments": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Qtys/QtyPayments",
+                      "title": "Qtypayments",
+                      "type": "object",
+                      "properties": {
+                        "Amount": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Qtys/QtyPayments/Amount",
+                          "title": "Amount",
+                          "type": "integer",
+                          "examples": [
+                            1
+                          ],
+                          "default": 0
+                        }
+                      }
+                    }
+
+                  }
+                }
+              ,
+                "SalesOrderNumber": {
+                  "$id": "#root/DomainEvent/TriggerEntity/Header/SalesOrderNumber",
+                  "title": "Salesordernumber",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "A0001191"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "Status": {
+                  "$id": "#root/DomainEvent/TriggerEntity/Header/Status",
+                  "title": "Status",
+                  "type": "object",
+                  "properties": {
+                    "FulfilmentStatus": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Status/FulfilmentStatus",
+                      "title": "Fulfilmentstatus",
+                      "type": "object",
+                      "properties": {
+                        "Code": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Status/FulfilmentStatus/Code",
+                          "title": "Code",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "FullyFulfilled"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      }
+                    }
+                  ,
+                    "OrderStatus": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Status/OrderStatus",
+                      "title": "Orderstatus",
+                      "type": "object",
+                      "properties": {
+                        "Code": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Status/OrderStatus/Code",
+                          "title": "Code",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "Completed"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      }
+                    }
+                  ,
+                    "PaymentStatus": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Status/PaymentStatus",
+                      "title": "Paymentstatus",
+                      "type": "object",
+                      "properties": {
+                        "Code": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Status/PaymentStatus/Code",
+                          "title": "Code",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "FullyPaid"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      }
+                    }
+
+                  }
+                }
+              ,
+                "TaxSummary": {
+                  "$id": "#root/DomainEvent/TriggerEntity/Header/TaxSummary",
+                  "title": "Taxsummary",
+                  "type": "object",
+                  "properties": {
+                    "Rate": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/TaxSummary/Rate",
+                      "title": "Rate",
+                      "type": "object",
+                      "properties": {
+                        "Estimated": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/TaxSummary/Rate/Estimated",
+                          "title": "Estimated",
+                          "type": "number",
+                          "examples": [
+                            0.2
+                          ],
+                          "default": 0.0
+                        }
+                      }
+                    }
+                  ,
+                    "SchemeCode": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/TaxSummary/SchemeCode",
+                      "title": "Schemecode",
+                      "type": "string",
+                      "default": "",
+                      "examples": [
+                        "VAT"
+                      ],
+                      "pattern": "^.*$"
+                    }
+                  }
+                }
+              ,
+                "TimeZones": {
+                  "$id": "#root/DomainEvent/TriggerEntity/Header/TimeZones",
+                  "title": "Timezones",
+                  "type": "object",
+                  "properties": {
+                    "DefaultTimeZone": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/TimeZones/DefaultTimeZone",
+                      "title": "Defaulttimezone",
+                      "type": "string",
+                      "default": "",
+                      "examples": [
+                        "Europe/London"
+                      ],
+                      "pattern": "^.*$"
+                    },
+                    "DefaultTimeZoneOffset": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/TimeZones/DefaultTimeZoneOffset",
+                      "title": "Defaulttimezoneoffset",
+                      "type": "string",
+                      "default": "",
+                      "examples": [
+                        "UTC +1"
+                      ],
+                      "pattern": "^.*$"
+                    },
+                    "EventTimeZone": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/TimeZones/EventTimeZone",
+                      "title": "Eventtimezone",
+                      "type": "string",
+                      "default": "",
+                      "examples": [
+                        "Europe/London"
+                      ],
+                      "pattern": "^.*$"
+                    },
+                    "EventTimeZoneOffset": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/TimeZones/EventTimeZoneOffset",
+                      "title": "Eventtimezoneoffset",
+                      "type": "string",
+                      "default": "",
+                      "examples": [
+                        "UTC +1"
+                      ],
+                      "pattern": "^.*$"
+                    }
+                  }
+                }
+              ,
+                "Times": {
+                  "$id": "#root/DomainEvent/TriggerEntity/Header/Times",
+                  "title": "Times",
+                  "type": "object",
+                  "properties": {
+                    "CompletedOn": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Times/CompletedOn",
+                      "title": "Completedon",
+                      "type": "object",
+                      "properties": {
+                        "Local": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Times/CompletedOn/Local",
+                          "title": "Local",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "2023-04-14T08:21:24.670Z"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "UTC": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Times/CompletedOn/UTC",
+                          "title": "Utc",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "2023-04-14T08:21:24.670Z"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      }
+                    }
+                  ,
+                    "CreatedOn": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Times/CreatedOn",
+                      "title": "Createdon",
+                      "type": "object",
+                      "properties": {
+                        "Local": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Times/CreatedOn/Local",
+                          "title": "Local",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "2023-04-14T08:20:15.755Z"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "UTC": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Times/CreatedOn/UTC",
+                          "title": "Utc",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "2023-04-14T08:20:15.755Z"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      }
+                    }
+                  ,
+                    "LastUpdatedOn": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Times/LastUpdatedOn",
+                      "title": "Lastupdatedon",
+                      "type": "object",
+                      "properties": {
+                        "Local": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Times/LastUpdatedOn/Local",
+                          "title": "Local",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "2023-04-14T08:21:24.670Z"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "UTC": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Times/LastUpdatedOn/UTC",
+                          "title": "Utc",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "2023-04-14T08:21:24.670Z"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      }
+                    }
+                  ,
+                    "PlacedOn": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Times/PlacedOn",
+                      "title": "Placedon",
+                      "type": "object",
+                      "properties": {
+                        "Local": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Times/PlacedOn/Local",
+                          "title": "Local",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "2023-04-14T08:20:15.748Z"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "UTC": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Times/PlacedOn/UTC",
+                          "title": "Utc",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "2023-04-14T08:20:15.748Z"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      }
+                    }
+                  ,
+                    "TBD": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Times/TBD",
+                      "title": "Tbd",
+                      "type": "object",
+                      "properties": {
+                        "Local": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Times/TBD/Local",
+                          "title": "Local",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "2023-04-14T08:21:28.793Z"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "UTC": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Times/TBD/UTC",
+                          "title": "Utc",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "2023-04-14T08:21:28.793Z"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      }
+                    }
+
+                  }
+                }
+              ,
+                "Totals": {
+                  "$id": "#root/DomainEvent/TriggerEntity/Header/Totals",
+                  "title": "Totals",
+                  "type": "object",
+                  "properties": {
+                    "BalanceDueTotal": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/BalanceDueTotal",
+                      "title": "Balanceduetotal",
+                      "type": "object",
+                      "properties": {
+                        "Current": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/BalanceDueTotal/Current",
+                          "title": "Current",
+                          "type": "object",
+                          "properties": {
+                            "LCY": {
+                              "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/BalanceDueTotal/Current/LCY",
+                              "title": "Lcy",
+                              "type": "object",
+                              "properties": {
+                                "CurrencyCode": {
+                                  "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/BalanceDueTotal/Current/LCY/CurrencyCode",
+                                  "title": "Currencycode",
+                                  "type": "string",
+                                  "default": "",
+                                  "examples": [
+                                    "EUR"
+                                  ],
+                                  "pattern": "^.*$"
+                                },
+                                "IncTax": {
+                                  "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/BalanceDueTotal/Current/LCY/IncTax",
+                                  "title": "Inctax",
+                                  "type": "integer",
+                                  "examples": [
+                                    0
+                                  ],
+                                  "default": 0
+                                }
+                              }
+                            }
+
+                          }
+                        }
+
+                      }
+                    }
+                  ,
+                    "DiscountTotal": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/DiscountTotal",
+                      "title": "Discounttotal",
+                      "type": "object",
+                      "properties": {
+                        "Current": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/DiscountTotal/Current",
+                          "title": "Current",
+                          "type": "object",
+                          "properties": {
+                            "LCY": {
+                              "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/DiscountTotal/Current/LCY",
+                              "title": "Lcy",
+                              "type": "object",
+                              "properties": {
+                                "CurrencyCode": {
+                                  "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/DiscountTotal/Current/LCY/CurrencyCode",
+                                  "title": "Currencycode",
+                                  "type": "string",
+                                  "default": "",
+                                  "examples": [
+                                    "EUR"
+                                  ],
+                                  "pattern": "^.*$"
+                                },
+                                "IncTax": {
+                                  "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/DiscountTotal/Current/LCY/IncTax",
+                                  "title": "Inctax",
+                                  "type": "integer",
+                                  "examples": [
+                                    -28
+                                  ],
+                                  "default": 0
+                                }
+                              }
+                            }
+
+                          }
+                        }
+
+                      }
+                    }
+                  ,
+                    "GrandTotal": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/GrandTotal",
+                      "title": "Grandtotal",
+                      "type": "object",
+                      "properties": {
+                        "Current": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/GrandTotal/Current",
+                          "title": "Current",
+                          "type": "object",
+                          "properties": {
+                            "LCY": {
+                              "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/GrandTotal/Current/LCY",
+                              "title": "Lcy",
+                              "type": "object",
+                              "properties": {
+                                "CurrencyCode": {
+                                  "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/GrandTotal/Current/LCY/CurrencyCode",
+                                  "title": "Currencycode",
+                                  "type": "string",
+                                  "default": "",
+                                  "examples": [
+                                    "EUR"
+                                  ],
+                                  "pattern": "^.*$"
+                                },
+                                "ExTax": {
+                                  "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/GrandTotal/Current/LCY/ExTax",
+                                  "title": "Extax",
+                                  "type": "number",
+                                  "examples": [
+                                    93.32
+                                  ],
+                                  "default": 0.0
+                                },
+                                "IncTax": {
+                                  "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/GrandTotal/Current/LCY/IncTax",
+                                  "title": "Inctax",
+                                  "type": "integer",
+                                  "examples": [
+                                    112
+                                  ],
+                                  "default": 0
+                                },
+                                "Tax": {
+                                  "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/GrandTotal/Current/LCY/Tax",
+                                  "title": "Tax",
+                                  "type": "number",
+                                  "examples": [
+                                    18.68
+                                  ],
+                                  "default": 0.0
+                                }
+                              }
+                            }
+
+                          }
+                        }
+
+                      }
+                    }
+                  ,
+                    "PaidTotal": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/PaidTotal",
+                      "title": "Paidtotal",
+                      "type": "object",
+                      "properties": {
+                        "Current": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/PaidTotal/Current",
+                          "title": "Current",
+                          "type": "object",
+                          "properties": {
+                            "LCY": {
+                              "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/PaidTotal/Current/LCY",
+                              "title": "Lcy",
+                              "type": "object",
+                              "properties": {
+                                "CurrencyCode": {
+                                  "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/PaidTotal/Current/LCY/CurrencyCode",
+                                  "title": "Currencycode",
+                                  "type": "string",
+                                  "default": "",
+                                  "examples": [
+                                    "EUR"
+                                  ],
+                                  "pattern": "^.*$"
+                                },
+                                "IncTax": {
+                                  "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/PaidTotal/Current/LCY/IncTax",
+                                  "title": "Inctax",
+                                  "type": "integer",
+                                  "examples": [
+                                    -112
+                                  ],
+                                  "default": 0
+                                }
+                              }
+                            }
+
+                          }
+                        }
+
+                      }
+                    }
+                  ,
+                    "ProductTotalBeforeAdjustments": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/ProductTotalBeforeAdjustments",
+                      "title": "Producttotalbeforeadjustments",
+                      "type": "object",
+                      "properties": {
+                        "Current": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/ProductTotalBeforeAdjustments/Current",
+                          "title": "Current",
+                          "type": "object",
+                          "properties": {
+                            "LCY": {
+                              "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/ProductTotalBeforeAdjustments/Current/LCY",
+                              "title": "Lcy",
+                              "type": "object",
+                              "properties": {
+                                "CurrencyCode": {
+                                  "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/ProductTotalBeforeAdjustments/Current/LCY/CurrencyCode",
+                                  "title": "Currencycode",
+                                  "type": "string",
+                                  "default": "",
+                                  "examples": [
+                                    "EUR"
+                                  ],
+                                  "pattern": "^.*$"
+                                },
+                                "IncTax": {
+                                  "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/ProductTotalBeforeAdjustments/Current/LCY/IncTax",
+                                  "title": "Inctax",
+                                  "type": "integer",
+                                  "examples": [
+                                    140
+                                  ],
+                                  "default": 0
+                                }
+                              }
+                            }
+
+                          }
+                        }
+
+                      }
+                    }
+                  ,
+                    "RefundTotal": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/RefundTotal",
+                      "title": "Refundtotal",
+                      "type": "object",
+                      "properties": {
+                        "Current": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/RefundTotal/Current",
+                          "title": "Current",
+                          "type": "object",
+                          "properties": {
+                            "LCY": {
+                              "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/RefundTotal/Current/LCY",
+                              "title": "Lcy",
+                              "type": "object",
+                              "properties": {
+                                "CurrencyCode": {
+                                  "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/RefundTotal/Current/LCY/CurrencyCode",
+                                  "title": "Currencycode",
+                                  "type": "string",
+                                  "default": "",
+                                  "examples": [
+                                    "EUR"
+                                  ],
+                                  "pattern": "^.*$"
+                                },
+                                "IncTax": {
+                                  "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/RefundTotal/Current/LCY/IncTax",
+                                  "title": "Inctax",
+                                  "type": "integer",
+                                  "examples": [
+                                    0
+                                  ],
+                                  "default": 0
+                                }
+                              }
+                            }
+
+                          }
+                        }
+
+                      }
+                    }
+                  ,
+                    "TaxTotal": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/TaxTotal",
+                      "title": "Taxtotal",
+                      "type": "object",
+                      "properties": {
+                        "Current": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/TaxTotal/Current",
+                          "title": "Current",
+                          "type": "object",
+                          "properties": {
+                            "LCY": {
+                              "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/TaxTotal/Current/LCY",
+                              "title": "Lcy",
+                              "type": "object",
+                              "properties": {
+                                "CurrencyCode": {
+                                  "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/TaxTotal/Current/LCY/CurrencyCode",
+                                  "title": "Currencycode",
+                                  "type": "string",
+                                  "default": "",
+                                  "examples": [
+                                    "EUR"
+                                  ],
+                                  "pattern": "^.*$"
+                                },
+                                "Tax": {
+                                  "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/TaxTotal/Current/LCY/Tax",
+                                  "title": "Tax",
+                                  "type": "number",
+                                  "examples": [
+                                    18.68
+                                  ],
+                                  "default": 0.0
+                                }
+                              }
+                            }
+
+                          }
+                        }
+
+                      }
+                    }
+                  ,
+                    "TaxableAmountTotal": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/TaxableAmountTotal",
+                      "title": "Taxableamounttotal",
+                      "type": "object",
+                      "properties": {
+                        "Current": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/TaxableAmountTotal/Current",
+                          "title": "Current",
+                          "type": "object",
+                          "properties": {
+                            "LCY": {
+                              "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/TaxableAmountTotal/Current/LCY",
+                              "title": "Lcy",
+                              "type": "object",
+                              "properties": {
+                                "CurrencyCode": {
+                                  "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/TaxableAmountTotal/Current/LCY/CurrencyCode",
+                                  "title": "Currencycode",
+                                  "type": "string",
+                                  "default": "",
+                                  "examples": [
+                                    "EUR"
+                                  ],
+                                  "pattern": "^.*$"
+                                },
+                                "Tax": {
+                                  "$id": "#root/DomainEvent/TriggerEntity/Header/Totals/TaxableAmountTotal/Current/LCY/Tax",
+                                  "title": "Tax",
+                                  "type": "integer",
+                                  "examples": [
+                                    112
+                                  ],
+                                  "default": 0
+                                }
+                              }
+                            }
+
+                          }
+                        }
+
+                      }
+                    }
+
+                  }
+                }
+              ,
+                "Type": {
+                  "$id": "#root/DomainEvent/TriggerEntity/Header/Type",
+                  "title": "Type",
+                  "type": "object",
+                  "properties": {
+                    "Class": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Type/Class",
+                      "title": "Class",
+                      "type": "object",
+                      "properties": {
+                        "Code": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Type/Class/Code",
+                          "title": "Code",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "Retail"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      }
+                    }
+                  ,
+                    "Type": {
+                      "$id": "#root/DomainEvent/TriggerEntity/Header/Type/Type",
+                      "title": "Type",
+                      "type": "object",
+                      "properties": {
+                        "Code": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Header/Type/Type/Code",
+                          "title": "Code",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "Sale"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      }
+                    }
+
+                  }
+                }
+              ,
+                "XrefIds": {
+                  "$id": "#root/DomainEvent/TriggerEntity/Header/XrefIds",
+                  "title": "Xrefids",
+                  "type": "array",
+                  "default": [],
+                  "items":{
+                    "$id": "#root/DomainEvent/TriggerEntity/Header/XrefIds/items",
+                    "title": "Items",
+                    "type": "object",
+                    "properties": {
+                      "Code": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Header/XrefIds/items/Code",
+                        "title": "Code",
+                        "type": "string",
+                        "default": "",
+                        "examples": [
+                          "EntityId"
+                        ],
+                        "pattern": "^.*$"
+                      },
+                      "Id": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Header/XrefIds/items/Id",
+                        "title": "Id",
+                        "type": "string",
+                        "default": "",
+                        "examples": [
+                          "SalesOrderHeader_PMC_A0001191"
+                        ],
+                        "pattern": "^.*$"
+                      },
+                      "SystemCode": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Header/XrefIds/items/SystemCode",
+                        "title": "Systemcode",
+                        "type": "string",
+                        "default": "",
+                        "examples": [
+                          "Xfuze"
+                        ],
+                        "pattern": "^.*$"
+                      }
+                    }
+                  }
+
+                }
+              }
+            }
+          ,
+            "Lines": {
+              "$id": "#root/DomainEvent/TriggerEntity/Lines",
+              "title": "Lines",
+              "type": "array",
+              "default": [],
+              "items":{
+                "$id": "#root/DomainEvent/TriggerEntity/Lines/items",
+                "title": "Items",
+                "type": "object",
+                "properties": {
+                  "AdjustmentLines": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/AdjustmentLines",
+                    "title": "Adjustmentlines",
+                    "type": "array",
+                    "default": [],
+                    "items":{
+                      "$id": "#root/DomainEvent/TriggerEntity/Lines/items/AdjustmentLines/items",
+                      "title": "Items",
+                      "type": "object",
+                      "properties": {
+                        "AdjustmentId": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Lines/items/AdjustmentLines/items/AdjustmentId",
+                          "title": "Adjustmentid",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "LineAdjustment::Promotion_"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "EntityId": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Lines/items/AdjustmentLines/items/EntityId",
+                          "title": "Entityid",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "LineAdjustment_Promotion_"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "EntityType": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Lines/items/AdjustmentLines/items/EntityType",
+                          "title": "Entitytype",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "LineAdjustment::Promotion"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "LineAdjustmentPct": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Lines/items/AdjustmentLines/items/LineAdjustmentPct",
+                          "title": "Lineadjustmentpct",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            ""
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "ParentEntityId": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Lines/items/AdjustmentLines/items/ParentEntityId",
+                          "title": "Parententityid",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "SalesOrderLine::Sale_PMC_A0001191_1"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "ParentEntityType": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Lines/items/AdjustmentLines/items/ParentEntityType",
+                          "title": "Parententitytype",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "SalesOrderLine::Sale"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "Type.Class": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Lines/items/AdjustmentLines/items/Type.Class",
+                          "title": "Type.class",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "Promotion"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      }
+                    }
+
+                  },
+                  "EntityId": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/EntityId",
+                    "title": "Entityid",
+                    "type": "string",
+                    "default": "",
+                    "examples": [
+                      "SalesOrderLine::Sale_PMC_A0001191_1"
+                    ],
+                    "pattern": "^.*$"
+                  },
+                  "EntityType": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/EntityType",
+                    "title": "Entitytype",
+                    "type": "string",
+                    "default": "",
+                    "examples": [
+                      "SalesOrderLine::Sale_PMC_A0001191_1"
+                    ],
+                    "pattern": "^.*$"
+                  },
+                  "FulfilmentAtts": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/FulfilmentAtts",
+                    "title": "Fulfilmentatts",
+                    "type": "object",
+                    "properties": {
+                      "DeliveryGroup": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/FulfilmentAtts/DeliveryGroup",
+                        "title": "Deliverygroup",
+                        "type": "string",
+                        "default": "",
+                        "examples": [
+                          "1"
+                        ],
+                        "pattern": "^.*$"
+                      },
+                      "DeliveryMethod": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/FulfilmentAtts/DeliveryMethod",
+                        "title": "Deliverymethod",
+                        "type": "string",
+                        "default": "",
+                        "examples": [
+                          "3"
+                        ],
+                        "pattern": "^.*$"
+                      },
+                      "FullfilmentId": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/FulfilmentAtts/FullfilmentId",
+                        "title": "Fullfilmentid",
+                        "type": "string",
+                        "default": "",
+                        "examples": [
+                          "189"
+                        ],
+                        "pattern": "^.*$"
+                      },
+                      "LeadTime": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/FulfilmentAtts/LeadTime",
+                        "title": "Leadtime",
+                        "type": "object",
+                        "properties": {
+                          "Type": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Lines/items/FulfilmentAtts/LeadTime/Type",
+                            "title": "Type",
+                            "type": "string",
+                            "default": "",
+                            "examples": [
+                              "Days"
+                            ],
+                            "pattern": "^.*$"
+                          },
+                          "Value": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Lines/items/FulfilmentAtts/LeadTime/Value",
+                            "title": "Value",
+                            "type": "string",
+                            "default": "",
+                            "examples": [
+                              "0"
+                            ],
+                            "pattern": "^.*$"
+                          }
+                        }
+                      }
+                    ,
+                      "OriginFullfilmentId": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/FulfilmentAtts/OriginFullfilmentId",
+                        "title": "Originfullfilmentid",
+                        "type": "string",
+                        "default": "",
+                        "examples": [
+                          "N/A"
+                        ],
+                        "pattern": "^.*$"
+                      }
+                    }
+                  }
+                ,
+                  "GiftCard": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/GiftCard",
+                    "title": "Giftcard",
+                    "type": "object",
+                    "properties": {
+                      "ExpiryDate": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/GiftCard/ExpiryDate",
+                        "title": "Expirydate",
+                        "type": "null",
+                        "default": null
+                      },
+                      "IsGiftCard": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/GiftCard/IsGiftCard",
+                        "title": "Isgiftcard",
+                        "type": "null",
+                        "default": null
+                      },
+                      "NumberIssued": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/GiftCard/NumberIssued",
+                        "title": "Numberissued",
+                        "type": "null",
+                        "default": null
+                      },
+                      "RecipientEmail": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/GiftCard/RecipientEmail",
+                        "title": "Recipientemail",
+                        "type": "null",
+                        "default": null
+                      },
+                      "RecipientName": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/GiftCard/RecipientName",
+                        "title": "Recipientname",
+                        "type": "null",
+                        "default": null
+                      }
+                    }
+                  }
+                ,
+                  "HeaderId": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/HeaderId",
+                    "title": "Headerid",
+                    "type": "string",
+                    "default": "",
+                    "examples": [
+                      "SalesOrderHeader_PMC_A0001191"
+                    ],
+                    "pattern": "^.*$"
+                  },
+                  "Prices": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Prices",
+                    "title": "Prices",
+                    "type": "object",
+                    "properties": {
+                      "UnitPriceBeforeDiscounts": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Prices/UnitPriceBeforeDiscounts",
+                        "title": "Unitpricebeforediscounts",
+                        "type": "object",
+                        "properties": {
+                          "IncTax": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Prices/UnitPriceBeforeDiscounts/IncTax",
+                            "title": "Inctax",
+                            "type": "integer",
+                            "examples": [
+                              55
+                            ],
+                            "default": 0
+                          }
+                        }
+                      }
+
+                    }
+                  }
+                ,
+                  "ProductAtts": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/ProductAtts",
+                    "title": "Productatts",
+                    "type": "object",
+                    "properties": {
+                      "Attributes": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/ProductAtts/Attributes",
+                        "title": "Attributes",
+                        "type": "array",
+                        "default": []
+                      },
+                      "Barcode": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/ProductAtts/Barcode",
+                        "title": "Barcode",
+                        "type": "null",
+                        "default": null
+                      },
+                      "Barcodes": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/ProductAtts/Barcodes",
+                        "title": "Barcodes",
+                        "type": "array",
+                        "default": [],
+                        "items":{
+                          "$id": "#root/DomainEvent/TriggerEntity/Lines/items/ProductAtts/Barcodes/items",
+                          "title": "Items",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "5.05441E+12"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      },
+                      "Categories": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/ProductAtts/Categories",
+                        "title": "Categories",
+                        "type": "array",
+                        "default": []
+                      },
+                      "Colour": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/ProductAtts/Colour",
+                        "title": "Colour",
+                        "type": "object",
+                        "properties": {
+                          "Code": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Lines/items/ProductAtts/Colour/Code",
+                            "title": "Code",
+                            "type": "null",
+                            "default": null
+                          }
+                        }
+                      }
+                    ,
+                      "CountryOfOrigin": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/ProductAtts/CountryOfOrigin",
+                        "title": "Countryoforigin",
+                        "type": "null",
+                        "default": null
+                      },
+                      "Description": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/ProductAtts/Description",
+                        "title": "Description",
+                        "type": "string",
+                        "default": "",
+                        "examples": [
+                          "OXFORD SHIRT DRESS | OWNJ001 | 18 | NAVY"
+                        ],
+                        "pattern": "^.*$"
+                      },
+                      "ImageUrls": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/ProductAtts/ImageUrls",
+                        "title": "Imageurls",
+                        "type": "array",
+                        "default": [],
+                        "items":{
+                          "$id": "#root/DomainEvent/TriggerEntity/Lines/items/ProductAtts/ImageUrls/items",
+                          "title": "Items",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "https://www.crewclothing.co.uk/images/products/large/OWNJ001_NAVY.jpg\r"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      },
+                      "ProductId": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/ProductAtts/ProductId",
+                        "title": "Productid",
+                        "type": "string",
+                        "default": "",
+                        "examples": [
+                          "ProductVariant_Retail247Origin_1201764"
+                        ],
+                        "pattern": "^.*$"
+                      },
+                      "SKU": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/ProductAtts/SKU",
+                        "title": "Sku",
+                        "type": "string",
+                        "default": "",
+                        "examples": [
+                          "1201764"
+                        ],
+                        "pattern": "^.*$"
+                      },
+                      "VariantType": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/ProductAtts/VariantType",
+                        "title": "Varianttype",
+                        "type": "null",
+                        "default": null
+                      }
+                    }
+                  }
+                ,
+                  "PromotionDiscounts": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/PromotionDiscounts",
+                    "title": "Promotiondiscounts",
+                    "type": "object",
+                    "properties": {
+                      "IsExcludePromotion": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/PromotionDiscounts/IsExcludePromotion",
+                        "title": "Isexcludepromotion",
+                        "type": "null",
+                        "default": null
+                      }
+                    }
+                  }
+                ,
+                  "Qtys": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Qtys",
+                    "title": "Qtys",
+                    "type": "object",
+                    "properties": {
+                      "NetQty": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Qtys/NetQty",
+                        "title": "Netqty",
+                        "type": "integer",
+                        "examples": [
+                          1
+                        ],
+                        "default": 0
+                      }
+                    }
+                  }
+                ,
+                  "SalesOrderLineNumber": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/SalesOrderLineNumber",
+                    "title": "Salesorderlinenumber",
+                    "type": "string",
+                    "default": "",
+                    "examples": [
+                      "A0001191_1"
+                    ],
+                    "pattern": "^.*$"
+                  },
+                  "SalesOrderNumber": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/SalesOrderNumber",
+                    "title": "Salesordernumber",
+                    "type": "string",
+                    "default": "",
+                    "examples": [
+                      "A0001191"
+                    ],
+                    "pattern": "^.*$"
+                  },
+                  "SeqNo": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/SeqNo",
+                    "title": "Seqno",
+                    "type": "integer",
+                    "examples": [
+                      1
+                    ],
+                    "default": 0
+                  },
+                  "Status": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Status",
+                    "title": "Status",
+                    "type": "object",
+                    "properties": {
+                      "ProcessingStatus": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Status/ProcessingStatus",
+                        "title": "Processingstatus",
+                        "type": "string",
+                        "default": "",
+                        "examples": [
+                          "NotCompleted"
+                        ],
+                        "pattern": "^.*$"
+                      }
+                    }
+                  }
+                ,
+                  "TaxLines": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/TaxLines",
+                    "title": "Taxlines",
+                    "type": "array",
+                    "default": [],
+                    "items":{
+                      "$id": "#root/DomainEvent/TriggerEntity/Lines/items/TaxLines/items",
+                      "title": "Items",
+                      "type": "object",
+                      "properties": {
+                        "LineSeqNo": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Lines/items/TaxLines/items/LineSeqNo",
+                          "title": "Lineseqno",
+                          "type": "integer",
+                          "examples": [
+                            1
+                          ],
+                          "default": 0
+                        },
+                        "SubTotal.Current.LCY.ExTax": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Lines/items/TaxLines/items/SubTotal.Current.LCY.ExTax",
+                          "title": "Subtotal.current.lcy.extax",
+                          "type": "number",
+                          "examples": [
+                            36.66
+                          ],
+                          "default": 0.0
+                        },
+                        "SubTotal.Current.LCY.IncTax": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Lines/items/TaxLines/items/SubTotal.Current.LCY.IncTax",
+                          "title": "Subtotal.current.lcy.inctax",
+                          "type": "integer",
+                          "examples": [
+                            44
+                          ],
+                          "default": 0
+                        },
+                        "SubTotal.Current.LCY.Tax": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Lines/items/TaxLines/items/SubTotal.Current.LCY.Tax",
+                          "title": "Subtotal.current.lcy.tax",
+                          "type": "number",
+                          "examples": [
+                            7.34
+                          ],
+                          "default": 0.0
+                        },
+                        "TaxCode": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Lines/items/TaxLines/items/TaxCode",
+                          "title": "Taxcode",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "VAT"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "TaxPct": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Lines/items/TaxLines/items/TaxPct",
+                          "title": "Taxpct",
+                          "type": "integer",
+                          "examples": [
+                            20
+                          ],
+                          "default": 0
+                        },
+                        "TaxTypeCode": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Lines/items/TaxLines/items/TaxTypeCode",
+                          "title": "Taxtypecode",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "H"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      }
+                    }
+
+                  },
+                  "Times": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Times",
+                    "title": "Times",
+                    "type": "object",
+                    "properties": {
+                      "CreatedOn": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Times/CreatedOn",
+                        "title": "Createdon",
+                        "type": "object",
+                        "properties": {
+                          "UTC": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Times/CreatedOn/UTC",
+                            "title": "Utc",
+                            "type": "null",
+                            "default": null
+                          }
+                        }
+                      }
+                    ,
+                      "LastUpdated": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Times/LastUpdated",
+                        "title": "Lastupdated",
+                        "type": "object",
+                        "properties": {
+                          "UTC": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Times/LastUpdated/UTC",
+                            "title": "Utc",
+                            "type": "null",
+                            "default": null
+                          }
+                        }
+                      }
+                    ,
+                      "LastUpdatedOn": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Times/LastUpdatedOn",
+                        "title": "Lastupdatedon",
+                        "type": "object",
+                        "properties": {
+                          "UTC": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Times/LastUpdatedOn/UTC",
+                            "title": "Utc",
+                            "type": "null",
+                            "default": null
+                          }
+                        }
+                      }
+
+                    }
+                  }
+                ,
+                  "Totals": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals",
+                    "title": "Totals",
+                    "type": "object",
+                    "properties": {
+                      "DiscountRefundApportionedTotal": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/DiscountRefundApportionedTotal",
+                        "title": "Discountrefundapportionedtotal",
+                        "type": "object",
+                        "properties": {
+                          "Current": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/DiscountRefundApportionedTotal/Current",
+                            "title": "Current",
+                            "type": "object",
+                            "properties": {
+                              "LCY": {
+                                "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/DiscountRefundApportionedTotal/Current/LCY",
+                                "title": "Lcy",
+                                "type": "object",
+                                "properties": {
+                                  "CurrencyCode": {
+                                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/DiscountRefundApportionedTotal/Current/LCY/CurrencyCode",
+                                    "title": "Currencycode",
+                                    "type": "null",
+                                    "default": null
+                                  },
+                                  "IncTax": {
+                                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/DiscountRefundApportionedTotal/Current/LCY/IncTax",
+                                    "title": "Inctax",
+                                    "type": "integer",
+                                    "examples": [
+                                      0
+                                    ],
+                                    "default": 0
+                                  }
+                                }
+                              }
+
+                            }
+                          }
+
+                        }
+                      }
+                    ,
+                      "DiscountsApportionedTotal": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/DiscountsApportionedTotal",
+                        "title": "Discountsapportionedtotal",
+                        "type": "object",
+                        "properties": {
+                          "Current": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/DiscountsApportionedTotal/Current",
+                            "title": "Current",
+                            "type": "object",
+                            "properties": {
+                              "LCY": {
+                                "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/DiscountsApportionedTotal/Current/LCY",
+                                "title": "Lcy",
+                                "type": "object",
+                                "properties": {
+                                  "CurrencyCode": {
+                                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/DiscountsApportionedTotal/Current/LCY/CurrencyCode",
+                                    "title": "Currencycode",
+                                    "type": "null",
+                                    "default": null
+                                  },
+                                  "IncTax": {
+                                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/DiscountsApportionedTotal/Current/LCY/IncTax",
+                                    "title": "Inctax",
+                                    "type": "integer",
+                                    "examples": [
+                                      -11
+                                    ],
+                                    "default": 0
+                                  }
+                                }
+                              }
+
+                            }
+                          }
+
+                        }
+                      }
+                    ,
+                      "PromotionsApportionedTotal": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/PromotionsApportionedTotal",
+                        "title": "Promotionsapportionedtotal",
+                        "type": "object",
+                        "properties": {
+                          "Current": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/PromotionsApportionedTotal/Current",
+                            "title": "Current",
+                            "type": "object",
+                            "properties": {
+                              "LCY": {
+                                "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/PromotionsApportionedTotal/Current/LCY",
+                                "title": "Lcy",
+                                "type": "object",
+                                "properties": {
+                                  "CurrencyCode": {
+                                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/PromotionsApportionedTotal/Current/LCY/CurrencyCode",
+                                    "title": "Currencycode",
+                                    "type": "null",
+                                    "default": null
+                                  },
+                                  "IncTax": {
+                                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/PromotionsApportionedTotal/Current/LCY/IncTax",
+                                    "title": "Inctax",
+                                    "type": "integer",
+                                    "examples": [
+                                      0
+                                    ],
+                                    "default": 0
+                                  }
+                                }
+                              }
+
+                            }
+                          }
+
+                        }
+                      }
+                    ,
+                      "SubTotal": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/SubTotal",
+                        "title": "Subtotal",
+                        "type": "object",
+                        "properties": {
+                          "Current": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/SubTotal/Current",
+                            "title": "Current",
+                            "type": "object",
+                            "properties": {
+                              "LCY": {
+                                "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/SubTotal/Current/LCY",
+                                "title": "Lcy",
+                                "type": "object",
+                                "properties": {
+                                  "CurrencyCode": {
+                                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/SubTotal/Current/LCY/CurrencyCode",
+                                    "title": "Currencycode",
+                                    "type": "null",
+                                    "default": null
+                                  },
+                                  "IncTax": {
+                                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/SubTotal/Current/LCY/IncTax",
+                                    "title": "Inctax",
+                                    "type": "integer",
+                                    "examples": [
+                                      55
+                                    ],
+                                    "default": 0
+                                  }
+                                }
+                              }
+
+                            }
+                          }
+
+                        }
+                      }
+                    ,
+                      "SubTotalBeforeDiscounts": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/SubTotalBeforeDiscounts",
+                        "title": "Subtotalbeforediscounts",
+                        "type": "object",
+                        "properties": {
+                          "Current": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/SubTotalBeforeDiscounts/Current",
+                            "title": "Current",
+                            "type": "object",
+                            "properties": {
+                              "LCY": {
+                                "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/SubTotalBeforeDiscounts/Current/LCY",
+                                "title": "Lcy",
+                                "type": "object",
+                                "properties": {
+                                  "CurrencyCode": {
+                                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/SubTotalBeforeDiscounts/Current/LCY/CurrencyCode",
+                                    "title": "Currencycode",
+                                    "type": "null",
+                                    "default": null
+                                  },
+                                  "IncTax": {
+                                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Totals/SubTotalBeforeDiscounts/Current/LCY/IncTax",
+                                    "title": "Inctax",
+                                    "type": "integer",
+                                    "examples": [
+                                      55
+                                    ],
+                                    "default": 0
+                                  }
+                                }
+                              }
+
+                            }
+                          }
+
+                        }
+                      }
+
+                    }
+                  }
+                ,
+                  "Type": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Type",
+                    "title": "Type",
+                    "type": "object",
+                    "properties": {
+                      "Class": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Type/Class",
+                        "title": "Class",
+                        "type": "object",
+                        "properties": {
+                          "Code": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Type/Class/Code",
+                            "title": "Code",
+                            "type": "string",
+                            "default": "",
+                            "examples": [
+                              "RetailTransaction"
+                            ],
+                            "pattern": "^.*$"
+                          }
+                        }
+                      }
+                    ,
+                      "SubType": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Type/SubType",
+                        "title": "Subtype",
+                        "type": "object",
+                        "properties": {
+                          "Code": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Type/SubType/Code",
+                            "title": "Code",
+                            "type": "string",
+                            "default": "",
+                            "examples": [
+                              "Sale"
+                            ],
+                            "pattern": "^.*$"
+                          }
+                        }
+                      }
+                    ,
+                      "Type": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Type/Type",
+                        "title": "Type",
+                        "type": "object",
+                        "properties": {
+                          "Code": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Lines/items/Type/Type/Code",
+                            "title": "Code",
+                            "type": "string",
+                            "default": "",
+                            "examples": [
+                              "SalesOrderLine"
+                            ],
+                            "pattern": "^.*$"
+                          }
+                        }
+                      }
+
+                    }
+                  }
+                ,
+                  "XrefIds": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Lines/items/XrefIds",
+                    "title": "Xrefids",
+                    "type": "array",
+                    "default": [],
+                    "items":{
+                      "$id": "#root/DomainEvent/TriggerEntity/Lines/items/XrefIds/items",
+                      "title": "Items",
+                      "type": "object",
+                      "properties": {
+                        "Code": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Lines/items/XrefIds/items/Code",
+                          "title": "Code",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "EntityId"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "Id": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Lines/items/XrefIds/items/Id",
+                          "title": "Id",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "SalesOrderLine::Sale_PMC_A0001191_1"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "SystemCode": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Lines/items/XrefIds/items/SystemCode",
+                          "title": "Systemcode",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "Xfuze"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      }
+                    }
+
+                  }
+                }
+              }
+
+            },
+            "ParentEntityId": {
+              "$id": "#root/DomainEvent/TriggerEntity/ParentEntityId",
+              "title": "Parententityid",
+              "type": "string",
+              "default": "",
+              "examples": [
+                "SalesOrder::Sale_PMC_A0001191"
+              ],
+              "pattern": "^.*$"
+            },
+            "ParentEntityType": {
+              "$id": "#root/DomainEvent/TriggerEntity/ParentEntityType",
+              "title": "Parententitytype",
+              "type": "string",
+              "default": "",
+              "examples": [
+                "SalesOrder::Sale"
+              ],
+              "pattern": "^.*$"
+            },
+            "Payments": {
+              "$id": "#root/DomainEvent/TriggerEntity/Payments",
+              "title": "Payments",
+              "type": "array",
+              "default": [],
+              "items":{
+                "$id": "#root/DomainEvent/TriggerEntity/Payments/items",
+                "title": "Items",
+                "type": "object",
+                "properties": {
+                  "Card": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Card",
+                    "title": "Card",
+                    "type": "object",
+                    "properties": {
+                      "PAN": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Card/PAN",
+                        "title": "Pan",
+                        "type": "string",
+                        "default": "",
+                        "examples": [
+                          "NA"
+                        ],
+                        "pattern": "^.*$"
+                      },
+                      "Type": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Card/Type",
+                        "title": "Type",
+                        "type": "string",
+                        "default": "",
+                        "examples": [
+                          "NA"
+                        ],
+                        "pattern": "^.*$"
+                      }
+                    }
+                  }
+                ,
+                  "Device": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Device",
+                    "title": "Device",
+                    "type": "object",
+                    "properties": {
+                      "EntryMethod": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Device/EntryMethod",
+                        "title": "Entrymethod",
+                        "type": "object",
+                        "properties": {
+                          "Code": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Device/EntryMethod/Code",
+                            "title": "Code",
+                            "type": "string",
+                            "default": "",
+                            "examples": [
+                              "NA"
+                            ],
+                            "pattern": "^.*$"
+                          }
+                        }
+                      }
+
+                    }
+                  }
+                ,
+                  "EntityId": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Payments/items/EntityId",
+                    "title": "Entityid",
+                    "type": "string",
+                    "default": "",
+                    "examples": [
+                      "SalesOrderPayment_PMC_H6jdoJ1892023-04-14T08:20:15.746Z2f9e"
+                    ],
+                    "pattern": "^.*$"
+                  },
+                  "HeaderId": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Payments/items/HeaderId",
+                    "title": "Headerid",
+                    "type": "string",
+                    "default": "",
+                    "examples": [
+                      "SalesOrderHeader_PMC_A0001191"
+                    ],
+                    "pattern": "^.*$"
+                  },
+                  "ProcessingResult": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Payments/items/ProcessingResult",
+                    "title": "Processingresult",
+                    "type": "object",
+                    "properties": {
+                      "AuthCode": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Payments/items/ProcessingResult/AuthCode",
+                        "title": "Authcode",
+                        "type": "string",
+                        "default": "",
+                        "examples": [
+                          "NA"
+                        ],
+                        "pattern": "^.*$"
+                      },
+                      "Code": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Payments/items/ProcessingResult/Code",
+                        "title": "Code",
+                        "type": "string",
+                        "default": "",
+                        "examples": [
+                          "Authorised"
+                        ],
+                        "pattern": "^.*$"
+                      },
+                      "ExternalCode": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Payments/items/ProcessingResult/ExternalCode",
+                        "title": "Externalcode",
+                        "type": "string",
+                        "default": "",
+                        "examples": [
+                          "AUTHORISED"
+                        ],
+                        "pattern": "^.*$"
+                      }
+                    }
+                  }
+                ,
+                  "SplitDetails": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Payments/items/SplitDetails",
+                    "title": "Splitdetails",
+                    "type": "object",
+                    "properties": {
+                      "IsSplit": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Payments/items/SplitDetails/IsSplit",
+                        "title": "Issplit",
+                        "type": "null",
+                        "default": null
+                      },
+                      "SeqNo": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Payments/items/SplitDetails/SeqNo",
+                        "title": "Seqno",
+                        "type": "null",
+                        "default": null
+                      }
+                    }
+                  }
+                ,
+                  "Status": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Status",
+                    "title": "Status",
+                    "type": "object",
+                    "properties": {
+                      "PaymentStatus": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Status/PaymentStatus",
+                        "title": "Paymentstatus",
+                        "type": "object",
+                        "properties": {
+                          "Code": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Status/PaymentStatus/Code",
+                            "title": "Code",
+                            "type": "string",
+                            "default": "",
+                            "examples": [
+                              "Completed"
+                            ],
+                            "pattern": "^.*$"
+                          }
+                        }
+                      }
+
+                    }
+                  }
+                ,
+                  "Times": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Times",
+                    "title": "Times",
+                    "type": "object",
+                    "properties": {
+                      "PaidOn": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Times/PaidOn",
+                        "title": "Paidon",
+                        "type": "object",
+                        "properties": {
+                          "UTC": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Times/PaidOn/UTC",
+                            "title": "Utc",
+                            "type": "string",
+                            "default": "",
+                            "examples": [
+                              "2023-04-14T08:20:15.748Z"
+                            ],
+                            "pattern": "^.*$"
+                          }
+                        }
+                      }
+
+                    }
+                  }
+                ,
+                  "Totals": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Totals",
+                    "title": "Totals",
+                    "type": "object",
+                    "properties": {
+                      "GrandTotal": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Totals/GrandTotal",
+                        "title": "Grandtotal",
+                        "type": "object",
+                        "properties": {
+                          "CurrentLCY": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Totals/GrandTotal/CurrentLCY",
+                            "title": "Currentlcy",
+                            "type": "object",
+                            "properties": {
+                              "CurrencyCode": {
+                                "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Totals/GrandTotal/CurrentLCY/CurrencyCode",
+                                "title": "Currencycode",
+                                "type": "string",
+                                "default": "",
+                                "examples": [
+                                  "EUR"
+                                ],
+                                "pattern": "^.*$"
+                              },
+                              "IncTax": {
+                                "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Totals/GrandTotal/CurrentLCY/IncTax",
+                                "title": "Inctax",
+                                "type": "integer",
+                                "examples": [
+                                  112
+                                ],
+                                "default": 0
+                              }
+                            }
+                          }
+
+                        }
+                      }
+                    ,
+                      "PaidTotal": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Totals/PaidTotal",
+                        "title": "Paidtotal",
+                        "type": "object",
+                        "properties": {
+                          "CurrentLCY": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Totals/PaidTotal/CurrentLCY",
+                            "title": "Currentlcy",
+                            "type": "object",
+                            "properties": {
+                              "CurrencyCode": {
+                                "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Totals/PaidTotal/CurrentLCY/CurrencyCode",
+                                "title": "Currencycode",
+                                "type": "string",
+                                "default": "",
+                                "examples": [
+                                  "EUR"
+                                ],
+                                "pattern": "^.*$"
+                              },
+                              "IncTax": {
+                                "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Totals/PaidTotal/CurrentLCY/IncTax",
+                                "title": "Inctax",
+                                "type": "integer",
+                                "examples": [
+                                  112
+                                ],
+                                "default": 0
+                              }
+                            }
+                          }
+
+                        }
+                      }
+
+                    }
+                  }
+                ,
+                  "Type": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Type",
+                    "title": "Type",
+                    "type": "object",
+                    "properties": {
+                      "PaymentType": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Type/PaymentType",
+                        "title": "Paymenttype",
+                        "type": "object",
+                        "properties": {
+                          "Code": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Type/PaymentType/Code",
+                            "title": "Code",
+                            "type": "string",
+                            "default": "",
+                            "examples": [
+                              "PDQ"
+                            ],
+                            "pattern": "^.*$"
+                          }
+                        }
+                      }
+                    ,
+                      "TransactionType": {
+                        "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Type/TransactionType",
+                        "title": "Transactiontype",
+                        "type": "object",
+                        "properties": {
+                          "Code": {
+                            "$id": "#root/DomainEvent/TriggerEntity/Payments/items/Type/TransactionType/Code",
+                            "title": "Code",
+                            "type": "string",
+                            "default": "",
+                            "examples": [
+                              "SALE"
+                            ],
+                            "pattern": "^.*$"
+                          }
+                        }
+                      }
+
+                    }
+                  }
+                ,
+                  "XrefIds": {
+                    "$id": "#root/DomainEvent/TriggerEntity/Payments/items/XrefIds",
+                    "title": "Xrefids",
+                    "type": "array",
+                    "default": [],
+                    "items":{
+                      "$id": "#root/DomainEvent/TriggerEntity/Payments/items/XrefIds/items",
+                      "title": "Items",
+                      "type": "object",
+                      "properties": {
+                        "Code": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Payments/items/XrefIds/items/Code",
+                          "title": "Code",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "EntityId"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "Id": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Payments/items/XrefIds/items/Id",
+                          "title": "Id",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "SalesOrderPayment_PMC_H6jdoJ1892023-04-14T08:20:15.746Z2f9e"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "SystemCode": {
+                          "$id": "#root/DomainEvent/TriggerEntity/Payments/items/XrefIds/items/SystemCode",
+                          "title": "Systemcode",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "Xfuze"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      }
+                    }
+
+                  }
+                }
+              }
+
+            }
+          }
+        }
+
+      }
+    }
+  ,
+    "EntityId": {
+      "$id": "#root/EntityId",
+      "title": "Entityid",
+      "type": "string",
+      "default": "",
+      "examples": [
+        "SalesOrder::Sale_PMC_A0001191"
+      ],
+      "pattern": "^.*$"
+    },
+    "EntityType": {
+      "$id": "#root/EntityType",
+      "title": "Entitytype",
+      "type": "string",
+      "default": "",
+      "examples": [
+        "SalesOrder::Sale"
+      ],
+      "pattern": "^.*$"
+    },
+    "EventId": {
+      "$id": "#root/EventId",
+      "title": "Eventid",
+      "type": "string",
+      "default": "",
+      "examples": [
+        "SalesOrderSaleCompleted_SalesOrder::Sale_PMC_A0001191_2023-04-14T08:21:28.793Z"
+      ],
+      "pattern": "^.*$"
+    },
+    "EventMetadata": {
+      "$id": "#root/EventMetadata",
+      "title": "Eventmetadata",
+      "type": "object",
+      "properties": {
+        "EntityAtts": {
+          "$id": "#root/EventMetadata/EntityAtts",
+          "title": "Entityatts",
+          "type": "object",
+          "properties": {
+            "Origin": {
+              "$id": "#root/EventMetadata/EntityAtts/Origin",
+              "title": "Origin",
+              "type": "object",
+              "properties": {
+                "EntityId": {
+                  "$id": "#root/EventMetadata/EntityAtts/Origin/EntityId",
+                  "title": "Entityid",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "A0001191"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "ParentEntityId": {
+                  "$id": "#root/EventMetadata/EntityAtts/Origin/ParentEntityId",
+                  "title": "Parententityid",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "A0001191"
+                  ],
+                  "pattern": "^.*$"
+                }
+              }
+            }
+          ,
+            "Xfuze": {
+              "$id": "#root/EventMetadata/EntityAtts/Xfuze",
+              "title": "Xfuze",
+              "type": "object",
+              "properties": {
+                "EntityClass": {
+                  "$id": "#root/EventMetadata/EntityAtts/Xfuze/EntityClass",
+                  "title": "Entityclass",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "Composite"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "EntityDomain": {
+                  "$id": "#root/EventMetadata/EntityAtts/Xfuze/EntityDomain",
+                  "title": "Entitydomain",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "Sales"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "EntityId": {
+                  "$id": "#root/EventMetadata/EntityAtts/Xfuze/EntityId",
+                  "title": "Entityid",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "SalesOrder::Sale_PMC_A0001191"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "EntitySubType": {
+                  "$id": "#root/EventMetadata/EntityAtts/Xfuze/EntitySubType",
+                  "title": "Entitysubtype",
+                  "type": "null",
+                  "default": null
+                },
+                "EntityType": {
+                  "$id": "#root/EventMetadata/EntityAtts/Xfuze/EntityType",
+                  "title": "Entitytype",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "SalesOrder::Sale"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "EntityVariation": {
+                  "$id": "#root/EventMetadata/EntityAtts/Xfuze/EntityVariation",
+                  "title": "Entityvariation",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "Retail"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "IsSensitive": {
+                  "$id": "#root/EventMetadata/EntityAtts/Xfuze/IsSensitive",
+                  "title": "Issensitive",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "N"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "ParentEntityId": {
+                  "$id": "#root/EventMetadata/EntityAtts/Xfuze/ParentEntityId",
+                  "title": "Parententityid",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "SalesOrder::Sale_PMC_A0001191"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "ParentEntityType": {
+                  "$id": "#root/EventMetadata/EntityAtts/Xfuze/ParentEntityType",
+                  "title": "Parententitytype",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "SalesOrder::Sale"
+                  ],
+                  "pattern": "^.*$"
+                }
+              }
+            }
+
+          }
+        }
+      ,
+        "EventAtts": {
+          "$id": "#root/EventMetadata/EventAtts",
+          "title": "Eventatts",
+          "type": "object",
+          "properties": {
+            "Origin": {
+              "$id": "#root/EventMetadata/EventAtts/Origin",
+              "title": "Origin",
+              "type": "object",
+              "properties": {
+                "CorrelationId": {
+                  "$id": "#root/EventMetadata/EventAtts/Origin/CorrelationId",
+                  "title": "Correlationid",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "7588ede7-36ac-45a0-90d4-e2f41da7510f"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "EventId": {
+                  "$id": "#root/EventMetadata/EventAtts/Origin/EventId",
+                  "title": "Eventid",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "7588ede7-36ac-45a0-90d4-e2f41da7510f"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "EventName": {
+                  "$id": "#root/EventMetadata/EventAtts/Origin/EventName",
+                  "title": "Eventname",
+                  "type": "null",
+                  "default": null
+                },
+                "SourceFormatType": {
+                  "$id": "#root/EventMetadata/EventAtts/Origin/SourceFormatType",
+                  "title": "Sourceformattype",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "JSON"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "SourceSubSystem": {
+                  "$id": "#root/EventMetadata/EventAtts/Origin/SourceSubSystem",
+                  "title": "Sourcesubsystem",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "OrderAPI"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "SourceSystem": {
+                  "$id": "#root/EventMetadata/EventAtts/Origin/SourceSystem",
+                  "title": "Sourcesystem",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "PMC"
+                  ],
+                  "pattern": "^.*$"
+                }
+              }
+            }
+          ,
+            "Xfuze": {
+              "$id": "#root/EventMetadata/EventAtts/Xfuze",
+              "title": "Xfuze",
+              "type": "object",
+              "properties": {
+                "BizCapabilityL0": {
+                  "$id": "#root/EventMetadata/EventAtts/Xfuze/BizCapabilityL0",
+                  "title": "Bizcapabilityl0",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "Sell"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "BizCapabilityL1": {
+                  "$id": "#root/EventMetadata/EventAtts/Xfuze/BizCapabilityL1",
+                  "title": "Bizcapabilityl1",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "Sell & Serve"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "BizCapabilityL2": {
+                  "$id": "#root/EventMetadata/EventAtts/Xfuze/BizCapabilityL2",
+                  "title": "Bizcapabilityl2",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "Take Sale"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "ClientCode": {
+                  "$id": "#root/EventMetadata/EventAtts/Xfuze/ClientCode",
+                  "title": "Clientcode",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "Crew"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "EventCategory": {
+                  "$id": "#root/EventMetadata/EventAtts/Xfuze/EventCategory",
+                  "title": "Eventcategory",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "Sales"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "EventChangePattern": {
+                  "$id": "#root/EventMetadata/EventAtts/Xfuze/EventChangePattern",
+                  "title": "Eventchangepattern",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "FullSnapshot"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "EventClass": {
+                  "$id": "#root/EventMetadata/EventAtts/Xfuze/EventClass",
+                  "title": "Eventclass",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "TriggerEvent"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "EventId": {
+                  "$id": "#root/EventMetadata/EventAtts/Xfuze/EventId",
+                  "title": "Eventid",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "SalesOrderSaleCompleted_SalesOrder::Sale_PMC_A0001191_2023-04-14T08:21:28.793Z"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "EventName": {
+                  "$id": "#root/EventMetadata/EventAtts/Xfuze/EventName",
+                  "title": "Eventname",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "SalesOrderSaleCompleted"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "EventValueStream": {
+                  "$id": "#root/EventMetadata/EventAtts/Xfuze/EventValueStream",
+                  "title": "Eventvaluestream",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "Order2Cash"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "IsDerivedEvent": {
+                  "$id": "#root/EventMetadata/EventAtts/Xfuze/IsDerivedEvent",
+                  "title": "Isderivedevent",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "N"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "Note": {
+                  "$id": "#root/EventMetadata/EventAtts/Xfuze/Note",
+                  "title": "Note",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "(Any context note like test)"
+                  ],
+                  "pattern": "^.*$"
+                }
+              }
+            }
+
+          }
+        }
+      ,
+        "IngestAtts": {
+          "$id": "#root/EventMetadata/IngestAtts",
+          "title": "Ingestatts",
+          "type": "object",
+          "properties": {
+            "Xfuze": {
+              "$id": "#root/EventMetadata/IngestAtts/Xfuze",
+              "title": "Xfuze",
+              "type": "object",
+              "properties": {
+                "API": {
+                  "$id": "#root/EventMetadata/IngestAtts/Xfuze/API",
+                  "title": "Api",
+                  "type": "object",
+                  "properties": {
+                    "Name": {
+                      "$id": "#root/EventMetadata/IngestAtts/Xfuze/API/Name",
+                      "title": "Name",
+                      "type": "string",
+                      "default": "",
+                      "examples": [
+                        "/PMC/OrderAPI"
+                      ],
+                      "pattern": "^.*$"
+                    },
+                    "PatternType": {
+                      "$id": "#root/EventMetadata/IngestAtts/Xfuze/API/PatternType",
+                      "title": "Patterntype",
+                      "type": "string",
+                      "default": "",
+                      "examples": [
+                        "Scheduled Poll"
+                      ],
+                      "pattern": "^.*$"
+                    },
+                    "Resource": {
+                      "$id": "#root/EventMetadata/IngestAtts/Xfuze/API/Resource",
+                      "title": "Resource",
+                      "type": "string",
+                      "default": "",
+                      "examples": [
+                        "/PMC/OrderAPI/Orders/123"
+                      ],
+                      "pattern": "^.*$"
+                    },
+                    "URI": {
+                      "$id": "#root/EventMetadata/IngestAtts/Xfuze/API/URI",
+                      "title": "Uri",
+                      "type": "string",
+                      "default": "",
+                      "examples": [
+                        "http://pmc.org/OrderAPI"
+                      ],
+                      "pattern": "^.*$"
+                    }
+                  }
+                }
+
+              }
+            }
+
+          }
+        }
+      ,
+        "LocationAtts": {
+          "$id": "#root/EventMetadata/LocationAtts",
+          "title": "Locationatts",
+          "type": "object",
+          "properties": {
+            "Xfuze": {
+              "$id": "#root/EventMetadata/LocationAtts/Xfuze",
+              "title": "Xfuze",
+              "type": "object",
+              "properties": {
+                "LocationId": {
+                  "$id": "#root/EventMetadata/LocationAtts/Xfuze/LocationId",
+                  "title": "Locationid",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "Location_f37f4592-da7e-4e59-bddc-6f6f2e17d3eb"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "LocationNumber": {
+                  "$id": "#root/EventMetadata/LocationAtts/Xfuze/LocationNumber",
+                  "title": "Locationnumber",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "189"
+                  ],
+                  "pattern": "^.*$"
+                }
+              }
+            }
+
+          }
+        }
+      ,
+        "PartyAtts": {
+          "$id": "#root/EventMetadata/PartyAtts",
+          "title": "Partyatts",
+          "type": "object",
+          "properties": {
+            "Origin": {
+              "$id": "#root/EventMetadata/PartyAtts/Origin",
+              "title": "Origin",
+              "type": "object",
+              "properties": {
+                "SystemPartyId": {
+                  "$id": "#root/EventMetadata/PartyAtts/Origin/SystemPartyId",
+                  "title": "Systempartyid",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                  ],
+                  "pattern": "^.*$"
+                }
+              }
+            }
+          ,
+            "Xfuze": {
+              "$id": "#root/EventMetadata/PartyAtts/Xfuze",
+              "title": "Xfuze",
+              "type": "object",
+              "properties": {
+                "PartyRoleSubTypeCode": {
+                  "$id": "#root/EventMetadata/PartyAtts/Xfuze/PartyRoleSubTypeCode",
+                  "title": "Partyrolesubtypecode",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "Seller"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "PartyRoleTypeCode": {
+                  "$id": "#root/EventMetadata/PartyAtts/Xfuze/PartyRoleTypeCode",
+                  "title": "Partyroletypecode",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "Employee"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "SystemPartyId": {
+                  "$id": "#root/EventMetadata/PartyAtts/Xfuze/SystemPartyId",
+                  "title": "Systempartyid",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "Party_9eda50c9-71c0-444d-878b-25c1c718fb12"
+                  ],
+                  "pattern": "^.*$"
+                }
+              }
+            }
+
+          }
+        }
+      ,
+        "PayloadAtts": {
+          "$id": "#root/EventMetadata/PayloadAtts",
+          "title": "Payloadatts",
+          "type": "object",
+          "properties": {
+            "Origin": {
+              "$id": "#root/EventMetadata/PayloadAtts/Origin",
+              "title": "Origin",
+              "type": "object",
+              "properties": {
+                "DataPayloadHash": {
+                  "$id": "#root/EventMetadata/PayloadAtts/Origin/DataPayloadHash",
+                  "title": "Datapayloadhash",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "4bs34a6b6e25dd36ab5206beecf71e48"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "EventPayloadHash": {
+                  "$id": "#root/EventMetadata/PayloadAtts/Origin/EventPayloadHash",
+                  "title": "Eventpayloadhash",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "9p23eed6cc74bc5e1d8fdf8d90f440a3"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "HashScheme": {
+                  "$id": "#root/EventMetadata/PayloadAtts/Origin/HashScheme",
+                  "title": "Hashscheme",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "MD5"
+                  ],
+                  "pattern": "^.*$"
+                }
+              }
+            }
+          ,
+            "Xfuze": {
+              "$id": "#root/EventMetadata/PayloadAtts/Xfuze",
+              "title": "Xfuze",
+              "type": "object",
+              "properties": {
+                "DataPayloadHash": {
+                  "$id": "#root/EventMetadata/PayloadAtts/Xfuze/DataPayloadHash",
+                  "title": "Datapayloadhash",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "3c906a6b6e25dd36ab5206beecf71e48"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "EventPayloadHash": {
+                  "$id": "#root/EventMetadata/PayloadAtts/Xfuze/EventPayloadHash",
+                  "title": "Eventpayloadhash",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "8e59eed6cc74bc5e1d8fdf8d90f440a3"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "HashScheme": {
+                  "$id": "#root/EventMetadata/PayloadAtts/Xfuze/HashScheme",
+                  "title": "Hashscheme",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "MD5"
+                  ],
+                  "pattern": "^.*$"
+                }
+              }
+            }
+
+          }
+        }
+      ,
+        "PrivacyAtts": {
+          "$id": "#root/EventMetadata/PrivacyAtts",
+          "title": "Privacyatts",
+          "type": "object",
+          "properties": {
+            "Origin": {
+              "$id": "#root/EventMetadata/PrivacyAtts/Origin",
+              "title": "Origin",
+              "type": "object",
+              "properties": {
+                "IsEncrypted": {
+                  "$id": "#root/EventMetadata/PrivacyAtts/Origin/IsEncrypted",
+                  "title": "Isencrypted",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "N"
+                  ],
+                  "pattern": "^.*$"
+                }
+              }
+            }
+          ,
+            "Xfuze": {
+              "$id": "#root/EventMetadata/PrivacyAtts/Xfuze",
+              "title": "Xfuze",
+              "type": "object",
+              "properties": {
+                "EncryptionKeyHost": {
+                  "$id": "#root/EventMetadata/PrivacyAtts/Xfuze/EncryptionKeyHost",
+                  "title": "Encryptionkeyhost",
+                  "type": "null",
+                  "default": null
+                },
+                "EncryptionKeyURI": {
+                  "$id": "#root/EventMetadata/PrivacyAtts/Xfuze/EncryptionKeyURI",
+                  "title": "Encryptionkeyuri",
+                  "type": "null",
+                  "default": null
+                },
+                "IsEncrypted": {
+                  "$id": "#root/EventMetadata/PrivacyAtts/Xfuze/IsEncrypted",
+                  "title": "Isencrypted",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "Y"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "IsSensitiveEntity": {
+                  "$id": "#root/EventMetadata/PrivacyAtts/Xfuze/IsSensitiveEntity",
+                  "title": "Issensitiveentity",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "Y"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "SensitiveFieldPaths": {
+                  "$id": "#root/EventMetadata/PrivacyAtts/Xfuze/SensitiveFieldPaths",
+                  "title": "Sensitivefieldpaths",
+                  "type": "array",
+                  "default": [],
+                  "items":{
+                    "$id": "#root/EventMetadata/PrivacyAtts/Xfuze/SensitiveFieldPaths/items",
+                    "title": "Items",
+                    "type": "string",
+                    "default": "",
+                    "examples": [
+                      "userName"
+                    ],
+                    "pattern": "^.*$"
+                  }
+                }
+              }
+            }
+
+          }
+        }
+      ,
+        "ProductAtts": {
+          "$id": "#root/EventMetadata/ProductAtts",
+          "title": "Productatts",
+          "type": "object",
+          "properties": {
+            "Xfuze": {
+              "$id": "#root/EventMetadata/ProductAtts/Xfuze",
+              "title": "Xfuze",
+              "type": "object",
+              "properties": {
+                "InvolvedReasonCode": {
+                  "$id": "#root/EventMetadata/ProductAtts/Xfuze/InvolvedReasonCode",
+                  "title": "Involvedreasoncode",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "SoldProduct"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "ProductIds": {
+                  "$id": "#root/EventMetadata/ProductAtts/Xfuze/ProductIds",
+                  "title": "Productids",
+                  "type": "array",
+                  "default": [],
+                  "items":{
+                    "$id": "#root/EventMetadata/ProductAtts/Xfuze/ProductIds/items",
+                    "title": "Items",
+                    "type": "string",
+                    "default": "",
+                    "examples": [
+                      "ProductVariant_Retail247Origin_1201764"
+                    ],
+                    "pattern": "^.*$"
+                  }
+                },
+                "ProductSkus": {
+                  "$id": "#root/EventMetadata/ProductAtts/Xfuze/ProductSkus",
+                  "title": "Productskus",
+                  "type": "array",
+                  "default": [],
+                  "items":{
+                    "$id": "#root/EventMetadata/ProductAtts/Xfuze/ProductSkus/items",
+                    "title": "Items",
+                    "type": "string",
+                    "default": "",
+                    "examples": [
+                      "1201764"
+                    ],
+                    "pattern": "^.*$"
+                  }
+                }
+              }
+            }
+
+          }
+        }
+      ,
+        "TimeAtts": {
+          "$id": "#root/EventMetadata/TimeAtts",
+          "title": "Timeatts",
+          "type": "object",
+          "properties": {
+            "Origin": {
+              "$id": "#root/EventMetadata/TimeAtts/Origin",
+              "title": "Origin",
+              "type": "object",
+              "properties": {
+                "Times": {
+                  "$id": "#root/EventMetadata/TimeAtts/Origin/Times",
+                  "title": "Times",
+                  "type": "object",
+                  "properties": {
+                    "EventOccurredTimestamp": {
+                      "$id": "#root/EventMetadata/TimeAtts/Origin/Times/EventOccurredTimestamp",
+                      "title": "Eventoccurredtimestamp",
+                      "type": "string",
+                      "default": "",
+                      "examples": [
+                        "2023-04-14T08:21:28.793Z"
+                      ],
+                      "pattern": "^.*$"
+                    }
+                  }
+                }
+
+              }
+            }
+          ,
+            "Xfuze": {
+              "$id": "#root/EventMetadata/TimeAtts/Xfuze",
+              "title": "Xfuze",
+              "type": "object",
+              "properties": {
+                "TimeZones": {
+                  "$id": "#root/EventMetadata/TimeAtts/Xfuze/TimeZones",
+                  "title": "Timezones",
+                  "type": "object",
+                  "properties": {
+                    "EventTimeZone": {
+                      "$id": "#root/EventMetadata/TimeAtts/Xfuze/TimeZones/EventTimeZone",
+                      "title": "Eventtimezone",
+                      "type": "object",
+                      "properties": {
+                        "TimeZone": {
+                          "$id": "#root/EventMetadata/TimeAtts/Xfuze/TimeZones/EventTimeZone/TimeZone",
+                          "title": "Timezone",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "Europe/London"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "TimeZoneOffset": {
+                          "$id": "#root/EventMetadata/TimeAtts/Xfuze/TimeZones/EventTimeZone/TimeZoneOffset",
+                          "title": "Timezoneoffset",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "UTC +1"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      }
+                    }
+                  ,
+                    "HomeTimeZone": {
+                      "$id": "#root/EventMetadata/TimeAtts/Xfuze/TimeZones/HomeTimeZone",
+                      "title": "Hometimezone",
+                      "type": "object",
+                      "properties": {
+                        "TimeZone": {
+                          "$id": "#root/EventMetadata/TimeAtts/Xfuze/TimeZones/HomeTimeZone/TimeZone",
+                          "title": "Timezone",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "Europe/London"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "TimeZoneOffset": {
+                          "$id": "#root/EventMetadata/TimeAtts/Xfuze/TimeZones/HomeTimeZone/TimeZoneOffset",
+                          "title": "Timezoneoffset",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "UTC +1"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      }
+                    }
+                  ,
+                    "PartyTimeZone": {
+                      "$id": "#root/EventMetadata/TimeAtts/Xfuze/TimeZones/PartyTimeZone",
+                      "title": "Partytimezone",
+                      "type": "object",
+                      "properties": {
+                        "TimeZone": {
+                          "$id": "#root/EventMetadata/TimeAtts/Xfuze/TimeZones/PartyTimeZone/TimeZone",
+                          "title": "Timezone",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "Europe/London"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "TimeZoneOffset": {
+                          "$id": "#root/EventMetadata/TimeAtts/Xfuze/TimeZones/PartyTimeZone/TimeZoneOffset",
+                          "title": "Timezoneoffset",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "UTC +1"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      }
+                    }
+
+                  }
+                }
+              ,
+                "Times": {
+                  "$id": "#root/EventMetadata/TimeAtts/Xfuze/Times",
+                  "title": "Times",
+                  "type": "object",
+                  "properties": {
+                    "EventOccurredTimestamp": {
+                      "$id": "#root/EventMetadata/TimeAtts/Xfuze/Times/EventOccurredTimestamp",
+                      "title": "Eventoccurredtimestamp",
+                      "type": "object",
+                      "properties": {
+                        "Local": {
+                          "$id": "#root/EventMetadata/TimeAtts/Xfuze/Times/EventOccurredTimestamp/Local",
+                          "title": "Local",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "2023-04-14T08:21:28.793Z"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "Millis": {
+                          "$id": "#root/EventMetadata/TimeAtts/Xfuze/Times/EventOccurredTimestamp/Millis",
+                          "title": "Millis",
+                          "type": "integer",
+                          "examples": [
+                            1697535296908
+                          ],
+                          "default": 0
+                        },
+                        "UTC": {
+                          "$id": "#root/EventMetadata/TimeAtts/Xfuze/Times/EventOccurredTimestamp/UTC",
+                          "title": "Utc",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "2023-04-14T08:21:28.793Z"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      }
+                    }
+                  ,
+                    "EventOccurredType": {
+                      "$id": "#root/EventMetadata/TimeAtts/Xfuze/Times/EventOccurredType",
+                      "title": "Eventoccurredtype",
+                      "type": "null",
+                      "default": null
+                    },
+                    "EventReceivedTimestamp": {
+                      "$id": "#root/EventMetadata/TimeAtts/Xfuze/Times/EventReceivedTimestamp",
+                      "title": "Eventreceivedtimestamp",
+                      "type": "object",
+                      "properties": {
+                        "Local": {
+                          "$id": "#root/EventMetadata/TimeAtts/Xfuze/Times/EventReceivedTimestamp/Local",
+                          "title": "Local",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "2023-10-17T09:34:56.908Z"
+                          ],
+                          "pattern": "^.*$"
+                        },
+                        "Millis": {
+                          "$id": "#root/EventMetadata/TimeAtts/Xfuze/Times/EventReceivedTimestamp/Millis",
+                          "title": "Millis",
+                          "type": "integer",
+                          "examples": [
+                            1697535296908
+                          ],
+                          "default": 0
+                        },
+                        "UTC": {
+                          "$id": "#root/EventMetadata/TimeAtts/Xfuze/Times/EventReceivedTimestamp/UTC",
+                          "title": "Utc",
+                          "type": "string",
+                          "default": "",
+                          "examples": [
+                            "2023-10-17T09:34:56.908Z"
+                          ],
+                          "pattern": "^.*$"
+                        }
+                      }
+                    }
+
+                  }
+                }
+
+              }
+            }
+
+          }
+        }
+
+      }
+    }
+  ,
+    "EventOccurredTimestampLocal": {
+      "$id": "#root/EventOccurredTimestampLocal",
+      "title": "Eventoccurredtimestamplocal",
+      "type": "string",
+      "default": "",
+      "examples": [
+        "2023-04-14T08:21:28.793Z"
+      ],
+      "pattern": "^.*$"
+    },
+    "EventOccurredTimestampUTC": {
+      "$id": "#root/EventOccurredTimestampUTC",
+      "title": "Eventoccurredtimestamputc",
+      "type": "string",
+      "default": "",
+      "examples": [
+        "2023-04-14T08:21:28.793Z"
+      ],
+      "pattern": "^.*$"
+    },
+    "ParentEntityId": {
+      "$id": "#root/ParentEntityId",
+      "title": "Parententityid",
+      "type": "string",
+      "default": "",
+      "examples": [
+        "SalesOrder::Sale_PMC_A0001191"
+      ],
+      "pattern": "^.*$"
+    },
+    "ParentEntityType": {
+      "$id": "#root/ParentEntityType",
+      "title": "Parententitytype",
+      "type": "string",
+      "default": "",
+      "examples": [
+        "SalesOrder::Sale"
+      ],
+      "pattern": "^.*$"
+    }
+  }
+}

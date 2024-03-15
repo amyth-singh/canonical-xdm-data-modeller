@@ -1,0 +1,52 @@
+{
+  "PostcodeObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/PostcodeProperties"
+    }
+  },
+  "PostcodeProperties": {
+    "type": "object",
+    "required": [
+      "PostcodeCode"
+    ],
+    "unevaluatedProperties": false,
+    "properties": {
+      "Postcode": {
+        "type": "string",
+        "description": "The full postcode of the address e.g SW1A 1AA"
+      },
+      "PostcodeScheme": {
+        "type": "string",
+        "description": "The scheme of the postcode e.g UK, US, AUS"
+      },
+      "PostcodeArea": {
+        "type": "string",
+        "description": "The area part of the postcode of the address e.g SW"
+      },
+      "PostcodeDistrict": {
+        "type": "string",
+        "description": "The district part of the postcode of the address e.g 1A"
+      },
+      "PostcodeSector": {
+        "type": "string",
+        "description": "The sector part of the postcode of the address e.g 1"
+      },
+      "PostcodeUnit": {
+        "type": "string",
+        "description": "The sector part of the postcode of the address e.g AA"
+      },
+      "IsVerified": {
+        "type": "string",
+        "description": "Has the postcode been verified? e.g Y",
+        "enum": [
+          "Y","N","U"
+        ]
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

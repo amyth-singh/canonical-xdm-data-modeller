@@ -1,0 +1,23 @@
+{
+  "messageID": "358f4b52-1094-46f2-9111-84a8d0256c84",
+  "EventTypeName": null,
+  "Cid": 711490807,
+  "RegulationTypeID": 4,
+  "BrandID": 0,
+  "BrandName": "888casino",
+  "subBrandID": 0,
+  "CountryIsoCodeID": 826,
+  "RegistrationCountryOfIPIsoCodeId": 826,
+  "OperationalStatusID": 1,
+  "OperationalStatusChangeDate": "2023-04-10T10:09:39.6390781+00:00",
+  "OperationalStatusReasonID": 470,
+  "OperationalStatusReasonChangeDate": "2023-04-10T10:09:39.6390781+00:00",
+  "PreviousOperationalStatusID": 0,
+  "PreviousOperationalStatusReasonID": 0,
+  "RequestedBy": null,
+  "Remark": "Customer Requested Self Exclusion",
+  "AdditionalData": "{\"AdditionalData\":{\"@VersionID\":\"1\",\"Remark\":\"Customer Requested Self Exclusion\",\"ReasonID\":\"470\",\"RequestedByTypeID\":\"2\",\"SelfExclusionRequestId\":\"325588\",\"SelfExclusionPeriod\":\"0\",\"ClosedExpirationDate\":\"2025-07-07T08:38:29.7600000Z\",\"SystemId\":\"50\",\"CorrelationId\":\"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\"SubBrandId\":\"0\",\"RequestFromPanicButton\":\"False\"}}",
+  "SystemID": 2,
+  "OriginalPlayerId": "57333QP",
+  "OriginalSystem": "WH"
+}

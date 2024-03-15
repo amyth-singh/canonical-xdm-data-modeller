@@ -1,0 +1,337 @@
+[
+  {
+    "SKU": "1196265",
+    "attributes": [],
+    "barcodes": [
+      "5054409799602"
+    ],
+    "currentLines": [
+      {
+        "SKU": "1196265",
+        "attributes": [],
+        "barcodes": [
+          "5054409799602"
+        ],
+        "changeQty": 1,
+        "currency": "GBP",
+        "deliveryGroup": "1",
+        "deliveryMethod": "3",
+        "description": "  SLEEVELESS JERSEY DRESS| GAD003 | 6-7 | WHITE",
+        "exchange": {
+          "exchangeId": 1,
+          "lineItemId": 1,
+          "newItems": [
+            {
+              "Quantity": 1,
+              "lineItemId": 2
+            }
+          ],
+          "quantity": 1,
+          "reason": "601-1"
+        },
+        "excludePromotion": false,
+        "fullfilmentId": "189",
+        "imageUrls": [
+          "https://www.crewclothing.co.uk/images/products/large/GAD003_WHITE.jpg"
+        ],
+        "inReturnItem": true,
+        "isChecked": false,
+        "isLastExchanged": false,
+        "itemDiscounts": {
+          "currentRefundPortion": 0,
+          "refundPortion": 0,
+          "trnDiscountsPortion": 0,
+          "trnPromotionsPortion": 0
+        },
+        "itemLineId": 1,
+        "leadTime": {
+          "type": "Days",
+          "value": "0"
+        },
+        "quantity": 1,
+        "refundPromotionalQuantity": 0,
+        "refunded": true,
+        "refundedQuantity": 1,
+        "refundedReason": "601-1",
+        "refundedReasonDescription": "Changed Mind",
+        "refundedTotal": -14,
+        "sealed": true,
+        "selectedPrice": 14,
+        "selectedVAT": 0,
+        "selectedVATCode": "Z",
+        "total": 14,
+        "totalLinePrice": 14
+      }
+    ],
+    "deliveryGroup": "1",
+    "deliveryMethod": "3",
+    "description": "  SLEEVELESS JERSEY DRESS| GAD003 | 6-7 | WHITE",
+    "exchange": {
+      "exchangeId": 1,
+      "lineItemId": 1,
+      "newItems": [
+        {
+          "Quantity": 1,
+          "lineItemId": 2
+        }
+      ],
+      "quantity": 1,
+      "reason": "601-1"
+    },
+    "exchangeLines": [
+      {
+        "exchangeId": 1,
+        "lineItemId": 1,
+        "newItems": [
+          {
+            "Quantity": 1,
+            "lineItemId": 2
+          }
+        ],
+        "quantity": 1,
+        "reason": "601-1"
+      }
+    ],
+    "excludePromotion": false,
+    "fullfilmentId": "189",
+    "imageUrls": [
+      "https://www.crewclothing.co.uk/images/products/large/GAD003_WHITE.jpg"
+    ],
+    "isLastExchanged": false,
+    "itemDiscounts": {
+      "currentRefundPortion": 0,
+      "refundPortion": 0,
+      "trnDiscountsPortion": 0,
+      "trnPromotionsPortion": 0
+    },
+    "itemLineId": "1",
+    "leadTime": {
+      "type": "Days",
+      "value": "0"
+    },
+    "originFullfillmentId": "N/A",
+    "price": 14,
+    "quantity": 2,
+    "refundedPromotionalQuantity": 0,
+    "refundedQuantity": 1,
+    "refundedReason": "601-1",
+    "refundedReasonDescription": "Changed Mind",
+    "refundedTotal": -14,
+    "taxLines": [
+      {
+        "PreTax": 28,
+        "VAT": 0,
+        "VATCode": "Z",
+        "itemLineId": 1,
+        "taxLineTotal": 0,
+        "taxableAmount": 28
+      }
+    ],
+    "totalLinePrice": 28
+  },
+  {
+    "SKU": "1201761",
+    "attributes": [],
+    "barcodes": [
+      "5.05441E+12"
+    ],
+    "currentLines": [
+      {
+        "SKU": "1201761",
+        "addedInBasket": true,
+        "barcodes": [
+          "5.05441E+12"
+        ],
+        "categories": [
+          {
+            "categoryId": "600",
+            "name": "600: Womenswear"
+          },
+          {
+            "categoryId": "656",
+            "id": "c54a2dd4-7371-4031-86a0-f4e71ffb704a",
+            "name": "656: Dresses",
+            "parentId": "edead937-5bcc-4aaa-89cc-4277e9536b01"
+          },
+          {
+            "categoryId": "6603",
+            "id": "47ac23e9-55c6-47a7-89a1-97847ab186af",
+            "name": "6603: Woven Dress",
+            "parentId": "c54a2dd4-7371-4031-86a0-f4e71ffb704a"
+          }
+        ],
+        "colour": "NAVY",
+        "countryofOrigin": "BGD",
+        "createdBy": "System Import",
+        "createdDate": "2021-04-28T13:21:45.782Z",
+        "deliveryGroup": "1",
+        "deliveryMethod": "3",
+        "description": "OXFORD SHIRT DRESS | OWNJ001 | 12 | NAVY",
+        "discountable": true,
+        "excludePromotion": false,
+        "fullfilmentId": "189",
+        "id": "0ccbea4e-a969-4ff9-b0de-38f940abddd2",
+        "imageUrls": [
+          "https://www.crewclothing.co.uk/images/products/large/OWNJ001_NAVY.jpg\r"
+        ],
+        "ingredients": "",
+        "isnewProduct": true,
+        "itemDiscounts": {
+          "refundPortion": 0,
+          "trnDiscountsPortion": 0,
+          "trnPromotionsPortion": 0
+        },
+        "itemLineId": 2,
+        "linePromotions": {
+          "displayText": "30%OFF",
+          "itemLineId": "2",
+          "name": "30%OFF",
+          "promotionAmount": 9,
+          "promotionId": "da1c5d2e-73cf-4edf-8410-ebe1d21b106a",
+          "promotionInfo": "undefined",
+          "promotionLinePrice": 21,
+          "promotionType": "PERCENTAGE_OFF",
+          "trigger": [
+            {
+              "itemLineId": "2",
+              "quantity": 1
+            }
+          ]
+        },
+        "nodeStructure": [
+          {
+            "isOverride": true,
+            "name": "Berkhamsted Test",
+            "nodeId": "NODE::e8503ec8-e60c-4938-a057-72698b794097",
+            "nodeType": "STORE",
+            "parentId": "NODE::bd7cf38e-98c8-4252-a7cc-1cdc96d36828",
+            "status": true
+          },
+          {
+            "isOverride": true,
+            "name": "Newbury",
+            "nodeId": "NODE::2ae2c00a-bc75-4fe6-a832-09cfd3c3b7d1",
+            "nodeType": "STORE",
+            "parentId": "NODE::bd7cf38e-98c8-4252-a7cc-1cdc96d36828",
+            "status": true
+          },
+          {
+            "isOverride": true,
+            "name": "Nottingham Open",
+            "nodeId": "NODE::ec7db3fe-7e3c-42fa-82da-6225b13cd383",
+            "nodeType": "STORE",
+            "parentId": "NODE::9193f385-1422-48f0-9d66-61a83e96293e",
+            "status": true
+          },
+          {
+            "isOverride": true,
+            "name": "PMC Abingdon",
+            "nodeId": "NODE::f37f4592-da7e-4e59-bddc-6f6f2e17d3eb",
+            "nodeType": "STORE",
+            "parentId": "NODE::0682036f-579b-42df-83a2-e5242ef4faf3",
+            "status": true
+          },
+          {
+            "isOverride": false,
+            "name": "Crew Clothing",
+            "nodeId": "NODE::05b41253-65e1-4d7e-ae9c-da1a34841f3c",
+            "nodeType": "ORGANIZATION",
+            "parentId": "",
+            "status": true
+          },
+          {
+            "isOverride": true,
+            "name": "smedev",
+            "nodeId": "7365865b-5b47-4cb9-bb4d-e51944a12bdf",
+            "nodeType": "ORGANIZATION",
+            "parentId": "",
+            "status": true
+          },
+          {
+            "isOverride": true,
+            "name": "ABC",
+            "nodeId": "41f6eb5a-5c5b-4a6c-aa0c-d2912ee995b1",
+            "nodeType": "COMPANY",
+            "parentId": "7365865b-5b47-4cb9-bb4d-e51944a12bdf",
+            "status": true
+          }
+        ],
+        "parentItemLineId": 1,
+        "price": [
+          {
+            "VAT": "20",
+            "VATCode": "H",
+            "currencyCode": "GBP",
+            "salesPrice": "30"
+          }
+        ],
+        "productId": "d2d7954f-7785-4e8c-9b61-fe313bf7437d",
+        "quantity": 1,
+        "season": "OM SS21",
+        "selectedPrice": 30,
+        "selectedVAT": 20,
+        "selectedVATCode": "H",
+        "size": "12",
+        "status": true,
+        "styleCode": "OWNJ001",
+        "total": 30,
+        "totalLinePrice": 30,
+        "type": "SKU",
+        "updateDate": "2022-02-22T16:50:57.983Z",
+        "updatedBy": "System Import",
+        "updatedDate": "2022-02-01T13:44:04.365Z",
+        "whyWeLoveIt": ""
+      }
+    ],
+    "deliveryGroup": "1",
+    "deliveryMethod": "3",
+    "description": "OXFORD SHIRT DRESS | OWNJ001 | 12 | NAVY",
+    "excludePromotion": false,
+    "fullfilmentId": "189",
+    "imageUrls": [
+      "https://www.crewclothing.co.uk/images/products/large/OWNJ001_NAVY.jpg\r"
+    ],
+    "itemDiscounts": {
+      "refundPortion": 0,
+      "trnDiscountsPortion": 0,
+      "trnPromotionsPortion": 0
+    },
+    "itemLineId": "2",
+    "leadTime": {
+      "type": "Days",
+      "value": "0"
+    },
+    "linePromotions": [
+      {
+        "displayText": "30%OFF",
+        "itemLineId": "2",
+        "name": "30%OFF",
+        "promotionAmount": 9,
+        "promotionId": "da1c5d2e-73cf-4edf-8410-ebe1d21b106a",
+        "promotionInfo": "undefined",
+        "promotionLinePrice": 21,
+        "promotionType": "PERCENTAGE_OFF",
+        "trigger": [
+          {
+            "itemLineId": "2",
+            "quantity": 1
+          }
+        ]
+      }
+    ],
+    "originFullfillmentId": "N/A",
+    "price": 30,
+    "quantity": 1,
+    "taxLines": [
+      {
+        "PreTax": 25,
+        "VAT": 20,
+        "VATCode": "H",
+        "itemLineId": 2,
+        "taxLineTotal": 5,
+        "taxableAmount": 30
+      }
+    ],
+    "totalLinePrice": 30
+  }
+]

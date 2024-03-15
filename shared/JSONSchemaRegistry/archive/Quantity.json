@@ -1,0 +1,26 @@
+{
+    "$id": "Quantity",
+    "description": "CDM Quantity definition",
+    "type": "object",
+    "properties": {
+      "AttHeader": {"$ref": "./Definitions.json#/properties/AttHeader"},
+      "Amount": {"type": "number"},
+      "AmountFloat": {"type": "number"},
+      "AccountingMethodType": {"type": "string"},
+      "UnitMeasure": {"type": "number"},
+      "UnitType": {"type": "number"},
+      "UnitScheme": {"type": "number"},
+      "AttMetadata": {"$ref": "./Definitions.json#/properties/AttMetadata"}
+    },
+    "required": [
+      "AttHeader",
+      "Amount",
+      "AmountFloat",
+      "AccountingMethodType",
+      "UnitMeasure",
+      "UnitType",
+      "UnitScheme",
+      "AttMetadata"
+    ]
+
+  }

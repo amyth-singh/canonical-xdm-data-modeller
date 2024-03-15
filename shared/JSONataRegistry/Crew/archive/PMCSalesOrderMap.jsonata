@@ -1,0 +1,1221 @@
+(
+    $formatValue := function($value, $dType, $format){(
+        $formatString := $string ~> $trim;
+        $formatArray := function($array){$type($array) = "array" ? $array : [$array]};
+        $formatNumber := function($num){$type($num) = "number" ? $num : $type($num) = "string" ? $contains($num,/^-?\d+(\.\d+)?$/) ? $number($num) : null};
+        $formatDateTime := function($dt,$format) {(
+            $dateTimeRegexMap := {"[Y0001]-[M01]-[D01] [H01]:[m01]:[s01] [P]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]) (AM|PM)$/,
+                                  "[Y0001]-[M01]-[D01] [H01]:[m01]:[s01].[f001]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]).\d{3}$/,
+                                  "[M01]/[D01]/[Y0001]":/^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/[1-9][0-9]{3}$/,
+                                  "[M01]/[D01]/[Y0001] [H01]:[m01]:[s01]":/^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/[1-9][0-9]{3} ([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/,
+                                  "ISO8601":/^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d)(\.\d+)?([+-]([01]\d|2[0-3]):([0-5]\d)|Z)$/
+                                 };
+            $dateTimeFormatValidator := function($datetime,$dateTimeFormat){$boolean($dateTimeFormat) ? $contains($datetime,$lookup($dateTimeRegexMap,$dateTimeFormat)): $contains($datetime,$lookup($dateTimeRegexMap,"ISO8601"))};
+
+            $exists($dt) ? $dateTimeFormatValidator($dt,$format) ? $boolean($format) and $not($format = "ISO8601") ? $fromMillis($toMillis($dt,$format)) : $fromMillis($toMillis($dt)) : null;
+            )};
+        $formatStringBool := function($value,$format){(
+            $stringBoolMap := {"Y":"Y","1":"Y","TRUE":"Y","N":"N","0":"N","FALSE":"N","false":"N","true":"Y","F":"N","T":"Y"};
+            $upperTrim := $string ~> $trim ~> $uppercase;
+            $stringBool := function($v){$exists($value)?$lookup($stringBoolMap, $upperTrim($value)):""};
+            $reverseBool := function($v){$v = "Y" ? "N" : $v = "N" ? "Y" : "U"};
+            $type($format)="null" ? $value ~> $stringBool : $format="reverse" ? $value ~> $stringBool ~> $reverseBool : null
+        )};
+
+        $dType = "TIMESTAMP"  ? $formatDateTime($value,$format) :
+        $dType = "STRINGBOOL" ? $formatStringBool($value,$format) :
+        $dType = "NUMERIC"    ? $formatNumber($value) :
+        $dType = "STRING"     ? $formatString($value) :
+        $dType = "ARRAY"      ? $formatArray($value) :
+        null;
+    )};
+
+    $attributeSplitter := function($v,$sep,$pos){$split($v, $sep) ~> function($v){$trim($v[$pos])}};
+
+    $buildCustomAttribute := function($rawEntityId       /* Unique code describing the associated event (e.g., Sale, Return, Deposit) */
+                                     ,$attributeId      /* ID for distinct attributes (e.g., unique line ID for sales lines) */
+                                     ,$canonicalCode    /* Hierarchical code in dot notation, indicating position in hierarchy */
+                                     ,$desc             /* Explanation of the attribute's purpose to avoid ambiguity */
+                                     ,$value            /* Value of the attribute */
+                                     ,$dType            /* Type of data (options: TIMESTAMP, STRINGBOOL, NUMERIC, STRING) */
+                                     ,$dFormat          /* Format details e.g. input time format or bool direction */
+                                     ,$includeMetadata  /* Boolean: Whether to include metadata in the hierarchical output */
+                                     )
+    {(
+        /* Build attribute unique id by concatenating entity code, canonical code and attribute id */
+        $buildAttributeID := function($rawEntityId,$canonicalCode,$attributeId){$rawEntityId & "_" & $replace($canonicalCode,".","_") & ($type($attributeId) = "null" ? "" : "_" & $attributeId)};
+
+
+        {"Id":$buildAttributeID($rawEntityId,$canonicalCode,$attributeId),
+         "Desc":$desc,
+         "Code":$canonicalCode,
+         "Value":$formatValue($value,$dType,$dFormat),
+         "Type":$dType,
+         "IncludeMetadata":$includeMetadata
+         }
+    )};
+
+
+    /* MAPPING START */
+
+
+    /* ENTITY ATTS */
+    /* Key consts & ids */
+    $entityDomain := "Sell";
+    $entityType := "SalesOrder";
+
+    /* ### Sub Type Code ### */
+    $rawEntitySubTypeCodeList := [
+      {"systemCode": "SALE",                "xfuzeCode": "Sale"},
+      {"systemCode": "SALE_EXCHANGE",       "xfuzeCode": "Exchange"},
+      {"systemCode": "SALE_REFUND",       	"xfuzeCode": "PartialReturn"},
+      {"systemCode": "REFUND",              "xfuzeCode": "FullReturn"}
+    ];
+
+    $mapRawEntitySubTypeCodeXrefFn := function($rawName) {
+      $rawEntitySubTypeCodeList[systemCode = $string($rawName)].xfuzeCode
+    };
+
+    $entitySubType := $mapRawEntitySubTypeCodeXrefFn(`type`);
+    $entityVariation := "Retail";
+    $entityClass := "Composite";
+    $sourceSystem := "PMC";
+    $sourceSubSystem := "Graphene";
+    $fullSourceSystemCode := $sourceSystem & "-" & $sourceSubSystem;
+    $sourceFormatType := "JSON";
+    $rawEntityId := $formatValue(`transactionId`,"STRING");
+    $entityId := $join([$entityType & "_" & $entitySubType,$sourceSystem,$rawEntityId][$type($) != "null"],"_");
+
+    /* NOTE: as this is a top level composite raw from source (i.e a full SO), all the extra 'parent' and 'composite' ID fields are the same in this mapping instance */
+
+    $rawParentEntityId := $rawEntityId;
+    $parentEntityType := $entityType;
+    $parentEntitySubType := $entitySubType;
+    $parentEntityType := $entityType;
+    $parentEntityId := $entityId;
+
+    $rawCompositeEntityId := $rawEntityId;
+    $compositeEntityType := $entityType;
+    $compositeEntitySubType := $entitySubType;
+    $compositeEntityType := $entityType;
+    $compositeEntityId := $entityId;
+
+    /* EVENT ATTS */
+    /* Key consts & ids */
+    $canonicalEventMetadataCodePrefix := "EventMetadata";
+    $eventBusinessRoot := "DomainEvent";
+    $eventTriggerPrefix := $eventBusinessRoot & ".TriggerEntity";
+    $eventLatestPrefix := $eventBusinessRoot & ".LatestEntity";
+    $eventCategory := "Sales";
+    $eventClass := "TriggerEvent";
+    $eventChangePattern := "FullSnapshot";
+    $eventSourceFormatType := "JSON";
+    $clientCode := "Crew";
+    $eventValueStream := "Order2Cash";
+    $bizCapL0 := "Sell";
+    $bizCapL1 := "Sell & Serve";
+    $bizCapL2 := "Take Sale";
+
+    /* EventName */
+    $rawEventName := NULL;
+    $eventVerb := "Published"; /* TODO: Is this the right verb, very coarse compared to maybe a 'Completed' verb */
+    $eventName := $replace($entityType & $eventVerb,"_","");
+
+    /* TimeZones */
+    /* TODO: to derive from time utils bindings when avail, will be dependant on EOT */
+    $homeTimeZone := "Europe/London";
+    $homeTimeZoneOffset := "(Runtime binding for time-utils go-jsonta func)";
+    $eventTimeZone := "Europe/London";
+    $eventTimeZoneOffset := "(Runtime binding for time-utils go-jsonta func)";
+    $partyTimeZone := "Europe/London";
+    $partyTimeZoneOffset := "(Runtime binding for time-utils go-jsonta func)";
+
+    /* TimeAtts */
+    /* EventOccurredTimestamp */
+    $rawEventOccurredTimestamp := `updatedAt`; /* TODO: validate with PMC */
+    $eventOccurredType = "TrueTime";
+    $rawEventOccurredTz := $eventTimeZone; /* TODO: Use for local conversion within the event */
+    $eventOccurredTsFormat := "ISO8601";
+    $eventOccurredTimestamp := $formatValue($rawEventOccurredTimestamp,"TIMESTAMP",$eventOccurredTsFormat);
+    $eventOccurredTimestampLocal := $formatValue($rawEventOccurredTimestamp,"TIMESTAMP",$eventOccurredTsFormat);
+    $eventOccurredTimestampMillis := $millis();
+
+
+    /* EventId */
+    $eventWatermark := $eventOccurredTimestamp;
+    $rawEventId := null;
+    $eventId := $join([$eventName,$entityId,$eventWatermark ][$type($) != "null"],"_");
+    $correlationId := `id`;
+
+    /* EventReceivedTimestamp */
+    /* TODO: be injected from runtime bindings, default to now for test purposes */
+    $eventReceivedTimestamp := $formatValue($now(),"TIMESTAMP");
+    $eventReceivedTimestampLocal := $formatValue($now(),"TIMESTAMP");
+    $eventReceivedTimestampMillis := $millis();
+
+    /* Party - Customer Atts */
+    $rawSystemPartyId := $formatValue(`userId`,"STRING");
+    $systemPartyId := "Party_" & $rawSystemPartyId;
+    $partyRoleType := $partyRoleTypeCode & "_" & $partyRoleSubTypeCode;
+    $partyRoleTypeCode := "Employee";
+    $partyRoleSubTypeCode := "Seller";
+
+    /* Product Atts */
+    $mapProductIdFromSkuFn := function($prodNum) {
+      "ProductVariant_Retail247Origin_" & $prodNum
+    };
+    $productId := NULL; /* Multiple products in this so the array is mapped */
+    $productNumber := NULL;
+    $productIdArray := $map(basket.products.SKU,$mapProductIdFromSkuFn);
+    $productNumberArray := basket.products.SKU;
+    $productInvolvedReasonCode := "SoldProduct";
+
+    /* Location Atts */
+    $rawLocationId := $formatValue(`storeNodeId`,"STRING");
+    $locationId := "Location_" & $rawLocationId;
+    $locationNumber := $formatValue(`storeId`,"STRING");
+
+    /* Privacy Atts */
+    $isRawEncrypted := "N";
+    $isSensitiveEntity := "Y";
+    $isEncrypted := "Y";
+    $encryptionKeyURI := NULL;
+    $encryptionKeyHost := NULL;
+    $sensitiveFieldPaths := ["userName"];
+
+    /* Ingest Atts */
+
+    /* Currency */
+    $homeCurrencyBCY := "GBP";
+    $localCurrencyLCY := $formatValue(`baseCurrency`,"STRING");
+
+    /* SPECIFIC SUB ENTITIES */
+    /* ### DomainEvent.TriggerEntity.Header ### */
+
+    /* LOOKUP FUNCS */
+    $rawTypeList := [
+      {"systemCode": "SALE",                "xfuzeCode": "Sale"},
+      {"systemCode": "SALE_EXCHANGE",       "xfuzeCode": "Exchange"},
+      {"systemCode": "SALE_REFUND",         "xfuzeCode": "PartialRefund"},
+      {"systemCode": "REFUND",              "xfuzeCode": "FullRefund"}
+    ];
+
+    $mapRawTypeXrefFn := function($rawName) {
+      $rawTypeList[systemCode = $string($rawName)].xfuzeCode
+    };
+
+
+    /* ### Header Status Lookup ### */
+    $rawStatusList := [
+      {"systemCode": "PAY_SUCCESS",         "xfuzeCode": "Completed"}
+    ];
+
+    $mapRawStatusXrefFn := function($rawName) {
+      $rawStatusList[systemCode = $string($rawName)].xfuzeCode
+    };
+
+    /* Ids & code */
+    $entityTypeClass_SOH := "RetailTransaction";
+    $entityType_SOH := "SalesOrderHeader";
+    $entitySubType_SOH := $mapRawTypeXrefFn(`type`);
+
+    $rawEntityId_SOH := $formatValue(`transactionId`,"STRING");
+    $entityId_SOH := ($entityType_SOH & "_" & $entitySubType_SOH & "_" & $sourceSystem & "_" & $rawEntityId_SOH);
+
+
+
+    /* ### SalesOrderLine (SOL) ### */
+    /* Ids & core codes */
+    $entityTypeClass_SOL := "RetailTransaction";
+    $entityType_SOL := "SalesOrderLine";
+    $entitySubType_SOL := $mapRawTypeXrefFn(`type`);
+
+    $mapRawEntityId_SOL := function($rawEntityId, $rawValue) {
+      $join([$rawEntityId,$rawValue][$type($) != "null"],"_")
+    };
+
+    $mapEntityId_SOL := function($rawEntityId, $rawValue) {
+      $join([$entityType_SOL & "_" & $entitySubType_SOL,$sourceSystem,$mapRawEntityId_SOL($rawEntityId,$rawValue)][$type($) != "null"],"_")
+    };
+
+    /* ### Header Status Lookup ### */
+    /* in: deliveryMethod */
+    $rawDeliveryMethodList := [
+      {"systemCode": "1",         "xfuzeCode": "WebOrder"},
+      {"systemCode": "2",         "xfuzeCode": "ClickCollect"},
+      {"systemCode": "3",         "xfuzeCode": "InStore"},
+      {"systemCode": "4",         "xfuzeCode": "ShipToStore"}
+    ];
+
+    $mapRawDeliveryMethodXrefFn := function($rawName) {
+      $rawDeliveryMethodList[systemCode = $string($rawName)].xfuzeCode
+    };
+
+
+    $sortLines := function($lineArray) {
+      $sort($lineArray, function($l, $r) {
+        $formatValue($l.itemLineId,"NUMERIC") > $formatValue($r.itemLineId,"NUMERIC")
+      })
+    };
+
+    /* ### SalesOrderPayment (SOP) ###*/
+    $entityType_SOP := "SalesOrderPayment";
+
+	/* LOOKUP FUNCS */
+    /* Map Payment Result Code */
+    $rawPaymentResultList := [
+      {"systemCode": "AUTHORISED",         "xfuzeCode": "Authorised"}
+    ];
+
+    $mapRawPaymentResultXrefFn := function($rawName) {
+      $rawPaymentResultList[systemCode = $string($rawName)].xfuzeCode
+    };
+
+    $rawPaymentTypeList := [
+      {"systemCode": "CARD",              "xfuzeCode": "Card"},
+      {"systemCode": "CASH",              "xfuzeCode": "Cash"},
+      {"systemCode": "PDQ",         	  "xfuzeCode": "PDQ"},
+      {"systemCode": "GIFT_CARD",         "xfuzeCode": "GiftCard"},
+      {"systemCode": "PAYBYLINK",         "xfuzeCode": "PAYBYLINK"}
+    ];
+
+    $mapRawPaymentTypeXrefFn := function($rawName) {
+      $rawPaymentTypeList[systemCode = $string($rawName)].xfuzeCode
+    };
+
+
+    /* Map Payment Status Code */
+    $paymentStatusCode := (isPaymentCompleted ? "FullyPaid" : "NoFullyPaid");
+    $fulfilmentStatusCode := "FullyFulfilled"; /* store so assumed constant for now! */
+
+    /* Map Line Status Code */
+    $mapLineStatusCodeFn := function($rawCode) {
+      ($rawCode ? "Completed" : "NotCompleted")
+    };
+
+	$unifiedBasket := $oneToManyJoin(basket.products,basket.taxBreakdown.taxLines,"itemLineId","itemLineId","taxLines");
+    $count(basket.lineDiscount) > 0 ? $unifiedBasket := $oneToManyJoin([$unifiedBasket],basket.lineDiscount,"itemLineId","itemLineId","lineDiscounts");
+    $count(basket.linePromotion) > 0 ? $unifiedBasket := $oneToManyJoin([$unifiedBasket],basket.linePromotion,"itemLineId","itemLineId","linePromotions");
+    $exists(basket.exchange.quantity) ? $unifiedBasket := $oneToManyJoin([$unifiedBasket],basket.exchange,"itemLineId","lineItemId","exchangeLines");
+    $exists(currentTransactionDetails.products) ? $unifiedBasket := $oneToManyJoin([$unifiedBasket],currentTransactionDetails.products,"itemLineId","itemLineId","currentLines");
+    $count(currentTransactionDetails.lineDiscount) > 0 ? $unifiedBasket := $oneToManyJoin([$unifiedBasket],currentTransactionDetails.lineDiscount,"itemLineId","itemLineId","currentDiscountLines");
+    $count(currentTransactionDetails.linePromotion) > 0 ? $unifiedBasket := $oneToManyJoin([$unifiedBasket],currentTransactionDetails.linePromotion,"itemLineId","itemLineId","currentPromotionLines");
+    $count(currentTransactionDetails.taxBreakdown.taxLines) > 0 ? $unifiedBasket := $oneToManyJoin([$unifiedBasket],currentTransactionDetails.taxBreakdown.taxLines,"itemLineId","itemLineId","currentTaxLines");
+
+
+    $objectsToDocument(
+    [
+      /* EVENT HEADER*/
+      /* Top level key atts for partitioning, clustering etc often needed at the top level */
+      $buildCustomAttribute($entityId,null,"EventId","",$eventId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,"EventName","",$eventName,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,"EntityId","",$entityId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,"EntityType","",$entityType,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,"EntitySubType","",$entitySubType,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,"ParentEntityId","",$parentEntityId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,"ParentEntityType","",$parentEntityType,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,"CompositeEntityId","",$compositeEntityId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,"CompositeEntityType","",$compositeEntityType,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,"EventOccurredTimestampUTC","",$eventOccurredTimestamp,"TIMESTAMP",null,false),
+      $buildCustomAttribute($entityId,null,"EventOccurredTimestampLocal","",$eventOccurredTimestamp,"TIMESTAMP",null,false),
+
+      /* EVENT METADATA */
+      /* EventAtts */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.EventId","",$eventId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.EventCategory","",$eventCategory,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.EventName","",$eventName,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.EventClass","",$eventClass,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.EventChangePattern","",$eventChangePattern,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.EventValueStream","",$eventValueStream,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.BizCapabilityL0","",$bizCapL0,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.BizCapabilityL1","",$bizCapL1,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.BizCapabilityL2","",$bizCapL2,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.ClientCode","",$clientCode,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.IsDerivedEvent","","N","STRINGBOOL",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Origin.EventId","",$rawEventId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Origin.EventName","",$rawEventName,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Origin.SourceSystem","",$sourceSystem,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Origin.SourceSubSystem","",$sourceSubSystem,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Origin.SourceFormatType","",$sourceFormatType,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Origin.CorrelationId","",$correlationId,"STRING",null,false),
+
+      /* EntityAtts */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Xfuze.EntityId","",$entityId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Xfuze.EntityType","",$entityType,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Xfuze.EntitySubType","",$entitySubType,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Xfuze.EntityVariation","",$entityVariation,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Xfuze.EntityDomain","",$entityDomain,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Xfuze.EntityClass","",$entityClass,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Xfuze.ParentEntityId","",$parentEntityId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Xfuze.ParentEntityType","",$parentEntityType,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Xfuze.CompositeEntityId","",$compositeEntityId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Xfuze.CompositeEntityType","",$compositeEntityType,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Xfuze.IsSensitive","","N","STRINGBOOL",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Origin.EntityId","",$rawEntityId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Origin.ParentEntityId","",$rawParentEntityId,"STRING",null,false),
+
+      /* TimeAtts */
+      /* TimeZones */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.TimeZones.HomeTimeZone.TimeZone","",$homeTimeZone,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.TimeZones.EventTimeZone.TimeZone","",$eventTimeZone,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.TimeZones.PartyTimeZone.TimeZone","",$partyTimeZone,"STRING",null,false),
+
+      /* EventOccurredTimestamp */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.Times.EventOccurredTimestamp.DateId","","(TODO)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.Times.EventOccurredTimestamp.UTC","",$eventOccurredTimestamp,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.Times.EventOccurredTimestamp.Local","",$eventOccurredTimestampLocal,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.Times.EventOccurredTimestamp.Millis","",$eventOccurredTimestampMillis,"NUMERIC",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.Times.EventOccurredTimestamp.TimeZone","",$eventTimeZone,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.Times.EventOccurredType","",$eventOccurredType,"STRING",null,false), /* JW: not showing ? */
+
+      /* EventReceivedTimestamp: To be passed in from connector */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.Times.EventReceivedTimestamp.DateId","","(runtime binding needed)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.Times.EventReceivedTimestamp.UTC","",$eventReceivedTimestamp,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.Times.EventReceivedTimestamp.Local","",$eventReceivedTimestampLocal,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.Times.EventReceivedTimestamp.Millis","",$eventReceivedTimestampMillis,"NUMERIC",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.Times.EventReceivedTimestamp.TimeZone","","UTC","STRING",null,false),
+
+      /* EventIngestProcessedTimestamp: TODO: from runtime bindings*/
+
+
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Origin.Times.EventOccurredTimestamp","",$rawEventOccurredTimestamp,"STRING",null,false),
+
+
+      /* Event Metadata -PartyAtts TODO */
+      /* Canonical data */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PartyAtts.Xfuze.SystemPartyId","",$systemPartyId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PartyAtts.Xfuze.PartyRoleTypeCode","",$partyRoleTypeCode,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PartyAtts.Xfuze.PartyRoleSubTypeCode","",$partyRoleSubTypeCode,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PartyAtts.Origin.SystemPartyId","",$rawSystemPartyId,"STRING",null,false),
+
+      /* Event Metadata - ProductAtts */
+      /* Canonical data */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".ProductAtts.Xfuze.ProductIds","",$productIdArray,"ARRAY",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".ProductAtts.Xfuze.ProductKeys","",$productNumberArray,"ARRAY",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".ProductAtts.Xfuze.InvolvedReasonCode","",$productInvolvedReasonCode,"STRING",null,false),
+
+      /* Event Metadata - LocationAtts */
+      /* Canonical data */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".LocationAtts.Xfuze.LocationId","",$locationId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".LocationAtts.Xfuze.LocationNumber","",$locationNumber,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".LocationAtts.Origin.LocationNumber","","(TODO)","STRING",null,false),
+
+      /* Event Metadata - PrivacyAtts */
+      /* Canonical data */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PrivacyAtts.Xfuze.IsSensitiveEntity","",$isSensitiveEntity ,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PrivacyAtts.Xfuze.IsEncrypted","",$isEncrypted,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PrivacyAtts.Xfuze.EncryptionKeyURI","",$encryptionKeyURI,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PrivacyAtts.Xfuze.EncryptionKeyHost","",$encryptionKeyHost,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PrivacyAtts.Xfuze.SensitiveFieldPaths","",$sensitiveFieldPaths,"ARRAY",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PrivacyAtts.Origin.IsEncrypted","",$isRawEncrypted ,"STRING",null,false),
+
+
+      /* Event Metadata - IngestAtts */
+      /* TODO: Runtime binding using hashing func (JIRA ticket logged) */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".IngestAtts.Xfuze.Api.URI","","(Dynamic Runtime Bindings)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".IngestAtts.Xfuze.Api.Name","","(Dynamic Runtime Bindings)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".IngestAtts.Xfuze.Api.Resource","","(Dynamic Runtime Bindings)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".IngestAtts.Xfuze.Api.PatternType","","(Dynamic Runtime Bindings)","STRING",null,false),
+
+      /* Event Metadata - PayloadAtts */
+      /* TODO: Runtime binding using hashing func (JIRA ticket logged) */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PayloadAtts.Xfuze.DataPayloadHash","", "3c906a6b6e25dd36ab5206beecf71e48","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PayloadAtts.Xfuze.EventPayloadHash","", "8e59eed6cc74bc5e1d8fdf8d90f440a3","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PayloadAtts.Xfuze.HashScheme","", "MD5","STRING",null,false),
+
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PayloadAtts.Origin.DataPayloadHash","", "4bs34a6b6e25dd36ab5206beecf71e48","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PayloadAtts.Origin.EventPayloadHash","", "9p23eed6cc74bc5e1d8fdf8d90f440a3","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PayloadAtts.Origin.HashScheme","", "MD5","STRING",null,false),
+
+
+      /* ENTITY DATA - Sales Order (Composite) */
+      /* Header details*/
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.EntityId","",$entityId_SOH,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.EntityType","",$entityType_SOH,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.EntitySubType","",$entitySubType,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.ParentEntityId","",$compositeEntityId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.ParentEntityType","",$compositeEntityType,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.CompositeEntityId","",$compositeEntityId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.CompositeEntityType","",$compositeEntityType,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.XRefIds","",
+      [
+          {"Id":$string(id),"SystemCode":$sourceSystem,"Code":"id","EntityId": $entityId},
+          {"Id":$string(transactionId),"SystemCode":$sourceSystem,"Code":"transactionId","EntityId": $entityId},
+          $length(originalTransId) > 0 ? {"Id":$string(originalTransId),"SystemCode":$sourceSystem,"Code":"originalTransId","EntityId": $entityId} : NULL
+          {"Id":$string(offlineTransactionId),"SystemCode":$sourceSystem,"Code":"offlineTransactionId","EntityId": $entityId},
+          {"Id":$string(transactionRef),"SystemCode":$sourceSystem,"Code":"transactionRef"}
+      ]
+      ,"ARRAY",null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Ids.SalesOrderId","",`id`,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Ids.SalesOrderKey","",`transactionId`,"STRING",null,false),
+      $length(originalTransId) > 0 ? $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Ids.OriginalSalesOrderId","","(TODO JW)","STRING",null,false) : NULL,
+      $length(originalTransId) > 0 ? $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Ids.OriginalSalesOrderKey","",`originalTransId`,"STRING",null,false) : NULL,
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Ids.SalesOrderReferenceNumber","",`transactionRef`,"STRING",null,false),
+
+      /* PartyIds: TODO */
+      /* Type */
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Type.TypeClass","","Retail","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Type.TypeCode","",$mapRawTypeXrefFn($string(type)),"STRING",null,false),
+
+ 	  /* Status */
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Status.OrderStatus.StatusCode","",$mapRawStatusXrefFn($string(operationStatus)),"STRING",null,true),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Status.PaymentStatus.StatusCode","",$paymentStatusCode,"STRING",null,true),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Status.FulfilmentStatus.StatusCode","",$fulfilmentStatusCode,"STRING",null,true),
+
+      /* TimeZones */
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.TimeZones.HomeTimeZone.TimeZone","",$homeTimeZone,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.TimeZones.EventTimeZone.TimeZone","",$eventTimeZone,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.TimeZones.PartyTimeZoneOffset.TimeZone","",$partyTimeZone,"STRING",null,false),
+
+ 	  /* Times */
+      /* TODO - format and local needs a func, clarify the times as well */
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Times.CreatedOn.UTC","",`createdAt`,"TIMESTAMP", $tsFormat,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Times.CreatedOn.Local","",`createdAt`,"TIMESTAMP", $tsFormat,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Times.PlacedOn.UTC","",`dateTime`,"TIMESTAMP", $tsFormat,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Times.PlacedOn.Local","",`dateTime`,"TIMESTAMP", $tsFormat,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Times.LastUpdatedOn.UTC","",`updatedAt`,"TIMESTAMP", $tsFormat,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Times.LastUpdatedOn.Local","",`updatedAt`,"TIMESTAMP", $tsFormat,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Times.CompletedOn.UTC","",`transCompletedAt`,"TIMESTAMP", $tsFormat,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Times.CompletedOn.Local","",`transCompletedAt`,"TIMESTAMP",$tsFormat, false),
+
+ 	  /* Channels & Touchpoints */
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Channels.SalesChannel.ChannelClass","","Retail","STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Channels.SalesChannel.ChannelCode","","RetailStore","STRING", null,false),
+	  $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Channels.SalesChannel.ChannelNumber","",`storeId`,"STRING", null,false),
+	  $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Channels.SalesChannel.ChannelNumberType","","Store","STRING", null,false),
+	  $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Channels.SalesChannel.TouchPoint.TouchPointSystem","",`initiatingModule`,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Channels.SalesChannel.TouchPoint.TerminalId","",`terminalId`,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Channels.SalesChannel.TouchPoint.ExternalTerminalId","",`externalTerminalId`,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Channels.SalesChannel.TouchPoint.Device.DeviceId","",`deviceId`,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Channels.SalesChannel.TouchPoint.Device.ExternalDeviceId","",`externalDeviceId`,"STRING", null,false),
+
+	  /* Locations */
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.LocationId","",$locationId,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.LocationNodeId","",$locationId,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.LocationNumber","",`storeId`,"STRING", null,false),
+  	  $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.LocationType","",storeNodeStructure[0].nodeType,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.LocationName.OrgCode","",`orgCode`,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.LocationName.OrgName","",storeNodeStructure[nodeType = "ORGANIZATION"].name,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.LocationName.CompanyName","",`storeNodeStructure`[4].`name`,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.SubsidiaryId","",subsidiaryId,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.HierarchyNode.L1","",storeNodeStructure[4].nodeId,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.HierarchyNode.L1Name","",storeNodeStructure[4].name,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.HierarchyNode.L1Type","",storeNodeStructure[4].nodeType,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.HierarchyNode.L2","",storeNodeStructure[3].nodeId,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.HierarchyNode.L2Name","",storeNodeStructure[3].name,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.HierarchyNode.L2Type","",storeNodeStructure[3].nodeType,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.HierarchyNode.L3","",storeNodeStructure[2].nodeId,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.HierarchyNode.L3Name","",storeNodeStructure[2].name,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.HierarchyNode.L3Type","",storeNodeStructure[2].nodeType,"STRING", null,false),
+	  $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.HierarchyNode.L4","",storeNodeStructure[1].nodeId,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.HierarchyNode.L4Name","",storeNodeStructure[1].name,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.HierarchyNode.L4Type","",storeNodeStructure[1].nodeType,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.HierarchyNode.L5","",storeNodeStructure[0].nodeId,"STRING", null,false),
+	  $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.HierarchyNode.L5Name","",storeNodeStructure[0].name,"STRING", null,false),
+	  $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.HierarchyNode.L5Type","",storeNodeStructure[0].nodeType,"STRING", null,false),
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+    	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Locations.SalesLocation.Hierarchy","",
+      	storeNodeStructure.(
+          $objectsToDocument(
+          [
+            $buildCustomAttribute($entityId,null,"NodeId","","HierarchyNode_Crew_" & nodeId,"STRING",null,false),
+            $buildCustomAttribute($entityId,null,"NodeKey","",nodeId,"STRING",null,false),
+            $length(parentId) > 0 ? $buildCustomAttribute($entityId,null,"ParentNodeId","","HierarchyNode_Crew_" & parentId,"STRING",null,false),
+            $length(parentId) > 0 ? $buildCustomAttribute($entityId,null,"ParentNodeKey","",parentId,"STRING",null,false),
+            $buildCustomAttribute($entityId,null,"NodeName","",name,"STRING",null,false),
+            nodeType="STORE" ? $buildCustomAttribute($entityId,null,"NodeCode","",$$.storeId,"STRING",null,false),
+            $buildCustomAttribute($entityId,null,"NodeClass","","Store","STRING",null,false),
+            $buildCustomAttribute($entityId,null,"NodeStatus","",status ? "Active" : "NotActive","STRING",null,false),
+            $buildCustomAttribute($entityId,null,"NodeType","",nodeType,"STRING",null,false),
+            $buildCustomAttribute($entityId,null,"IsOverride","",isOverride,"STRINGBOOL",null,false)
+          ])
+        ),"ARRAY",null, false),
+
+      /* Currency */
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Currency.BCY.ISO3","",$homeCurrencyBCY,"STRING", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Currency.LCY.ISO3","",$localCurrencyLCY,"STRING", null,false),
+
+      /* ExchangeRates */
+      /* TODO: need more examples */
+      $mapRawTypeXrefFn(`type`) = "Sale" ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.ExchangeRates.SaleRate.Rate","",1.00,"NUMERIC", null,false),
+
+      /* Qtys */
+	  $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Qtys.QtySold.Amount","",basketSummary.totalItems,"NUMERIC", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Qtys.QtyNet.Amount","",$exists(currentTransactionDetails.basketSummary) ? currentTransactionDetails.basketSummary.totalItems : basketSummary.totalItems,"NUMERIC", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Qtys.QtyNetByLines.Amount","",$exists(currentTransactionDetails.products) ? $sum(currentTransactionDetails.products.quantity) - $sum(currentTransactionDetails.products.refundedQuantity) : $sum(basket.products.quantity),"NUMERIC", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Qtys.QtyRefunded.Amount","",$exists(currentTransactionDetails.products) ? -1 * $sum(currentTransactionDetails.products.refundedQuantity) : -1 * ($exists(basket.products.refundedQuantity) ? $sum(basket.products.refundedQuantity) :0),"NUMERIC", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Qtys.QtyChanged.Amount","",$exists(currentTransactionDetails.products) ? $sum(currentTransactionDetails.products.changeQty) : 0,"NUMERIC", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Qtys.QtyExchanged.Amount","",$exists(basket.products.exchange) ? -1 * $sum(basket.products.exchange.quantity) : -0,"NUMERIC", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Qtys.QtyExchangedNew.Amount","",$exists(basket.products.exchange) ? $sum(basket.products.exchange.newItems.Quantity) : 0,"NUMERIC", null,false),
+
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Qtys.QtyNumGrossSalesLines.Amount","",$count(basket.products),"NUMERIC",null, false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Qtys.QtyNumNetSalesLines.Amount","",$exists(currentTransactionDetails.products) ? $count(currentTransactionDetails.products) : $count(basket.products),"NUMERIC",null, false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Qtys.QtyNumGrossPaymentLines.Amount","",$count(paymentDetails),"NUMERIC",null, false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Qtys.QtyNumNetPaymentLines.Amount","",$count(paymentDetails),"NUMERIC",null, false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Qtys.QtyNumGrossTaxLines.Amount","",$count(basket.taxBreakdown.taxLines),"NUMERIC",null, false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Qtys.QtyNumNetTaxLines.Amount","",$exists(currentTransactionDetails.taxBreakdown) ? $count(currentTransactionDetails.taxBreakdown.taxLines) : $count(basket.taxBreakdown.taxLines),"NUMERIC",null, false),
+
+ 	  /* ### Totals ### */
+      /* Totals.SaleTotals.GrandTotal.Original */
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.GrandTotal.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.GrandTotal.Original.LCY.IncTax","",basketSummary.basketTotal,"NUMERIC", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.GrandTotal.Original.LCY.ExTax","",basketSummary.basketTotal - basketSummary.VATTotal,"NUMERIC", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.GrandTotal.Original.LCY.Tax","",basketSummary.VATTotal,"NUMERIC", null,false),
+      $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.GrandTotal.Original.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING", null,false),
+      $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.GrandTotal.Original.BCY.IncTax","",basketSummary.basketTotal,"NUMERIC", null,false),
+      $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.GrandTotal.Original.BCY.ExTax","",basketSummary.basketTotal - basketSummary.VATTotal,"NUMERIC", null,false),
+      $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.GrandTotal.Original.BCY.Tax","",basketSummary.VATTotal,"NUMERIC", null,false),
+
+	  /* Totals.SaleTotals.GrandTotal.Current */
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.GrandTotal.Current.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.GrandTotal.Current.LCY.IncTax","",$exists(currentTransactionDetails.basketSummary) ? currentTransactionDetails.basketSummary.basketTotal : basketSummary.basketTotal,"NUMERIC", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.GrandTotal.Current.LCY.ExTax","",$exists(currentTransactionDetails.basketSummary) ? currentTransactionDetails.basketSummary.basketTotal - currentTransactionDetails.basketSummary.VATTotal : basketSummary.basketTotal - basketSummary.VATTotal,"NUMERIC", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.GrandTotal.Current.LCY.Tax","",$exists(currentTransactionDetails.basketSummary) ? currentTransactionDetails.basketSummary.VATTotal : basketSummary.VATTotal,"NUMERIC", null,false),
+      $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.GrandTotal.Current.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING", null,false),
+      $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.GrandTotal.Current.BCY.IncTax","",$exists(currentTransactionDetails.basketSummary) ? currentTransactionDetails.basketSummary.basketTotal : basketSummary.basketTotal,"NUMERIC", null,false),
+      $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.GrandTotal.Current.BCY.ExTax","",$exists(currentTransactionDetails.basketSummary) ? currentTransactionDetails.basketSummary.basketTotal - currentTransactionDetails.basketSummary.VATTotal : basketSummary.basketTotal - basketSummary.VATTotal,"NUMERIC", null,false),
+      $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.GrandTotal.Current.BCY.Tax","",$exists(currentTransactionDetails.basketSummary) ? currentTransactionDetails.basketSummary.VATTotal : basketSummary.VATTotal,"NUMERIC", null,false),
+
+	  /* ### Totals.SaleTotals.ProductTotalBeforeAdjustments ### */
+   	  /* Totals.SaleTotals.ProductTotalBeforeAdjustments.Original */
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.ProductTotalBeforeAdjustments.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.ProductTotalBeforeAdjustments.Original.LCY.IncTax","",(basketSummary.saleTotal),"NUMERIC",null, false),
+      $localCurrencyLCY = $homeCurrencyBCY ?
+ 	  	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.ProductTotalBeforeAdjustments.Original.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING", null,false),
+      $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.ProductTotalBeforeAdjustments.Original.BCY.IncTax","",(basketSummary.saleTotal),"NUMERIC",null, false),
+
+	  /* Totals.SaleTotals.ProductTotalBeforeAdjustments.Current */
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.ProductTotalBeforeAdjustments.Current.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.ProductTotalBeforeAdjustments.Current.LCY.IncTax","",$exists(currentTransactionDetails.basketSummary) ? currentTransactionDetails.basketSummary.saleTotal : basketSummary.saleTotal,"NUMERIC", null,false),
+      $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.ProductTotalBeforeAdjustments.Current.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING", null,false),
+      $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.ProductTotalBeforeAdjustments.Current.BCY.IncTax","",$exists(currentTransactionDetails.basketSummary) ? currentTransactionDetails.basketSummary.saleTotal : basketSummary.saleTotal,"NUMERIC", null,false),
+
+
+      /* ### Totals.SaleTotals.DiscountTotal ### */
+      /* Totals.SaleTotals.DiscountTotal.Original */
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.DiscountsTotal.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.DiscountsTotal.Original.LCY.IncTax","",-1.00 * basketSummary.discountTotal,"NUMERIC",null, false),
+	  $localCurrencyLCY = $homeCurrencyBCY ?
+ 	  	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.DiscountsTotal.Original.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING", null,false),
+      $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.DiscountsTotal.Original.BCY.IncTax","",-1.00 * basketSummary.discountTotal,"NUMERIC",null, false),
+
+      /* Totals.SaleTotals.DiscountTotal.Current */
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.DiscountsTotal.Current.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.DiscountsTotal.Current.LCY.IncTax","",$exists(currentTransactionDetails.basketSummary) ? -1.00 * currentTransactionDetails.basketSummary.discountTotal : -1.00 * basketSummary.discountTotal,"NUMERIC", null,false),
+	        $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.DiscountsTotal.Current.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING", null,false),
+      $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.DiscountsTotal.Current.BCY.IncTax","",$exists(currentTransactionDetails.basketSummary) ? -1.00 * currentTransactionDetails.basketSummary.discountTotal : -1.00 * basketSummary.discountTotal,"NUMERIC", null,false),
+
+
+ 	  /* ### Totals.SaleTotals.RefundTotal ### */
+      /* Totals.SaleTotals.RefundTotal.Original */
+ 	  $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.RefundsTotal.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.RefundsTotal.Original.LCY.IncTax","",basketSummary.refundTotal,"NUMERIC",null, false),
+      	  $localCurrencyLCY = $homeCurrencyBCY ?
+ 	  	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.RefundsTotal.Original.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING", null,false),
+      $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.RefundsTotal.Original.BCY.IncTax","",basketSummary.refundTotal,"NUMERIC",null, false),
+
+	  /* Totals.SaleTotals.RefundTotal.Current */
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.RefundsTotal.Current.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.RefundsTotal.Current.LCY.IncTax","",$exists(currentTransactionDetails.basketSummary) ? currentTransactionDetails.basketSummary.refundTotal : basketSummary.refundTotal,"NUMERIC", null,false),
+      $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.RefundsTotal.Current.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING", null,false),
+      $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.RefundsTotal.Current.BCY.IncTax","",$exists(currentTransactionDetails.basketSummary) ? currentTransactionDetails.basketSummary.refundTotal : basketSummary.refundTotal,"NUMERIC", null,false),
+
+      /* ### Totals.SaleTotals.PaidTotal ### */
+      /* Totals.SaleTotals.PaidTotal.Original */
+      $exists(paymentDetails[transactionType = "SALE"]) ? $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.PaidTotal.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING", null,false),
+      $exists(paymentDetails[transactionType = "SALE"]) ? $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.PaidTotal.Original.LCY.IncTax","",(-1.0 * $sum(paymentDetails[transactionType = "SALE"].($number(amount)))),"NUMERIC",null, false),
+	  $exists(paymentDetails[transactionType = "SALE"]) and $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.PaidTotal.Original.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING", null,false),
+      $exists(paymentDetails[transactionType = "SALE"]) and $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.PaidTotal.Original.BCY.IncTax","",(-1.0 * $sum(paymentDetails[transactionType = "SALE"].($number(amount)))),"NUMERIC",null, false),
+
+	  /* Totals.SaleTotals.PaidTotal.Current */
+      /* NOTE: not quire right, would need to sum ALL these for any previous trans to get proper total at this point in time of this trans */
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.PaidTotal.Current.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.PaidTotal.Current.LCY.IncTax","",(-1.0 * $sum(paymentDetails.($number(amount)))),"NUMERIC", null,false),
+      $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.PaidTotal.Current.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING", null,false),
+      $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.PaidTotal.Current.BCY.IncTax","",(-1.0 * $sum(paymentDetails.($number(amount)))),"NUMERIC", null,false),
+
+	  /* ### Totals.SaleTotals.TaxTotal ### */
+      /* Totals.SaleTotals.TaxTotal.Original */
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.TaxTotal.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.TaxTotal.Original.LCY.Tax","",basketSummary.VATTotal,"NUMERIC",null, false),
+      $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.TaxTotal.Original.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING", null,false),
+      $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.TaxTotal.Original.BCY.Tax","",basketSummary.VATTotal,"NUMERIC",null, false),
+
+      /* Totals.SaleTotals.TaxTotal.Current */
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.TaxTotal.Current.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.TaxTotal.Current.LCY.Tax","",$exists(currentTransactionDetails.basketSummary) ? currentTransactionDetails.basketSummary.VATTotal : basketSummary.VATTotal,"NUMERIC", null,false),
+	  $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.TaxTotal.Current.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING", null,false),
+	  $localCurrencyLCY = $homeCurrencyBCY ?
+      	$buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.Totals.SaleTotals.TaxTotal.Current.BCY.Tax","",$exists(currentTransactionDetails.basketSummary) ? currentTransactionDetails.basketSummary.VATTotal : basketSummary.VATTotal,"NUMERIC", null,false),
+
+      /* Lines */
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".SaleLines","",
+      /* TODO: sort by itemLineId */
+      $unifiedBasket.(
+        $objectsToDocument(
+        [
+          $buildCustomAttribute($entityId,null,"EntityId","",$mapEntityId_SOL($rawEntityId,itemLineId),"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"EntityType","",$entityType_SOL,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"EntitySubType","",$entitySubType_SOL,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"ParentEntityId","",$entityId_SOH,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"ParentEntityType","",$entityType_SOH,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"CompositeEntityId","",$compositeEntityId,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"CompositeEntityType","",$compositeEntityType,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"LineIds.SalesOrderLineNumberKey","",$$.transactionId & "_" & itemLineId,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"LineIds.SalesOrderLineProductKey","",$$.transactionId & "_" & SKU,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"LineIds.SalesOrderLineProductKeyType","","Sku","STRING",null,false),
+          $buildCustomAttribute($entityId,null,"LineIds.SalesOrderLineSeq","",itemLineId,"NUMERIC",null,false),
+          $buildCustomAttribute($entityId,null,"LineIds.SalesOrderId","",$$.id,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"LineIds.SalesOrderKey","",$$.transactionId,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"LineIds.SalesOrderReferenceNumber","",$$.transactionRef,"STRING",null,false),
+          $length($$.originalTransId) > 0 ? $buildCustomAttribute($entityId,null,"LineIds.SalesOrderIds.OriginalSalesOrderKey","",$$.originalTransId,"STRING",null,false) : NULL,
+          $buildCustomAttribute($entityId,null,"XRefIds","",
+          [
+              {"Id":$$.transactionId & "_" & itemLineId,"SystemCode":"Xfuze","Code":"SalesOrderLineNumberKey","EntityId":$mapEntityId_SOL($rawEntityId,itemLineId)},
+              {"Id":$$.transactionId & "_" & SKU,"SystemCode":"Xfuze","Code":"SalesOrderLineProductKey","EntityId":$mapEntityId_SOL($rawEntityId,itemLineId)},
+              {"Id":$$.transactionId,"SystemCode":$sourceSystem,"Code":"transactionId","EntityId":$mapEntityId_SOL($rawEntityId,itemLineId)},
+              {"Id":$$.transactionRef,"SystemCode":$sourceSystem,"Code":"transactionRef","EntityId":$mapEntityId_SOL($rawEntityId,itemLineId)}
+              {"Id":$$.id,"SystemCode":$sourceSystem,"Code":"id","EntityId":$mapEntityId_SOL($rawEntityId,itemLineId)}
+
+          ]
+          ,"ARRAY",null, false),
+
+           /* SaleLines[].Type */
+          $buildCustomAttribute($entityId,null,"Type.TypeClass","",$entityTypeClass_SOL,"STRING", null, false),
+          $buildCustomAttribute($entityId,null,"Type.TypeCode","",$entityType_SOL,"STRING", null, false),
+          $buildCustomAttribute($entityId,null,"Type.SubTypeCode","",$entitySubType_SOL,"STRING", null, false),
+
+		  /* SaleLines[].Type *//* SaleLines[].Type */
+          $buildCustomAttribute($entityId,null,"Status.ProcessingStatus.StatusCode","", "Completed", "STRING", null, false),
+          $buildCustomAttribute($entityId,null,"Status.FulfilmentStatus.StatusCode","", "FullyFulfiled", "STRING", null, false),
+          /* TODO: below 2 needs work */
+          $buildCustomAttribute($entityId,null,"Status.DiscountStatus.StatusCode","", itemDiscounts.trnDiscountsPortion != 0 or itemDiscounts.trnPromotionsPortion != 0 or $count(lineDiscounts) > 0 or $count(linePromotions) > 0? "Discounted" : "NotDiscounted", "STRING", null, false),
+          $buildCustomAttribute($entityId,null,"Status.RefundStatus.StatusCode","", $exists(refundedQuantity) and refundedQuantity = quantity ? "FullyRefunded" : (refundedQuantity < quantity ? "PartiallyRefunded" : "NoneRefunded"), "STRING", null, false),
+
+
+          /* ### SaleLines[].Times ### */
+          /* TODO - these are header level ones, which should remain, also enrichment whe go-jsonata for time utils comes*/
+          $buildCustomAttribute($entityId,null,"Times.CreatedOn.UTC","",$$.createdAt,"TIMESTAMP", $tsFormat,false),
+          $buildCustomAttribute($entityId,null,"Times.CreatedOn.Local","",$$.createdAt,"TIMESTAMP", $tsFormat,false),
+          $buildCustomAttribute($entityId,null,"Times.PlacedOn.UTC","",$$.`dateTime`,"TIMESTAMP", $tsFormat,false),
+          $buildCustomAttribute($entityId,null,"Times.PlacedOn.Local","",$$.`dateTime`,"TIMESTAMP", $tsFormat,false),
+          $buildCustomAttribute($entityId,null,"Times.LastUpdatedOn.UTC","",$$.`updatedAt`,"TIMESTAMP", $tsFormat,false),
+          $buildCustomAttribute($entityId,null,"Times.LastUpdatedOn.Local","",$$.`updatedAt`,"TIMESTAMP", $tsFormat,false),
+          $buildCustomAttribute($entityId,null,"Times.CompletedOn.UTC","",$$.`transCompletedAt`,"TIMESTAMP", $tsFormat,false),
+          $buildCustomAttribute($entityId,null,"Times.CompletedOn.Local","",$$.`transCompletedAt`,"TIMESTAMP",$tsFormat, false),
+
+          /* ### SaleLines[].ProductAtts ### */
+          $buildCustomAttribute($entityId,null,"ProductAtts.ProductIds.ProductVariantId","",$mapProductIdFromSkuFn(SKU),"STRING",null, false),
+          $buildCustomAttribute($entityId,null,"ProductAtts.ProductIds.ProductVariantNumber","",SKU,"STRING",false),
+          $buildCustomAttribute($entityId,null,"ProductAtts.ProductIdsProductVariantNumberType","","SKU","STRING",false),
+          $buildCustomAttribute($entityId,null,"ProductAtts.ProductIds.SKU","",SKU,"STRING",false),
+          $buildCustomAttribute($entityId,null,"ProductAtts.ProductIds.Barcode","",$length(barCode) > 0 ? barCode : barcodes[0],"STRING",false),
+          $buildCustomAttribute($entityId,null,"ProductAtts.ProductIds.Barcodes","",barcodes,"ARRAY",false), /* TODO: use XDM */
+          $buildCustomAttribute($entityId,null,"ProductAtts.Description","",description,"STRING",false),
+          $buildCustomAttribute($entityId,null,"ProductAtts.ColourCode","",colour,"STRING",false),
+          $buildCustomAttribute($entityId,null,"ProductAtts.CountryOfOrigin","",countryofOrigin,"STRING",false),
+
+          $buildCustomAttribute($entityId,null,"Hierarchy","",
+      		currentLines.categories.(
+            $objectsToDocument(
+            [
+              $length(id) > 0 ? $buildCustomAttribute($entityId,null,"NodeId","","HierarchyNode::Category_Crew_" & id,"STRING",null,false),
+              $length(id) > 0 ? $buildCustomAttribute($entityId,null,"NodeKey","",id,"STRING",null,false),
+              $length(parentId) > 0 ? $buildCustomAttribute($entityId,null,"ParentNodeId","","HierarchyNode::Category_Crew_" & parentId,"STRING",null,false),
+              $length(parentId) > 0? $buildCustomAttribute($entityId,null,"ParentNodeKey","",parentId,"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"NodeCode","",categoryId,"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"NodeName","",name,"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"NodeClass","","ProductCategory","STRING",null,false),
+              $buildCustomAttribute($entityId,null,"NodeStatus","","Active","STRING",null,false),
+              $buildCustomAttribute($entityId,null,"NodeType","","CategoryLevel","STRING",null,false)
+            ])
+      	  ),"ARRAY",null, false),
+
+          $buildCustomAttribute($entityId,null,"ProductAtts.ColourCode","",colour,"STRING",false),
+          $buildCustomAttribute($entityId,null,"ProductAtts.CountryOfOrigin","",countryofOrigin,"STRING",false),
+          $buildCustomAttribute($entityId,null,"ProductAtts.AttributeCodes","",attributes,"ARRAY",false),
+          $buildCustomAttribute($entityId,null,"ProductAtts.ImageURLs","",imageUrls,"ARRAY",false),
+
+          /* SaleLines[].Currency */
+      	  $buildCustomAttribute($entityId,null,"Currency.BCY.ISO3","",$homeCurrencyBCY,"STRING", null,false),
+      	  $buildCustomAttribute($entityId,null,"Currency.LCY.ISO3","",$localCurrencyLCY,"STRING", null,false),
+
+      	  /* SaleLines[].ExchangeRates */
+          /* TODO: need more examples */
+          $mapRawTypeXrefFn(`type`) = "Sale" ?
+            $buildCustomAttribute($entityId,null,"ExchangeRates.SaleRate.Rate","",1.00,"NUMERIC", null,false),
+
+  		  /* ### SaleLines[].Qtys ### */
+          $buildCustomAttribute($entityId,null,"Qtys.QtySold.Amount","",quantity,"NUMERIC",null,false),
+          $buildCustomAttribute($entityId,null,"Qtys.QtyNet.Amount","",$exists(currentLines[0].quantity) ? currentLines[0].quantity : (quantity - ($exists(refundedQuantity) ? refundedQuantity : 0)),"NUMERIC",null,false),
+          $buildCustomAttribute($entityId,null,"Qtys.QtyCancelled.Amount","",-1 * 0,"NUMERIC",null,false),
+          $buildCustomAttribute($entityId,null,"Qtys.QtyVoided.Amount","",-1 * 0,"NUMERIC",null,false),
+          $buildCustomAttribute($entityId,null,"Qtys.QtyChanged.Amount","",-1 * ($exists(currentLines[0].changeQty) ? currentLines[0].changeQty : ($exists(refundedQuantity) ? refundedQuantity : 0)),"NUMERIC",null,false),
+          $buildCustomAttribute($entityId,null,"Qtys.QtyExchanged.Amount","",-1 * ($exists(exchange.quantity) ? exchange.quantity : 0),"NUMERIC",null,false),
+          $buildCustomAttribute($entityId,null,"Qtys.QtyRefunded.Amount","",-1 * ($exists(refundedQuantity) ? refundedQuantity : 0),"NUMERIC",null,false),
+          $buildCustomAttribute($entityId,null,"Qtys.QtyRefundedPromotional.Amount","",-1 * ($exists(refundedPromotionalQuantity) ? refundedPromotionalQuantity : 0),"NUMERIC",null,false),
+          $buildCustomAttribute($entityId,null,"Qtys.QtyFulfilledGross.Amount","",quantity,"NUMERIC",null,false),
+          $buildCustomAttribute($entityId,null,"Qtys.QtyFulfilledNet.Amount","",$exists(currentLines[0].quantity) ? currentLines[0].quantity : (quantity - ($exists(refundedQuantity) ? refundedQuantity : 0)),"NUMERIC",null,false),
+          $buildCustomAttribute($entityId,null,"Qtys.QtyNetNumDiscountLines.Amount","",$count(lineDiscounts),"NUMERIC",null,false),
+          $buildCustomAttribute($entityId,null,"Qtys.QtyNetNumPromotionLines.Amount","",$count(linePromotions),"NUMERIC",null,false),
+          $buildCustomAttribute($entityId,null,"Qtys.QtyNetNumTaxLines.Amount","",$count(taxLines),"NUMERIC",null,false),
+
+          /* ### SaleLines[].Prices.SellingPrices ### */
+          /* SaleLines[].Prices.SellingPrices.SoldUnitPrice.Original */
+          $buildCustomAttribute($entityId,null,"Prices.SellingPrices.SoldUnitPrice.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"Prices.SellingPrices.SoldUnitPrice.Original.LCY.IncTax","",price,"NUMERIC",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Prices.SellingPrices.SoldUnitPrice.Original.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Prices.SellingPrices.SoldUnitPrice.Original.BCY.IncTax","",price,"NUMERIC",null,false),
+
+          $buildCustomAttribute($entityId,null,"Prices.SellingPrices.SoldUnitPrice.Current.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"Prices.SellingPrices.SoldUnitPrice.Current.LCY.IncTax","",$exists(currentLines[0].selectedPrice) ? currentLines[0].selectedPrice : price,"NUMERIC",null,false),
+                   $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Prices.SellingPrices.SoldUnitPrice.Current.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING",null,false),
+		  $localCurrencyLCY = $homeCurrencyBCY ?
+            $buildCustomAttribute($entityId,null,"Prices.SellingPrices.SoldUnitPrice.Current.BCY.IncTax","",$exists(currentLines[0].selectedPrice) ? currentLines[0].selectedPrice : price,"NUMERIC",null,false),
+
+          /* ### SaleLines[].Totals.SaleTotals ### */
+          /* SaleLines[].Totals.SaleTotals.LineTotal.Original (after all adjustments, what is actually owed net and is payable)*/
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.LineTotal.IsChanged","",totalLinePrice != ($exists(currentLines[0].totalLinePrice) ? currentLines[0].totalLinePrice : totalLinePrice),"STRINGBOOL",null,false),
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.LineTotal.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.LineTotal.Original.LCY.IncTax","",totalLinePrice,"NUMERIC",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.LineTotal.Original.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.LineTotal.Original.BCY.IncTax","",totalLinePrice,"NUMERIC",null,false),
+
+          /* SaleLines[].Totals.SaleTotals.LineTotal.Current */
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.LineTotal.Current.LCY.Currency.ISO3","",$exists(currentLines[0].totalLinePrice) ? $localCurrencyLCY,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.LineTotal.Current.LCY.IncTax","",$exists(currentLines[0].totalLinePrice) ? currentLines[0].totalLinePrice : totalLinePrice,"NUMERIC",null,false),
+		  $localCurrencyLCY = $homeCurrencyBCY ?
+			$buildCustomAttribute($entityId,null,"Totals.SaleTotals.LineTotal.Current.BCY.Currency.ISO3","",$exists(currentLines[0].totalLinePrice) ? $homeCurrencyBCY,"STRING",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.LineTotal.Current.LCY.IncTax","",$exists(currentLines[0].totalLinePrice) ? currentLines[0].totalLinePrice : totalLinePrice,"NUMERIC",null,false),
+
+
+          /* SaleLines[].Totals.SaleTotals.ProductTotalBeforeAdjustments.Original (product only total, before any adjustments)*/
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.ProductTotalBeforeAdjustments.IsChanged","",(quantity * price) != ($exists(currentLines[0].quantity) ? (currentLines[0].quantity * price)),"STRINGBOOL",null,false),
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.ProductTotalBeforeAdjustments.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.ProductTotalBeforeAdjustments.Original.LCY.IncTax","",quantity * price,"NUMERIC",null,false),
+  	      $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.ProductTotalBeforeAdjustments.Original.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.ProductTotalBeforeAdjustments.Original.BCY.IncTax","",quantity * price,"NUMERIC",null,false),
+
+          /* SaleLines[].Totals.SaleTotals.ProductTotalBeforeAdjustments.Original */
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.ProductTotalBeforeAdjustments.Current.LCY.Currency.ISO3","",$exists(currentLines[0].quantity) ? $localCurrencyLCY,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.ProductTotalBeforeAdjustments.Current.LCY.IncTax","",$exists(currentLines[0].quantity) ? (currentLines[0].quantity * price),"NUMERIC",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.ProductTotalBeforeAdjustments.Current.LCY.Currency.ISO3","",$exists(currentLines[0].quantity) ? $homeCurrencyBCY,"STRING",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.ProductTotalBeforeAdjustments.Current.LCY.IncTax","",$exists(currentLines[0].quantity) ? (currentLines[0].quantity * price),"NUMERIC",null,false),
+
+
+		  /* SaleLines[].Totals.SaleTotals.DiscountsTotal (final full total, sum of below) */
+          /* TODO: check logic */
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsTotal.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsTotal.Original.LCY.IncTax","",-1.00 * (itemDiscounts.trnDiscountsPortion + itemDiscounts.trnPromotionsPortion),"NUMERIC",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsTotal.Original.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsTotal.Original.BCY.IncTax","",-1.00 * (itemDiscounts.trnDiscountsPortion + itemDiscounts.trnPromotionsPortion),"NUMERIC",null,false),
+
+          /* TODO below */
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsTotal.Current.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsTotal.Current.LCY.IncTax","",-1.00,"NUMERIC",null,false),
+		  $localCurrencyLCY = $homeCurrencyBCY ?
+		  	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsTotal.Current.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsTotal.Current.BCY.IncTax","",-1.00,"NUMERIC",null,false),
+
+
+     	  /* SaleLines[].Totals.SaleTotals.DiscountsApportionedTotal.Original (apportioned total for discounts) */
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsApportionedTotal.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsApportionedTotal.Original.LCY.IncTax","",-1.00 * itemDiscounts.trnDiscountsPortion,"NUMERIC",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsApportionedTotal.Original.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsApportionedTotal.Original.BCY.IncTax","",-1.00 * itemDiscounts.trnDiscountsPortion,"NUMERIC",null,false),
+
+          /* SaleLines[].Totals.SaleTotals.DiscountsApportionedTotal.Current */
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsApportionedTotal.Current.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsApportionedTotal.Current.LCY.IncTax","",-1.00 * ($exists(currentLines[0].itemDiscounts) ? currentLines[0].itemDiscounts.trnDiscountsPortion : itemDiscounts.trnDiscountsPortion),"NUMERIC",null,false),
+		  $localCurrencyLCY = $homeCurrencyBCY ?
+		  	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsApportionedTotal.Current.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsApportionedTotal.Current.BCY.IncTax","",-1.00 * ($exists(currentLines[0].itemDiscounts) ? currentLines[0].itemDiscounts.trnDiscountsPortion : itemDiscounts.trnDiscountsPortion),"NUMERIC",null,false),
+
+
+          /* SaleLines[].Totals.SaleTotals.PromotionsApportionedTotal.Original (apportioned total for promos) */
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.PromotionsApportionedTotal.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.PromotionsApportionedTotal.Original.LCY.IncTax","",-1.00 * itemDiscounts.trnPromotionsPortion,"NUMERIC",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.PromotionsApportionedTotal.Original.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.PromotionsApportionedTotal.Original.BCY.IncTax","",-1.00 * ($exists(currentLines[0].itemDiscounts) ? currentLines[0].itemDiscounts.trnPromotionsPortion : itemDiscounts.trnPromotionsPortion),"NUMERIC",null,false),
+
+		  /* SaleLines[].Totals.SaleTotals.PromotionsApportionedTotal.Current */
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.PromotionsApportionedTotal.Current.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.PromotionsApportionedTotal.Current.LCY.IncTax","",-1.00 * ($exists(currentLines[0].itemDiscounts) ? currentLines[0].itemDiscounts.trnPromotionsPortion : itemDiscounts.trnPromotionsPortion),"NUMERIC",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.PromotionsApportionedTotal.Current.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.PromotionsApportionedTotal.Current.BCY.IncTax","",-1.00 * ($exists(currentLines[0].itemDiscounts) ? currentLines[0].itemDiscounts.trnPromotionsPortion : itemDiscounts.trnPromotionsPortion),"NUMERIC",null,false),
+
+ 		  /* SaleLines[].Totals.SaleTotals.DiscountsRefundTotal.Original (apportioned total for promos) */
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsRefundTotal.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsRefundTotal.Original.LCY.IncTax","",-1.00 * itemDiscounts.refundPortion,"NUMERIC",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsRefundTotal.Original.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsRefundTotal.Original.BCY.IncTax","",-1.00 * itemDiscounts.refundPortion,"NUMERIC",null,false),
+
+          /* SaleLines[].Totals.SaleTotals.DiscountsRefundTotal.Current */
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsRefundTotal.Current.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsRefundTotal.Current.LCY.IncTax","",-1.00 * itemDiscounts.currentRefundPortion,"NUMERIC",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsRefundTotal.Current.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.DiscountsRefundTotal.Current.BCY.IncTax","",-1.00 * itemDiscounts.currentRefundPortion,"NUMERIC",null,false),
+
+		  /* SaleLines[].Totals.SaleTotals.RefundTotal.Original */
+		  $buildCustomAttribute($entityId,null,"Totals.SaleTotals.RefundTotal.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.RefundTotal.Original.LCY.IncTax","",-1.00 * ($exists(refundedTotal) ? refundedTotal : 0.00),"NUMERIC",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.RefundTotal.Original.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.RefundTotal.Original.BCY.IncTax","",-1.00 * ($exists(refundedTotal) ? refundedTotal : 0.00),"NUMERIC",null,false),
+
+          /* SaleLines[].Totals.SaleTotals.RefundTotal.Current */
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.RefundTotal.Current.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.RefundTotal.Current.LCY.IncTax","",-1.00 * ($exists(currentLines[0].refundedTotal) ? currentLines[0].refundedTotal : ($exists(refundedTotal) ? refundedTotal : 0.00)),"NUMERIC",null,false),
+		  $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.RefundTotal.Current.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.RefundTotal.Current.BCY.IncTax","",-1.00 * ($exists(currentLines[0].refundedTotal) ? currentLines[0].refundedTotal : ($exists(refundedTotal) ? refundedTotal : 0.00)),"NUMERIC",null,false),
+
+		  /* SaleLines[].Totals.SaleTotals.TaxTotal.Original */
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.TaxTotal.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.TaxTotal.Original.LCY.Tax","",$sum(taxLines.taxLineTotal),"NUMERIC",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.TaxTotal.Original.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.TaxTotal.Original.BCY.Tax","",$sum(taxLines.taxLineTotal),"NUMERIC",null,false),
+
+          /* SaleLines[].Totals.SaleTotals.TaxTotal.Current */
+          /* TODO - need currentTrans versions of lines */
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.TaxTotal.Current.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING",null,false),
+          $buildCustomAttribute($entityId,null,"Totals.SaleTotals.TaxTotal.Current.LCY.Tax","",$sum(taxLines.taxLineTotal),"NUMERIC",null,false),
+		  $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.TaxTotal.Current.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING",null,false),
+          $localCurrencyLCY = $homeCurrencyBCY ?
+          	$buildCustomAttribute($entityId,null,"Totals.SaleTotals.TaxTotal.Current.BCY.Tax","",$sum(taxLines.taxLineTotal),"NUMERIC",null,false),
+
+		  /* SaleLines[].FulfilmentAtts */
+          $buildCustomAttribute($entityId,null,"FulfilmentAtts.Ids.FulfilmentId","",fullfilmentId,"STRING",false),
+          $buildCustomAttribute($entityId,null,"FulfilmentAtts.Ids.OriginFullfilmentId","",originFullfillmentId,"STRING",false),
+          $buildCustomAttribute($entityId,null,"FulfilmentAtts.FulfilmentClass","","Delivery","STRING",false),
+          $buildCustomAttribute($entityId,null,"FulfilmentAtts.FulfilmentGroup","",deliveryGroup,"STRING",false),
+          $buildCustomAttribute($entityId,null,"FulfilmentAtts.FulfilmentMethodType","",$mapRawDeliveryMethodXrefFn(deliveryMethod),"STRING",false),
+          $buildCustomAttribute($entityId,null,"FulfilmentAtts.ExternalFulfilmentMethodType","",deliveryMethod,"STRING",false),
+          $buildCustomAttribute($entityId,null,"FulfilmentAtts.ExtAtts","",
+          [
+          	$objectsToDocument(
+             [
+              	$buildCustomAttribute($entityId,null,"LeadTime.Type","",leadTime.type,"STRING",false),
+              	$buildCustomAttribute($entityId,null,"LeadTime.Value","",leadTime.value,"STRING",false)
+             ])
+          ]
+          ,"ARRAY",null, false),
+
+ 		  $exists(exchange) ? $buildCustomAttribute($entityId,null,"ExchangeAtts.ExchangeId","",exchange.exchangeId,"STRING",null,false),
+  		  $exists(currentLines[0].refunded) ? $buildCustomAttribute($entityId,null,"ExchangeAtts.IsRefunded","",currentLines[0].refunded,"STRINGBOOL",null,false),
+  		  $exists(refundedReason) ? $buildCustomAttribute($entityId,null,"ExchangeAtts.ReasonCode","",refundedReason,"STRING",null,false),
+  		  $exists(refundedReasonDescription) ? $buildCustomAttribute($entityId,null,"ExchangeAtts.ReasonDesc","",refundedReasonDescription,"STRING",null,false),
+  		  $exists(currentLines[0].inReturnItem) ? $buildCustomAttribute($entityId,null,"ExchangeAtts.IsInReturnItem","",currentLines[0].inReturnItem,"STRINGBOOL",null,false),
+  		  $exists(currentLines[0].isChecked) ? $buildCustomAttribute($entityId,null,"ExchangeAtts.IsChecked","",currentLines[0].isChecked,"STRINGBOOL",null,false),
+  		  $exists(currentLines[0].isLastExchanged) ? $buildCustomAttribute($entityId,null,"ExchangeAtts.IsLastExchanged","",currentLines[0].isLastExchanged,"STRINGBOOL",null,false),
+  		  $exists(currentLines[0].sealed) ? $buildCustomAttribute($entityId,null,"ExchangeAtts.IsSealed","",currentLines[0].sealed,"STRINGBOOL",null,false),
+  		  $exists(currentLines[0].exchange) ? $buildCustomAttribute($entityId,null,"ExchangeAtts.NewLines","",currentLines[0].exchange.newItems.(
+          	$objectsToDocument(
+        	[
+              $buildCustomAttribute($entityId,null,"Qty.Amount","",Quantity,"NUMERIC",null,false),
+              $buildCustomAttribute($entityId,null,"ItemType","","SaleOrderLine","STRING",null,false),
+              $buildCustomAttribute($entityId,null,"LineNumberKey","",$$.transactionId & "_" & lineItemId,"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"LineSeq","",lineItemId,"STRING",null,false)
+
+            ])
+          ),"ARRAY",null,false),
+
+          /* AdjustmentLines */
+          $buildCustomAttribute($entityId,null,"AdjustmentLines","",
+            $append(
+              linePromotions.(
+                $objectsToDocument(
+                [
+                  $buildCustomAttribute($entityId,null,"AdjustmentClass","","Promotion","STRING",null,false),
+                  $buildCustomAttribute($entityId,null,"AdjustmentId","",promotionId,"STRING",null,false),
+                  $buildCustomAttribute($entityId,null,"AdjustmentName","",name,"STRING",null,false),
+                  $buildCustomAttribute($entityId,null,"AdjustmentType","","(TBD)","STRING",null,false),
+                  $buildCustomAttribute($entityId,null,"AdjustmentMethod","","(TBD)","STRING",null,false),
+                  $buildCustomAttribute($entityId,null,"AdjustmentDesc","",promotionInfo,"STRING",null,false),
+                  $buildCustomAttribute($entityId,null,"AdjustmentDisplayText","",displayText,"STRING",null,false),
+                  $buildCustomAttribute($entityId,null,"SalesOrderLineNumberKey","",$$.transactionId & "_" & itemLineId,"NUMERIC",null,false),
+                  $buildCustomAttribute($entityId,null,"SalesOrderLineSeq","",itemLineId,"NUMERIC",null,false),
+                  $buildCustomAttribute($entityId,null,"AdjustedAmountPercentage","",-1,"NUMERIC",null,false),
+                  $buildCustomAttribute($entityId,null,"AdjustedAmount.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"NUMERIC",null,false),
+                  $buildCustomAttribute($entityId,null,"AdjustedAmount.Original.LCY.IncTax","",-1.00 * promotionAmount,"NUMERIC",null,false),
+                  $buildCustomAttribute($entityId,null,"PreAdjustedAmount.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"NUMERIC",null,false),
+                  $buildCustomAttribute($entityId,null,"PreAdjustedAmount.Original.LCY.IncTax","",-1.00 * promotionAmount,"NUMERIC",null,false),
+                  $buildCustomAttribute($entityId,null,"PostAdjustedAmount.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"NUMERIC",null,false),
+                  $buildCustomAttribute($entityId,null,"PostAdjustedAmount.Original.LCY.IncTax","",-1.00 * promotionAmount,"NUMERIC",null,false),
+                  $buildCustomAttribute($entityId,null,"UnitPrice.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"NUMERIC",null,false),
+                  $buildCustomAttribute($entityId,null,"UnitPrice.Original.LCY.IncTax","",-1.00 * promotionAmount,"NUMERIC",null,false),
+                  $buildCustomAttribute($entityId,null,"ExtAtts","",
+                  [
+                    $objectsToDocument(
+                     [
+                        $buildCustomAttribute($entityId,null,"LeadTime.Type","",leadTime.type,"STRING",false),
+                        $buildCustomAttribute($entityId,null,"LeadTime.Value","",leadTime.value,"STRING",false)
+                     ])
+                  ]
+                  ,"ARRAY",null, false)
+
+                ])
+              ),
+
+
+              lineDiscounts.(
+                $objectsToDocument(
+                [
+                  $buildCustomAttribute($entityId,null,"AdjustmentClass","","Discount","STRING",null,false),
+                  $buildCustomAttribute($entityId,null,"AdjustmentId","",promotionId,"STRING",null,false),
+                  $buildCustomAttribute($entityId,null,"AdjustmentName","",name,"STRING",null,false),
+                  $buildCustomAttribute($entityId,null,"AdjustmentType","","(TBD)","STRING",null,false),
+                  $buildCustomAttribute($entityId,null,"AdjustmentMethod","","(TBD)","STRING",null,false),
+                  $buildCustomAttribute($entityId,null,"AdjustmentDesc","",promotionInfo,"STRING",null,false),
+                  $buildCustomAttribute($entityId,null,"AdjustmentDisplayText","",displayText,"STRING",null,false),
+                  $buildCustomAttribute($entityId,null,"SalesOrderLineNumberKey","",$$.transactionId & "_" & itemLineId,"NUMERIC",null,false),
+                  $buildCustomAttribute($entityId,null,"SalesOrderLineSeq","",itemLineId,"NUMERIC",null,false),
+                  $buildCustomAttribute($entityId,null,"AdjustedAmountPercentage","",-1,"NUMERIC",null,false),
+                  $buildCustomAttribute($entityId,null,"AdjustedAmount.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"NUMERIC",null,false),
+                  $buildCustomAttribute($entityId,null,"AdjustedAmount.Original.LCY.IncTax","",-1.00 * promotionAmount,"NUMERIC",null,false),
+                  $buildCustomAttribute($entityId,null,"PreAdjustedAmount.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"NUMERIC",null,false),
+                  $buildCustomAttribute($entityId,null,"PreAdjustedAmount.Original.LCY.IncTax","",-1.00 * promotionAmount,"NUMERIC",null,false),
+                  $buildCustomAttribute($entityId,null,"PostAdjustedAmount.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"NUMERIC",null,false),
+                  $buildCustomAttribute($entityId,null,"PostAdjustedAmount.Original.LCY.IncTax","",-1.00 * promotionAmount,"NUMERIC",null,false),
+                  $buildCustomAttribute($entityId,null,"UnitPrice.Original.LCY.Currency.ISO3","",$localCurrencyLCY,"NUMERIC",null,false),
+                  $buildCustomAttribute($entityId,null,"UnitPrice.Original.LCY.IncTax","",-1.00 * promotionAmount,"NUMERIC",null,false)
+
+                 ])
+               )
+             )
+             ,"ARRAY",null, false),
+
+            $buildCustomAttribute($entityId,null,"TaxLines","",
+            taxLines.(
+              $objectsToDocument(
+              [
+
+                $buildCustomAttribute($entityId,null,"LineIds.SalesOrderLineId","","SalesOrderLine_Sale" & "_" & $$.transactionId & "_" & itemLineId,"STRING", null,false),
+                $buildCustomAttribute($entityId,null,"LineIds.SalesOrderLineNumberKey","",$$.transactionId & "_" & itemLineId,"STRING", null,false),
+                $buildCustomAttribute($entityId,null,"LineIds.SalesOrderLineSeq","",itemLineId,"NUMERIC", null,false),
+                $buildCustomAttribute($entityId,null,"Tax.TaxLineType","","DetailByLine","STRING", null,false),
+                $buildCustomAttribute($entityId,null,"Tax.TaxLineLevel","","Line","STRING", null,false),
+                $buildCustomAttribute($entityId,null,"Tax.TaxCode","",VATCode,"STRING", null,false),
+                $buildCustomAttribute($entityId,null,"Tax.TaxSchemeCode","","VAT","STRING", null,false),
+                $buildCustomAttribute($entityId,null,"Tax.IsTaxExempt","",VAT = 0,"STRINGBOOL", null,false),
+                $buildCustomAttribute($entityId,null,"Tax.TaxRate","",VAT,"NUMERIC", null,false),
+                $buildCustomAttribute($entityId,null,"Totals.TaxableAmountTotal.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING", null,false),
+                $buildCustomAttribute($entityId,null,"Totals.TaxableAmountTotal.LCY.IncTax","",taxableAmount,"NUMERIC", null,false),
+                $buildCustomAttribute($entityId,null,"Totals.TaxableAmountTotal.LCY.ExTax","",PreTax,"NUMERIC", null,false),
+                $buildCustomAttribute($entityId,null,"Totals.TaxableAmountTotal.LCY.Tax","",taxLineTotal,"NUMERIC", null,false),
+                $localCurrencyLCY = $homeCurrencyBCY ?
+                	$buildCustomAttribute($entityId,null,"Totals.TaxableAmountTotal.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING", null,false),
+                $localCurrencyLCY = $homeCurrencyBCY ?
+                	$buildCustomAttribute($entityId,null,"Totals.TaxableAmountTotal.BCY.IncTax","",taxableAmount,"NUMERIC", null,false),
+                $localCurrencyLCY = $homeCurrencyBCY ?
+                	$buildCustomAttribute($entityId,null,"Totals.TaxableAmountTotal.BCY.ExTax","",PreTax,"NUMERIC", null,false),
+                $localCurrencyLCY = $homeCurrencyBCY ?
+                	$buildCustomAttribute($entityId,null,"Totals.TaxableAmountTotal.BCY.Tax","",taxLineTotal,"NUMERIC", null,false),
+                $localCurrencyLCY = $homeCurrencyBCY ?
+                	$buildCustomAttribute($entityId,null,"HasJurisdictonLineDetails","","N","NUMERIC", null,false)
+
+              ])
+            ),"ARRAY",null, false)
+
+
+        ])
+      ),"ARRAY",null, false),
+
+
+
+        /* SalesPaymentLines */
+        $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".PaymentLines","",
+          paymentDetails.(
+            $objectsToDocument(
+            [
+              $buildCustomAttribute($entityId,null,"EntityId","",$entityType_PL & "_" & $entitySubType_PL & "_" & transactionReference,"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"EntityType","",$entityType_PL,"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"EntitySubType","",$entitySubType_PL,"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"ParentEntityId","",$compositeEntityId,"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"ParentEntityType","",$compositeEntityType,"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"CompositeEntityId","",$compositeEntityId,"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"CompositeEntityType","",$compositeEntityType,"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"LineIds.SalesOrderId","",$$.id,"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"LineIds.SalesOrderKey","",$$.transactionId,"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"LineIds.SalesOrderReferenceNumber","",$$.transactionRef,"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"PaymentLineId","",$$.transactionId & "_" & transactionReference,"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"PaymentLineKey","",transactionReference,"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"PaymentType","",$mapRawPaymentTypeXrefFn(paymentType),"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"ExternalPaymentType","",paymentType,"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"PaymentTransactionType","",$mapRawTypeXrefFn($$.type),"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"PaymentResultType","",$mapRawPaymentResultXrefFn(result),"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"ExternalPaymentResultType","",result,"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"Times.TransactionDate.UTC","",transactionDate,"TIMESTAMP","ISO8601",false),
+              $buildCustomAttribute($entityId,null,"Times.TransactionDate.Local","",transactionDate,"TIMESTAMP","ISO8601",false),
+              $buildCustomAttribute($entityId,null,"Totals.PaymentTotal.LCY.Currency.ISO3","",currency,"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"Totals.PaymentTotal.LCY.IncTax","",amount,"NUMERIC",null,false),
+              currency = $homeCurrencyBCY ?
+                  $buildCustomAttribute($entityId,null,"Totals.PaymentTotal.BCY.Currency.ISO3","",$homeCurrencyBCY,"STRING",null,false),
+              currency = $homeCurrencyBCY ?
+                  $buildCustomAttribute($entityId,null,"Totals.PaymentTotal.BCY.IncTax","",amount,"NUMERIC",null,false),
+              $buildCustomAttribute($entityId,null,"PaymentProvider","",paymentProvider,"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"PaymentReference","",transactionReference,"STRING",null,false),
+              $length(authcode) > 0 and authcode != "NA" ?
+                  $buildCustomAttribute($entityId,null,"AuthCode","",authcode,"STRING",null,false),
+              $length(hostReferenceId) > 0 and hostReferenceId != "NA" ?
+                  $buildCustomAttribute($entityId,null,"PaymentProviderReference","",hostReferenceId,"STRING",null,false),
+
+              /* cash details */
+              $length(drawer.name) > 0 and drawer.name != "NA" ?
+                  $buildCustomAttribute($entityId,null,"PaymentMethod.Cash.DrawerName","",drawer.name,"STRING",null,false),
+              $length(drawer.type) > 0 and drawer.type != "NA" ?
+                  $buildCustomAttribute($entityId,null,"PaymentMethod.Cash.DrawerType","",drawer.type,"STRING",null,false),
+
+              /* card details */
+              $length(cardType) > 0 and cardType != "NA" ?
+                  $buildCustomAttribute($entityId,null,"PaymentMethod.Card.CardType","",cardType,"STRING",null,false),
+              $length(cardSchemeId) > 0 and cardSchemeId != "NA" ?
+                  $buildCustomAttribute($entityId,null,"PaymentMethod.Card.CardSchemeType","",cardSchemeId,"STRING",null,false),
+              $length(pan) > 0 and pan != "NA" ?
+                  $buildCustomAttribute($entityId,null,"PaymentMethod.Card.Pan","",pan,"STRING",null,false),
+
+              /* gift card*/
+              $length(cardNumber) > 0 and cardNumber != "NA" ?
+                  $buildCustomAttribute($entityId,null,"PaymentMethod.GiftCard.CardNumber","",cardNumber,"STRING",null,false),
+              $length(sqNo) > 0 and sqNo != "NA" ?
+                  $buildCustomAttribute($entityId,null,"PaymentMethod.GiftCard.SeqNum","",sqNo,"STRING",null,false),
+              $length(remainingBalance) > 0 and remainingBalance != "NA" ?
+                  $buildCustomAttribute($entityId,null,"PaymentMethod.GiftCard.Balance","",remainingBalance,"STRING",null,false),
+              $length(expiryDate) > 0 and expiryDate != "NA" ?
+                  $buildCustomAttribute($entityId,null,"PaymentMethod.GiftCard.ExpiryDate","",expiryDate,"STRING",null,false),
+
+              /* entry method and device*/
+              $length(entryMethod) > 0 and entryMethod != "NA" ?
+                  $buildCustomAttribute($entityId,null,"PaymentEntryMethod","",entryMethod,"STRING",null,false),
+              $length(deviceId) > 0 and deviceId != "NA" ?
+                  $buildCustomAttribute($entityId,null,"DeviceId","",deviceId,"STRING",null,false),
+              $length(tid) > 0 and tid != "NA" ?
+                  $buildCustomAttribute($entityId,null,"TerminalId","",tid,"STRING",null,false),
+              $buildCustomAttribute($entityId,null,"IsSplitPayment","",$$.splitPayment,"STRINGBOOL",null,false)
+
+            ])
+         ),"ARRAY",null, false),
+
+        /* TaxSummaryLines */
+        $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".TaxSummaryLines","",
+          basket.totalTaxSummary.(
+            $objectsToDocument(
+            [
+                  $buildCustomAttribute($entityId,null,"Ids.SalesOrderOrderId","",$$.transactionId,"STRING", null,false),
+                  $buildCustomAttribute($entityId,null,"Ids.SalesOrderOrderKey","",$$.transactionId,"STRING", null,false),
+                  $buildCustomAttribute($entityId,null,"Tax.TaxLineType","","SummaryByTaxCode","STRING", null,false),
+                  $buildCustomAttribute($entityId,null,"Tax.TaxLineLevel","","Order","STRING", null,false),
+                  $buildCustomAttribute($entityId,null,"Tax.TaxCode","",VATCode,"STRING", null,false),
+                  $buildCustomAttribute($entityId,null,"Tax.TaxSchemeCode","","VAT","STRING", null,false),
+                  $buildCustomAttribute($entityId,null,"Tax.IsTaxExempt","",VAT = 0,"STRINGBOOL", null,false),
+                  $buildCustomAttribute($entityId,null,"Tax.TaxRate","",VAT,"NUMERIC", null,false),
+                  $buildCustomAttribute($entityId,null,"Totals.TaxableAmountTotal.LCY.Currency.ISO3","",$localCurrencyLCY,"STRING", null,false),
+                  $buildCustomAttribute($entityId,null,"Totals.TaxableAmountTotal.LCY.IncTax","",TXrateSum,"NUMERIC", null,false),
+                  $buildCustomAttribute($entityId,null,"Totals.TaxableAmountTotal.LCY.ExTax","",PreTaxSum,"NUMERIC", null,false),
+                  $buildCustomAttribute($entityId,null,"Totals.TaxableAmountTotal.LCY.Tax","",TaxSum,"NUMERIC", null,false),
+                  $localCurrencyLCY = $homeCurrencyBCY ?
+                      $buildCustomAttribute($entityId,null,"Totals.TaxableAmountTotal.BCY.Currency.ISO3","",$localCurrencyLCY,"STRING", null,false),
+                  $localCurrencyLCY = $homeCurrencyBCY ?
+                      $buildCustomAttribute($entityId,null,"Totals.TaxableAmountTotal.BCY.IncTax","",TXrateSum,"NUMERIC", null,false),
+                  $localCurrencyLCY = $homeCurrencyBCY ?
+                      $buildCustomAttribute($entityId,null,"Totals.TaxableAmountTotal.BCY.ExTax","",PreTaxSum,"NUMERIC", null,false),
+                  $localCurrencyLCY = $homeCurrencyBCY ?
+                      $buildCustomAttribute($entityId,null,"Totals.TaxableAmountTotal.BCY.Tax","",TaxSum,"NUMERIC", null,false)
+
+            ])
+         ),"ARRAY",null, false)
+
+
+
+
+    ]
+
+    );
+
+)

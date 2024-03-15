@@ -1,0 +1,17 @@
+AccountLimits - AccountLimit[]
+AccountRegulatoryLimits - AccountRegulatoryLimit[]
+ErrorCode - Int32
+ErrorDescription – String
+
+AccountLimit
+
+LastUpdateTime - DateTime
+LimitOffering - Int32 (Nullable)
+LimitPeriodTypeId - Int32
+LimitTypeId - Int32
+NextFacilitateTime - DateTime
+
+AccountRegulatoryLimit
+
+ExpirationDate - DateTime (Nullable)
+LimitType - Int32

@@ -1,0 +1,918 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions name="CasinoWallet" targetNamespace="http://tempuri.org/"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://tempuri.org/"
+                  xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl">
+    <wsdl:types>
+        <xs:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:import
+                    namespace="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"/>
+            <xs:element name="Debit">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="request" nillable="true" type="q1:DebitRequest"
+                                    xmlns:q1="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="DebitResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="DebitResult" nillable="true" type="q2:DebitResponse"
+                                    xmlns:q2="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="CancelDebit">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="request" nillable="true" type="q3:CancelDebitRequest"
+                                    xmlns:q3="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="CancelDebitResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="CancelDebitResult" nillable="true" type="q4:CancelDebitResponse"
+                                    xmlns:q4="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="UpdateGameState">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="request" nillable="true" type="q5:UpdateGameStateRequest"
+                                    xmlns:q5="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="UpdateGameStateResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="UpdateGameStateResult" nillable="true"
+                                    type="q6:UpdateGameStateResponse"
+                                    xmlns:q6="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetAccountBalance">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="request" nillable="true" type="q7:GetAccountBalanceRequest"
+                                    xmlns:q7="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetAccountBalanceResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="GetAccountBalanceResult" nillable="true"
+                                    type="q8:GetAccountBalanceResponse"
+                                    xmlns:q8="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetFreePlayDetails">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="request" nillable="true" type="q9:GetFreePlayDetailsRequest"
+                                    xmlns:q9="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetFreePlayDetailsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="GetFreePlayDetailsResult" nillable="true"
+                                    type="q10:GetFreePlayDetailsResponse"
+                                    xmlns:q10="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="FinishFreePlayDetails">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="request" nillable="true" type="q11:FinishFreePlayDetailsRequest"
+                                    xmlns:q11="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="FinishFreePlayDetailsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="FinishFreePlayDetailsResult" nillable="true"
+                                    type="q12:FinishFreePlayDetailsResponse"
+                                    xmlns:q12="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="JackpotWinning">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="request" nillable="true" type="q13:JackpotWinningRequest"
+                                    xmlns:q13="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="JackpotWinningResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="JackpotWinningResult" nillable="true"
+                                    type="q14:JackpotWinningResponse"
+                                    xmlns:q14="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetJackpotAmount">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="request" nillable="true" type="q15:GetJackpotAmountRequest"
+                                    xmlns:q15="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetJackpotAmountResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="GetJackpotAmountResult" nillable="true"
+                                    type="q16:GetJackpotAmountResponse"
+                                    xmlns:q16="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="RegulationGameStringReport">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="request" nillable="true"
+                                    type="q17:RegulationGameStringReportRequest"
+                                    xmlns:q17="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="RegulationGameStringReportResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="RegulationGameStringReportResult" nillable="true"
+                                    type="q18:RegulationGameStringReportResponse"
+                                    xmlns:q18="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetPlayerLastGamingActivityTime">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="request" nillable="true"
+                                    type="q19:GetPlayerLastGamingActivityTimeRequest"
+                                    xmlns:q19="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetPlayerLastGamingActivityTimeResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="GetPlayerLastGamingActivityTimeResult" nillable="true"
+                                    type="q20:GetPlayerLastGamingActivityTimeResponse"
+                                    xmlns:q20="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="IsAlive">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="IsAliveResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="IsAliveResult" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified"
+                   targetNamespace="http://schemas.microsoft.com/2003/10/Serialization/"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   xmlns:tns="http://schemas.microsoft.com/2003/10/Serialization/">
+            <xs:element name="anyType" nillable="true" type="xs:anyType"/>
+            <xs:element name="anyURI" nillable="true" type="xs:anyURI"/>
+            <xs:element name="base64Binary" nillable="true" type="xs:base64Binary"/>
+            <xs:element name="boolean" nillable="true" type="xs:boolean"/>
+            <xs:element name="byte" nillable="true" type="xs:byte"/>
+            <xs:element name="dateTime" nillable="true" type="xs:dateTime"/>
+            <xs:element name="decimal" nillable="true" type="xs:decimal"/>
+            <xs:element name="double" nillable="true" type="xs:double"/>
+            <xs:element name="float" nillable="true" type="xs:float"/>
+            <xs:element name="int" nillable="true" type="xs:int"/>
+            <xs:element name="long" nillable="true" type="xs:long"/>
+            <xs:element name="QName" nillable="true" type="xs:QName"/>
+            <xs:element name="short" nillable="true" type="xs:short"/>
+            <xs:element name="string" nillable="true" type="xs:string"/>
+            <xs:element name="unsignedByte" nillable="true" type="xs:unsignedByte"/>
+            <xs:element name="unsignedInt" nillable="true" type="xs:unsignedInt"/>
+            <xs:element name="unsignedLong" nillable="true" type="xs:unsignedLong"/>
+            <xs:element name="unsignedShort" nillable="true" type="xs:unsignedShort"/>
+            <xs:element name="char" nillable="true" type="tns:char"/>
+            <xs:simpleType name="char">
+                <xs:restriction base="xs:int"/>
+            </xs:simpleType>
+            <xs:element name="duration" nillable="true" type="tns:duration"/>
+            <xs:simpleType name="duration">
+                <xs:restriction base="xs:duration">
+                    <xs:pattern value="\-?P(\d*D)?(T(\d*H)?(\d*M)?(\d*(\.\d*)?S)?)?"/>
+                    <xs:minInclusive value="-P10675199DT2H48M5.4775808S"/>
+                    <xs:maxInclusive value="P10675199DT2H48M5.4775807S"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="guid" nillable="true" type="tns:guid"/>
+            <xs:simpleType name="guid">
+                <xs:restriction base="xs:string">
+                    <xs:pattern value="[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:attribute name="FactoryType" type="xs:QName"/>
+            <xs:attribute name="Id" type="xs:ID"/>
+            <xs:attribute name="Ref" type="xs:IDREF"/>
+        </xs:schema>
+        <xs:schema elementFormDefault="qualified"
+                   targetNamespace="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   xmlns:tns="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts.WalletDataContracts">
+            <xs:import namespace="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes"/>
+            <xs:import
+                    namespace="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts"/>
+            <xs:import namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
+            <xs:complexType name="DebitRequest">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="CurrencyCode" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="Date" type="xs:dateTime"/>
+                    <xs:element minOccurs="0" name="DebitAmount" type="xs:long"/>
+                    <xs:element minOccurs="0" name="DebitReason" type="xs:int"/>
+                    <xs:element minOccurs="0" name="FreePlayID" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="GameID" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="GameMode" type="xs:int"/>
+                    <xs:element minOccurs="0" name="GameSessionID" type="xs:long"/>
+                    <xs:element minOccurs="0" name="GameTypeID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="JPContributions" nillable="true" type="q1:ArrayOfContributionData"
+                                xmlns:q1="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes"/>
+                    <xs:element minOccurs="0" name="JackpotType" nillable="true" type="xs:int"/>
+                    <xs:element minOccurs="0" name="PlayerID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="PlayerSessionID" type="xs:long"/>
+                    <xs:element minOccurs="0" name="RequestReferenceID" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="ServerID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="SideBetAmount" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="TicketID" type="xs:long"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="DebitRequest" nillable="true" type="tns:DebitRequest"/>
+            <xs:complexType name="DebitResponse">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q2:BaseResponse"
+                                  xmlns:q2="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="AvailableBalance" type="xs:long"/>
+                            <xs:element minOccurs="0" name="DebitFundsSource" nillable="true" type="xs:int">
+                                <xs:annotation>
+                                    <xs:appinfo>
+                                        <DefaultValue EmitDefaultValue="false"
+                                                      xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+                                    </xs:appinfo>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" name="FreePlayBalance" nillable="true" type="xs:long"/>
+                            <xs:element minOccurs="0" name="FreePlayWinningAmount" nillable="true" type="xs:long"/>
+                            <xs:element minOccurs="0" name="LimitLeftover" nillable="true" type="xs:long"/>
+                            <xs:element minOccurs="0" name="MessageTextToDisplay" nillable="true" type="xs:string">
+                                <xs:annotation>
+                                    <xs:appinfo>
+                                        <DefaultValue EmitDefaultValue="false"
+                                                      xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+                                    </xs:appinfo>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" name="SessionTotalBets" nillable="true" type="xs:long"/>
+                            <xs:element minOccurs="0" name="SessionTotalWins" nillable="true" type="xs:long"/>
+                            <xs:element minOccurs="0" name="TotalBalance" type="xs:long"/>
+                            <xs:element minOccurs="0" name="UpdatedGameSessionLimit" nillable="true" type="xs:long"/>
+                            <xs:element minOccurs="0" name="WinLimitationRequired" type="xs:boolean"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="DebitResponse" nillable="true" type="tns:DebitResponse"/>
+            <xs:complexType name="CancelDebitRequest">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="Date" type="xs:dateTime"/>
+                    <xs:element minOccurs="0" name="DebitTicketID" type="xs:long"/>
+                    <xs:element minOccurs="0" name="IsGameCanceled" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="PlayerID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="RequestReferenceID" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="ServerID" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="CancelDebitRequest" nillable="true" type="tns:CancelDebitRequest"/>
+            <xs:complexType name="CancelDebitResponse">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q3:BaseResponse"
+                                  xmlns:q3="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="Receipt" type="xs:long"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="CancelDebitResponse" nillable="true" type="tns:CancelDebitResponse"/>
+            <xs:complexType name="UpdateGameStateRequest">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="BetsAmount" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="CarryForwardBetsAmount" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="CreditAmount" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="CurrencyCode" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="Date" type="xs:dateTime"/>
+                    <xs:element minOccurs="0" name="FreePlayID" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="FreePlayWinningAmount" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="GameData" nillable="true" type="q4:GameDataProperties"
+                                xmlns:q4="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts"/>
+                    <xs:element minOccurs="0" name="GameID" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="GameMode" type="xs:int"/>
+                    <xs:element minOccurs="0" name="GameSessionID" type="xs:long"/>
+                    <xs:element minOccurs="0" name="GameString" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="GameTypeID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="JackpotType" nillable="true" type="xs:int"/>
+                    <xs:element minOccurs="0" name="MoneyOnTable" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="PlayerID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="PlayerSessionID" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="RequestReferenceID" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="ServerID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="SumOfCredits" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="SumOfDebits" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="TicketID" type="xs:long"/>
+                    <xs:element minOccurs="0" name="UpdateReason" type="xs:int"/>
+                    <xs:element minOccurs="0" name="WinningsAmount" nillable="true" type="xs:long"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="UpdateGameStateRequest" nillable="true" type="tns:UpdateGameStateRequest"/>
+            <xs:complexType name="UpdateGameStateResponse">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q5:BaseResponse"
+                                  xmlns:q5="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="AlternativeGames" nillable="true" type="q6:ArrayOfint"
+                                        xmlns:q6="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
+                            <xs:element minOccurs="0" name="AvailableBalance" type="xs:long"/>
+                            <xs:element minOccurs="0" name="FreePlayBalance" nillable="true" type="xs:long"/>
+                            <xs:element minOccurs="0" name="FreePlayState" nillable="true" type="xs:int"/>
+                            <xs:element minOccurs="0" name="FreePlayWinnings" nillable="true" type="xs:long"/>
+                            <xs:element minOccurs="0" name="LimitPercentageReminder" type="xs:boolean"/>
+                            <xs:element minOccurs="0" name="SessionTotalBets" nillable="true" type="xs:long"/>
+                            <xs:element minOccurs="0" name="SessionTotalWins" nillable="true" type="xs:long"/>
+                            <xs:element minOccurs="0" name="TotalBalance" type="xs:long"/>
+                            <xs:element minOccurs="0" name="UpdatedGameSessionLimit" nillable="true" type="xs:long"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="UpdateGameStateResponse" nillable="true" type="tns:UpdateGameStateResponse"/>
+            <xs:complexType name="GetAccountBalanceRequest">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="CurrencyCode" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="Date" type="xs:dateTime"/>
+                    <xs:element minOccurs="0" name="FreePlayID" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="GameTypeID" nillable="true" type="xs:int"/>
+                    <xs:element minOccurs="0" name="PlayerID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="PlayerSessionID" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="ServerID" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="GetAccountBalanceRequest" nillable="true" type="tns:GetAccountBalanceRequest"/>
+            <xs:complexType name="GetAccountBalanceResponse">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q7:BaseResponse"
+                                  xmlns:q7="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="AvailableBalance" nillable="true" type="xs:long"/>
+                            <xs:element minOccurs="0" name="ExchangeRateToUSD" type="xs:double"/>
+                            <xs:element minOccurs="0" name="FreePlayBalance" nillable="true" type="xs:long"/>
+                            <xs:element minOccurs="0" name="FreePlayWinning" nillable="true" type="xs:long"/>
+                            <xs:element minOccurs="0" name="RealBR" nillable="true" type="xs:long">
+                                <xs:annotation>
+                                    <xs:appinfo>
+                                        <DefaultValue EmitDefaultValue="false"
+                                                      xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+                                    </xs:appinfo>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" name="TotalBalance" type="xs:long"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="GetAccountBalanceResponse" nillable="true" type="tns:GetAccountBalanceResponse"/>
+            <xs:complexType name="GetFreePlayDetailsRequest">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="Date" type="xs:dateTime"/>
+                    <xs:element minOccurs="0" name="FreePlayID" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="FreePlayTypes" nillable="true" type="q8:ArrayOfint"
+                                xmlns:q8="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
+                    <xs:element minOccurs="0" name="GameTypeID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="PlayerID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="PlayerSessionID" type="xs:long"/>
+                    <xs:element minOccurs="0" name="ServerID" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="GetFreePlayDetailsRequest" nillable="true" type="tns:GetFreePlayDetailsRequest"/>
+            <xs:complexType name="GetFreePlayDetailsResponse">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q9:BaseResponse"
+                                  xmlns:q9="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="AlternativeGames" nillable="true" type="q10:ArrayOfint"
+                                        xmlns:q10="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
+                            <xs:element minOccurs="0" name="CurrentAmount" type="xs:long"/>
+                            <xs:element minOccurs="0" name="FreePlayID" type="xs:long"/>
+                            <xs:element minOccurs="0" name="FreePlayType" type="xs:int"/>
+                            <xs:element minOccurs="0" name="GameTypesList" nillable="true" type="q11:ArrayOfint"
+                                        xmlns:q11="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
+                            <xs:element minOccurs="0" name="MaxBetAmount" type="xs:long"/>
+                            <xs:element minOccurs="0" name="MaxWinningCap" nillable="true" type="xs:long"/>
+                            <xs:element minOccurs="0" name="WinningAmount" type="xs:long"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="GetFreePlayDetailsResponse" nillable="true" type="tns:GetFreePlayDetailsResponse"/>
+            <xs:complexType name="FinishFreePlayDetailsRequest">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="BrandId" type="xs:int"/>
+                    <xs:element minOccurs="0" name="CurrencyCode" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="Date" type="xs:dateTime"/>
+                    <xs:element minOccurs="0" name="FreePlayID" type="xs:long"/>
+                    <xs:element minOccurs="0" name="GameTypeId" type="xs:int"/>
+                    <xs:element minOccurs="0" name="PlayerID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="PlayerSessionId" type="xs:long"/>
+                    <xs:element minOccurs="0" name="ReasonCode" nillable="true" type="xs:int"/>
+                    <xs:element minOccurs="0" name="RegulationType" type="xs:int"/>
+                    <xs:element minOccurs="0" name="ServerID" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="FinishFreePlayDetailsRequest" nillable="true" type="tns:FinishFreePlayDetailsRequest"/>
+            <xs:complexType name="FinishFreePlayDetailsResponse">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q12:BaseResponse"
+                                  xmlns:q12="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes">
+                        <xs:sequence/>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="FinishFreePlayDetailsResponse" nillable="true" type="tns:FinishFreePlayDetailsResponse"/>
+            <xs:complexType name="JackpotWinningRequest">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="CurrencyCode" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="Date" type="xs:dateTime"/>
+                    <xs:element minOccurs="0" name="GameID" type="xs:long"/>
+                    <xs:element minOccurs="0" name="GameMode" type="xs:int"/>
+                    <xs:element minOccurs="0" name="GameSessionID" type="xs:long"/>
+                    <xs:element minOccurs="0" name="GameTypeID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="IsJpLive" nillable="true" type="xs:boolean">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <DefaultValue EmitDefaultValue="false"
+                                              xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="PlayerID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="PlayerSessionID" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="RequestReferenceID" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="ServerID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="TicketID" type="xs:long"/>
+                    <xs:element minOccurs="0" name="WinDetails" nillable="true" type="q13:WinData"
+                                xmlns:q13="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="JackpotWinningRequest" nillable="true" type="tns:JackpotWinningRequest"/>
+            <xs:complexType name="JackpotWinningResponse">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q14:BaseResponse"
+                                  xmlns:q14="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="JPWinAmount" type="xs:long"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="JackpotWinningResponse" nillable="true" type="tns:JackpotWinningResponse"/>
+            <xs:complexType name="GetJackpotAmountRequest">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="BrandID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="CurrencyCode" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="Date" type="xs:dateTime"/>
+                    <xs:element minOccurs="0" name="GameTypeID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="JackpotID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="ServerID" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="GetJackpotAmountRequest" nillable="true" type="tns:GetJackpotAmountRequest"/>
+            <xs:complexType name="GetJackpotAmountResponse">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q15:BaseResponse"
+                                  xmlns:q15="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="CurrencyCode" nillable="true" type="xs:string"/>
+                            <xs:element minOccurs="0" name="JackpotAmount" type="xs:long"/>
+                            <xs:element minOccurs="0" name="LastJPWinAmount" nillable="true" type="xs:long"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="GetJackpotAmountResponse" nillable="true" type="tns:GetJackpotAmountResponse"/>
+            <xs:complexType name="RegulationGameStringReportRequest">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="GameID" type="xs:long"/>
+                    <xs:element minOccurs="0" name="GameResult" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="GameStartDate" nillable="true" type="xs:dateTime"/>
+                    <xs:element minOccurs="0" name="ServerID" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="RegulationGameStringReportRequest" nillable="true"
+                        type="tns:RegulationGameStringReportRequest"/>
+            <xs:complexType name="RegulationGameStringReportResponse">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q16:BaseResponse"
+                                  xmlns:q16="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes">
+                        <xs:sequence/>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="RegulationGameStringReportResponse" nillable="true"
+                        type="tns:RegulationGameStringReportResponse"/>
+            <xs:complexType name="GetPlayerLastGamingActivityTimeRequest">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="PlayerID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="PlayerSessionID" type="xs:long"/>
+                    <xs:element minOccurs="0" name="SystemID" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="GetPlayerLastGamingActivityTimeRequest" nillable="true"
+                        type="tns:GetPlayerLastGamingActivityTimeRequest"/>
+            <xs:complexType name="GetPlayerLastGamingActivityTimeResponse">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q17:BaseResponse"
+                                  xmlns:q17="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="LastActivityDate" nillable="true" type="xs:dateTime"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="GetPlayerLastGamingActivityTimeResponse" nillable="true"
+                        type="tns:GetPlayerLastGamingActivityTimeResponse"/>
+        </xs:schema>
+        <xs:schema elementFormDefault="qualified"
+                   targetNamespace="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   xmlns:tns="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes">
+            <xs:complexType name="ArrayOfContributionData">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="ContributionData" nillable="true"
+                                type="tns:ContributionData"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ArrayOfContributionData" nillable="true" type="tns:ArrayOfContributionData"/>
+            <xs:complexType name="ContributionData">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="ContributionAmount" type="xs:double"/>
+                    <xs:element minOccurs="0" name="ContributionPercentage" type="xs:double"/>
+                    <xs:element minOccurs="0" name="JackpotID" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ContributionData" nillable="true" type="tns:ContributionData"/>
+            <xs:complexType name="BaseResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="ErrorCode" type="xs:int"/>
+                    <xs:element minOccurs="0" name="ErrorDescription" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="BaseResponse" nillable="true" type="tns:BaseResponse"/>
+        </xs:schema>
+        <xs:schema elementFormDefault="qualified"
+                   targetNamespace="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   xmlns:tns="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts">
+            <xs:import namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
+            <xs:complexType name="GameDataProperties">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="AutoPlayCycleID" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="BigWinAmount" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="BonusGamesNames" nillable="true" type="q1:ArrayOfstring"
+                                xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
+                    <xs:element minOccurs="0" name="ChillVersion" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="ChosenPayline" nillable="true" type="xs:int"/>
+                    <xs:element minOccurs="0" name="Coins" nillable="true" type="xs:int"/>
+                    <xs:element minOccurs="0" name="CurrentAPRoundNumber" type="xs:int"/>
+                    <xs:element minOccurs="0" name="CurrentAutoPlayNetLoss" type="xs:long"/>
+                    <xs:element minOccurs="0" name="ExtraBetAmount" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="ExtraBetType" nillable="true" type="xs:int"/>
+                    <xs:element minOccurs="0" name="FreePlayType" type="xs:int"/>
+                    <xs:element minOccurs="0" name="FreeSpinTrigger" nillable="true" type="q2:ArrayOfstring"
+                                xmlns:q2="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
+                    <xs:element minOccurs="0" name="GameClientVersion" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="GameEndDate" nillable="true" type="xs:dateTime"/>
+                    <xs:element minOccurs="0" name="GameFinishedAction" nillable="true" type="xs:int"/>
+                    <xs:element minOccurs="0" name="GamePlatform" nillable="true" type="xs:int"/>
+                    <xs:element minOccurs="0" name="GameStartDate" nillable="true" type="xs:dateTime"/>
+                    <xs:element minOccurs="0" name="IsAutoPlay" nillable="true" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="IsJPInGame" nillable="true" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="IsJPWon" nillable="true" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="JPTotalContribution" nillable="true" type="xs:double"/>
+                    <xs:element minOccurs="0" name="JPWinAmount" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="LiveDealer" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="MoneyRemaining" nillable="true" type="xs:double"/>
+                    <xs:element minOccurs="0" name="NetLostAutoPlayLimit" type="xs:long"/>
+                    <xs:element minOccurs="0" name="NumOfFreeSpinsWon" nillable="true" type="xs:int"/>
+                    <xs:element minOccurs="0" name="NumberOfBonusRounds" nillable="true" type="xs:int"/>
+                    <xs:element minOccurs="0" name="NumberOfFreeSpins" nillable="true" type="xs:int"/>
+                    <xs:element minOccurs="0" name="NumberOfHands" nillable="true" type="xs:int"/>
+                    <xs:element minOccurs="0" name="NumberOfRounds" nillable="true" type="xs:int"/>
+                    <xs:element minOccurs="0" name="PlayedDoubleUpRoundsQuantity" nillable="true" type="xs:int"/>
+                    <xs:element minOccurs="0" name="RouletteResult" nillable="true" type="xs:int"/>
+                    <xs:element minOccurs="0" name="StateId" nillable="true" type="xs:int"/>
+                    <xs:element minOccurs="0" name="TableFee" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="TableGameCycleID" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="TableName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="TestCaseId" type="xs:int"/>
+                    <xs:element minOccurs="0" name="TestId" type="xs:int"/>
+                    <xs:element minOccurs="0" name="TotalAPRounds" type="xs:int"/>
+                    <xs:element minOccurs="0" name="WinAutoPlayLimit" type="xs:long"/>
+                    <xs:element minOccurs="0" name="WinCombinationId" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="GameDataProperties" nillable="true" type="tns:GameDataProperties"/>
+            <xs:complexType name="WinData">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="JackpotID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="WinType" type="xs:int"/>
+                    <xs:element minOccurs="0" name="WinValue" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="WinData" nillable="true" type="tns:WinData"/>
+        </xs:schema>
+        <xs:schema elementFormDefault="qualified"
+                   targetNamespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   xmlns:tns="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+            <xs:complexType name="ArrayOfstring">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ArrayOfstring" nillable="true" type="tns:ArrayOfstring"/>
+            <xs:complexType name="ArrayOfint">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="int" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ArrayOfint" nillable="true" type="tns:ArrayOfint"/>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="IWallet_Debit_InputMessage">
+        <wsdl:part name="parameters" element="tns:Debit"/>
+    </wsdl:message>
+    <wsdl:message name="IWallet_Debit_OutputMessage">
+        <wsdl:part name="parameters" element="tns:DebitResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IWallet_CancelDebit_InputMessage">
+        <wsdl:part name="parameters" element="tns:CancelDebit"/>
+    </wsdl:message>
+    <wsdl:message name="IWallet_CancelDebit_OutputMessage">
+        <wsdl:part name="parameters" element="tns:CancelDebitResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IWallet_UpdateGameState_InputMessage">
+        <wsdl:part name="parameters" element="tns:UpdateGameState"/>
+    </wsdl:message>
+    <wsdl:message name="IWallet_UpdateGameState_OutputMessage">
+        <wsdl:part name="parameters" element="tns:UpdateGameStateResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IWallet_GetAccountBalance_InputMessage">
+        <wsdl:part name="parameters" element="tns:GetAccountBalance"/>
+    </wsdl:message>
+    <wsdl:message name="IWallet_GetAccountBalance_OutputMessage">
+        <wsdl:part name="parameters" element="tns:GetAccountBalanceResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IWallet_GetFreePlayDetails_InputMessage">
+        <wsdl:part name="parameters" element="tns:GetFreePlayDetails"/>
+    </wsdl:message>
+    <wsdl:message name="IWallet_GetFreePlayDetails_OutputMessage">
+        <wsdl:part name="parameters" element="tns:GetFreePlayDetailsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IWallet_FinishFreePlayDetails_InputMessage">
+        <wsdl:part name="parameters" element="tns:FinishFreePlayDetails"/>
+    </wsdl:message>
+    <wsdl:message name="IWallet_FinishFreePlayDetails_OutputMessage">
+        <wsdl:part name="parameters" element="tns:FinishFreePlayDetailsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IWallet_JackpotWinning_InputMessage">
+        <wsdl:part name="parameters" element="tns:JackpotWinning"/>
+    </wsdl:message>
+    <wsdl:message name="IWallet_JackpotWinning_OutputMessage">
+        <wsdl:part name="parameters" element="tns:JackpotWinningResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IWallet_GetJackpotAmount_InputMessage">
+        <wsdl:part name="parameters" element="tns:GetJackpotAmount"/>
+    </wsdl:message>
+    <wsdl:message name="IWallet_GetJackpotAmount_OutputMessage">
+        <wsdl:part name="parameters" element="tns:GetJackpotAmountResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IWallet_RegulationGameStringReport_InputMessage">
+        <wsdl:part name="parameters" element="tns:RegulationGameStringReport"/>
+    </wsdl:message>
+    <wsdl:message name="IWallet_RegulationGameStringReport_OutputMessage">
+        <wsdl:part name="parameters" element="tns:RegulationGameStringReportResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IWallet_GetPlayerLastGamingActivityTime_InputMessage">
+        <wsdl:part name="parameters" element="tns:GetPlayerLastGamingActivityTime"/>
+    </wsdl:message>
+    <wsdl:message name="IWallet_GetPlayerLastGamingActivityTime_OutputMessage">
+        <wsdl:part name="parameters" element="tns:GetPlayerLastGamingActivityTimeResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IWallet_IsAlive_InputMessage">
+        <wsdl:part name="parameters" element="tns:IsAlive"/>
+    </wsdl:message>
+    <wsdl:message name="IWallet_IsAlive_OutputMessage">
+        <wsdl:part name="parameters" element="tns:IsAliveResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="IWallet">
+        <wsdl:operation name="Debit">
+            <wsdl:input wsaw:Action="http://tempuri.org/IWallet/Debit" message="tns:IWallet_Debit_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IWallet/DebitResponse"
+                         message="tns:IWallet_Debit_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="CancelDebit">
+            <wsdl:input wsaw:Action="http://tempuri.org/IWallet/CancelDebit"
+                        message="tns:IWallet_CancelDebit_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IWallet/CancelDebitResponse"
+                         message="tns:IWallet_CancelDebit_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="UpdateGameState">
+            <wsdl:input wsaw:Action="http://tempuri.org/IWallet/UpdateGameState"
+                        message="tns:IWallet_UpdateGameState_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IWallet/UpdateGameStateResponse"
+                         message="tns:IWallet_UpdateGameState_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetAccountBalance">
+            <wsdl:input wsaw:Action="http://tempuri.org/IWallet/GetAccountBalance"
+                        message="tns:IWallet_GetAccountBalance_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IWallet/GetAccountBalanceResponse"
+                         message="tns:IWallet_GetAccountBalance_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetFreePlayDetails">
+            <wsdl:input wsaw:Action="http://tempuri.org/IWallet/GetFreePlayDetails"
+                        message="tns:IWallet_GetFreePlayDetails_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IWallet/GetFreePlayDetailsResponse"
+                         message="tns:IWallet_GetFreePlayDetails_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="FinishFreePlayDetails">
+            <wsdl:input wsaw:Action="http://tempuri.org/IWallet/FinishFreePlayDetails"
+                        message="tns:IWallet_FinishFreePlayDetails_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IWallet/FinishFreePlayDetailsResponse"
+                         message="tns:IWallet_FinishFreePlayDetails_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="JackpotWinning">
+            <wsdl:input wsaw:Action="http://tempuri.org/IWallet/JackpotWinning"
+                        message="tns:IWallet_JackpotWinning_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IWallet/JackpotWinningResponse"
+                         message="tns:IWallet_JackpotWinning_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetJackpotAmount">
+            <wsdl:input wsaw:Action="http://tempuri.org/IWallet/GetJackpotAmount"
+                        message="tns:IWallet_GetJackpotAmount_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IWallet/GetJackpotAmountResponse"
+                         message="tns:IWallet_GetJackpotAmount_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="RegulationGameStringReport">
+            <wsdl:input wsaw:Action="http://tempuri.org/IWallet/RegulationGameStringReport"
+                        message="tns:IWallet_RegulationGameStringReport_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IWallet/RegulationGameStringReportResponse"
+                         message="tns:IWallet_RegulationGameStringReport_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetPlayerLastGamingActivityTime">
+            <wsdl:input wsaw:Action="http://tempuri.org/IWallet/GetPlayerLastGamingActivityTime"
+                        message="tns:IWallet_GetPlayerLastGamingActivityTime_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IWallet/GetPlayerLastGamingActivityTimeResponse"
+                         message="tns:IWallet_GetPlayerLastGamingActivityTime_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="IsAlive">
+            <wsdl:input wsaw:Action="http://tempuri.org/IWallet/IsAlive" message="tns:IWallet_IsAlive_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IWallet/IsAliveResponse"
+                         message="tns:IWallet_IsAlive_OutputMessage"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="BasicHttpBinding_IWallet" type="tns:IWallet">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="Debit">
+            <soap:operation soapAction="http://tempuri.org/IWallet/Debit" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="CancelDebit">
+            <soap:operation soapAction="http://tempuri.org/IWallet/CancelDebit" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="UpdateGameState">
+            <soap:operation soapAction="http://tempuri.org/IWallet/UpdateGameState" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="GetAccountBalance">
+            <soap:operation soapAction="http://tempuri.org/IWallet/GetAccountBalance" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="GetFreePlayDetails">
+            <soap:operation soapAction="http://tempuri.org/IWallet/GetFreePlayDetails" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="FinishFreePlayDetails">
+            <soap:operation soapAction="http://tempuri.org/IWallet/FinishFreePlayDetails" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="JackpotWinning">
+            <soap:operation soapAction="http://tempuri.org/IWallet/JackpotWinning" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="GetJackpotAmount">
+            <soap:operation soapAction="http://tempuri.org/IWallet/GetJackpotAmount" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="RegulationGameStringReport">
+            <soap:operation soapAction="http://tempuri.org/IWallet/RegulationGameStringReport" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="GetPlayerLastGamingActivityTime">
+            <soap:operation soapAction="http://tempuri.org/IWallet/GetPlayerLastGamingActivityTime" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="IsAlive">
+            <soap:operation soapAction="http://tempuri.org/IWallet/IsAlive" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="CasinoWallet">
+        <wsdl:port name="BasicHttpBinding_IWallet" binding="tns:BasicHttpBinding_IWallet">
+            <soap:address location="http://mrg-real-financialcasino.production-qa.com/CasinoWallet.svc"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

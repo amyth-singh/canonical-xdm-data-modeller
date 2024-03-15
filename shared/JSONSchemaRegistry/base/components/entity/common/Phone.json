@@ -1,0 +1,113 @@
+{
+  "PhoneObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/PhoneProperties"
+    }
+  },
+  "PhoneProperties": {
+    "type": "object",
+    "oneOf": [
+      {
+        "required": [
+          "PhoneLocal"
+        ]
+      },
+      {
+        "required": [
+          "PhoneInternational"
+        ]
+      }
+    ],
+    "unevaluatedProperties": false,
+    "properties": {
+      "PhoneId": {
+        "type": "string",
+        "description": "The canonical (synthetic) Xfuze phone id for the phone if identifiable and has some unique key e.g Phone_D365_123456"
+      },
+      "PhoneNumber": {
+        "type": "string",
+        "description": "The native phone number (key not user number) of the phone if identifiable and has some unique key e.g 123456"
+      },
+      "PhoneType": {
+        "type": "string",
+        "description": "The type of the address",
+        "enum": [
+          "Landline",
+          "Mobile",
+          "Fax",
+          "Other"
+        ]
+      },
+      "PhonePurpose": {
+        "type": "string",
+        "description": "The purpose of the usage of the address",
+        "enum": [
+          "Billing",
+          "Invoice",
+          "Delivery",
+          "Contact",
+          "Customer",
+          "Shipping",
+          "ReturnExchange",
+          "Store",
+          "Warehouse",
+          "Marketing",
+          "LegitimateInterest",
+          "Supplier",
+          "Franchisee",
+          "Employee",
+          "PhysicalEvent",
+          "DropOff",
+          "Collection",
+          "LogisticsPoint",
+          "Other"
+        ]
+      },
+      "PhoneLocal": {
+        "type": "string",
+        "description": "The actual phone number, in local format (i.e without international prefix)"
+      },
+      "PhoneInternational": {
+        "type": "string",
+        "description": "The actual phone number, in international format (i.e with international prefix)"
+      },
+      "CountryPrefix": {
+        "type": "string",
+        "description": "The CountryPrefix e.g +44"
+      },
+      "IsMobile": {
+        "type": "string",
+        "description": "Is this phone a mobile one? e.g Y",
+        "enum": [
+          "Y","N","U"
+        ]
+      },
+      "IsPrimary": {
+        "type": "string",
+        "description": "Is this phone a primary one? e.g Y",
+        "enum": [
+          "Y","N","U"
+        ]
+      },
+      "IsVerified": {
+        "type": "string",
+        "description": "Is this phone verified by an official phone lookup / validator? e.g Y",
+        "enum": [
+          "Y","N","U"
+        ]
+      },
+      "IsEncrypted": {
+        "type": "string",
+        "description": "Is this phone encrypted? e.g Y",
+        "enum": [
+          "Y","N","U"
+        ]
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "LineIdsObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/LineIdsProperties"
+    }
+  },
+  "LineIdsProperties": {
+    "type": "object",
+    "description": "A generic object for capturing all purchase order ids as a common set",
+    "unevaluatedProperties": false,
+    "properties": {
+      "PurchaseOrderLineId": {
+        "type": "string",
+        "description": "The (required) PurchaseOrderLineId Id, in Xfuze canonical form, identifying this purchase order line amongst other lines, in the form of PurchaseOrderLine::[type]_[sourceSystem]_[PurchaseOrderLineKey] e.g PurchaseOrder::Sale_PMC_123456789_1"
+      },
+      "PurchaseOrderLineKey": {
+        "type": "string",
+        "description": "The (required) 'natural' purchase order line number, typically either a combination of PurchaseOrderNumber & a 'sequence number' (derived) OR explicitly supplied unique Id from source - also used to construct the synthetic SOL Xfuze Ids. e.g 123456789_1"
+      },
+      "OriginalPurchaseOrderLineId": {
+        "type": "number",
+        "description": "The PurchaseOrderLineId Id, in Xfuze canonical form, identifying an 'original' purchase order, in the form of PurchaseOrder::[type]_[sourceSystem]_[OriginalPurchaseOrderKey] e.g PurchaseOrder::Sale_PMC_987654321"
+      },
+      "OriginalPurchaseOrderLineKey": {
+        "type": "string",
+        "description": "The original 'natural' purchase order 'key' / 'number', typically as a way to link related orders together the can be physically seperate and need a linking e.g Return,Exchange,"
+      },
+      "PurchaseOrderLineProductKey": {
+        "type": "string",
+        "description": "An alternate Purchase oder line number, often a combination of PurchaseOrderNumber & a 'product number' (e.g SKU, EAN) - oftent o support grouping of unit SOLs by product number for aggregate Xfuze SOLs."
+      },
+      "PurchaseOrderIds": {
+        "$ref": "../../common/OrderIds.json#/OrderIdsProperties",
+        "description": "The (required) common set of order Ids for this order, not all a required individually, only what can be mapped & derived"
+      }
+    },
+    "required": ["PurchaseOrderId","PurchaseOrderNumber","PurchaseOrderLineId","PurchaseOrderLineKey"]
+  }
+}

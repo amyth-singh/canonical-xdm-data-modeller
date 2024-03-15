@@ -1,0 +1,339 @@
+(
+    $formatValue := function($value, $dType, $format){(
+        $formatString := $string ~> $trim;
+        $formatNumber := function($num){$type($num) = "number" ? $num : $type($num) = "string" ? $contains($num,/^-?\d+(\.\d+)?$/) ? $number($num) : null};
+        $formatDateTime := function($dt,$format) {(
+            $dateTimeRegexMap := {"[Y0001]-[M01]-[D01] [H01]:[m01]:[s01] [P]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]) (AM|PM)$/,
+                                  "[Y0001]-[M01]-[D01] [H01]:[m01]:[s01].[f001]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]).\d{3}$/,
+                                  "[M01]/[D01]/[Y0001]":/^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/[1-9][0-9]{3}$/,
+                                  "ISO8601":/^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d)(\.\d+)?([+-]([01]\d|2[0-3]):([0-5]\d)|Z)$/
+                                 };
+            $dateTimeFormatValidator := function($datetime,$dateTimeFormat){$exists($dateTimeFormat) ? $contains($datetime,$lookup($dateTimeRegexMap,$dateTimeFormat)): $contains($datetime,$lookup($dateTimeRegexMap,"ISO8601"))};
+
+            $exists($dt) ? $dateTimeFormatValidator($dt,$format) ? $exists($format) ? $fromMillis($toMillis($dt,$format)) : $fromMillis($toMillis($dt)) : null;
+            )};
+
+        $formatStringBool := function($value,$format){(
+          $stringBoolMap := {"Y":"Y","YES":"Y","1":"Y","TRUE":"Y","N":"N","0":"N","FALSE":"N","NO":"N"};
+          $upperTrim := $string ~> $trim ~> $uppercase;
+          $stringBool := function($v){$exists($value)?$lookup($stringBoolMap, $upperTrim($value)):""};
+          $reverseBool := function($v){$v = "Y" ? "N" : $v = "N" ? "Y" : "U"};
+          $type($format)="null" ? $value ~> $stringBool : $format="reverse" ? $value ~> $stringBool ~> $reverseBool : null
+        )};
+
+        $dType = "TIMESTAMP"  ? $formatDateTime($value,$format) :
+        $dType = "STRINGBOOL" ? $formatStringBool($value,$format) :
+        $dType = "NUMERIC"    ? $formatNumber($value) :
+        $dType = "STRING"     ? $formatString($value) :
+        null;
+    )};
+
+    /* JW: need to handle better comparison of IsValueChanged */
+    $buildCustomAttribute := function($entityCode,$attributeId,$canonicalCode,$name,$value,$valueBefore,$isValueChanged,$rawValue,$rawValueBefore,$dType,$dFormat,$eot,$eventId, $isSensitive, $isEncrypted){(
+        $buildAttributeID := function($entityCode,$canonicalCode,$attributeId){$entityCode & "_" & $replace($canonicalCode,".","_") & ($type($attributeId) = "null" ? "" : "_" & $attributeId)};
+
+        {
+         "Id":$buildAttributeID($entityCode,$canonicalCode,$attributeId),
+         "Code":$canonicalCode,
+         "Name":$name,
+         "Value": $value != null ? $formatValue($value,$dType,$dFormat) : NULL,
+         "ValueBefore":$valueBefore != null ? $formatValue($valueBefore,$dType,$dFormat) : NULL,
+         /* TODO: "IsValueChanged":(($formatValue($value,$dType,$dFormat) != $formatValue($valueBefore,$dType,$dFormat) or $isValueChanged = "Y") ? "Y" : null),*/
+         "RawValue":$rawValue != null ? $formatValue($rawValue,$dType,$dFormat) : NULL,
+         "RawValueBefore":$rawValueBefore != null ? $formatValue($rawValueBefore,$dType,$dFormat) : NULL,
+         /* TODO: "IsRawValueChanged":($rawValue != $rawValueBefore or $isValueChanged = NULL ? "Y" : "N"), */
+         "IsSensitive":$isSensitive != null ? $isSensitive : NULL,
+         "IsEncrypted":$isEncrypted != null ? $isEncrypted : NULL,
+         "Type": $dType = "STRING" ? NULL : $dType, /* default = STRING if not present, saves on space*/
+         "AsOf":$eot,
+         "EventId":$eventId};
+         )
+    };
+
+    $buildCustomEventMetadataAttribute := function($canonicalCode,$name,$value,$dType,$dFormat,$isSensitive, $isEncrypted)  {
+        {
+         "Code":$canonicalEventMetadataCodePrefix & "." & $canonicalCode,
+         "Value":$formatValue($value,$dType,$dFormat),
+         "IsSensitive":$isSensitive != null ? $isSensitive : NULL,
+         "IsEncrypted":$isEncrypted != null ? $isEncrypted : NULL,
+         "Type": $dType = "STRING" ? NULL : $dType /* default = STRING if not present, saves on space*/
+         }
+    };
+
+    $clientCode := "CDR";
+    $sourceSystem := "DW";
+    $canonicalCodePrefix:= "Location";
+    $canonicalEventMetadataCodePrefix:= "EventMetadata";
+    $tsFormat := "[Y0001]-[M01]-[D01] [H01]:[m01]:[s01].[f001]";
+    $tsIsoFormat := "YYYY-mm-DD HH:MM:SS.mmm";
+
+
+    /* Event Metadata / Info */
+    $rawSourceSystem := "Catalyst";
+    $rawSourceSystemOrg := "CDR"; /* 888,WH,MRG */
+    $rawSourceSystemFull := $rawSourceSystemOrg & $rawSourceSystem;
+    $rawSourceTimeZone := "Europe/London";
+    $rawEventOccurredTimestamp := $formatValue(dt,"STRING") & "T00:00:00.000Z"; /*  EventDateTime seems to be source event sent time? */
+    $rawEventOccurredTimestampField := "dt"; /*  EventDateTime seems to be source event sent time? */
+    $rawEventReceivedTimestamp := "";
+    $rawEntityId := $formatValue(Cat_Number,"STRING");
+    $rawParentEntityId := NULL;
+    $rawEventId := EventID;
+    $rawEventName := EventName;
+
+    $eventDomain := "Location";
+    $eventCategory := "ForecourtLocation";
+    $eventChangePattern := "FullSnapshot";
+    $eventClass := "Trigger";
+    $eventPriority := 5;
+    $defaultEventVerb := "Published";
+    $entityType := "SiteLocation";
+    $parentEntityType := NULL;
+    $entityCode := ($entityType & "_" & $rawSourceSystemFull & "_" & $rawEntityId);
+    $entityId := $entityCode;
+    $parentEntityId := ($parentEntityType != NULL ? $parentEntityId :  NULL);
+    $eventName := "SiteLocationPublished"; /* convert to Xfuze eventName?*/
+    $entityIsSensitive := "N";
+    $eventOccurredType := "IngestEventTime"; /* using DepositStatusChangeDateTime not EventDateTime as that seems to be when event sent */
+    $eventOccurredLocalTimeZone = $rawSourceTimeZone;
+    $eventOccurredTimestamp := ($rawEventOccurredTimestamp = null ? "" : $rawEventOccurredTimestamp);
+    $eventProcessedTimestamp := "";
+    $eventReceivedTimestamp := ($rawEventReceivedTimestamp = null ? "" : $rawEventReceivedTimestamp);
+    $eventId := $eventName & "_" & $entityCode & "_" & $eventOccurredTimestamp;
+    $siteId := "Location_" & $rawSourceSystem & "_" & $formatValue(Cat_Number,"STRING");
+
+    /* TODO doesnt work for +01:00 embedded timetamps */
+    $getDateDimFn := function($dt,$isUTC,$tz,$format) {$exists($dt) ? $dateTimeFormatValidator($dt,$format) ?
+    {
+          "DateId": $fromMillis($toMillis($dt,$format),"[Y0001][M01][D01]"),
+          "TimestampUTC": ($isUTC ? $dt : NULL),
+          "DateUTC": ($isUTC ? $dt : NULL), /* TODO convert to date */
+          "TimeZone": ($tz != null ? $tz : $rawSourceTimeZone),
+          "DateTimeLocal": $fromMillis($toMillis($dt,$format)),
+          "DateLocal": $fromMillis($toMillis($dt,$format),"[Y0001]-[M01]-[D01]"),
+          "HourId": $fromMillis($toMillis($dt,$format),"[H01]"),
+          "Millis": $toMillis($dt,$format)
+    }
+    : NULL
+  };
+
+/* Core Event mapping */
+/* NOTE: Need key top level fields concrete (i.e not just in EventMetadata array) to enable phsyical storage optimisations with PK/CK/Indexing */
+{
+  "EventId": $eventId,
+  "EventName": $eventName,
+  "EntityId": $entityId,
+  "ParentEntityId": ($parentEntityId != NULL ? $parentEntityId :  null),
+  "LocationId": $customerId,
+  "AccountId": $accountId,
+  "SessionId": $sessionId,
+  "EventOccurredTimestamp": $eventOccurredTimestamp, /* TODO: not using formatValue */
+
+  /* Consistent core event metadata */
+  "EventMetadata" : [
+    /* -----EventAtts----- */
+    /* canonical event atts: key event level features/atts defining core context related to the change event*/
+    $buildCustomEventMetadataAttribute("EventAtts.EventId","EventId",$eventId,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EventAtts.EventDomain","EventDomain",$eventDomain,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EventAtts.EventCategory","EventCategory",$eventCategory,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EventAtts.EventName","EventName",$eventName,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EventAtts.EventClass","EventClass",$eventClass,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EventAtts.EventChangePattern","EventChangePattern",$eventChangePattern,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EventAtts.ClientCode","ClientCode",$clientCode,"STRING",$tsFormat,NULL,NULL),
+
+    /* raw source event atts: key raw event level atts, from source/trigger event, defining core context related to the raw change event*/
+    $buildCustomEventMetadataAttribute("EventAtts.RawSourceSystemFullCode","RawSourceSystemFullCode",$rawSourceSystemFull,"STRING",$tsFormat,NULL,NULL),
+
+    /* -----EntityAtts----- */
+    /* entity atts: key entity features/atts contextualising the entity subject to change from the event*/
+    $buildCustomEventMetadataAttribute("EntityAtts.EntityId","EntityId",$entityId,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EntityAtts.EntityType","EntityType",$entityType,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EntityAtts.IsSensitiveEntity","IsSensitiveEntity",$entityIsSensitive,"STRING",$tsFormat,NULL,NULL),
+
+    /* raw source entity atts: key raw event level atts, from source/trigger event, defining core context related to the raw change event*/
+    $buildCustomEventMetadataAttribute("EntityAtts.RawEntityId","RawEntityId",$rawEntityId,"STRING",$tsFormat,NULL,NULL),
+    /* -----TimeAtts----- */
+    /* time atts: key event 'time' features/atts contextualising the entity subject to change from the event*/
+    $buildCustomEventMetadataAttribute("TimeAtts.EventOccurredTimestamp","EventOccurredTimestamp",$eventOccurredTimestamp,"STRING",$tsFormat,NULL,NULL),
+    /*$buildCustomEventMetadataAttribute("TimeAtts.EventOccurredDateDim","EventOccurredDateDim", $getDateDimFn($eventOccurredTimestamp,false,$rawSourceTimeZone,$tsIsoFormat),"STRING",$tsFormat,NULL,NULL),*/
+    $buildCustomEventMetadataAttribute("TimeAtts.EventOccurredType","EventOccurredType",$eventOccurredType,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("TimeAtts.EventOccurredLocalTimeZone","EventOccurredLocalTimeZone",$rawSourceTimeZone,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("TimeAtts.EventReceivedTimestamp","EventReceivedTimestamp",$eventReceivedTimestamp,"TIMESTAMP",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("TimeAtts.ExternalEventReceivedTimestamp","ExternalEventReceivedTimestamp",NULL,"TIMESTAMP",$tsFormat,NULL,NULL),
+
+    /* raw source time atts: key raw event level time based atts, from source/trigger event, defining core context related to the raw change event*/
+    $buildCustomEventMetadataAttribute("TimeAtts.RawEventOccurredTimestamp","RawEventOccurredTimestamp",$rawEventOccurredTimestamp,"TIMESTAMP",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("TimeAtts.RawEventOccurredTimestampFieldName","RawEventOccurredTimestampFieldName",$rawEventOccurredTimestampField,"STRING",$tsFormat,NULL,NULL),
+
+    /* -----ProduductAtts----- */
+    /* product atts: key event 'location' based features/atts contextualising the entity subject to change from the event*/
+    $buildCustomEventMetadataAttribute("LocationAtts.LocationId","LocationId",$entityId,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("LocationAtts.LocationNumber","LocationNumber",$rawEntityId,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("LocationAtts.CountryISO2Code","CountryISO2Code",$uppercase(Country_Code),"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("LocationAtts.InvolvedReasonCode","InvolvedReasonCode","SiteLocation","STRING",$tsFormat,NULL,NULL)
+
+    /* raw source product / brand atts: key raw event level product based atts, from source/trigger event, defining core context related to the raw change event*/
+    /*$buildCustomEventMetadataAttribute("ProductAtts.BrandId","BrandId",$mapRawBrandIdXrefFn($string(BrandID)),"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("ProductAtts.SubBrandId","SubBrandId",$mapRawSubBrandIdXrefFn($string(SubBrandID)),"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("ProductAtts.ProductId","ProductId",$mapRawProductPackageIDXrefFn($string(ProductPackageID)),"STRING",$tsFormat,NULL,NULL)*/
+
+  ],
+
+  /* Business entity data subject of the event change */
+  "EventData" : [
+      /* Site Attributes: forecourt site attributers such as id, type, status etc */
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".CompanyBrandAtts.CompanyName","CompanyBrandAtts.CompanyName",$formatValue(Company_Name,"STRING"),null,null,$formatValue(Company_Name,"STRING"),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".CompanyBrandAtts.Brand.Code","CompanyBrandAtts.Brand.Code",$formatValue(Brand,"STRING"),null,null,$formatValue(Brand,"STRING"),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".CompanyBrandAtts.ShareBrand.Code","CompanyBrandAtts.ShareBrand.Code",$formatValue(Share_Brand,"STRING"),null,null,$formatValue(Share_Brand,"STRING"),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".CompanyBrandAtts.ContactProfile.Telephone","CompanyBrandAtts.ContactProfile.Telephone",$formatValue(Telephone,"STRING"),null,null,$formatValue(Telephone,"STRING"),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+
+      /* Site Attributes: forecourt site attributers such as id, type, status etc */
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".SiteAtts.SiteId","SiteAtts.SiteId",$entityId,null,null,$rawEntityId,null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null), /* TODO: should be timestamp */
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".SiteAtts.SiteNumber","SiteAtts.SiteNumber",$rawEntityId,null,null,$rawEntityId,null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null), /* TODO: should be timestamp */
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".SiteAtts.Quality.Code","SiteAtts.Quality.Code",$formatValue(Quality,"STRING"),null,null,$formatValue(Quality,"STRING"),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".SiteAtts.LocationType.TypeCode","SiteAtts.LocationType.TypeCode",$formatValue(Location_Type,"STRING"),null,null,$string(Location_Type),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null), /* TODO: should be timestamp */
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".SiteAtts.SiteType.TypeCode","SiteAtts.SiteType.TypeCode",$formatValue(Site_Type,"STRING"),null,null,$string(Site_Type),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null), /* TODO: should be timestamp */
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".SiteAtts.SiteOwnership","SiteAtts.SiteOwnership",$formatValue(Ownership,"STRING"),null,null,$string(Ownership),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null), /* TODO: should be timestamp */
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".SiteAtts.SiteStatus.StatusCode","SiteAtts.SiteStatus.StatusCode",$formatValue(Site_Status,"STRING"),null,null,$string(Site_Status),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null), /* TODO: should be timestamp */
+
+      /* Shop Attributes: retail shopping atts */
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ShopAtts.ShopType.Code","ShopAtts.ShopType.Code",$formatValue(Shop_Type,"STRING"),null,null,$string(Shop_Type),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ShopAtts.IsShop","ShopAtts.IsShop",$formatValue(Shop,"STRINGBOOL"),null,null,$string(Shop),null,"STRINGBOOL",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ShopAtts.Brand.Code","ShopAtts.Brand.Code",$formatValue(Shop_Brand,"STRING"),null,null,$string(Shop_Brand),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ShopAtts.Area","ShopAtts.Area",$formatValue(Shop_Area,"STRING"),null,null,$string(Shop_Area),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ShopAtts.Sales","ShopAtts.Sales",$formatValue(Shop_Sales,"STRING"),null,null,$string(Shop_Sales),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ShopAtts.Quality","ShopAtts.Quality",$formatValue(Shop_Quality,"STRING"),null,null,$string(Shop_Quality),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ShopAtts.Competition","ShopAtts.Competition",$formatValue(Shop_Competition,"STRING"),null,null,$string(Shop_Competition),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ShopAtts.DevelopmentYear","ShopAtts.DevelopmentYear",$formatValue(Development_Year,"STRING"),null,null,$string(Development_Year),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+
+      /* FuelSelling Attributes: fuel types, num pumps and num positions */
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".FuelSellingAtts.HasPetrol","FuelSellingAtts.HasPetrol",$formatValue(Petrol,"STRINGBOOL"),null,null,$string(Petrol),null,"STRINGBOOL",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".FuelSellingAtts.HasDiesel","FuelSellingAtts.HasDiesel",$formatValue(Diesel,"STRINGBOOL"),null,null,$string(Diesel),null,"STRINGBOOL",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".FuelSellingAtts.HasLPG","FuelSellingAtts.HasLPG",$formatValue(LPG,"STRINGBOOL"),null,null,$string(LPG),null,"STRINGBOOL",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".FuelSellingAtts.HasOtherFuel","FuelSellingAtts.HasOtherFuel",$formatValue(Other_Fuel,"STRINGBOOL"),null,null,$string(Other_Fuel),null,"STRINGBOOL",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".FuelSellingAtts.NumMFPumps","FuelSellingAtts.NumMFPumps",$formatValue(MF_Pumps,"STRING"),null,null,$string(MF_Pumps),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".FuelSellingAtts.NumMFPositions","FuelSellingAtts.NumMFPositions",$formatValue(MF_Positions,"STRING"),null,null,$string(MF_Positions),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".FuelSellingAtts.NumHGVPumps","FuelSellingAtts.NumHGVPumps",$formatValue(HGV_Pumps,"STRING"),null,null,$string(HGV_Pumps),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".FuelSellingAtts.NumHGVPositions","FuelSellingAtts.NumHGVPositions",$formatValue(HGV_Positions,"STRING"),null,null,$string(HGV_Positions),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".FuelSellingAtts.LPGBrand","FuelSellingAtts.LPGBrand",$formatValue(LPG_Brand,"STRING"),null,null,$string(LPG_Brand),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".FuelSellingAtts.NumLPGPumps","FuelSellingAtts.NumLPGPumps",$formatValue(LPG_Pumps,"STRING"),null,null,$string(LPG_Pumps),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".FuelSellingAtts.NumLPGPositions","FuelSellingAtts.NumLPGPositions",$formatValue(LPG_Positions,"STRING"),null,null,$string(LPG_Positions),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".FuelSellingAtts.NumRedDieselPumps","FuelSellingAtts.NumRedDieselPumps",$formatValue(Red_Diesel_Pumps,"STRING"),null,null,$string(Red_Diesel_Pumps),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".FuelSellingAtts.NumAdBluePumps","FuelSellingAtts.NumAdBluePumps",$formatValue(Ad_Blue_Pumps,"STRING"),null,null,$string(Ad_Blue_Pumps),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".FuelSellingAtts.NumCNGLNGPumps","FuelSellingAtts.NumCNGLNGPumps",$formatValue(CNG_LNG_Pumps,"STRING"),null,null,$string(CNG_LNG_Pumps),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null) ,
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".FuelSellingAtts.NumHydrogenPumpsPumps","FuelSellingAtts.NumHydrogenPumpsPumps",$formatValue(Hydrogen_Pumps,"STRING"),null,null,$string(Hydrogen_Pumps),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+
+      /* ElectricCharging Attributes: positions and brands */
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ElectricChargingAtts.NumElectricChargingPositions","ElectricChargingAtts.NumElectricChargingPositions",$formatValue(Electric_Charging_Spaces,"STRING"),null,null,$string(Electric_Charging_Spaces),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ElectricChargingAtts.ElectricChargingBrands","ElectricChargingAtts.ElectricChargingBrands",$formatValue(Electric_Charging_Brands,"STRING"),null,null,$string(Electric_Charging_Brands),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+
+      /* PhysicalLocation Attributes: geo, address, plot size etc */
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.Latitude","PhysicalLocationAtts.Latitude",$formatValue(Positioned_X,"STRING"),null,null,$string(Positioned_X),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.Longitude","PhysicalLocationAtts.Longitude",$formatValue(Positioned_Y,"STRING"),null,null,$string(Positioned_Y),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.ForecourtLayout","PhysicalLocationAtts.ForecourtLayout",$formatValue(Forecourt_Layout,"STRING"),null,null,$string(Forecourt_Layout),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.DedicatedParkingSpaces","PhysicalLocationAtts.DedicatedParkingSpaces",$formatValue(Dedicated_Spaces,"STRING"),null,null,$string(Dedicated_Spaces),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.PedestrianCustomers","PhysicalLocationAtts.PedestrianCustomers",$formatValue(Pedestrian_Customers,"STRING"),null,null,$string(Pedestrian_Customers),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.BuildingNumber","PhysicalLocationAtts.BuildingNumber",$formatValue(Building_Number,"STRING"),null,null,$string(Building_Number),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.HasCanopy","PhysicalLocationAtts.HasCanopy",$formatValue(Canopy,"STRING"),null,null,$string(Canopy),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.Street","PhysicalLocationAtts.Street",$formatValue(Street,"STRING"),null,null,$string(Street),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.Secondary_Street","PhysicalLocationAtts.Secondary_Street",$formatValue(Secondary_Street,"STRING"),null,null,$string(Secondary_Street),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.Suburb","PhysicalLocationAtts.Suburb",$formatValue(Suburb,"STRING"),null,null,$string(Suburb),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.Street","PhysicalLocationAtts.Suburb2",$formatValue(Suburb2,"STRING"),null,null,$string(Suburb2),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.Suburb2","PhysicalLocationAtts.Town",$formatValue(Town,"STRING"),null,null,$string(Town),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.County","PhysicalLocationAtts.County",$formatValue(COUNTY,"STRING"),null,null,$string(COUNTY),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.Region","PhysicalLocationAtts.Region",$formatValue(Region,"STRING"),null,null,$string(Region),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.LocalAuthorityArea","PhysicalLocationAtts.LocalAuthorityArea",$formatValue(Local_Authority_Area,"STRING"),null,null,$string(Local_Authority_Area),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.Postcode","PhysicalLocationAtts.Postcode",$formatValue(Postcode,"STRING"),null,null,$string(Postcode),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.CountryName","PhysicalLocationAtts.CountryName",$formatValue(Country,"STRING"),null,null,$string(Country),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.CountryISO2Code","PhysicalLocationAtts.CountryISO2Code",$formatValue(Country_Code,"STRING"),null,null,$string(Country_Code),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.PrimaryRoadNumber","PhysicalLocationAtts.PrimaryRoadNumber",$formatValue(Primary_Road_Number,"STRING"),null,null,$string(Primary_Road_Number),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.SecondaryRoadNumber","PhysicalLocationAtts.SecondaryRoadNumber",$formatValue(Secondary_Road_Number,"STRING"),null,null,$string(Secondary_Road_Number),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.PlotSizeFront","PhysicalLocationAtts.PlotSizeFront",$formatValue(Plot_Size_Front,"STRING"),null,null,$string(Plot_Size_Front),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.PlotSizeDepth","PhysicalLocationAtts.PlotSizeDepth",$formatValue(Plot_Size_Depth,"STRING"),null,null,$string(Plot_Size_Depth),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PhysicalLocationAtts.PlotSizeArea","PhysicalLocationAtts.PlotSizeArea",$formatValue(Plot_Size_Area,"STRING"),null,null,$string(Plot_Size_Area),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+
+      /* ServicesAtts Attributes: where offers various retail products, services ammenities and some extra details e.g toilets, sells alcohol, carwash etc*/
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.HasCustomerToilets","ServicesAtts.HasCustomerToilets",$formatValue(Customer_Toilets,"STRING"),null,null,$string(Customer_Toilets),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.HasAlcohol","ServicesAtts.HasAlcohol",$formatValue(Alcohol,"STRING"),null,null,$string(Alcohol),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.HasLottery","ServicesAtts.HasLottery",$formatValue(Lottery,"STRING"),null,null,$string(Lottery),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.HasTobacco","ServicesAtts.HasTobacco",$formatValue(Tobacco,"STRING"),null,null,$string(Tobacco),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.HasGroceries","ServicesAtts.HasGroceries",$formatValue(Groceries,"STRING"),null,null,$string(Groceries),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.HasTakeAwayFood","ServicesAtts.HasTakeAwayFood",$formatValue(Take_Away_Food,"STRING"),null,null,$string(Take_Away_Food),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.HasHotDrinks","ServicesAtts.HasHotDrinks",$formatValue(Hot_Drinks,"STRING"),null,null,$string(Hot_Drinks),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.HasMicrowave","ServicesAtts.HasMicrowave",$formatValue(Microwave,"STRING"),null,null,$string(Microwave),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.HasInStoreBakery","ServicesAtts.HasInStoreBakery",$formatValue(In_Store_Bakery,"STRING"),null,null,$string(In_Store_Bakery),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.CoffeeOfferBrand","ServicesAtts.CoffeeOfferBrand",$formatValue(Coffee_Offer_Brand,"STRING"),null,null,$string(Coffee_Offer_Brand),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.HasCarProductRange","ServicesAtts.HasCarProductRange",$formatValue(Car_Product_Range,"STRING"),null,null,$string(Car_Product_Range),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.HasCarWash","ServicesAtts.HasCarWash",$formatValue(Car_Wash,"STRING"),null,null,$string(Car_Wash),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.CarWashBrand","ServicesAtts.CarWashBrand",$formatValue(Car_Wash_Brand,"STRING"),null,null,$string(Car_Wash_Brand),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.CarWashQuality","ServicesAtts.CarWashQuality",$formatValue(Car_Wash_Quality,"STRING"),null,null,$string(Car_Wash_Quality),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.CarWashCompetition","ServicesAtts.CarWashCompetition",$formatValue(Car_Wash_Competition,"STRING"),null,null,$string(Car_Wash_Competition),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.ConveyorWashUnits","ServicesAtts.ConveyorWashUnits",$formatValue(Conveyor_Wash_Units,"STRING"),null,null,$string(Conveyor_Wash_Units),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.AutomaticWashUnits","ServicesAtts.AutomaticWashUnits",$formatValue(Automatic_Wash_Units,"STRING"),null,null,$string(Automatic_Wash_Units),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.JetWashUnits","ServicesAtts.JetWashUnits",$formatValue(Jet_Wash_Units,"STRING"),null,null,$string(Jet_Wash_Units),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.HasCatering","ServicesAtts.HasCatering",$formatValue(Catering,"STRING"),null,null,$string(Catering),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.HasCarSales","ServicesAtts.HasCarSales",$formatValue(Car_Sales,"STRING"),null,null,$string(Car_Sales),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.HasServiceBays","ServicesAtts.HasServiceBays",$formatValue(Service_Bays,"STRING"),null,null,$string(Service_Bays),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.HasATMs","ServicesAtts.HasATMs",$formatValue(ATM,"STRING"),null,null,$string(ATM),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.ATMName","ServicesAtts.ATMName",$formatValue(ATM_Name,"STRING"),null,null,$string(ATM_Name),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.HasAttendantService","ServicesAtts.HasAttendantService",$formatValue(Attendant_Service,"STRING"),null,null,$string(Attendant_Service),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.HasAutomatService","ServicesAtts.HasAutomatService",$formatValue(Automat_Service,"STRING"),null,null,$string(Automat_Service),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.HasSelfService","ServicesAtts.HasSelfService",$formatValue(Self_Service,"STRING"),null,null,$string(Self_Service),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ServicesAtts.HasDriveThru","ServicesAtts.HasDriveThru",$formatValue(Drive_thru,"STRING"),null,null,$string(Drive_thru),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+
+      /* TradingTimeAtts Attributes: Trading details */
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".TradingTimeAtts.OpeningTime","TradingTimeAtts.OpeningTime",$formatValue(Opening_Time,"STRING"),null,null,$string(Opening_Time),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".TradingTimeAtts.ClosingTime","TradingTimeAtts.ClosingTime",$formatValue(Lottery,"STRING"),null,null,$string(Lottery),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".TradingTimeAtts.Is24Hours","TradingTimeAtts.Is24Hours",$formatValue(Is_24_Hours,"STRING"),null,null,$string(Is_24_Hours),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+
+     /* AccessParkingAtts Attributes: parking spaces, padestriant access */
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".TrafficAccessParkingAtts.PrimaryTrafficQuality","TrafficAccessParkingAtts.PrimaryTrafficQuality",$formatValue(Pri_Traffic,"STRING"),null,null,$string(Pri_Traffic),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".TrafficAccessParkingAtts.SecondaryTrafficQuality","TrafficAccessParkingAtts.SecondaryTrafficQuality",$formatValue(Sec_Traffic,"STRING"),null,null,$string(Sec_Traffic),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".TrafficAccessParkingAtts.AccessFromRoad","TrafficAccessParkingAtts.AccessFromRoad",$formatValue(Access,"STRING"),null,null,$string(Access),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".TrafficAccessParkingAtts.CarriagewayBarrier","TrafficAccessParkingAtts.CarriagewayBarrier",$formatValue(Carriageway_Barrier,"STRING"),null,null,$string(Carriageway_Barrier),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".TrafficAccessParkingAtts.VisibilityFromRoad","TrafficAccessParkingAtts.VisibilityFromRoad",$formatValue(Visibility,"STRING"),null,null,$string(Visibility),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".TrafficAccessParkingAtts.HighlyTransient","TrafficAccessParkingAtts.HighlyTransient",$formatValue(Highly_Transient,"STRING"),null,null,$string(Highly_Transient),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".TrafficAccessParkingAtts.TrafficSpeed","TrafficAccessParkingAtts.TrafficSpeed",$formatValue(Traffic_Speed,"STRING"),null,null,$string(Traffic_Speed),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".TrafficAccessParkingAtts.DedicatedParkingSpaces","TrafficAccessParkingAtts.DedicatedParkingSpaces",$formatValue(Dedicated_Spaces,"STRING"),null,null,$string(Dedicated_Spaces),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".TrafficAccessParkingAtts.PedestrianCustomers","TrafficAccessParkingAtts.PedestrianCustomers",$formatValue(Pedestrian_Customers,"STRING"),null,null,$string(Pedestrian_Customers),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+
+      /* CardAtts Attributes: cards supported for purchasing */
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".CardAtts.HasCreditCards","CardAtts.HasCreditCards",$formatValue(Credit_Cards,"STRING"),null,null,$string(Credit_Cards),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".CardAtts.HasFuelCards","CardAtts.HasFuelCards",$formatValue(Fuel_Cards,"STRING"),null,null,$string(Fuel_Cards),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".CardAtts.HasDieselOnlyCards","CardAtts.HasDieselOnlyCards",$formatValue(Diesel_Only_Cards,"STRING"),null,null,$string(Diesel_Only_Cards),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null)
+
+      /*$buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Times.DepositRequestDateTime","DepositRequestDateTime",DepositRequestDateTime,null,$string(DepositRequestDateTime),null,"TIMESTAMP",$tsFormat,DepositRequestDateTime,$eventId,null,null)
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Times.DepositApprovalDateTime","DepositApprovalDateTime",DepositApprovalDateTime,"","TIMESTAMP",$tsFormat,DepositApprovalDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Times.DepositStatusChangeDateTime","DepositStatusChangeDateTime",DepositStatusChangeDateTime,"","TIMESTAMP",$tsFormat,DepositStatusChangeDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Times.EventSentTime","EventSentTime",EventDateTime,null,"TIMESTAMP",$tsFormat,EventSentTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Times.EventSentTime.UTCTimeStamp","",EventDateTime,null,"TIMESTAMP",$tsFormat,EventDateTime,$eventId,NULL,NULL),*/
+      /*$buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Status.TransactionStatus.StatusCode","TransactionStatus.StatusCode",TransactionStatus,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Status.TransactionStatus.StatusReasonCode","TransactionStatus.StatusReasonCode",TransactionStatusReason,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Status.RiskManagementStatus.StatusCode","",RiskManagementStatus,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Amounts.DepositAmountBankroll.LCY.PriceIncTax","",DepositAmountBankrollCurrency,"","NUMERIC","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Amounts.DepositAmountBankroll.LCY.CurrencyCode","",BankrollCurrency,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Amounts.DepositAmountBankroll.BCY.CurrencyCode","","USD","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Amounts.DepositAmountBankroll.BCY.ExchangeRateDerived","",(DepositAmountUSD / DepositAmountBankrollCurrency),"","NUMERIC","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Amounts.DepositClearingAmount.LCY.PriceIncTax","",DepositClearingAmount,"","NUMERIC","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Amounts.DepositClearingAmount.LCY.CurrencyCode","",DepositRequestCurrencyISO,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ProductAtts.ProductId","",ProductPackageID,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PromoAtts.PromoCode.PromoAtts","",PromoCode,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PromoAtts.PromoCode","",PromoCode,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PromoAtts.PromotionId","",GrantedPromotionsID,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.CashierType","",CashierType,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.PSPName","",PSPName,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.Bin","",Bin,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.BankName","",BankName,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.IsSentTo3D","",IsSentTo3D,"","STRINGBOOL","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.ID3DSVersion","",ID3DSVersion,"","STRINGBOOL","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.Is3DwithChallenged","",Is3DwithChallenged,"","STRINGBOOL","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.IsRerouted","",IsRerouted,"","STRINGBOOL","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.MFTUnitID","",MFTUnitID,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.PaymentPlatformId","",PaymentPlatformID,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.IsPayPalInstantPayment","",IsPayPalInstantPayment,"","STRINGBOOL","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.MFTID","",MFTID,"","STRINGBOOL","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.ExternalResponse","",ExternalResponse,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.MFTExternalSubResponseID","",ExternalSubResponse,"","STRING","",EventDateTime,$eventId,NULL,NULL)*/
+  ]
+}
+)

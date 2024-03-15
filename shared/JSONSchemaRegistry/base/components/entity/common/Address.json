@@ -1,0 +1,132 @@
+{
+  "AddressObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/AddressProperties"
+    }
+  },
+  "AddressProperties": {
+    "type": "object",
+    "unevaluatedProperties": false,
+    "properties": {
+      "AddressId": {
+        "type": "string",
+        "description": "The canonical (synthetic) Xfuze address id if identifiable and has some unique key e.g Address_D365_987654"
+      },
+      "AddressKey": {
+        "type": "string",
+        "description": "The native address number of the address master if identifiable and has some unique key e.g 987654"
+      },
+      "AddressType": {
+        "type": "string",
+        "description": "The type of the address",
+        "enum": [
+          "Residential",
+          "Business",
+          "Billing",
+          "Shipping",
+          "Mailing",
+          "Postal",
+          "POBox",
+          "Physical",
+          "Service",
+          "Forwarding",
+          "Temporary",
+          "Work",
+          "Home",
+          "Other"
+        ]
+      },
+      "AddressPurpose": {
+        "type": "string",
+        "description": "The purpose of the usage of the address",
+        "enum": [
+          "Billing",
+          "Invoice",
+          "Delivery",
+          "Contact",
+          "Customer",
+          "Shipping",
+          "ReturnExchange",
+          "Store",
+          "Warehouse",
+          "Marketing",
+          "LegitimateInterest",
+          "Supplier",
+          "Franchisee",
+          "Employee",
+          "PhysicalEvent",
+          "DropOff",
+          "Collection",
+          "LogisticsPoint",
+          "Other"
+        ]
+      },
+      "FormattedAddress": {
+        "type": "string",
+        "description": "The fully formatted address with all address parts as a single string"
+      },
+      "AddressName": {
+        "type": "string",
+        "description": "The name of the address"
+      },
+      "AddressDesc": {
+        "type": "string",
+        "description": "The description of the address"
+      },
+      "Flat": {
+        "type": "string",
+        "description": "The flat number of the address"
+      },
+      "HouseNameNumber": {
+        "type": "string",
+        "description": "The house / name number of the address"
+      },
+      "AddressLines": {
+        "$ref": "./AddressLines.json#/AddressLinesProperties",
+        "description": "The address line 1..5 of the address"
+      },
+      "TownCity": {
+        "$ref": "./City.json#/CityProperties",
+        "description": "The town / city of the address"
+      },
+      "Postcode": {
+        "$ref": "./Postcode.json#/PostcodeProperties",
+        "description": "The Postcode of the address"
+      },
+      "Country": {
+        "$ref": "./Country.json#/CountryProperties",
+        "description": "The country of the address"
+      },
+      "Coordinates": {
+        "description": "The geographical coordinates of the city or town.",
+        "$ref": "./Coordinates.json#/CoordinatesProperties"
+      },
+      "IsPrimary": {
+        "type": "string",
+        "description": "Ia this address a primary one? e.g Y",
+        "enum": [
+          "Y","N","U"
+        ]
+      },
+      "IsVerified": {
+        "type": "string",
+        "description": "Is this address verified by an official address lookup / validator? e.g Y",
+        "enum": [
+          "Y","N","U"
+        ]
+      },
+      "IsEncrypted": {
+        "type": "string",
+        "description": "Is this address encrypted? e.g Y",
+        "enum": [
+          "Y","N","U"
+        ]
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

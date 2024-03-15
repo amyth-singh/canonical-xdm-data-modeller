@@ -1,0 +1,14 @@
+(
+$appendKeys := function($k,$v){$map($v,function($value){$k & "." & $value})};
+
+$recursive_keys := function($node) {
+  (
+    $my_keys := $keys($node);
+    $append(
+     $my_keys,
+     $reduce($map($my_keys, function($key) {$appendKeys($key,$recursive_keys($lookup($node, $key)))}), $append)
+    )
+  )
+};
+$recursive_keys($$)
+)

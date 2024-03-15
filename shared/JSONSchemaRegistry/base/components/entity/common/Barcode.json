@@ -1,0 +1,30 @@
+{
+  "BarcodeObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/BarcodeProperties"
+    }
+  },
+  "BarcodeProperties": {
+    "type": "object",
+    "unevaluatedProperties": false,
+    "properties": {
+      "Barcode": {
+        "type": "string",
+        "description": "The barcode data itself"
+      },
+      "BarcodeType": {
+        "type": "string",
+        "description": "The type of the barcode e.g  UPC, EAB, QRCode, Code39, Code128, DataMatrix, PDF417, ITF14, Codabar, MaxiCode"
+      },
+      "BarcodeSource": {
+        "type": "string",
+        "description": "The source of the barcode instance"
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

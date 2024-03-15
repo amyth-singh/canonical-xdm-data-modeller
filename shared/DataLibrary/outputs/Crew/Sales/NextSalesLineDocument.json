@@ -1,0 +1,258 @@
+{
+  "EventId": "Core event fields at top level to enable storage and query optimisations in physical systems (e.g PK/CK/ and various indexes for access patterns) that require these to be top level only (e.g BQ) - refer core definition from EventMetadata for business definition",
+  "EntityId": "Core event fields at top level to enable storage and query optimisations in physical systems (e.g PK/CK/ and various indexes for access patterns) that require these to be top level only (e.g BQ) - refer core definition from EventMetadata for business definition",
+  "EntityType": "Core event fields at top level to enable storage and query optimisations in physical systems (e.g PK/CK/ and various indexes for access patterns) that require these to be top level only (e.g BQ) - refer core definition from EventMetadata for business definition",
+  "ParentEntityId": "Core event fields at top level to enable storage and query optimisations in physical systems (e.g PK/CK/ and various indexes for access patterns) that require these to be top level only (e.g BQ) - refer core definition from EventMetadata for business definition",
+  "ParentEntityType": "Core event fields at top level to enable storage and query optimisations in physical systems (e.g PK/CK/ and various indexes for access patterns) that require these to be top level only (e.g BQ) - refer core definition from EventMetadata for business definition",
+  "EventName": "Core event fields at top level to enable storage and query optimisations in physical systems (e.g PK/CK/ and various indexes for access patterns) that require these to be top level only (e.g BQ) - refer core definition from EventMetadata for business definition",
+  "EventOccurredTimestampUTC": "Core event fields at top level to enable storage and query optimisations in physical systems (e.g PK/CK/ and various indexes for access patterns) that require these to be top level only (e.g BQ) - refer core definition from EventMetadata for business definition",
+  "EventOccurredTimestampLocal": "Core event fields at top level to enable storage and query optimisations in physical systems (e.g PK/CK/ and various indexes for access patterns) that require these to be top level only (e.g BQ) - refer core definition from EventMetadata for business definition",
+  "EventMetadata": {
+    "EventAtts": {
+      "Xfuze": {
+        "EventId": "The (required) globally unique synthetic Xfuze ID for this event instance, unique across all events. Typically of the format [EventName]_[EntityId]_[EventUniqueWatermark] e.g SalesOrderItemsDelivered_SalesOrderDelivery_Hybris_8106008620_JVGL06053_2023-01-12T12:03:00+00:00",
+        "EventCategory": "The (required) event category of this domain event (refer controlled list of allowed values) e.g SalesOrder",
+        "EventName": "The (required) event name defines the 'type' of the event (in business terms) and key for routing to specific event handlers (refer to controlled list of allowed values per entity type).  Format is [EntityType][VerbPastTense] e.g SalesOrderItemsDelivered",
+        "EventClass": "The class of the event as defined by where this event instance was generated e.g TriggerEvent",
+        "EventChangePattern": "The type of triggering data/change pattern of the source that resulted in this event e.g BusinessEvent",
+        "ClientCode": "An (required) client code used for event ownership and billing attribution where required e.g GSR",
+        "Note": "An (optional) free form test field to add some comment to the note, typically for testing purposes e.g (Test case name, or a prod smoke test)",
+        "BizCapabilityL2": "The Level 2 (top) of Xiatech's Industry Specific Business Capability Model (i.e Retail BCM Model) e.g Process Returns & Exchanges",
+        "BizCapabilityL1": "The Level 1 (top) of Xiatech's Industry Specific Business Capability Model (i.e Retail BCM Model) e.g Sell & Serve",
+        "IsDerivedEvent": "String bool indicator for whether this event is a derived one (i.e derived from a processedEvent such as 'CustomerLastNameChanged' derived off 'CustomerProfileUpdated' e.g 'N'",
+        "BizCapabilityL0": "The Level 0 (top) of Xiatech's Industry Specific Business Capability Model (i.e Retail BCM Model) e.g Sell",
+        "EventValueStream": "The retail value stream this event is related to e.g Order2Cash"
+      },
+      "Origin": {
+        "SourceSystem": "The (required) Xfuze system code of the external source system that is the genesis of the raw data trigger e.g Hybris",
+        "SourceFormatType": "The (required) code of the data interchange format of the raw data e.g JSON",
+        "CorrelationId": "The (optional) external correlation Id as provided by the source (often, but not always, the same as the rawEventId) e.g 3e35cec2-050d-4334-b564-5f1ce704a5f8",
+        "EventName": "Raw form (optional) of the input eventName from the source, used in transforming to 'Xfuze' representations e.g ORDER_PARCEL_DELIVERED",
+        "EventId": "Raw form (optional) of the input eventId from the source, used in transforming to 'Xfuze' representations e.g d1d982ef-6dc6-47bb-80fb-2eaaf572deca",
+        "SourceSubSystem": "The (optional) Xfuze subsystem system code of the external (sub) source system that is the genesis of the raw data trigger e.g OrdersAPI"
+      }
+    },
+    "EntityAtts": {
+      "Xfuze": {
+        "EntityId": "The (required) globally unique synthetic Xfuze Id for the entity instance this event is related to and whose payload is the subject of change, unique across all entities. Typically of the format [EntityType::EntitySubType]_[SystemCode]_[RawEntityId] where RawEntityId can be composed of 1 or more source fields to create singular uniqueness e.g SalesOrderLine::Return_Hybris_8106008620_RET1",
+        "EntityType": "The (required) entity type, allowing for a typing system (top level) for entities, where the type is sourced from the master Xfuze control list e.g SalesOrderLine",
+        "EntityDomain": "The (required) core entity domain, sourced from the master Xfuze control list e.g SalesOrder",
+        "IsSensitive": "e.g Y",
+        "ParentEntityId": "An (optional) canonical Xfuze parent entity Id, where there is a natural 'composition' and containing parent, this importantly allows natural grouping by the parent for different access patterns e.g SalesOrder_Hybris_8106008620",
+        "EntityStatusDesc": "An (optional) canonical Xfuze entity status, often key for events and the state transition happening with the entity. e.g Line Processing In-Progress",
+        "EntityStatusCode": "An (optional) canonical Xfuze entity status, often key for events and the state transition happening with the entity. e.g InProgress",
+        "ParentEntityType": "An (optional) canonical Xfuze parent entity type.  Ideally this should always be created even if the top parent (would have same values as EntityId and EntityType) allowing a consistent place to group by to get all records in the hierarchy  e.g SalesOrder",
+        "EntityClass": "The (required) class of the entity in this event, representing the levelling / granularity of the entity state being transferred and contained e.g Composite (multi entity composite)",
+        "EntityVariation": "An (optional) instance variation of the type of entity and is contextual to the type of entity under change e.g RetailTransaction"
+      },
+      "Origin": {
+        "EntityId": "Raw form (required) of the input EntityId from the source, used in transforming to 'Xfuze' representations e.g 8106008620_RET1",
+        "EntityStatusCode": "Raw form (optional) of the input EntityId from the source, used in transforming to 'Xfuze' representations e.g INPROGRESS",
+        "ParentEntityId": "Raw form (optional) of the input EntityId from the source, used in transforming to 'Xfuze' representations e.g 8106008620"
+      }
+    },
+    "TimeAtts": {
+      "Xfuze": {
+        "TimeZones": {
+          "HomeTimeZone": {
+            "TimeZone": "The Time Zone e.g Europe/London",
+            "TimeZoneOffset": "UTC+01:00"
+          },
+          "EventTimeZone": {
+            "TimeZone": "The Time Zone e.g Europe/London",
+            "TimeZoneOffset": "UTC+01:00",
+            "TimeZoneCountryCode": "The ISO3 country code that is the country this TimeZone is for e.g GBR"
+          },
+          "PartyTimeZone": {
+            "TimeZone": "The Time Zone e.g Europe/London",
+            "TimeZoneOffset": "UTC+01:00",
+            "TimeZoneCountryCode": "The ISO3 country code that is the country this TimeZone is for e.g GBR"
+          }
+        },
+        "Times": {
+          "EventOccurredTimestamp": {
+            "DateId": "The Xfuze Date dim Id e.g Dates_20231001",
+            "UTC": "An Xfuze timestamp represented in UTC e.g 2023-01-12T12:03:00.000+0000",
+            "Millis": "An Xfuze timestamp represented in unix Millis e.g 1673525621103",
+            "HourId": "The Xfuze hour dim Id e.g Hours_2023100112",
+            "PartyLocal": "An Xfuze timestamp represented in party local time e.g 2023-01-12T13:03:00.000+0100"
+          },
+          "EventOccurredType": "The (required) type of the EventOccurredTimestamp, indicator of the quality.  TrueTime is if EOT is sourced from correct / best timestamp from the source and is the highest quality.",
+          "EventReceivedTimestamp": {
+            "DateId": "The Xfuze Date dim Id e.g Dates_20231001",
+            "UTC": "An Xfuze timestamp represented in UTC e.g 2023-01-12T12:03:00.000+0000",
+            "Millis": "An Xfuze timestamp represented in unix Millis e.g 1673525621103",
+            "PartyLocal": "An Xfuze timestamp represented in party local time e.g 2023-01-12T13:03:00.000+0100",
+            "HourId": "The Xfuze hour dim Id e.g Hours_2023100112"
+          },
+          "EventPublishedTimestamp": {
+            "DateId": "The Xfuze Date dim Id e.g Dates_20231001",
+            "Local": "An Xfuze timestamp represented in local time e.g 2023-01-12T13:03:00.000+0100",
+            "Timezone": "The related timezone"
+          },
+          "EventIngestProcessedTimestamp": {
+            "DateId": "The Xfuze Date dim Id e.g Dates_20231001",
+            "Local": "An Xfuze timestamp represented in local time e.g 2023-01-12T13:03:00.000+0100",
+            "Timezone": "The related timezone",
+            "HourId": "The Xfuze hour dim Id e.g Hours_2023100112",
+            "PartyLocal": "An Xfuze timestamp represented in party local time e.g 2023-01-12T13:03:00.000+0100"
+          },
+          "EventSeq": "The (optional) sequence number of this event over life of entity, typically explicitly provided or sometimes derived",
+          "EventProcessedTimestamp": {
+            "DateId": "The Xfuze Date dim Id e.g Dates_20231001",
+            "UTC": "An Xfuze timestamp represented in UTC e.g 2023-01-12T12:03:00.000+0000",
+            "Millis": "An Xfuze timestamp represented in unix Millis e.g 1673525621103",
+            "HourId": "The Xfuze hour dim Id e.g Hours_2023100112",
+            "PartyLocal": "An Xfuze timestamp represented in party local time e.g 2023-01-12T13:03:00.000+0100"
+          },
+          "EventExternalReceivedTimestamp": {
+            "DateId": "The Xfuze Date dim Id e.g Dates_20231001",
+            "UTC": "An Xfuze timestamp represented in UTC e.g 2023-01-12T12:03:00.000+0000",
+            "Millis": "An Xfuze timestamp represented in unix Millis e.g 1673525621103",
+            "PartyLocal": "An Xfuze timestamp represented in party local time e.g 2023-01-12T13:03:00.000+0100",
+            "HourId": "The Xfuze hour dim Id e.g Hours_2023100112"
+          },
+          "EventSourceSentTimestamp": {
+            "DateId": "The Xfuze Date dim Id e.g Dates_20231001",
+            "Local": "An Xfuze timestamp represented in local time e.g 2023-01-12T13:03:00.000+0100",
+            "Timezone": "The related timezone"
+          }
+        }
+      },
+      "Origin": {
+        "Times": {
+          "EventOccurredTimestamp": "Raw form (as provided) of the input timestamp used in generating Xfuze EventOccurredTimestamp e.g 2023-01-12 12:03:00+00:00",
+          "EventSourceSentTimestamp": "Raw form (as provided) of the input timestamp used in generating Xfuze EventSourceSentTimestamp e.g 1673525621103",
+          "EventExternalReceivedTimestamp": "Raw form (as provided) of the input timestamp used in generating Xfuze EventExternalReceivedTimestamp e.g 1673525621012"
+        }
+      }
+    },
+    "IngestAtts": {
+      "Xfuze": "The (mandatory) Xfuze derived / enriched attributes that define the context of the external trigger system and full ingest path for lineage and auditability"
+    },
+    "PrivacyAtts": {
+      "Origin": {
+        "IsEncrypted": "Raw form (optional) of the input ProductId from the source, used in transforming to 'Xfuze' representations e.g 1"
+      }
+    },
+    "ReplayAtts": {
+      "Origin": "The 'origin' source / raw attributes provided as input and that were consumed as part of producing the companion 'Xfuze' representations",
+      "Xfuze": "The Xfuze derived / enriched attributes that define the schema and transforms and metadata used in generating this transform"
+    },
+    "ProductAtts": {
+      "Origin": {
+        "ProductKey": "Raw form (optional) of the input ProductKey from the source, used in transforming to 'Xfuze' representations e.g D20165-7647-D578-XXL",
+        "ProductId": "Raw form (optional) of the input ProductId from the source, used in transforming to 'Xfuze' representations e.g PRODUCT_APP_DE_de_DE_D20165-7647-D578-XXL"
+      },
+      "Xfuze": {
+        "ProductIds": "e.g [\"PRODUCT_APP_DE_de_DE_D20165-7647-D578-XXL\", \"PRODUCT_APP_DE_de_DE_51001-C909-C762-3834\", \"PRODUCT_APP_DE_de_DE_D22284-D183-D338-3834\"]",
+        "ProductKeys": "e.g [\"D20165-7647-D578-XXL\", \"51001-C909-C762-3834\", \"D22284-D183-D338-3834\"]",
+        "InvolvedReasonCode": "e.g SoldProduct"
+      }
+    },
+    "ReferenceAtts": {
+      "ReferenceAtts": "The Xfuze derived / enriched attributes that define core reference data / lookup data fields to enrich other structs/fields with in the event"
+    },
+    "MeasuresAtts": {
+      "LatestEntity": {
+        "Value2Code": "e.g SalesOrder.Header.Totals.FinalMargin.BCY.Percent",
+        "Value4": "e.g 50.15",
+        "Value3": "e.g 0.0",
+        "Value7Code": "e.g SalesOrder.Header.Qtys.QtySold",
+        "Value6": "e.g 3",
+        "Value5": "e.g 0.0",
+        "Value5Code": "e.g SalesOrder.Header.Totals.DiscountsTotal.BCY.IncTax"
+      },
+      "TriggerEntity": {
+        "Value6": "e.g 3",
+        "Value2Code": "e.g SalesOrder.Header.Totals.FinalMargin.BCY.Percent",
+        "Value3": "e.g 0.0",
+        "Value4Code": "e.g SalesOrder.Header.Totals.FinalMargin.BCY.Percent",
+        "Value2": "e.g 50.15",
+        "Value7": "e.g 3",
+        "Value1": "e.g 232.98",
+        "Value7Code": "e.g SalesOrder.Header.Qtys.QtySold",
+        "Value1Code": "e.g SalesOrder.Header.Totals.GrandTotal.BCY.IncTax",
+        "Value6Code": "e.g SalesOrder.Header.Qtys.QtySold",
+        "Value5Code": "e.g SalesOrder.Header.Totals.DiscountsTotal.BCY.IncTax",
+        "Value3Code": "e.g SalesOrder.Header.Totals.DiscountsTotal.BCY.IncTax",
+        "Value4": "e.g 50.15",
+        "Value5": "e.g 0.0"
+      }
+    },
+    "PayloadAtts": {
+      "Xfuze": {
+        "DataPayloadHash": "The hash of the 'Data / Domain Objects' part of the Xfuze payload only, excluding EventHeader details e.g ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+      },
+      "Origin": {
+        "DataPayloadHash": "The hash of the Origins 'Data / Domain Objects' part of the Xfuze payload only, excluding EventHeader details e.g ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
+        "EventPayloadHash": "The hash of the Origins 'Full Event' payload, if applicable e.g cd5453f8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
+        "HashScheme": "The hash scheme used to hash the origin payload partse.g SHA256, MD5"
+      }
+    },
+    "ExtensionAtts": {
+      "ExtensionAtts": "The Xfuze derived / enriched customer extension atts as a generic placeholder for new values not in the core schema of the XDM event"
+    }
+  },
+  "EventOccurredTimestampPartyLocal": "Core event fields at top level to enable storage and query optimisations in physical systems (e.g PK/CK/ and various indexes for access patterns) that require these to be top level only (e.g BQ) - refer core definition from EventMetadata for business definition",
+  "DomainEvent": {
+    "TriggerEntity": {
+      "SalesOrder": {
+        "EntityId": "The (required) globally unique synthetic Xfuze Id for the entity instance this event is related to and whose payload is the subject of change, unique across all entities. Typically of the format [EntityType::EntitySubType]_[SystemCode]_[RawEntityId] where RawEntityId can be composed of 1 or more source fields to create singular uniqueness e.g SalesOrderLine::Return_Hybris_8106008620_RET1",
+        "EntityType": "The (required) entity type, allowing for a typing system (top level) for entities, where the type is sourced from the master Xfuze control list e.g SalesOrderLine",
+        "ParentEntityId": "An (required) canonical Xfuze parent entity Id, where there is a natural parent a level above, this importantly allows natural grouping by the parent for different access patterns e.g SalesOrder_Hybris_8106008620",
+        "ParentEntityType": "An (required) canonical Xfuze parent entity type.  Ideally this should always be created even if the top parent (would have same values as EntityId and EntityType) allowing a consistent place to group by to get all records in the hierarchy  e.g SalesOrder",
+        "CompositeEntityId": "An (optional) canonical Xfuze parent entity Id, where there is a natural 'composition' and containing parent, this importantly allows natural grouping by the parent for different access patterns e.g SalesOrder_Hybris_8106008620",
+        "CompositeEntityType": "An (optional) canonical Xfuze parent entity type.  Ideally this should always be created even if the top parent (would have same values as EntityId and EntityType) allowing a consistent place to group by to get all records in the hierarchy  e.g SalesOrder",
+        "XRefIds": "The list of cross reference lookups, i.e all the ways to look up this entity by the various data points, both in canonical Ids and system specific ones",
+        "Status": {
+          "Code": "The unique code for the status e.g ProcessingStatus",
+          "ReasonCode": "A reason code for the status being in this state e.g Faulty Product",
+          "Class": "The class of the status e.g Retail, Hire, TailorMe",
+          "SeqNo": "The sequence number of this status in relation to all the possible values in terms of time order e.g 2",
+          "EventId": "The Xfuze EventId that was the source of this data"
+        },
+        "EntitySubType": "An (optional) entity subtype, allowing for further, more refined typing of the core type for accuracy of interpretation e.g ReturnLine, CancelLine, VoidLine etc",
+        "Header": {
+          "Header": {
+            "EntityId": "The (required) globally unique synthetic Xfuze Id for the entity instance this event is related to and whose payload is the subject of change, unique across all entities. Typically of the format [EntityType::EntitySubType]_[SystemCode]_[RawEntityId] where RawEntityId can be composed of 1 or more source fields to create singular uniqueness e.g SalesOrderLine::Return_Hybris_8106008620_RET1",
+            "EntityType": "The (required) entity type, allowing for a typing system (top level) for entities, where the type is sourced from the master Xfuze control list e.g SalesOrderLine",
+            "ParentEntityId": "An (required) canonical Xfuze parent entity Id, where there is a natural parent a level above, this importantly allows natural grouping by the parent for different access patterns e.g SalesOrder_Hybris_8106008620",
+            "ParentEntityType": "An (required) canonical Xfuze parent entity type.  Ideally this should always be created even if the top parent (would have same values as EntityId and EntityType) allowing a consistent place to group by to get all records in the hierarchy  e.g SalesOrder",
+            "CompositeEntityId": "An (optional) canonical Xfuze parent entity Id, where there is a natural 'composition' and containing parent, this importantly allows natural grouping by the parent for different access patterns e.g SalesOrder_Hybris_8106008620",
+            "CompositeEntityType": "An (optional) canonical Xfuze parent entity type.  Ideally this should always be created even if the top parent (would have same values as EntityId and EntityType) allowing a consistent place to group by to get all records in the hierarchy  e.g SalesOrder",
+            "XRefIds": "The list of cross reference lookups, i.e all the ways to look up this entity by the various data points, both in canonical Ids and system specific ones",
+            "Status": {
+              "Code": "The unique code for the status e.g ProcessingStatus",
+              "ReasonDesc": "A reason description for the status being in this state"
+            }
+          }
+        },
+        "Lines": {
+          "items": {
+            "0": {
+              "EntityId": "The (required) globally unique synthetic Xfuze Id for the entity instance this event is related to and whose payload is the subject of change, unique across all entities. Typically of the format [EntityType::EntitySubType]_[SystemCode]_[RawEntityId] where RawEntityId can be composed of 1 or more source fields to create singular uniqueness e.g SalesOrderLine::Return_Hybris_8106008620_RET1",
+              "EntityType": "The (required) entity type, allowing for a typing system (top level) for entities, where the type is sourced from the master Xfuze control list e.g SalesOrderLine",
+              "ParentEntityId": "An (required) canonical Xfuze parent entity Id, where there is a natural parent a level above, this importantly allows natural grouping by the parent for different access patterns e.g SalesOrder_Hybris_8106008620",
+              "ParentEntityType": "An (required) canonical Xfuze parent entity type.  Ideally this should always be created even if the top parent (would have same values as EntityId and EntityType) allowing a consistent place to group by to get all records in the hierarchy  e.g SalesOrder",
+              "CompositeEntityId": "An (optional) canonical Xfuze parent entity Id, where there is a natural 'composition' and containing parent, this importantly allows natural grouping by the parent for different access patterns e.g SalesOrder_Hybris_8106008620",
+              "CompositeEntityType": "An (optional) canonical Xfuze parent entity type.  Ideally this should always be created even if the top parent (would have same values as EntityId and EntityType) allowing a consistent place to group by to get all records in the hierarchy  e.g SalesOrder",
+              "XRefIds": "The list of cross reference lookups, i.e all the ways to look up this entity by the various data points, both in canonical Ids and system specific ones",
+              "Status": {
+                "Code": "The unique code for the status e.g ProcessingStatus",
+                "Desc": "The description for the status e.g ProcessingStatus",
+                "EventId": "The Xfuze EventId that was the source of this data",
+                "AsOf": "The timestamp at which the price was valid 'as of', if known and applicable",
+                "SeqNo": "The sequence number of this status in relation to all the possible values in terms of time order e.g 2",
+                "Class": "The class of the status e.g Retail, Hire, TailorMe",
+                "ReasonDesc": "A reason description for the status being in this state",
+                "ReasonCode": "A reason code for the status being in this state e.g Faulty Product"
+              },
+              "EntitySubType": "An (optional) entity subtype, allowing for further, more refined typing of the core type for accuracy of interpretation e.g ReturnLine, CancelLine, VoidLine etc"
+            }
+          }
+        }
+      }
+    }
+  }
+}

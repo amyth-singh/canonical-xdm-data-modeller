@@ -1,0 +1,1044 @@
+{
+  "DomainEvent": {
+    "TriggerEntity": {
+      "EntityId": "SalesOrder::Sale_PMC_A0001191",
+      "EntityType": "SalesOrder::Sale",
+      "Header": {
+        "Channels": {
+          "SalesChannel": {
+            "Touchpoint": {
+              "BusinessSystem": "eBasket",
+              "DeviceId": "3d56c68cd0dbdbbc",
+              "ExternalDeviceId": null,
+              "ExternalTerminalId": "",
+              "TerminalId": "18968"
+            },
+            "Type": {
+              "Code": "RetailStore"
+            }
+          }
+        },
+        "CurrencyExchangeRates": {
+          "BCY": "GBP",
+          "LCY": "EUR",
+          "SalesFx": {
+            "Rate": null
+          }
+        },
+        "EntityId": "SalesOrderHeader_PMC_A0001191",
+        "HeaderId": "SalesOrderHeader_PMC_A0001191",
+        "Locations": {
+          "SalesLocation": {
+            "Company": "Crew Clothing",
+            "Hierarchy": {
+              "L0": "{\"isOverride\":true,\"name\":\"PMC Abingdon\",\"nodeId\":\"NODE::f37f4592-da7e-4e59-bddc-6f6f2e17d3eb\",\"nodeType\":\"STORE\",\"parentId\":\"NODE::0682036f-579b-42df-83a2-e5242ef4faf3\",\"status\":true}",
+              "L1": "{\"isOverride\":false,\"name\":\"Stores\",\"nodeId\":\"NODE::0682036f-579b-42df-83a2-e5242ef4faf3\",\"nodeType\":\"STORE_GROUP\",\"parentId\":\"NODE::4d385484-9a44-4809-b83f-2ea142078599\",\"status\":true}",
+              "L2": "{\"isOverride\":true,\"name\":\"UK\",\"nodeId\":\"NODE::4d385484-9a44-4809-b83f-2ea142078599\",\"nodeType\":\"TRADING_REGION\",\"parentId\":\"NODE::92a82e7c-e106-4c2c-af6a-7965ad711206\",\"status\":true}",
+              "L3": "{\"isOverride\":true,\"name\":\"Crew Clothing\",\"nodeId\":\"NODE::92a82e7c-e106-4c2c-af6a-7965ad711206\",\"nodeType\":\"COMPANY\",\"parentId\":\"NODE::05b41253-65e1-4d7e-ae9c-da1a34841f3c\",\"status\":true}",
+              "L4": "{\"checked\":true,\"isOverride\":false,\"name\":\"Crew Clothing\",\"nodeId\":\"NODE::05b41253-65e1-4d7e-ae9c-da1a34841f3c\",\"nodeType\":\"ORGANIZATION\",\"parentId\":\"\",\"status\":true}"
+            },
+            "Id": "Location_f37f4592-da7e-4e59-bddc-6f6f2e17d3eb",
+            "Name": "PMC Abingdon",
+            "Number": "189",
+            "OrgCode": "H6jdoJ",
+            "OrgName": "Crew Clothing",
+            "StoreNumber": "189",
+            "SubsidiaryId": "1",
+            "TradingRegion": "UK",
+            "Type": "STORE"
+          }
+        },
+        "PartyIds": {
+          "SalesStaff": {
+            "Id": "PartyRole_SalesStaff_PMC_9eda50c9-71c0-444d-878b-25c1c718fb12",
+            "Name": "taylorm"
+          }
+        },
+        "Qtys": {
+          "QtyLines": {
+            "Amount": 3
+          },
+          "QtyNet": {
+            "Amount": 3
+          },
+          "QtyPayments": {
+            "Amount": 1
+          }
+        },
+        "SalesOrderNumber": "A0001191",
+        "Status": {
+          "FulfilmentStatus": {
+            "Code": "FullyFulfilled"
+          },
+          "OrderStatus": {
+            "Code": "Completed"
+          },
+          "PaymentStatus": {
+            "Code": "FullyPaid"
+          }
+        },
+        "TaxSummary": {
+          "Rate": {
+            "Estimated": 0.2
+          },
+          "SchemeCode": "VAT"
+        },
+        "TimeZones": {
+          "DefaultTimeZone": "Europe/London",
+          "DefaultTimeZoneOffset": "UTC +1",
+          "EventTimeZone": "Europe/London",
+          "EventTimeZoneOffset": "UTC +1"
+        },
+        "Times": {
+          "CompletedOn": {
+            "Local": "2023-04-14T08:21:24.670Z",
+            "UTC": "2023-04-14T08:21:24.670Z"
+          },
+          "CreatedOn": {
+            "Local": "2023-04-14T08:20:15.755Z",
+            "UTC": "2023-04-14T08:20:15.755Z"
+          },
+          "LastUpdatedOn": {
+            "Local": "2023-04-14T08:21:24.670Z",
+            "UTC": "2023-04-14T08:21:24.670Z"
+          },
+          "PlacedOn": {
+            "Local": "2023-04-14T08:20:15.748Z",
+            "UTC": "2023-04-14T08:20:15.748Z"
+          },
+          "TBD": {
+            "Local": "2023-04-14T08:21:28.793Z",
+            "UTC": "2023-04-14T08:21:28.793Z"
+          }
+        },
+        "Totals": {
+          "BalanceDueTotal": {
+            "Current": {
+              "LCY": {
+                "CurrencyCode": "EUR",
+                "IncTax": 0
+              }
+            }
+          },
+          "DiscountTotal": {
+            "Current": {
+              "LCY": {
+                "CurrencyCode": "EUR",
+                "IncTax": -28
+              }
+            }
+          },
+          "GrandTotal": {
+            "Current": {
+              "LCY": {
+                "CurrencyCode": "EUR",
+                "ExTax": 93.32,
+                "IncTax": 112,
+                "Tax": 18.68
+              }
+            }
+          },
+          "PaidTotal": {
+            "Current": {
+              "LCY": {
+                "CurrencyCode": "EUR",
+                "IncTax": -112
+              }
+            }
+          },
+          "ProductTotalBeforeAdjustments": {
+            "Current": {
+              "LCY": {
+                "CurrencyCode": "EUR",
+                "IncTax": 140
+              }
+            }
+          },
+          "RefundTotal": {
+            "Current": {
+              "LCY": {
+                "CurrencyCode": "EUR",
+                "IncTax": -0
+              }
+            }
+          },
+          "TaxTotal": {
+            "Current": {
+              "LCY": {
+                "CurrencyCode": "EUR",
+                "Tax": 18.68
+              }
+            }
+          },
+          "TaxableAmountTotal": {
+            "Current": {
+              "LCY": {
+                "CurrencyCode": "EUR",
+                "Tax": 112
+              }
+            }
+          }
+        },
+        "Type": {
+          "Class": {
+            "Code": "Retail"
+          },
+          "Type": {
+            "Code": "Sale"
+          }
+        },
+        "XrefIds": [
+          {
+            "Code": "EntityId",
+            "Id": "SalesOrderHeader_PMC_A0001191",
+            "SystemCode": "Xfuze"
+          },
+          {
+            "Code": "RawEntityId",
+            "Id": "A0001191",
+            "SystemCode": "PMC"
+          },
+          {
+            "Code": "OrderId",
+            "Id": "SalesOrder::Sale_PMC_A0001191",
+            "SystemCode": "Xfuze"
+          },
+          {
+            "Code": "HeaderId",
+            "Id": "SalesOrderHeader_PMC_A0001191",
+            "SystemCode": "Xfuze"
+          },
+          {
+            "Code": "Id",
+            "Id": "7588ede7-36ac-45a0-90d4-e2f41da7510f",
+            "SystemCode": "PMC"
+          },
+          {
+            "Code": "transactionId",
+            "Id": "A0001191",
+            "SystemCode": "PMC"
+          },
+          {
+            "Code": "offlineTransactionId",
+            "Id": "",
+            "SystemCode": "PMC"
+          },
+          {
+            "Code": "transactionRef",
+            "Id": "H6jdoJ1892023-04-14T08:20:15.746Z2f9e",
+            "SystemCode": "PMC"
+          }
+        ]
+      },
+      "Lines": [
+        {
+          "AdjustmentLines": [
+            {
+              "AdjustmentId": "LineAdjustment::Promotion_",
+              "EntityId": "LineAdjustment_Promotion_",
+              "EntityType": "LineAdjustment::Promotion",
+              "LineAdjustmentPct": "",
+              "ParentEntityId": "SalesOrderLine::Sale_PMC_A0001191_1",
+              "ParentEntityType": "SalesOrderLine::Sale",
+              "Type.Class": "Promotion"
+            }
+          ],
+          "EntityId": "SalesOrderLine::Sale_PMC_A0001191_1",
+          "EntityType": "SalesOrderLine::Sale_PMC_A0001191_1",
+          "FulfilmentAtts": {
+            "DeliveryGroup": "1",
+            "DeliveryMethod": "3",
+            "FullfilmentId": "189",
+            "LeadTime": {
+              "Type": "Days",
+              "Value": "0"
+            },
+            "OriginFullfilmentId": "N/A"
+          },
+          "GiftCard": {
+            "ExpiryDate": null,
+            "IsGiftCard": null,
+            "NumberIssued": null,
+            "RecipientEmail": null,
+            "RecipientName": null
+          },
+          "HeaderId": "SalesOrderHeader_PMC_A0001191",
+          "Prices": {
+            "UnitPriceBeforeDiscounts": {
+              "IncTax": 55
+            }
+          },
+          "ProductAtts": {
+            "Attributes": [],
+            "Barcode": null,
+            "Barcodes": [
+              "5.05441E+12"
+            ],
+            "Categories": [],
+            "Colour": {
+              "Code": null
+            },
+            "CountryOfOrigin": null,
+            "Description": "OXFORD SHIRT DRESS | OWNJ001 | 18 | NAVY",
+            "ImageUrls": [
+              "https://www.crewclothing.co.uk/images/products/large/OWNJ001_NAVY.jpg\r"
+            ],
+            "ProductId": "ProductVariant_Retail247Origin_1201764",
+            "SKU": "1201764",
+            "VariantType": null
+          },
+          "PromotionDiscounts": {
+            "IsExcludePromotion": null
+          },
+          "Qtys": {
+            "NetQty": 1
+          },
+          "SalesOrderLineNumber": "A0001191_1",
+          "SalesOrderNumber": "A0001191",
+          "SeqNo": 1,
+          "Status": {
+            "ProcessingStatus": "NotCompleted"
+          },
+          "TaxLines": [
+            {
+              "LineSeqNo": 1,
+              "SubTotal.Current.LCY.ExTax": 36.66,
+              "SubTotal.Current.LCY.IncTax": 44,
+              "SubTotal.Current.LCY.Tax": 7.34,
+              "TaxCode": "VAT",
+              "TaxPct": 20,
+              "TaxTypeCode": "H"
+            }
+          ],
+          "Times": {
+            "CreatedOn": {
+              "UTC": null
+            },
+            "LastUpdated": {
+              "UTC": null
+            },
+            "LastUpdatedOn": {
+              "UTC": null
+            }
+          },
+          "Totals": {
+            "DiscountRefundApportionedTotal": {
+              "Current": {
+                "LCY": {
+                  "CurrencyCode": null,
+                  "IncTax": 0
+                }
+              }
+            },
+            "DiscountsApportionedTotal": {
+              "Current": {
+                "LCY": {
+                  "CurrencyCode": null,
+                  "IncTax": -11
+                }
+              }
+            },
+            "PromotionsApportionedTotal": {
+              "Current": {
+                "LCY": {
+                  "CurrencyCode": null,
+                  "IncTax": -0
+                }
+              }
+            },
+            "SubTotal": {
+              "Current": {
+                "LCY": {
+                  "CurrencyCode": null,
+                  "IncTax": 55
+                }
+              }
+            },
+            "SubTotalBeforeDiscounts": {
+              "Current": {
+                "LCY": {
+                  "CurrencyCode": null,
+                  "IncTax": 55
+                }
+              }
+            }
+          },
+          "Type": {
+            "Class": {
+              "Code": "RetailTransaction"
+            },
+            "SubType": {
+              "Code": "Sale"
+            },
+            "Type": {
+              "Code": "SalesOrderLine"
+            }
+          },
+          "XrefIds": [
+            {
+              "Code": "EntityId",
+              "Id": "SalesOrderLine::Sale_PMC_A0001191_1",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "RawEntityId",
+              "Id": "A0001191_1",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "LineId",
+              "Id": "SalesOrderLine::Sale_PMC_A0001191_1",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "HeaderId",
+              "Id": "SalesOrderHeader_PMC_A0001191",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "OrderId",
+              "Id": "SalesOrder::Sale_PMC_A0001191",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "ProductId",
+              "Id": "ProductVariant_Retail247Origin_1201764",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "SKU",
+              "Id": "1201764",
+              "SystemCode": "PMC"
+            },
+            {
+              "Code": "id",
+              "SystemCode": "PMC"
+            }
+          ]
+        },
+        {
+          "AdjustmentLines": [
+            {
+              "AdjustmentId": "LineAdjustment::Promotion_",
+              "EntityId": "LineAdjustment_Promotion_",
+              "EntityType": "LineAdjustment::Promotion",
+              "LineAdjustmentPct": "",
+              "ParentEntityId": "SalesOrderLine::Sale_PMC_A0001191_2",
+              "ParentEntityType": "SalesOrderLine::Sale",
+              "Type.Class": "Promotion"
+            }
+          ],
+          "EntityId": "SalesOrderLine::Sale_PMC_A0001191_2",
+          "EntityType": "SalesOrderLine::Sale_PMC_A0001191_2",
+          "FulfilmentAtts": {
+            "DeliveryGroup": "1",
+            "DeliveryMethod": "3",
+            "FullfilmentId": "189",
+            "LeadTime": {
+              "Type": "Days",
+              "Value": "0"
+            },
+            "OriginFullfilmentId": "N/A"
+          },
+          "GiftCard": {
+            "ExpiryDate": null,
+            "IsGiftCard": null,
+            "NumberIssued": null,
+            "RecipientEmail": null,
+            "RecipientName": null
+          },
+          "HeaderId": "SalesOrderHeader_PMC_A0001191",
+          "Prices": {
+            "UnitPriceBeforeDiscounts": {
+              "IncTax": 30
+            }
+          },
+          "ProductAtts": {
+            "Attributes": [],
+            "Barcode": null,
+            "Barcodes": [
+              "5.05441E+12"
+            ],
+            "Categories": [],
+            "Colour": {
+              "Code": null
+            },
+            "CountryOfOrigin": null,
+            "Description": "OXFORD SHIRT DRESS | OWNJ001 | 12 | NAVY",
+            "ImageUrls": [
+              "https://www.crewclothing.co.uk/images/products/large/OWNJ001_NAVY.jpg\r"
+            ],
+            "ProductId": "ProductVariant_Retail247Origin_1201761",
+            "SKU": "1201761",
+            "VariantType": null
+          },
+          "PromotionDiscounts": {
+            "IsExcludePromotion": null
+          },
+          "Qtys": {
+            "NetQty": 1
+          },
+          "SalesOrderLineNumber": "A0001191_2",
+          "SalesOrderNumber": "A0001191",
+          "SeqNo": 2,
+          "Status": {
+            "ProcessingStatus": "NotCompleted"
+          },
+          "TaxLines": [
+            {
+              "LineSeqNo": 2,
+              "SubTotal.Current.LCY.ExTax": 20,
+              "SubTotal.Current.LCY.IncTax": 24,
+              "SubTotal.Current.LCY.Tax": 4,
+              "TaxCode": "VAT",
+              "TaxPct": 20,
+              "TaxTypeCode": "H"
+            }
+          ],
+          "Times": {
+            "CreatedOn": {
+              "UTC": null
+            },
+            "LastUpdated": {
+              "UTC": null
+            },
+            "LastUpdatedOn": {
+              "UTC": null
+            }
+          },
+          "Totals": {
+            "DiscountRefundApportionedTotal": {
+              "Current": {
+                "LCY": {
+                  "CurrencyCode": null,
+                  "IncTax": 0
+                }
+              }
+            },
+            "DiscountsApportionedTotal": {
+              "Current": {
+                "LCY": {
+                  "CurrencyCode": null,
+                  "IncTax": -6
+                }
+              }
+            },
+            "PromotionsApportionedTotal": {
+              "Current": {
+                "LCY": {
+                  "CurrencyCode": null,
+                  "IncTax": -0
+                }
+              }
+            },
+            "SubTotal": {
+              "Current": {
+                "LCY": {
+                  "CurrencyCode": null,
+                  "IncTax": 30
+                }
+              }
+            },
+            "SubTotalBeforeDiscounts": {
+              "Current": {
+                "LCY": {
+                  "CurrencyCode": null,
+                  "IncTax": 30
+                }
+              }
+            }
+          },
+          "Type": {
+            "Class": {
+              "Code": "RetailTransaction"
+            },
+            "SubType": {
+              "Code": "Sale"
+            },
+            "Type": {
+              "Code": "SalesOrderLine"
+            }
+          },
+          "XrefIds": [
+            {
+              "Code": "EntityId",
+              "Id": "SalesOrderLine::Sale_PMC_A0001191_2",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "RawEntityId",
+              "Id": "A0001191_2",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "LineId",
+              "Id": "SalesOrderLine::Sale_PMC_A0001191_2",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "HeaderId",
+              "Id": "SalesOrderHeader_PMC_A0001191",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "OrderId",
+              "Id": "SalesOrder::Sale_PMC_A0001191",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "ProductId",
+              "Id": "ProductVariant_Retail247Origin_1201761",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "SKU",
+              "Id": "1201761",
+              "SystemCode": "PMC"
+            },
+            {
+              "Code": "id",
+              "SystemCode": "PMC"
+            }
+          ]
+        },
+        {
+          "AdjustmentLines": [
+            {
+              "AdjustmentId": "LineAdjustment::Promotion_",
+              "EntityId": "LineAdjustment_Promotion_",
+              "EntityType": "LineAdjustment::Promotion",
+              "LineAdjustmentPct": "",
+              "ParentEntityId": "SalesOrderLine::Sale_PMC_A0001191_3",
+              "ParentEntityType": "SalesOrderLine::Sale",
+              "Type.Class": "Promotion"
+            }
+          ],
+          "EntityId": "SalesOrderLine::Sale_PMC_A0001191_3",
+          "EntityType": "SalesOrderLine::Sale_PMC_A0001191_3",
+          "FulfilmentAtts": {
+            "DeliveryGroup": "1",
+            "DeliveryMethod": "3",
+            "FullfilmentId": "189",
+            "LeadTime": {
+              "Type": "Days",
+              "Value": "0"
+            },
+            "OriginFullfilmentId": "N/A"
+          },
+          "GiftCard": {
+            "ExpiryDate": null,
+            "IsGiftCard": null,
+            "NumberIssued": null,
+            "RecipientEmail": null,
+            "RecipientName": null
+          },
+          "HeaderId": "SalesOrderHeader_PMC_A0001191",
+          "Prices": {
+            "UnitPriceBeforeDiscounts": {
+              "IncTax": 55
+            }
+          },
+          "ProductAtts": {
+            "Attributes": [],
+            "Barcode": null,
+            "Barcodes": [
+              "5.05441E+12"
+            ],
+            "Categories": [],
+            "Colour": {
+              "Code": null
+            },
+            "CountryOfOrigin": null,
+            "Description": "COOMBE DRESS | WNJ009 | 12 | GREEN",
+            "ImageUrls": [
+              "https://www.crewclothing.co.uk/images/products/large/WNJ009_GREEN.jpg\r"
+            ],
+            "ProductId": "ProductVariant_Retail247Origin_1207940",
+            "SKU": "1207940",
+            "VariantType": null
+          },
+          "PromotionDiscounts": {
+            "IsExcludePromotion": null
+          },
+          "Qtys": {
+            "NetQty": 1
+          },
+          "SalesOrderLineNumber": "A0001191_3",
+          "SalesOrderNumber": "A0001191",
+          "SeqNo": 3,
+          "Status": {
+            "ProcessingStatus": "NotCompleted"
+          },
+          "TaxLines": [
+            {
+              "LineSeqNo": 3,
+              "SubTotal.Current.LCY.ExTax": 36.66,
+              "SubTotal.Current.LCY.IncTax": 44,
+              "SubTotal.Current.LCY.Tax": 7.34,
+              "TaxCode": "VAT",
+              "TaxPct": 20,
+              "TaxTypeCode": "H"
+            }
+          ],
+          "Times": {
+            "CreatedOn": {
+              "UTC": null
+            },
+            "LastUpdated": {
+              "UTC": null
+            },
+            "LastUpdatedOn": {
+              "UTC": null
+            }
+          },
+          "Totals": {
+            "DiscountRefundApportionedTotal": {
+              "Current": {
+                "LCY": {
+                  "CurrencyCode": null,
+                  "IncTax": 0
+                }
+              }
+            },
+            "DiscountsApportionedTotal": {
+              "Current": {
+                "LCY": {
+                  "CurrencyCode": null,
+                  "IncTax": -11
+                }
+              }
+            },
+            "PromotionsApportionedTotal": {
+              "Current": {
+                "LCY": {
+                  "CurrencyCode": null,
+                  "IncTax": -0
+                }
+              }
+            },
+            "SubTotal": {
+              "Current": {
+                "LCY": {
+                  "CurrencyCode": null,
+                  "IncTax": 55
+                }
+              }
+            },
+            "SubTotalBeforeDiscounts": {
+              "Current": {
+                "LCY": {
+                  "CurrencyCode": null,
+                  "IncTax": 55
+                }
+              }
+            }
+          },
+          "Type": {
+            "Class": {
+              "Code": "RetailTransaction"
+            },
+            "SubType": {
+              "Code": "Sale"
+            },
+            "Type": {
+              "Code": "SalesOrderLine"
+            }
+          },
+          "XrefIds": [
+            {
+              "Code": "EntityId",
+              "Id": "SalesOrderLine::Sale_PMC_A0001191_3",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "RawEntityId",
+              "Id": "A0001191_3",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "LineId",
+              "Id": "SalesOrderLine::Sale_PMC_A0001191_3",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "HeaderId",
+              "Id": "SalesOrderHeader_PMC_A0001191",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "OrderId",
+              "Id": "SalesOrder::Sale_PMC_A0001191",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "ProductId",
+              "Id": "ProductVariant_Retail247Origin_1207940",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "SKU",
+              "Id": "1207940",
+              "SystemCode": "PMC"
+            },
+            {
+              "Code": "id",
+              "SystemCode": "PMC"
+            }
+          ]
+        }
+      ],
+      "ParentEntityId": "SalesOrder::Sale_PMC_A0001191",
+      "ParentEntityType": "SalesOrder::Sale",
+      "Payments": [
+        {
+          "Card": {
+            "PAN": "NA",
+            "Type": "NA"
+          },
+          "Device": {
+            "EntryMethod": {
+              "Code": "NA"
+            }
+          },
+          "EntityId": "SalesOrderPayment_PMC_H6jdoJ1892023-04-14T08:20:15.746Z2f9e",
+          "HeaderId": "SalesOrderHeader_PMC_A0001191",
+          "ProcessingResult": {
+            "AuthCode": "NA",
+            "Code": "Authorised",
+            "ExternalCode": "AUTHORISED"
+          },
+          "SplitDetails": {
+            "IsSplit": null,
+            "SeqNo": null
+          },
+          "Status": {
+            "PaymentStatus": {
+              "Code": "Completed"
+            }
+          },
+          "Times": {
+            "PaidOn": {
+              "UTC": "2023-04-14T08:20:15.748Z"
+            }
+          },
+          "Totals": {
+            "GrandTotal": {
+              "CurrentLCY": {
+                "CurrencyCode": "EUR",
+                "IncTax": 112
+              }
+            },
+            "PaidTotal": {
+              "CurrentLCY": {
+                "CurrencyCode": "EUR",
+                "IncTax": 112
+              }
+            }
+          },
+          "Type": {
+            "PaymentType": {
+              "Code": "PDQ"
+            },
+            "TransactionType": {
+              "Code": "SALE"
+            }
+          },
+          "XrefIds": [
+            {
+              "Code": "EntityId",
+              "Id": "SalesOrderPayment_PMC_H6jdoJ1892023-04-14T08:20:15.746Z2f9e",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "PaymentId",
+              "Id": "SalesOrderPayment_PMC_H6jdoJ1892023-04-14T08:20:15.746Z2f9e",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "PaymentLineId",
+              "Id": "SalesOrderPayment_PMC_A0001191_",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "HeaderId",
+              "Id": "SalesOrderHeader_PMC_A0001191",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "OrderId",
+              "Id": "SalesOrder::Sale_PMC_A0001191",
+              "SystemCode": "Xfuze"
+            },
+            {
+              "Code": "hostReferenceId",
+              "Id": "NA",
+              "SystemCode": "PMC"
+            },
+            {
+              "Code": "sqNo",
+              "SystemCode": "PMC"
+            },
+            {
+              "Code": "transactionReference",
+              "Id": "H6jdoJ1892023-04-14T08:20:15.746Z2f9e",
+              "SystemCode": "PMC"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "EntityId": "SalesOrder::Sale_PMC_A0001191",
+  "EntityType": "SalesOrder::Sale",
+  "EventId": "SalesOrderSaleCompleted_SalesOrder::Sale_PMC_A0001191_2023-04-14T08:21:28.793Z",
+  "EventMetadata": {
+    "EntityAtts": {
+      "Origin": {
+        "EntityId": "A0001191",
+        "ParentEntityId": "A0001191"
+      },
+      "Xfuze": {
+        "EntityClass": "Composite",
+        "EntityDomain": "Sales",
+        "EntityId": "SalesOrder::Sale_PMC_A0001191",
+        "EntitySubType": null,
+        "EntityType": "SalesOrder::Sale",
+        "EntityVariation": "Retail",
+        "IsSensitive": "N",
+        "ParentEntityId": "SalesOrder::Sale_PMC_A0001191",
+        "ParentEntityType": "SalesOrder::Sale"
+      }
+    },
+    "EventAtts": {
+      "Origin": {
+        "CorrelationId": "7588ede7-36ac-45a0-90d4-e2f41da7510f",
+        "EventId": "7588ede7-36ac-45a0-90d4-e2f41da7510f",
+        "EventName": null,
+        "SourceFormatType": "JSON",
+        "SourceSubSystem": "OrderAPI",
+        "SourceSystem": "PMC"
+      },
+      "Xfuze": {
+        "BizCapabilityL0": "Sell",
+        "BizCapabilityL1": "Sell \u0026 Serve",
+        "BizCapabilityL2": "Take Sale",
+        "ClientCode": "Crew",
+        "EventCategory": "Sales",
+        "EventChangePattern": "FullSnapshot",
+        "EventClass": "TriggerEvent",
+        "EventId": "SalesOrderSaleCompleted_SalesOrder::Sale_PMC_A0001191_2023-04-14T08:21:28.793Z",
+        "EventName": "SalesOrderSaleCompleted",
+        "EventValueStream": "Order2Cash",
+        "IsDerivedEvent": "N",
+        "Note": "(Any context note like test)"
+      }
+    },
+    "IngestAtts": {
+      "Xfuze": {
+        "API": {
+          "Name": "/PMC/OrderAPI",
+          "PatternType": "Scheduled Poll",
+          "Resource": "/PMC/OrderAPI/Orders/123",
+          "URI": "http://pmc.org/OrderAPI"
+        }
+      }
+    },
+    "LocationAtts": {
+      "Xfuze": {
+        "LocationId": "Location_f37f4592-da7e-4e59-bddc-6f6f2e17d3eb",
+        "LocationNumber": "189"
+      }
+    },
+    "PartyAtts": {
+      "Origin": {
+        "SystemPartyId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+      },
+      "Xfuze": {
+        "PartyRoleSubTypeCode": "Seller",
+        "PartyRoleTypeCode": "Employee",
+        "SystemPartyId": "Party_9eda50c9-71c0-444d-878b-25c1c718fb12"
+      }
+    },
+    "PayloadAtts": {
+      "Origin": {
+        "DataPayloadHash": "4bs34a6b6e25dd36ab5206beecf71e48",
+        "EventPayloadHash": "9p23eed6cc74bc5e1d8fdf8d90f440a3",
+        "HashScheme": "MD5"
+      },
+      "Xfuze": {
+        "DataPayloadHash": "3c906a6b6e25dd36ab5206beecf71e48",
+        "EventPayloadHash": "8e59eed6cc74bc5e1d8fdf8d90f440a3",
+        "HashScheme": "MD5"
+      }
+    },
+    "PrivacyAtts": {
+      "Origin": {
+        "IsEncrypted": "N"
+      },
+      "Xfuze": {
+        "EncryptionKeyHost": null,
+        "EncryptionKeyURI": null,
+        "IsEncrypted": "Y",
+        "IsSensitiveEntity": "Y",
+        "SensitiveFieldPaths": [
+          "userName"
+        ]
+      }
+    },
+    "ProductAtts": {
+      "Xfuze": {
+        "InvolvedReasonCode": "SoldProduct",
+        "ProductIds": [
+          "ProductVariant_Retail247Origin_1201764",
+          "ProductVariant_Retail247Origin_1201761",
+          "ProductVariant_Retail247Origin_1207940"
+        ],
+        "ProductSkus": [
+          "1201764",
+          "1201761",
+          "1207940"
+        ]
+      }
+    },
+    "TimeAtts": {
+      "Origin": {
+        "Times": {
+          "EventOccurredTimestamp": "2023-04-14T08:21:28.793Z"
+        }
+      },
+      "Xfuze": {
+        "TimeZones": {
+          "EventTimeZone": {
+            "TimeZone": "Europe/London",
+            "TimeZoneOffset": "UTC +1"
+          },
+          "HomeTimeZone": {
+            "TimeZone": "Europe/London",
+            "TimeZoneOffset": "UTC +1"
+          },
+          "PartyTimeZone": {
+            "TimeZone": "Europe/London",
+            "TimeZoneOffset": "UTC +1"
+          }
+        },
+        "Times": {
+          "EventOccurredTimestamp": {
+            "Local": "2023-04-14T08:21:28.793Z",
+            "Millis": 1698767979497,
+            "UTC": "2023-04-14T08:21:28.793Z"
+          },
+          "EventOccurredType": null,
+          "EventReceivedTimestamp": {
+            "Local": "2023-10-31T15:59:39.497Z",
+            "Millis": 1698767979497,
+            "UTC": "2023-10-31T15:59:39.497Z"
+          }
+        }
+      }
+    }
+  },
+  "EventOccurredTimestampLocal": "2023-04-14T08:21:28.793Z",
+  "EventOccurredTimestampUTC": "2023-04-14T08:21:28.793Z",
+  "ParentEntityId": "SalesOrder::Sale_PMC_A0001191",
+  "ParentEntityType": "SalesOrder::Sale"
+}

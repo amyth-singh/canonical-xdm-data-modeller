@@ -1,0 +1,55 @@
+{
+  "TimePeriodObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/TimePeriodProperties"
+    }
+  },
+  "TimePeriodProperties": {
+    "type": "object",
+    "description": "A TimePeriod object",
+    "unevaluatedProperties": false,
+    "properties": {
+      "StartDate": {
+        "type": "string",
+        "format": "date-time",
+        "description": "The start date of the period"
+      },
+      "StartTimestamp": {
+        "type": "string",
+        "format": "date-time",
+        "description": "The start timestamp of the period (intra day readings)"
+      },
+      "EndDate": {
+        "type": "string",
+        "format": "date-time",
+        "description": "The end date of the period"
+      },
+      "EndTimestamp": {
+        "type": "string",
+        "format": "date-time",
+        "description": "The end timestamp of the period (intra day readings)"
+      },
+      "PeriodDuration": {
+        "type": "string",
+        "description": "The duration of the full set of periods where this period instance is contained",
+        "enum": [
+          "Second",
+          "Minute",
+          "Hour",
+          "Day",
+          "Week",
+          "Month",
+          "Quarter",
+          "Year",
+          "Adhoc",
+          "Other"
+        ]
+      }
+    },
+    "Lineage": {
+      "$ref": "./EventLineage.json#/EventLineageProperties",
+      "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+    }
+  }
+}

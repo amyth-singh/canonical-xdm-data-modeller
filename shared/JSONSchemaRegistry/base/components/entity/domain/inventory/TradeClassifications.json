@@ -1,0 +1,39 @@
+{
+    "type": "object",
+    "unevaluatedProperties": false,
+    "description": "Trade Classifications for Import and Export such as Tariff and HS (Harmonized System) Codes",
+    "properties": {
+        "HS": {
+            "type": "object",
+            "unevaluatedProperties": false,
+            "description": "HS (Harmonized System) Codes",
+            "properties": {
+                "HSCode": {
+                    "type": "string",
+                    "description": "HS Code",
+                    "maxLength": 10
+                },
+                "HSDesc": {
+                    "type": "string",
+                    "description": "HS Description"
+                }
+            }
+        },
+        "Tariff": {
+            "type": "object",
+            "unevaluatedProperties": false,
+            "description": "HS (Harmonized System) Codes",
+            "properties": {
+                "TariffCode": {
+                    "type": "string",
+                    "description": "Tariff Code",
+                    "maxLength": 10
+                },
+                "TariffDesc": {
+                    "type": "string",
+                    "description": "Tariff Description"
+                }
+            }
+        }
+    }
+}

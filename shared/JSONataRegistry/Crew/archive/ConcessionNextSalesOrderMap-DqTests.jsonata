@@ -1,0 +1,253 @@
+(
+    $formatValue := function($value, $dType, $format){(
+        $formatString := $string ~> $trim;
+        $formatArray := function($array){$type($array) = "array" ? $array : [$array]};
+        $formatNumber := function($num){$type($num) = "number" ? $num : $type($num) = "string" ? $contains($num,/^-?\d+(\.\d+)?$/) ? $number($num) : null};
+        $formatDateTime := function($dt,$format) {(
+            $dateTimeRegexMap := {"[Y0001]-[M01]-[D01] [H01]:[m01]:[s01] [P]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]) (AM|PM)$/,
+                                  "[Y0001]-[M01]-[D01] [H01]:[m01]:[s01].[f001]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]).\d{3}$/,
+                                  "[M01]/[D01]/[Y0001]":/^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/[1-9][0-9]{3}$/,
+                                  "[M01]/[D01]/[Y0001] [H01]:[m01]:[s01]":/^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/[1-9][0-9]{3} ([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/,
+                                  "ISO8601":/^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d)(\.\d+)?([+-]([01]\d|2[0-3]):([0-5]\d)|Z)$/
+                                 };
+            $dateTimeFormatValidator := function($datetime,$dateTimeFormat){$boolean($dateTimeFormat) ? $contains($datetime,$lookup($dateTimeRegexMap,$dateTimeFormat)): $contains($datetime,$lookup($dateTimeRegexMap,"ISO8601"))};
+
+            $exists($dt) ? $dateTimeFormatValidator($dt,$format) ? $boolean($format) and $not($format = "ISO8601") ? $fromMillis($toMillis($dt,$format)) : $fromMillis($toMillis($dt)) : null;
+            )};
+        $formatStringBool := function($value,$format){(
+            $stringBoolMap := {"Y":"Y","1":"Y","TRUE":"Y","N":"N","0":"N","FALSE":"N","false":"N","true":"Y","F":"N","T":"Y"};
+            $upperTrim := $string ~> $trim ~> $uppercase;
+            $stringBool := function($v){$exists($value)?$lookup($stringBoolMap, $upperTrim($value)):""};
+            $reverseBool := function($v){$v = "Y" ? "N" : $v = "N" ? "Y" : "U"};
+            $type($format)="null" ? $value ~> $stringBool : $format="reverse" ? $value ~> $stringBool ~> $reverseBool : null
+        )};
+
+        $dType = "TIMESTAMP"  ? $formatDateTime($value,$format) :
+        $dType = "STRINGBOOL" ? $formatStringBool($value,$format) :
+        $dType = "NUMERIC"    ? $formatNumber($value) :
+        $dType = "STRING"     ? $formatString($value) :
+        $dType = "ARRAY"      ? $formatArray($value) :
+        null;
+    )};
+
+    $attributeSplitter := function($v,$sep,$pos){$split($v, $sep) ~> function($v){$trim($v[$pos])}};
+
+    $buildCustomAttribute := function($rawEntityId       /* Unique code describing the associated event (e.g., Sale, Return, Deposit) */
+                                     ,$attributeId      /* ID for distinct attributes (e.g., unique line ID for sales lines) */
+                                     ,$canonicalCode    /* Hierarchical code in dot notation, indicating position in hierarchy */
+                                     ,$desc             /* Explanation of the attribute's purpose to avoid ambiguity */
+                                     ,$value            /* Value of the attribute */
+                                     ,$dType            /* Type of data (options: TIMESTAMP, STRINGBOOL, NUMERIC, STRING) */
+                                     ,$dFormat          /* Format details e.g. input time format or bool direction */
+                                     ,$includeMetadata  /* Boolean: Whether to include metadata in the hierarchical output */
+                                     )
+    {(
+        /* Build attribute unique id by concatenating entity code, canonical code and attribute id */
+        $buildAttributeID := function($rawEntityId,$canonicalCode,$attributeId){$rawEntityId & "_" & $replace($canonicalCode,".","_") & ($type($attributeId) = "null" ? "" : "_" & $attributeId)};
+
+
+        {"Id":$buildAttributeID($rawEntityId,$canonicalCode,$attributeId),
+         "Desc":$desc,
+         "Code":$canonicalCode,
+         "Value":$formatValue($value,$dType,$dFormat),
+         "Type":$dType,
+         "IncludeMetadata":$includeMetadata
+         }
+    )};
+
+    $convertCustomAttribute := function($jsonDoc){(
+
+        /* This function converts a custom attribute in the input JSON document into a hierarchy of objects.           */
+        /* The hierarchy is based on the 'Code' attribute value and creates objects accordingly.                       */
+        /* An example of which is shown below                                                                          */
+
+        /* INPUT CUSTOM ATTRIBUTE                                                                                      */
+        /*   {                                                                                                         */
+        /*     "ID": "Get_Customer_1234_Header_Contact_Address_AddresLine1",                                           */
+        /*     "Desc": "First Line of Contact Address",                                                                */
+        /*     "Code": "Header.Contact.Address.AddresLine1",                                                           */
+        /*     "Value": "Test Street",                                                                                 */
+        /*     "Type": "STRING"                                                                                        */
+        /*   }                                                                                                         */
+
+        /* OUTPUT ARRAY OF COMPONENT ATTRIBUTES                                                                        */
+        /*  [{                                                                                                         */
+        /*     "Key": "Header",                                                                                        */
+        /*     "Location": "$",                                                                                        */
+        /*     "Value": {                                                                                              */
+        /*       "Header": {}                                                                                          */
+        /*     }                                                                                                       */
+        /*   },                                                                                                        */
+        /*   {                                                                                                         */
+        /*     "Key": "Header.Contact",                                                                                */
+        /*     "Location": "Header",                                                                                   */
+        /*     "Value": {                                                                                              */
+        /*       "Contact": {}                                                                                         */
+        /*     }                                                                                                       */
+        /*   },                                                                                                        */
+        /*   {                                                                                                         */
+        /*     "Key": "Header.Contact.Address",                                                                        */
+        /*     "Location": "Header.Contact",                                                                           */
+        /*     "Value": {                                                                                              */
+        /*       "Address": {}                                                                                         */
+        /*     }                                                                                                       */
+        /*   },                                                                                                        */
+        /*   {                                                                                                         */
+        /*     "Key": "Header.Contact.Address.AddresLine1",                                                            */
+        /*     "Location": "Header.Address",                                                                           */
+        /*     "Value": {                                                                                              */
+        /*       "AddresLine1": "Test Street"                                                                          */
+        /*     }                                                                                                       */
+        /*   }]                                                                                                        */
+
+        $nestedObjectParts := $jsonDoc.(
+          $codeParts := $split(Code, ".");
+          $codeLength := $count($codeParts)-1;
+          $value := Value;
+          $description := Desc;
+          $includeMetadata := IncludeMetadata;
+          $Id := Id;
+
+          /* Determine the structure of the 'Value' field based on whether 'IncludeMetadata' is true or false */
+          $metadataValue := {"Id":$Id, "Value":$value,"Description":$description};
+
+          /* Build attribute array using the accumulator of the reduce function                     */
+          /* (https://docs.jsonata.org/higher-order-functions#reduce)                               */
+          /* and the append array function to concatenate the output array to the accumulator array */
+          /* https://docs.jsonata.org/array-functions#append                                        */
+          $codeValues := $reduce($codeParts, function($a, $v, $i) {(
+
+            $valueBaseStruct := $i=$codeLength ? [{"Key":$v,"Location":"$","Value":{$v:$value}}] :[{"Key":$v,"Location":"$","Value":{$v:{}}}];
+            $valueLeafStruct := [{"Key":$a[-1].Key & "." & $v,"Location":$a[-1].Key,"Value":{$v:{}}}];
+            $valueStruct := [{"Key":$a[-1].Key & "." & $v,"Location":$a[-1].Key,"Value":{$v: $value}}];
+
+            $append($a, $i=0           ? $valueBaseStruct :
+                        $i=$codeLength ? $valueStruct :
+                                         $valueLeafStruct
+                   )
+          )}, []);
+
+          $metadataValues := $reduce($codeParts, function($a, $v, $i) {(
+
+            $metadataBaseStruct := $includeMetadata ? [{"Key":$v & ".EntityMetadata","Location":$v,"Value":{"EntityMetadata":{}}}] : [];
+            $metadataLeafStruct := $includeMetadata ? [{"Key":$a[-1].Key & "." & $v,"Location":$a[-1].Key,"Value":{$v:{}}}] : [];
+            $metadataStruct := $includeMetadata ? [{"Key":$a[-1].Key & "." & $v,"Location":$a[-1].Key,"Value":{$v: $metadataValue}}] : [];
+
+            $append($a, $i=0           ?  $metadataBaseStruct:
+                        $i=$codeLength ?  $metadataStruct:
+                                          $metadataLeafStruct
+                   )
+          )}, []);
+
+          {"Values":$codeValues, "Metadata":$metadataValues};
+        );
+
+        /*  Remove duplicate objects from the array           */
+        /*  https://docs.jsonata.org/array-functions#distinct */
+
+        $distinctValueObjectParts := $distinct($nestedObjectParts.Values);
+        $distinctMetadataObjectParts := $distinct($nestedObjectParts.Metadata);
+        $distinctObjectParts := $append($distinctValueObjectParts, $distinctMetadataObjectParts);
+
+        /*  Build the final JSON document by iteratively inserting values                */
+        /*  The object is built using the accumulator of the reduce function             */
+        /*  (https://docs.jsonata.org/higher-order-functions#reduce)                     */
+        /*  to iteratively add to the json document                                      */
+        /*  in combination with the transform higher order function                      */
+        /*  (https://docs.jsonata.org/other-operators#-------transform)                  */
+        /*  to insert values into the document at the location defined in each attribute */
+
+        /* FINAL HIERARCHICAL OUTPUT                                                     */
+        /*   {                                                                           */
+        /*     "Header": {                                                               */
+        /*       "Contact": {                                                            */
+        /*         "Address": {                                                          */
+        /*           "AddresLine1": "Test Street"                                        */
+        /*         },                                                                    */
+        /*       }                                                                       */
+        /*     }                                                                         */
+        /*   }                                                                           */
+
+        $reduce($distinctObjectParts,function($a, $v){
+          $a ~> |$eval($v.Location)|$v.Value|
+        },{});
+
+
+    )};
+
+    /* MAPPING START */
+    $sourceSystem := "Next";
+    $sourceSubSystem := "ConcessionCSV";
+
+    $canonicalEventMetadataCodePrefix := "EventMetadata";
+    $eventBusinessRoot := "DomainEvent";
+    $eventTriggerPrefix := $eventBusinessRoot & ".TriggerEntity";
+
+    $fnTestOutput := function($testName,$testType,$inputValName,$inputVal,$actResVal,$expResVal,$sev) {
+      {
+        "TestName":$testName,
+        "TestType":$testType,
+        "InputValueName": $inputValName,
+        "InputValue": $inputVal,
+        "ActualResultValue":$actResVal,
+        "ExpectedResultValue":$expResVal,
+        "TestResult": $actResVal = $expResVal ? "PASS" : "FAIL",
+        "SeverityCode":$sev
+      }
+    };
+
+    /* DQ tests */
+    /* Origin */
+
+    $fnDqCheckExists_TransDate_ExistsValid := function() {
+      $fnTestOutput(
+        "TransDate_ExistsValid","Semantic", "TransDate",`TransDate`,
+          $match(`TransDate`,/^(19|20)\d{2}-(0[1-9]|1[012])-([012][0-9]|3[01])$/).match = `TransDate` ? "Y" : "N",
+          "Y",
+          "5"
+        )
+    };
+
+    $fnDqCheckRecon_SaleUnitsReturnUnits_HasValidQuantities := function() {
+      $fnTestOutput(
+        "SaleUnitsReturnUnits_HasValidQuantities","Semantic", "SaleUnits,ReturnUnits",`SaleUnits` & "," & `ReturnUnits` ,
+          ($formatValue(`SaleUnits`,"NUMERIC") > 0 and $formatValue(`ReturnUnits`,"NUMERIC") = 0)
+            or ($formatValue(`ReturnUnits`,"NUMERIC") < 0 and $formatValue(`SaleUnits`,"NUMERIC") = 0) ? "Y" : "N",
+          "Y",
+          "5"
+        )
+    };
+
+    $fnDqCheckRecon_SaleValueReturnValue_HasValidValues := function() {
+      $fnTestOutput(
+        "SaleValueReturnValue_HasValidValues","Semantic", "SaleValue,ReturnValue", `SaleValue` & "," & `ReturnValue` ,
+          ($formatValue(`SaleValue`,"NUMERIC") > 0 and $formatValue(`ReturnValue`,"NUMERIC") = 0)
+            or ($formatValue(`ReturnValue`,"NUMERIC") < 0 and $formatValue(`SaleValue`,"NUMERIC") = 0) ? "Y" : "N",
+          "Y",
+          "5"
+        )
+    };
+
+    $fnDqCheckEnum_Source_HasExpectedValues := function() {
+      $fnTestOutput(
+        "Source_HasExpectedValues","Semantic", "Source", `Source` ,
+          ($formatValue(`Source`,"STRING") = "RET" or $formatValue(`Source`,"STRING") = "ONL") ? "Y" : "N",
+          "Y",
+          "3"
+        )
+    };
+
+    $convertCustomAttribute(
+    [
+        $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".DqTestAtts.Origin","",
+          [
+            $fnDqCheckExists_TransDate_ExistsValid().TestResult = "FAIL" ? $fnDqCheckExists_TransDate_ExistsValid() :  NULL,
+            $fnDqCheckRecon_SaleUnitsReturnUnits_HasValidQuantities().TestResult = "FAIL" ? $fnDqCheckRecon_SaleUnitsReturnUnits_HasValidQuantities() :  NULL,
+            $fnDqCheckRecon_SaleValueReturnValue_HasValidValues().TestResult = "FAIL" ? $fnDqCheckRecon_SaleValueReturnValue_HasValidValues() :  NULL,
+            $fnDqCheckEnum_Source_HasExpectedValues().TestResult = "FAIL" ? $fnDqCheckEnum_Source_HasExpectedValues() :  NULL
+          ]
+
+        ,"ARRAY",null,false)
+    ]
+    );
+)

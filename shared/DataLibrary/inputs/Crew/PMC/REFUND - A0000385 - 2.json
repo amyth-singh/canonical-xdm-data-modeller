@@ -1,0 +1,267 @@
+{
+  "id": "",
+  "type": "REFUND",
+  "transactionId": "A0000385",
+  "transactionRef": "H6jdoJEI012022-03-02T09:07:03.050Zab54",
+  "dateTime": "2022-03-02T09:07:03.051Z",
+  "createdAt": "2022-03-02T09:07:03.054Z",
+  "updatedAt": "2022-03-02T09:07:09.832Z",
+  "updated_date": "2022-03-02T09:07:15.858Z",
+  "transCompletedAt": "2022-03-02T09:07:09.832Z",
+  "operationStatus": "PAY_SUCCESS",
+  "basket": {
+    "transactionDiscount": [
+      {
+        "discountAmount": -1,
+        "discountType": "Amount",
+        "reasonCode": "Refunded Discount",
+        "itemLineIds": [
+          1
+        ]
+      },
+      {
+        "discountAmount": -1.5,
+        "discountType": "Amount",
+        "reasonCode": "Refunded Discount",
+        "itemLineIds": [
+          1
+        ]
+      },
+      {
+        "discountAmount": 10,
+        "discountType": "currency",
+        "reasonCode": "20% Event",
+        "override": {
+          "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+          "automaticApprove": "true",
+          "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+        },
+        "itemLineIds": [
+          1
+        ]
+      },
+      {
+        "discountAmount": -1.5,
+        "discountType": "Amount",
+        "reasonCode": "Refunded Discount",
+        "itemLineIds": [
+          1
+        ]
+      },
+      {
+        "itemLineIds": [
+          1
+        ],
+        "discountAmount": -3,
+        "discountType": "Amount",
+        "reasonCode": "Refunded Discount"
+      }
+    ],
+    "transactionPromotion": [
+      {
+        "itemLineIds": [
+          1
+        ],
+        "promotionType": "TRANSACTION_OFF",
+        "promotionInfo": "undefined",
+        "promotionAmount": 5,
+        "promotionId": "a37e838e-694c-4069-9972-cddbd00abf43",
+        "promotionLinePrice": 275,
+        "displayText": "TP £10 off",
+        "name": "TP £10 off"
+      }
+    ],
+    "lineDiscount": [],
+    "linePromotion": [],
+    "products": [
+      {
+        "description": "  SEERSUCKER STRIPE EMB DRESS| GCD015 | 9-10 | GREEN",
+        "imageUrls": [
+          "https://www.crewclothing.co.uk/images/products/large/GCD015_GREEN.jpg"
+        ],
+        "price": 28,
+        "itemDiscounts": {
+          "trnDiscountsPortion": -3,
+          "trnPromotionsPortion": 5,
+          "refundPortion": 0
+        },
+        "SKU": "1219077",
+        "quantity": 3,
+        "refundedTotal": -84,
+        "refundedQuantity": 3,
+        "refundedPromotionalQuantity": 0,
+        "barCode": "5059595166306",
+        "isLastExchanged": true,
+        "refunded": true,
+        "totalLinePrice": 84,
+        "excludePromotion": false,
+        "itemLineId": "1",
+        "exchange": {
+          "exchangeId": 2,
+          "reason": "20",
+          "newItems": [
+            {
+              "lineItemId": 3,
+              "Quantity": 1
+            }
+          ],
+          "lineItemId": 1,
+          "quantity": 3
+        }
+      },
+      {
+        "totalLinePrice": 12,
+        "barCode": "5054409036196",
+        "refundedQuantity": 1,
+        "itemDiscounts": {
+          "trnDiscountsPortion": 0,
+          "trnPromotionsPortion": 0,
+          "refundPortion": 0
+        },
+        "refunded": true,
+        "refundedPromotionalQuantity": 0,
+        "description": "TILLY JUMPER | GCD001 | 8-9 | WHTDENMPCH",
+        "imageUrls": [
+          "https://www.crewclothing.co.uk/images/products/large/GCD001_WHTDENMPCH.jpg"
+        ],
+        "price": 12,
+        "quantity": 1,
+        "itemLineId": "3",
+        "refundedTotal": -12,
+        "SKU": "1111710"
+      },
+      {
+        "refunded": true,
+        "description": "TILLY JUMPER | GCD001 | 8-9 | WHTDENMPCH",
+        "SKU": "1111710",
+        "totalLinePrice": 12,
+        "quantity": 1,
+        "barCode": "5054409036196",
+        "refundedQuantity": 1,
+        "itemDiscounts": {
+          "trnDiscountsPortion": 0,
+          "trnPromotionsPortion": 0,
+          "refundPortion": 0
+        },
+        "imageUrls": [
+          "https://www.crewclothing.co.uk/images/products/large/GCD001_WHTDENMPCH.jpg"
+        ],
+        "price": 12,
+        "itemLineId": "2",
+        "refundedTotal": -12,
+        "refundedPromotionalQuantity": 0
+      }
+    ],
+    "taxBreakdown": {
+      "taxLines": [
+        {
+          "VAT": 20,
+          "VATCode": "H",
+          "itemLineId": 1,
+          "taxableAmount": -86,
+          "taxLineTotal": -17.2
+        },
+        {
+          "itemLineId": 3,
+          "taxableAmount": -12,
+          "taxLineTotal": -2.4,
+          "VAT": 20,
+          "VATCode": "H"
+        },
+        {
+          "VAT": 20,
+          "VATCode": "H",
+          "itemLineId": 2,
+          "taxableAmount": -12,
+          "taxLineTotal": -2.4
+        }
+      ],
+      "totalTaxableAmount": -110
+    }
+  },
+  "saleTotal": 108,
+  "terminalId": "EI013",
+  "storeNodeStructure": [
+    {
+      "parentId": "NODE::172d8290-7b61-4ebd-8114-7759135fdbd8",
+      "status": true,
+      "isOverride": true,
+      "name": "Cork",
+      "nodeId": "NODE::d535bc55-c123-4c8d-b0d5-1e2ab48d4428",
+      "nodeType": "STORE"
+    },
+    {
+      "status": true,
+      "isOverride": false,
+      "name": "Trading Stores",
+      "nodeId": "NODE::172d8290-7b61-4ebd-8114-7759135fdbd8",
+      "nodeType": "STORE_GROUP",
+      "parentId": "NODE::afe3bbef-3eaf-445a-af79-21b944c21b83"
+    },
+    {
+      "nodeType": "TRADING_REGION",
+      "parentId": "NODE::92a82e7c-e106-4c2c-af6a-7965ad711206",
+      "status": true,
+      "isOverride": true,
+      "name": "Ireland",
+      "nodeId": "NODE::afe3bbef-3eaf-445a-af79-21b944c21b83"
+    },
+    {
+      "parentId": "NODE::05b41253-65e1-4d7e-ae9c-da1a34841f3c",
+      "status": true,
+      "isOverride": false,
+      "name": "Crew Clothing",
+      "nodeId": "NODE::92a82e7c-e106-4c2c-af6a-7965ad711206",
+      "nodeType": "COMPANY"
+    },
+    {
+      "nodeId": "NODE::05b41253-65e1-4d7e-ae9c-da1a34841f3c",
+      "nodeType": "ORGANIZATION",
+      "parentId": "",
+      "status": true,
+      "type": "ORGANIZATION",
+      "checked": true,
+      "isOverride": false,
+      "name": "Crew Clothing"
+    }
+  ],
+  "storeId": "EI01",
+  "storeNodeId": "d535bc55-c123-4c8d-b0d5-1e2ab48d4428",
+  "reasonCode": "20",
+  "deviceId": "d4be53095b70b64d",
+  "basketSummary": {
+    "totalItems": 5,
+    "discountTotal": 100,
+    "refundTotal": -108,
+    "basketTotal": -100,
+    "VATTotal": -22,
+    "saleTotal": 108
+  },
+  "orgCode": "H6jdoJ",
+  "currentTransactionDetails": {},
+  "baseCurrency": "EUR",
+  "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+  "override": {
+    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+    "automaticApprove": "true",
+    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+  },
+  "offlineTransactionId": "",
+  "reasonDescription": "Too Small",
+  "paymentDetails": {
+    "transactionType": "REFUND",
+    "pan": "NA",
+    "paymentType": "PDQ",
+    "totalamount": "-100.00",
+    "entryMethod": "NA",
+    "result": "AUTHORISED",
+    "amount": "-100.00",
+    "hostReferenceId": "NA",
+    "transactionDate": "2022-03-02T09:07:03.051Z",
+    "currency": "EUR",
+    "cardType": "NA",
+    "authcode": "NA",
+    "aid": "NA",
+    "transactionReference": "H6jdoJEI012022-03-02T09:07:03.050Zab54"
+  }
+}

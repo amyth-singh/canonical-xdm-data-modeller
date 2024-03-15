@@ -1,0 +1,708 @@
+{
+  "$id": "https://xfuze.io/xdm/schema/components/event/common/EventHeader",
+  "title": "EventHeader",
+  "description": "XDM Schema for the common event component 'EventHeader'",
+  "type": "object",
+  "properties": {
+    "EventId": {
+      "type": "string",
+      "description": "Core event fields (repeated) at top level to enable storage (PK/CK/Indexes) and query optimisations in physical systems that require these to be top level only (e.g BQ) - refer core definition from EventMetadata for business definition"
+    },
+    "EntityId": {
+      "type": "string",
+      "description": "Core event fields (repeated) at top level to enable storage (PK/CK/Indexes) and query optimisations in physical systems that require these to be top level only (e.g BQ) - refer core definition from EventMetadata for business definition"
+    },
+    "EntityType": {
+      "type": "string",
+      "description": "Core event fields (repeated) at top level to enable storage (PK/CK/Indexes) and query optimisations in physical systems that require these to be top level only (e.g BQ) - refer core definition from EventMetadata for business definition"
+    },
+    "ParentEntityId": {
+      "type": "string",
+      "description": "Core event fields (repeated) at top level to enable storage (PK/CK/Indexes) and query optimisations in physical systems that require these to be top level only (e.g BQ) - refer core definition from EventMetadata for business definition"
+    },
+    "ParentEntityType": {
+      "type": "string",
+      "description": "Core event fields (repeated) at top level to enable storage (PK/CK/Indexes) and query optimisations in physical systems that require these to be top level only (e.g BQ) - refer core definition from EventMetadata for business definition"
+    },
+    "EventName": {
+      "type": "string",
+      "description": "Core event fields (repeated) at top level to enable storage (PK/CK/Indexes) and query optimisations in physical systems that require these to be top level only (e.g BQ) - refer core definition from EventMetadata for business definition"
+    },
+    "EventOccurredTimestampUTC": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Core event fields (repeated) at top level to enable storage (PK/CK/Indexes) and query optimisations in physical systems that require these to be top level only (e.g BQ) - refer core definition from EventMetadata for business definition"
+    },
+    "EventOccurredTimestampLocal": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Core event fields (repeated) at top level to enable storage (PK/CK/Indexes) and query optimisations in physical systems that require these to be top level only (e.g BQ) - refer core definition from EventMetadata for business definition"
+    },
+    "EventOccurredTimestampPartyLocal": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Core event fields (repeated) at top level to enable storage (PK/CK/Indexes) and query optimisations in physical systems that require these to be top level only (e.g BQ) - refer core definition from EventMetadata for business definition"
+    },
+    "EventMetadata": {
+      "description": "Core event fields (repeated) at top level to enable storage (PK/CK/Indexes) and query optimisations in physical systems that require these to be top level only (e.g BQ) - refer core definition from EventMetadata for business definition",
+      "$id": "https://xfuze.io/xdm/schema/components/event/common/EventMetadata",
+      "title": "EventMetadata",
+      "type": "object",
+      "properties": {
+        "EventAtts": {
+          "$id": "https://xfuze.io/xdm/schema/components/event/common/EventHeader/EventMetadata/EventAtts",
+          "description": "XDM Schema for the common event component 'EventHeader/EventMetadata/EventAtts'",
+          "type": "object",
+          "properties": {
+            "Xfuze": {
+              "type": "object",
+              "description": "The Xfuze derived / enriched attributes that define the context of the event itself",
+              "properties": {
+                "EventId": {
+                  "type": "string",
+                  "description": "e.g SalesOrderItemsDelivered_SalesOrderDelivery_Hybris_8106008620_JVGL06053_2023-01-12T12:03:00+00:00"
+                },
+                "EventCategory": {
+                  "type": "string",
+                  "description": "e.g Sales"
+                },
+                "EventName": {
+                  "type": "string",
+                  "description": "e.g SalesOrderItemsDelivered"
+                },
+                "TriggerEventId": {
+                  "type": "string",
+                  "description": "e.g SalesOrderItemsDelivered"
+                },
+                "EventClass": {
+                  "type": "string",
+                  "description": "e.g TriggerEvent"
+                },
+                "EventChangePattern": {
+                  "type": "string",
+                  "description": "e.g BusinessEvent"
+                },
+                "EventValueStream": {
+                  "type": "string",
+                  "description": "e.g Order2Cash"
+                },
+                "BizCapabilityL0": {
+                  "type": "string",
+                  "description": "e.g Distribution & Logistics"
+                },
+                "BizCapabilityL1": {
+                  "type": "string",
+                  "description": "e.g Manage Transport"
+                },
+                "ClientCode": {
+                  "type": "string",
+                  "description": "e.g GSR"
+                },
+                "Note": {
+                  "type": "string",
+                  "description": "e.g (Smoke test)"
+                },
+                "IsDerivedEvent": {
+                  "type": "string",
+                  "description": "e.g 'N'"
+                }
+              },
+              "required": [
+                "EventId",
+                "EventCategory",
+                "EventName",
+                "EventClass",
+                "EventChangePattern",
+                "ClientCode"
+              ]
+            },
+            "Origin": {
+              "type": "object",
+              "description": "The 'origin' source / raw attributes provided as input and that were consumed as part of producing the companion 'Xfuze' representations",
+              "properties": {
+                "EventId": {
+                  "type": "string",
+                  "description": "e.g d1d982ef-6dc6-47bb-80fb-2eaaf572deca"
+                },
+                "EventName": {
+                  "type": "string",
+                  "description": "e.g ORDER_PARCEL_DELIVERED"
+                },
+                "SourceSystem": {
+                  "type": "string",
+                  "description": "e.g OrderWebhookAPI"
+                },
+                "SourceSubSystem": {
+                  "type": "string",
+                  "description": "e.g '/resources/orders/order/deliveries"
+                },
+                "SourceFormatType": {
+                  "type": "string",
+                  "description": "e.g 'N'"
+                },
+                "CorrelationId": {
+                  "type": "string",
+                  "description": "e.g 3e35cec2-050d-4334-b564-5f1ce704a5f8"
+                }
+              },
+              "required": [
+                "SourceSystem",
+                "SourceFormatType"
+              ]
+            }
+          },
+          "required": [
+            "Xfuze",
+            "Origin"
+          ]
+        },
+        "EntityAtts": {
+          "$id": "https://xfuze.io/xdm/schema/components/event/common/EventHeader/EventAtts",
+          "description": "XDM Schema for the common event component 'EventHeader/EventAtts'",
+          "type": "object",
+          "properties": {
+            "Xfuze": {
+              "type": "object",
+              "description": "The Xfuze derived / enriched attributes that define the context of the entity the event is changing / notifying on",
+              "properties": {
+                "EntityId": {
+                  "type": "string",
+                  "description": "e.g SalesOrderDelivery_Hybris_8106008620_JVGL06053"
+                },
+                "EntityType": {
+                  "type": "string",
+                  "description": "e.g SalesOrderDelivery"
+                },
+                "EntitySubType": {
+                  "type": "string",
+                  "description": "e.g Sale"
+                },
+                "EntityVariation": {
+                  "type": "string",
+                  "description": "e.g DeliverToCustomer"
+                },
+                "EntityDomain": {
+                  "type": "string",
+                  "description": "e.g SalesOrder"
+                },
+                "ParentEntityId": {
+                  "type": "string",
+                  "description": "e.g SalesOrder_Hybris_8106008620"
+                },
+                "ParentEntityType": {
+                  "type": "string",
+                  "description": "e.g SalesOrder"
+                },
+                "EntityStatusCode": {
+                  "type": "string",
+                  "description": "e.g ShipmentCompleted"
+                },
+                "EntityStatusDesc": {
+                  "type": "string",
+                  "description": "e.g Shipment Delivered"
+                },
+                "IsSensitive": {
+                  "type": "string",
+                  "description": "e.g Y"
+                }
+              },
+              "required": [
+                "EntityId",
+                "EntityType",
+                "EntityDomain",
+                "IsSensitive"
+              ]
+            },
+            "Origin": {
+              "type": "object",
+              "description": "The 'origin' source / raw attributes provided as input and that were consumed as part of producing the companion 'Xfuze' representations",
+              "properties": {
+                "EntityId": {
+                  "type": "string",
+                  "description": "e.g 8106008620_JVGL06053"
+                },
+                "ParentEntityId": {
+                  "type": "string",
+                  "description": "e.g 8106008620"
+                },
+                "EntityStatusCode": {
+                  "type": "string",
+                  "description": "e.g SHIPMENT_COMPLETED"
+                }
+              },
+              "required": [
+                "EntityId"
+              ]
+            }
+          },
+          "required": [
+            "Xfuze",
+            "Origin"
+          ]
+        },
+        "TimeAtts": {
+          "$id": "https://xfuze.io/xdm/schema/components/event/common/EventHeader/EventMetadata/TimeAtts",
+          "description": "XDM Schema for the common event component 'EventHeader/EventMetadata/TimeAtts'",
+          "type": "object",
+          "properties": {
+            "Xfuze": {
+              "type": "object",
+              "description": "The Xfuze derived / enriched attributes that define the context of the time points (external / internal) related to the event is changing / notifying on",
+              "properties": {
+                "TimeZones": {
+                  "type": "object",
+                  "properties": {
+                    "HomeTimeZone": {
+                      "description": "A TimeZone object (required) representing the main 'home' timezone the client is and reports form",
+                      "type": "object",
+                      "properties": {
+                        "TimeZone": {
+                          "type": "string",
+                          "description": "The Time Zone e.g Europe/London"
+                        },
+                        "TimeZoneOffset": {
+                          "type": "string",
+                          "description": "UTC+01:00"
+                        },
+                        "TimeZoneCountryCode": {
+                          "type": "string",
+                          "description": "The ISO3 country code that is the country this TimeZone is for e.g GBR"
+                        }
+                      }
+                    },
+                    "EventTimeZone": {
+                      "description": "A TimeZone object (required) representing the main 'event' timezone i.e event source could represent all times in UTC.  Can be same as HomeTimeZone but also different",
+                      "type": "object",
+                      "properties": {
+                        "TimeZone": {
+                          "type": "string",
+                          "description": "The Time Zone e.g Europe/London"
+                        },
+                        "TimeZoneOffset": {
+                          "type": "string",
+                          "description": "UTC+01:00"
+                        },
+                        "TimeZoneCountryCode": {
+                          "type": "string",
+                          "description": "The ISO3 country code that is the country this TimeZone is for e.g GBR"
+                        }
+                      }
+                    },
+                    "PartyTimeZone": {
+                      "description": "A TimeZone object (optional) representing the contextual 'party' timezone associated with the party (e.b customer) in the context of the event (e.g order placed timezone)",
+                      "type": "object",
+                      "properties": {
+                        "TimeZone": {
+                          "type": "string",
+                          "description": "The Time Zone e.g Europe/London"
+                        },
+                        "TimeZoneOffset": {
+                          "type": "string",
+                          "description": "UTC+01:00"
+                        },
+                        "TimeZoneCountryCode": {
+                          "type": "string",
+                          "description": "The ISO3 country code that is the country this TimeZone is for e.g GBR"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "HomeTimeZone",
+                    "EventTimeZone"
+                  ]
+                },
+                "Times": {
+                  "type": "object",
+                  "properties": {
+                    "EventOccurredTimestamp": {
+                      "description": "A Time object (required) representing the 'true' real-world time the event occurred (EOT) e.g orderPlaced time, (typically) sourced from.  If the DQ of the source is poor, fallback on system time (not great).  This should be the timestamp(s) to use for any analysis and operational handling e.g ordering",
+                      "required": [
+                        "UTC",
+                        "Local",
+                        "Millis"
+                      ],
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "anyOf": [
+                          {
+                            "required": [
+                              "UTC"
+                            ]
+                          },
+                          {
+                            "required": [
+                              "Local",
+                              "Timezone"
+                            ]
+                          }
+                        ],
+                        "properties": {
+                          "DateId": {
+                            "type": "string",
+                            "description": "The Xfuze Date dim Id e.g Dates_20231001"
+                          },
+                          "HourId": {
+                            "type": "string",
+                            "description": "The Xfuze hour dim Id e.g Dates_2023100112"
+                          },
+                          "UTC": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "An Xfuze timestamp represented in UTC e.g 2023-01-12T12:03:00.000+0000"
+                          },
+                          "Local": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "An Xfuze timestamp represented in UTC e.g 2023-01-12T13:03:00.000+0100"
+                          },
+                          "PartyLocal": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "An Xfuze timestamp represented in UTC e.g 2023-01-12T13:03:00.000+0100"
+                          },
+                          "Millis": {
+                            "type": "number",
+                            "description": "An Xfuze timestamp represented in unix Millis e.g 1673525621103"
+                          }
+                        }
+                      }
+                    },
+                    "EventOccurredType": {
+                      "type": "string",
+                      "description": "The (required) type of the EventOccurredTimestamp, indicator of the quality.  TrueTime is if EOT is sourced from correct / best timestamp from the source and is the highest quality.",
+                      "enum": [
+                        "TrueTime",
+                        "ApproximateTime",
+                        "SystemTime"
+                      ]
+                    },
+                    "EventExternalReceivedTimestamp": {
+                      "description": "A Time object (required) representing the 'true' real-world time the event occurred e.g orderPlaced time, (typically) sourced from.  If the DQ of the source is poor, fallback on system time (not great).  This should be the timestamp(s) to use for any analysis and operational handling e.g ordering",
+                      "required": [
+                        "UTC",
+                        "Local",
+                        "Millis"
+                      ],
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "anyOf": [
+                          {
+                            "required": [
+                              "UTC"
+                            ]
+                          },
+                          {
+                            "required": [
+                              "Local",
+                              "Timezone"
+                            ]
+                          }
+                        ],
+                        "properties": {
+                          "DateId": {
+                            "type": "string",
+                            "description": "The Xfuze Date dim Id e.g Dates_20231001"
+                          },
+                          "HourId": {
+                            "type": "string",
+                            "description": "The Xfuze hour dim Id e.g Dates_2023100112"
+                          },
+                          "UTC": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "An Xfuze timestamp represented in UTC e.g 2023-01-12T12:03:00.000+0000"
+                          },
+                          "Local": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "An Xfuze timestamp represented in UTC e.g 2023-01-12T13:03:00.000+0100"
+                          },
+                          "PartyLocal": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "An Xfuze timestamp represented in UTC e.g 2023-01-12T13:03:00.000+0100"
+                          },
+                          "Millis": {
+                            "type": "number",
+                            "description": "An Xfuze timestamp represented in unix Millis e.g 1673525621103"
+                          }
+                        }
+                      }
+                    },
+                    "EventReceivedTimestamp": {
+                      "required": [
+                        "UTC",
+                        "Local",
+                        "Millis"
+                      ],
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "anyOf": [
+                          {
+                            "required": [
+                              "UTC"
+                            ]
+                          },
+                          {
+                            "required": [
+                              "Local",
+                              "Timezone"
+                            ]
+                          }
+                        ],
+                        "properties": {
+                          "DateId": {
+                            "type": "string",
+                            "description": "The Xfuze Date dim Id e.g Dates_20231001"
+                          },
+                          "HourId": {
+                            "type": "string",
+                            "description": "The Xfuze hour dim Id e.g Dates_2023100112"
+                          },
+                          "UTC": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "An Xfuze timestamp represented in UTC e.g 2023-01-12T12:03:00.000+0000"
+                          },
+                          "Local": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "An Xfuze timestamp represented in UTC e.g 2023-01-12T13:03:00.000+0100"
+                          },
+                          "PartyLocal": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "An Xfuze timestamp represented in UTC e.g 2023-01-12T13:03:00.000+0100"
+                          },
+                          "Millis": {
+                            "type": "number",
+                            "description": "An Xfuze timestamp represented in unix Millis e.g 1673525621103"
+                          }
+                        }
+                      }
+                    },
+                    "EventIngestProcessedTimestamp": {
+                      "required": [
+                        "UTC",
+                        "Local",
+                        "Millis"
+                      ],
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "anyOf": [
+                          {
+                            "required": [
+                              "UTC"
+                            ]
+                          },
+                          {
+                            "required": [
+                              "Local",
+                              "Timezone"
+                            ]
+                          }
+                        ],
+                        "properties": {
+                          "DateId": {
+                            "type": "string",
+                            "description": "The Xfuze Date dim Id e.g Dates_20231001"
+                          },
+                          "HourId": {
+                            "type": "string",
+                            "description": "The Xfuze hour dim Id e.g Dates_2023100112"
+                          },
+                          "UTC": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "An Xfuze timestamp represented in UTC e.g 2023-01-12T12:03:00.000+0000"
+                          },
+                          "Local": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "An Xfuze timestamp represented in UTC e.g 2023-01-12T13:03:00.000+0100"
+                          },
+                          "PartyLocal": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "An Xfuze timestamp represented in UTC e.g 2023-01-12T13:03:00.000+0100"
+                          },
+                          "Millis": {
+                            "type": "number",
+                            "description": "An Xfuze timestamp represented in unix Millis e.g 1673525621103"
+                          }
+                        }
+                      }
+                    },
+                    "EventProcessedTimestamp": {
+                      "required": [
+                        "UTC",
+                        "Local",
+                        "Millis"
+                      ],
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "anyOf": [
+                          {
+                            "required": [
+                              "UTC"
+                            ]
+                          },
+                          {
+                            "required": [
+                              "Local",
+                              "Timezone"
+                            ]
+                          }
+                        ],
+                        "properties": {
+                          "DateId": {
+                            "type": "string",
+                            "description": "The Xfuze Date dim Id e.g Dates_20231001"
+                          },
+                          "HourId": {
+                            "type": "string",
+                            "description": "The Xfuze hour dim Id e.g Dates_2023100112"
+                          },
+                          "UTC": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "An Xfuze timestamp represented in UTC e.g 2023-01-12T12:03:00.000+0000"
+                          },
+                          "Local": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "An Xfuze timestamp represented in UTC e.g 2023-01-12T13:03:00.000+0100"
+                          },
+                          "PartyLocal": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "An Xfuze timestamp represented in UTC e.g 2023-01-12T13:03:00.000+0100"
+                          },
+                          "Millis": {
+                            "type": "number",
+                            "description": "An Xfuze timestamp represented in unix Millis e.g 1673525621103"
+                          }
+                        }
+                      }
+                    },
+                    "EventPublishedTimestamp": {
+                      "required": [
+                        "UTC",
+                        "Local",
+                        "Millis"
+                      ],
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "anyOf": [
+                          {
+                            "required": [
+                              "UTC"
+                            ]
+                          },
+                          {
+                            "required": [
+                              "Local",
+                              "Timezone"
+                            ]
+                          }
+                        ],
+                        "properties": {
+                          "DateId": {
+                            "type": "string",
+                            "description": "The Xfuze Date dim Id e.g Dates_20231001"
+                          },
+                          "HourId": {
+                            "type": "string",
+                            "description": "The Xfuze hour dim Id e.g Dates_2023100112"
+                          },
+                          "UTC": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "An Xfuze timestamp represented in UTC e.g 2023-01-12T12:03:00.000+0000"
+                          },
+                          "Local": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "An Xfuze timestamp represented in UTC e.g 2023-01-12T13:03:00.000+0100"
+                          },
+                          "PartyLocal": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "An Xfuze timestamp represented in UTC e.g 2023-01-12T13:03:00.000+0100"
+                          },
+                          "Millis": {
+                            "type": "number",
+                            "description": "An Xfuze timestamp represented in unix Millis e.g 1673525621103"
+                          }
+                        }
+                      }
+                    },
+                    "EventSeq": {
+                      "type": "number",
+                      "description": "The (optional) sequence number of this event over life of entity, explicitly provided or derived"
+                    }
+                  },
+                  "required": [
+                    "EventOccurredTimestamp",
+                    "EventOccurredType",
+                    "EventReceivedTimestamp"
+                  ]
+                }
+              },
+              "required": [
+                "TimeZones",
+                "Times"
+              ]
+            },
+            "Origin": {
+              "type": "object",
+              "description": "The Origin (i.e source / raw attributes) input fields provided used in transforming to 'Xfuze' representations",
+              "properties": {
+                "EventOccurredTimestamp": {
+                  "type": "string",
+                  "description": "Raw for of the input timestamp used in generating Xfuze EventOccurredTimestamp e.g 2023-01-12 12:03:00+00:00"
+                },
+                "EventSourceSentTimestamp": {
+                  "type": "string",
+                  "description": "Raw for of the input timestamp used in generating Xfuze EventSourceSentTimestamp e.g 1673525621103"
+                },
+                "EventExternalReceivedTimestamp": {
+                  "type": "string",
+                  "description": "Raw for of the input timestamp used in generating Xfuze EventExternalReceivedTimestamp e.g 1673525621012"
+                }
+              },
+              "required": [
+                "EventOccurredTimestamp"
+              ]
+            }
+          },
+          "required": [
+            "Xfuze",
+            "Origin"
+          ]
+        }
+      },
+      "required": [
+        "EventAtts",
+        "EntityAtts",
+        "TimeAtts"
+      ]
+    }
+  },
+  "required": [
+    "EventId",
+    "EntityId",
+    "EntityType",
+    "EventName",
+    "EventOccurredTimestampUTC",
+    "EventOccurredTimestampLocal",
+    "EventMetadata"
+  ]
+}

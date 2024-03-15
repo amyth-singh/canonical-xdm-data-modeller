@@ -1,0 +1,38 @@
+{
+    "type": "object",
+    "unevaluatedProperties": false,
+    "description": "Unit Load Device",
+    "required": [
+        "ULDType"
+    ],
+    "properties": {
+        "ULDType": {
+            "type": "string",
+            "description": "The type of ULD",
+            "enum": [
+                "Package",
+                "Container",
+                "Pallet",
+                "Crate"
+            ]
+        },
+        "ULDCapacity": {
+            "$ref": "../../common/Measure.json#/MeasureProperties"
+        },
+        "ULDWeight": {
+            "$ref": "../../common/Measure.json#/MeasureProperties"
+        },
+        "ULDVolume": {
+            "$ref": "../../common/Measure.json#/MeasureProperties"
+        },
+        "ULDHeight": {
+            "$ref": "../../common/Measure.json#/MeasureProperties"
+        },
+        "ULDWidth": {
+            "$ref": "../../common/Measure.json#/MeasureProperties"
+        },
+        "ULDLength": {
+            "$ref": "../../common/Measure.json#/MeasureProperties"
+        }
+    }
+}

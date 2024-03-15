@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xfuze.io/xdm/schema/components/event/common/EventHeader/EventMetadata/ErrorAtts",
+  "description": "XDM Schema for the common event component 'EventHeader/EventMetadata/ErrorAtts'",
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "Xfuze": {
+      "type": "object",
+      "description": "The Xfuze derived / enriched error attributes for capturing error info related to any part of the event tlifecycle of this event",
+      "unevaluatedProperties": false,
+      "properties": {
+        "ServiceId": {
+          "type": ["string","null"],
+          "description": "(TODO)"
+        },
+        "ErrorId": {
+          "type": ["string","null"],
+          "description": "(TODO)"
+        },
+        "ErrorType": {
+          "type": ["string","null"],
+          "description": "(TODO)",
+          "enum": [
+            "Ingress Source - Source Connectivity",
+            "Ingress Source - Source Data Quality",
+            "Ingress Connector - Network",
+            "Ingress Connector - Storage",
+            "Ingress Connector - Database",
+            "Ingress Connector - Security",
+            "Ingress Connector - XDM - Bad Raw Input",
+            "Ingress Connector - XDM - Schema Validation Error",
+            "Ingress Connector - XDM - Transformation Execution Error",
+            "Ingress Connector - Distribution - Publication Error",
+            "(Other)"
+          ]
+        },
+        "ErrorCode": {
+          "type": ["string","null"],
+          "description": "(TODO)"
+        },
+        "ErrorDesc": {
+          "type": ["string","null"],
+          "description": "(TODO)"
+        },
+        "ErrorPriority": {
+          "type": ["string","null"],
+          "enum": [
+            "Critical",
+            "VeryHigh",
+            "High",
+            "Medium",
+            "Low"
+          ]
+        },
+        "ErrorSourceSystem": {
+          "type": ["string","null"],
+          "description": "(TODO)"
+        },
+        "ErrorSourceSubSystem": {
+          "type": ["string","null"],
+          "description": "(TODO)"
+        },
+        "ErrorSourceEventId": {
+          "type": ["string","null"],
+          "description": "(TODO)"
+        },
+        "ErrorEventId": {
+          "type": ["string","null"],
+          "description": "(TODO)"
+        },
+        "ErrorTimestampUTC": {
+          "type": ["string","null"],
+          "description": "(TODO)"
+        },
+        "ErrorEntityId": {
+          "type": ["string","null"],
+          "description": "(TODO)"
+        },
+        "StackTrace": {
+          "type": ["string","null"],
+          "description": "(TODO)"
+        },
+        "HttpStatusCode": {
+          "type": ["string","null"],
+          "description": "(TODO)"
+        },
+        "LogHint": {
+          "type": ["string","null"],
+          "description": "(TODO)"
+        },
+        "RemedyType": {
+          "type": ["string","null"],
+          "enum": [
+            "XiatechToResolve",
+            "ClientToResolve",
+            "ThirdPartyToResolve",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "Origin": {
+      "type": "object",
+      "description": "The 'origin' source / raw attributes provided as input and that were consumed as part of producing the companion 'Xfuze' representations",
+      "unevaluatedProperties": false,
+      "properties": {
+        "ErrorCode": {
+          "type": ["string","null"]
+        },
+        "ErrorDesc": {
+          "type": ["string","null"]
+        },
+        "HttpStatusCode": {
+          "type": ["string","null"]
+        },
+        "ReplayCount": {
+          "type": ["string","null"]
+        },
+        "LastEventId": {
+          "type": ["string","null"]
+        },
+        "LastEventOccurredTimestampUTC": {
+          "type": ["string","null"]
+        }
+      }
+    }
+  }
+}

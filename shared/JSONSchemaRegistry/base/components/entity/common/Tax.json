@@ -1,0 +1,51 @@
+{
+  "TaxObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/TaxProperties"
+    }
+  },
+  "TaxProperties": {
+    "type": "object",
+    "unevaluatedProperties": false,
+    "properties": {
+      "TaxCode": {
+        "type": "string",
+        "description": "The unique code of the tax e.g VAT20"
+      },
+      "TaxSchemeCode": {
+        "type": "string",
+        "description": "The scheme of the tax e.g VAT"
+      },
+      "TaxTypeCode": {
+        "type": "string",
+        "description": "The type of the tax e.g Sales"
+      },
+      "TaxGroupId": {
+        "type": "string",
+        "description": "The group id this tax code is part of"
+      },
+      "TaxGroupCode": {
+        "type": "string",
+        "description": "The group code this tax code is part of"
+      },
+      "IsTaxExempt": {
+        "type": "string",
+        "description": "Is this tax line a tex exempt one? e.g Y",
+        "enum": ["Y","N","U"]
+      },
+      "TaxRate": {
+        "type": "number",
+        "description": "The tax rate as a percentage e.g 20.00"
+      },
+      "GLCode": {
+        "type": "string",
+        "description": "A GL code associated with this Tax"
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

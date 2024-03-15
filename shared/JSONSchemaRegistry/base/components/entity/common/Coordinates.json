@@ -1,0 +1,32 @@
+{
+  "CoordinatesObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/CoordinatesProperties"
+    }
+  },
+  "CoordinatesProperties": {
+    "type": "object",
+    "description": "A coordinates object",
+    "unevaluatedProperties": false,
+    "properties": {
+      "Latitude": {
+        "type": "number",
+        "description": "The 'lat' value of the coordinate.  It ranges from -90 (South Pole) to 90 (North Pole)",
+        "minimum": -90,
+        "maximum": 90
+      },
+      "Longitude": {
+        "type": "number",
+        "description": "The 'long' value of the coordinate.  It ranges from -180 (West) to 180 (East)",
+        "minimum": -180,
+        "maximum": 180
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    },
+    "required": ["Latitude", "Longitude"]
+  }
+}

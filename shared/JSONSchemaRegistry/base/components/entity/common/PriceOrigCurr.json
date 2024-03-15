@@ -1,0 +1,44 @@
+  {
+  "PriceOrigCurrObject": {
+    "type": "object",
+    "description": "A common pair of pricing components, where there is an 'original' (e.g gross price before adjustments) and a 'current' (latest at point in time after any adjustments up to that time)",
+    "additionalProperties": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "anyOf": [
+        {
+          "required": ["Original"]
+        },
+        {
+          "required": ["Current"]
+        }
+      ],
+      "properties": {
+        "Original": {
+          "$ref": "#/PriceOrigCurrProperties"
+        },
+        "Current": {
+          "$ref": "#/PriceOrigCurrProperties"
+        }
+      }
+    }
+  },
+    "PriceOrigCurrProperties": {
+      "type": "object",
+      "properties": {
+        "IsChanged": {
+          "type": "string",
+          "description": "Has the original changed compared to the current for this price pair",
+          "enum": ["Y","N","U"]
+        },
+        "Original": {
+          "$ref": "./Price.json#/PriceProperties",
+          "description": "The original price BEFORE any adjustments"
+        },
+        "Current": {
+          "$ref": "./Price.json#/PriceProperties",
+          "description": "The current (relative to the time of the event) price AFTER any adjustments"
+        }
+      }
+    }
+}

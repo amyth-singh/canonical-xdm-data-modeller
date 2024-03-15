@@ -1,0 +1,8 @@
+process:
+  - inputSchema: industry-specific/RetailFashion/Product.json
+    outputSchema: client-specific/whs/product/WHSProductSchema.json
+    test:
+      inputDocument: ../../shared/DataLibrary/outputs/WHS/Product/WHSProduct.json
+      result: ../../tests/WHSProduct_Ingest_Output_Test_Results.json
+
+

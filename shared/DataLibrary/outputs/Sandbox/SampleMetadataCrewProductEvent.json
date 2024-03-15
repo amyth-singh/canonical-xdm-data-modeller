@@ -1,0 +1,293 @@
+{
+  "EventId": "ProductVariantPublished_ProductVariant_Retail247Origin_1286788_2023-09-08T15:23:06.000Z",
+  "EntityId": "ProductVariant_Retail247Origin_1286788",
+  "EventName": "ProductVariantPublished",
+  "EventOccurredTimestampUTC": "2023-09-08T15:23:06.000Z",
+  "EventOccurredTimestampLocal": "(TODO)",
+  "EventMetadata": {
+    "EventAtts": {
+      "Xfuze": {
+        "EventId": "ProductVariantPublished_ProductVariant_Retail247Origin_1286788_2023-09-08T15:23:06.000Z",
+        "EventCategory": "Product",
+        "EventName": "ProductVariantPublished",
+        "EventValueStream": "Product2Offer",
+        "EventClass": "TriggerEvent",
+        "EventChangePattern": "FullSnapshot",
+        "ClientCode": "Crew",
+        "Note": "(Any context note like test)",
+        "IsDerivedEvent": "N"
+      },
+      "Origin": {
+        "EventId": "null",
+        "EventName": "null",
+        "SourceSystem": "Retail247Origin",
+        "SourceSubSystem": "(N/A)",
+        "SourceFormatType": "CSV",
+        "CorrelationId": "null"
+      }
+    },
+    "EntityAtts": {
+      "Xfuze": {
+        "EntityId": "ProductVariant_Retail247Origin_1286788",
+        "EntityType": "ProductVariant",
+        "EntitySubType": "Sku",
+        "EntityVariation": "Retail",
+        "EntityDomain": "Sales",
+        "ParentEntityId": "null",
+        "ParentEntityType": "ProductBase",
+        "IsSensitive": "N"
+      },
+      "Origin": {
+        "EntityId": "1286788",
+        "ParentEntityId": null
+      }
+    },
+    "TimeAtts": {
+      "Xfuze": {
+        "TimeZones": {
+          "HomeTimeZone": {
+            "TimeZone": "Europe/London",
+            "TimeZoneOffset": "(To Calculate)"
+          },
+          "EventTimeZone": {
+            "TimeZone": "UTC",
+            "TimeZoneOffset": "(To Calculate)"
+          }
+        },
+        "Times": {
+          "EventOccurredTimestamp": {
+            "UTC": "2023-09-08T15:23:06.000Z",
+            "Local": "2023-09-08T15:23:06.000Z",
+            "Millis": "2023-09-08T15:23:06.000Z"
+          },
+          "EventReceivedTimestamp": {
+            "UTC": "2023-09-25T11:07:02.195Z",
+            "Local": "2023-09-25T11:07:02.195Z",
+            "Millis": "2023-09-25T11:07:02.195Z"
+          },
+          "EventIngestProcessedTimestamp": {
+            "UTC": "(TODO - INJECT by go post processing)",
+            "Local": "(TODO - INJECT by go post processing)",
+            "Millis": "(TODO - INJECT by go post processing)"
+          }
+        }
+      },
+      "Origin": {
+        "Times": {
+          "EventOccurredTimestamp": "09/08/2023 15:23:06"
+        }
+      }
+    },
+    "ProductAtts": {
+      "Xfuze": {
+        "ProductId": "ProductVariant_Retail247Origin_1286788",
+        "ProductKey": "1286788"
+      },
+      "Origin": {
+        "ProductId": "null",
+        "ProductKey": "1286788"
+      }
+    },
+    "IngestAtts": {
+      "Xfuze": {
+        "File": {
+          "SystemCode": "(TODO - from go injected or can be staticaly)",
+          "URI": "(TODO- as above)",
+          "ServerId": "(TODO)",
+          "Path": "(TODO)",
+          "Name": "(TODO)",
+          "SizeKBs": null,
+          "LineNumber": null,
+          "FormatType": "(TODO)",
+          "PatternType": "(TODO)",
+          "ModificationTimestampUTC ": "(TODO)"
+        }
+      }
+    },
+    "PayloadAtts": {
+      "Xfuze": {
+        "DataPayloadHash": "(TODO - post jsonata on 'DomainEvent') - Important for dedupping)",
+        "EventPayloadHash": "(TODO)",
+        "HashScheme": "MD5"
+      },
+      "Origin": {
+        "DataPayloadHash": "(TODO - pre jsonata raw only) - Important for dedupping)",
+        "EventPayloadHash": "(TODO)",
+        "HashScheme": "MD5"
+      }
+    }
+  },
+  "DomainEvent": {
+    "TriggerEntity": {
+      "EntityId": "ProductVariant_Retail247Origin_1286788",
+      "EntityType": "ProductVariant",
+      "ProductVariant": {
+        "Times": {
+          "CreatedOn": {
+            "UTC": "2023-07-19T11:52:54.000Z"
+          },
+          "UpdatedOn": {
+            "UTC": "2023-09-08T15:23:06.000Z"
+          }
+        },
+        "XRefIds": [
+          {
+            "Id": "ProductVariant_Retail247Origin_1286788",
+            "SystemCode": "Xfuze",
+            "Code": "EntityId"
+          },
+          {
+            "Id": "1286788",
+            "SystemCode": "Retail247Origin",
+            "Code": "SKU"
+          },
+          {
+            "Id": "5063013214005",
+            "SystemCode": "Retail247Origin",
+            "Code": "EAN"
+          },
+          {
+            "Id": "",
+            "SystemCode": "Retail247Origin",
+            "Code": "Product Code"
+          },
+          {
+            "Id": "",
+            "SystemCode": "Retail247Origin",
+            "Code": "SKU ID"
+          },
+          {
+            "Id": "",
+            "SystemCode": "Retail247Origin",
+            "Code": "Very PART"
+          },
+          {
+            "Id": "",
+            "SystemCode": "Retail247Origin",
+            "Code": "Very SKU"
+          }
+        ],
+        "Classification": {
+          "Gender": {
+            "Code": ""
+          },
+          "Phase": {
+            "Code": "October"
+          },
+          "ProductGroup": {
+            "Code": "600",
+            "Desc": "Womenswear"
+          },
+          "ProductType": {
+            "Code": "6036",
+            "Desc": "Woven Top"
+          },
+          "Range": {
+            "Code": "Range test"
+          },
+          "Season": {
+            "Code": "AUTUMN WINTER 2023"
+          }
+        },
+        "CoreAtts": {
+          "Description": "Celia lace blouse"
+        },
+        "DigitalAttributes": {
+          "WebExclusive": "Web Exclusive Test"
+        },
+        "InventoryLogistics": {
+          "SupplierID": "Hangzhou HS Fashion International Ltd."
+        },
+        "PhysicalAttributes": {
+          "Colour": {
+            "Code": "NAVY",
+            "Description": "",
+            "Group": "Colour Group Test"
+          },
+          "Measurements": {
+            "Dimensions": {
+              "Height": {
+                "CM": ""
+              },
+              "Width": {
+                "CM": ""
+              },
+              "Depth": {
+                "CM": ""
+              },
+              "Length": {
+                "CM": ""
+              }
+            },
+            "StandardSize": "10"
+          },
+          "Pattern": "",
+          "Style": {
+            "Code": "WTC057"
+          }
+        },
+        "PricingFinancial": {
+          "CostPrices": {
+            "CostPrice": {
+              "BCY": {
+                "ExTax": null
+              }
+            },
+            "SandpiperCostPrice": {
+              "BCY": {
+                "ExTax": null
+              }
+            }
+          },
+          "SellingPrices": {
+            "CurrentPrice": {
+              "BCY": {
+                "Currency": "GBP",
+                "IncTax": 65,
+                "Localisation": "UK"
+              },
+              "LCY": {
+                "Currency": "EUR",
+                "IncTax": 88,
+                "Localisation": "IE"
+              }
+            },
+            "OriginalPrice": {
+              "BCY": {
+                "Currency": "GBP",
+                "IncTax": 65,
+                "Localisation": "UK"
+              },
+              "LCY": {
+                "Currency": "EUR",
+                "IncTax": 88,
+                "Localisation": "IE"
+              }
+            },
+            "TicketPrice": {
+              "BCY": {
+                "Currency": "GBP",
+                "IncTax": 65,
+                "Localisation": "UK"
+              },
+              "LCY": {
+                "Currency": "EUR",
+                "IncTax": 88,
+                "Localisation": "IE"
+              }
+            }
+          },
+          "Tax": {
+            "Vat": {
+              "Code": "H"
+            }
+          }
+        },
+        "RegulatoryCompliance": {
+          "CountryOfOrigin": "",
+          "EcoFriendly": "Eco Friendly Test"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xfuze.io/xdm/schema/components/event/common/EventHeader/ModelAtts",
+  "description": "XDM Schema for the common event component 'EventHeader/ModelAtts'",
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "Xfuze": {
+      "type": "object",
+      "description": "The Xfuze derived / enriched attributes that define the schema and transforms and metadata used in generating this transform",
+      "unevaluatedProperties": false,
+      "properties": {
+        "SchemaURI": {
+          "type": "null"
+        },
+        "SchemaName": {
+          "type": "null"
+        },
+        "SchemaVersion": {
+          "type": "null"
+        },
+        "SchemaMetaModellerId": {
+          "type": "null"
+        },
+        "JSONataURI": {
+          "type": "null"
+        },
+        "JSONataName": {
+          "type": "null"
+        },
+        "JSONataVersion": {
+          "type": "null"
+        },
+        "JSONataMetaModellerId": {
+          "type": "null"
+        }
+      }
+    }
+  }
+}

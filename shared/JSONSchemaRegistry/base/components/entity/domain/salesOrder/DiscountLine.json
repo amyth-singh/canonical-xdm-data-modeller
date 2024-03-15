@@ -1,0 +1,69 @@
+{
+  "type": "object",
+  "description": "A discount line related to a single discount against a sales order entity (SOH, SOL).  Multiple discount lines are possible (1:*), thus this line object is typically in an array",
+  "unevaluatedProperties": false,
+  "allOf": [
+    {
+      "$ref": "../../common/Entity.json#/EntityHeader"
+    },
+    {
+      "properties": {
+        "LineIds": {
+          "$ref": "./LineIds.json#/LineIdsProperties",
+          "description": "The (required) common set of order line Ids for this discount line, not all a required individually, only what can be mapped & derived."
+        },
+        "DiscountLineKey": {
+          "type": "string",
+          "description": "The 'natural' discount line key/number, typically either a combination of SalesOrderNumber & a 'sequence number' (derived) OR explicitly supplied unique Id from source - also used to construct the synthetic SOL Xfuze Ids. e.g 123456789_1"
+        },
+        "DiscountLineSeq": {
+          "type": "number",
+          "description": "The ordinal line sequence number e.g 2"
+        },
+        "Discount": {
+          "$ref": "../marketing/DiscountPromo.json",
+          "description": "The Discount associated with this line"
+        },
+        "CouponCode": {
+          "type": "string",
+          "description": "The coupon code captured that triggered the discount to be applied"
+        },
+        "CouponDesc": {
+          "type": "string",
+          "description": "The coupon description of the code captured that triggered the discount to be applied"
+        },
+        "Totals": {
+          "type": "object",
+          "description": "The collection of possible totals, related to the discount.  Actual usage and ability to populate depends on the richness of the sources..",
+          "unevaluatedProperties": false,
+          "properties": {
+            "DiscountTotal": {
+              "description": "",
+              "$ref": "../../common/Price.json#/PriceProperties"
+            }
+          },
+          "required": [
+            "DiscountTotal"
+          ]
+        },
+        "ReasonCode": {
+          "type": "string",
+          "description": "The reason code for this discount line"
+        },
+        "ReasonDesc": {
+          "type": "string",
+          "description": "The reason desc for this discount line"
+        },
+        "Lineage": {
+          "$ref": "../../common/EventLineage.json#/EventLineageProperties",
+          "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+        }
+      },
+      "required": [
+        "LineIds",
+        "Discount",
+        "Totals"
+      ]
+    }
+  ]
+}

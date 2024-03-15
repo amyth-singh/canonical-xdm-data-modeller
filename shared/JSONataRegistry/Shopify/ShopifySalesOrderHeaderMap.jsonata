@@ -1,0 +1,2393 @@
+(
+  /*
+    Desc: Shopify Sales Order Mapper
+    Author: Kurt Maile
+    Status: In Dev
+    Exclude Filter: test = true (.e dont map) - we need to ignore 'test' events
+    Other Comments:
+
+    Links:
+      Order Events: https://shopify.dev/docs/api/admin-rest/2023-01/resources/event#order-events
+      Order Entity: https://shopify.dev/docs/api/admin-rest/2023-01/resources/order
+      Draft Order Entity: https://shopify.dev/docs/api/admin-rest/2023-01/resources/draftorder
+
+    Todo:
+     Look at the actual event resource itself not just the Order resource.
+
+  */
+
+  $upperTrim := $string ~> $trim ~> $uppercase;
+  $cleanStr := $string ~> $trim;
+  $stringBoolMap := {"Y":"Y","1":"Y","TRUE":"Y","N":"N","0":"N","FALSE":"Y"};
+  $stringBool := function($value){$lookup($stringBoolMap, $upperTrim($value))};
+  $buildEntityID := function($entityCode,$system,$rawEntityId){$replace($entityCode,".","_") & "_" & $system & "_" & $rawEntityId};
+  $buildAttributeID := function($entityID,$AttributeCode,$AttributeId){$entityID & "_" & $replace($AttributeCode,".","_") & ($AttributeId = "" ? "" : "_" & $AttributeId)};
+
+ 
+  /* ------------ START OF RAW INPUT DATA ------------ (Injected inn e.g Go / Dataform supplied) */
+  
+  /* Raw input data (injected config) enabling xdm derived values and actiing as templates */
+  $rawSourceSystem := "Shopify";
+  $rawSourceTimeZone := "Europe/London";
+  $rawEventId := null; /*  TODO: 'id' for an event is the id, but sample is resource only so far*/
+  $rawEventName := null;
+  $rawEventNameList := [ /* Full lookup list and mappings can expect for 'Order' events from shopify with XF mappings*/
+    {"systemEventName": "placed",                "xfuzeEventName": "SalesOrderPlaced"},
+    {"systemEventName": "updated",               "xfuzeEventName": "SalesOrderUpdated"},
+    {"systemEventName": "authorization_failure", "xfuzeEventName": "SalesOrderPaymentAuthFailed"},
+    {"systemEventName": "authorization_pending", "xfuzeEventName": "SalesOrderPaymentAuthPending"},
+    {"systemEventName": "authorization_success", "xfuzeEventName": "SalesOrderPaymentAuthSucceded"},
+    {"systemEventName": "cancelled",             "xfuzeEventName": "SalesOrderCancelled"},
+    {"systemEventName": "capture_failure",       "xfuzeEventName": "SalesOrderPaymentFailed"},
+    {"systemEventName": "capture_pending",       "xfuzeEventName": "SalesOrderPaymentPending"},
+    {"systemEventName": "capture_success",       "xfuzeEventName": "SalesOrderPaid"},
+    {"systemEventName": "closed",                "xfuzeEventName": "SalesOrderClosed"},
+    {"systemEventName": "re_opened",             "xfuzeEventName": "SalesOrderReopened"},
+    {"systemEventName": "confirmed",             "xfuzeEventName": "SalesOrderAccepted"},
+    {"systemEventName": "fulfillment_cancelled", "xfuzeEventName": "SalesOrderItemsFulfilmentCancelled"},
+    {"systemEventName": "fulfillment_pending",   "xfuzeEventName": "SalesOrderItemsFulfilmentPending"},
+    {"systemEventName": "fulfillment_success",   "xfuzeEventName": "SalesOrderItemsFulfilled"},
+    {"systemEventName": "refund_failure",        "xfuzeEventName": "SalesOrderRefundFailed"},
+    {"systemEventName": "refund_pending",        "xfuzeEventName": "SalesOrderRefundPending"},
+    {"systemEventName": "refund_success",        "xfuzeEventName": "SalesOrderRefunded"},
+    {"systemEventName": "restock_line_items",    "xfuzeEventName": "SalesOrderItemsRefunded"},
+    {"systemEventName": "sale_failure",          "xfuzeEventName": "SalesOrderPaymentFailed"}, /*  TODO: whats diff to capture*/
+    {"systemEventName": "sale_pending",          "xfuzeEventName": "SalesOrderPaymentPending"},
+    {"systemEventName": "sale_success",          "xfuzeEventName": "SalesOrderPaid"},
+    {"systemEventName": "void_failure",          "xfuzeEventName": "SalesOrderVoidFailed"},
+    {"systemEventName": "void_pending",          "xfuzeEventName": "SalesOrderVoidPending"},
+    {"systemEventName": "void_success",          "xfuzeEventName": "SalesOrderVoided"}    
+  ];
+  /* Lookup func for above */
+  $rawEventXrefFn := function($rawName) {
+    $rawEventNameList[systemEventName = $trim($rawName)].xfuzeEventName
+  };
+
+  $rawEntityId := $cleanStr(id); /* TODO: also 'subject_id' on the event*/
+  $rawEntityType := NULL;  /* TODO: 'subject_type' on the event */
+  $rawParentEntityId := (customer.id != null ? $cleanStr(customer.id) : NULL);
+  $rawEntityPartyId := (customer.id != null ? $cleanStr(customer.id) : NULL);
+  $rawEntityCustomerId := (customer.id != null ? $cleanStr(customer.id) : NULL);
+  $rawEntitySalesStaffId := (customer.id != null ? $cleanStr(user_id) : NULL);
+  $rawLocationId := (loction_id != null ? $cleanStr(loction_id) : NULL);
+  $rawEntityLastUpdatedOn := updated_at;
+  $rawEntityCreatedOn := created_at;
+  /* Raw but mapped for derived event metadata usage */
+  $rawEventOccurredTimestamp := updated_at;  /* clean update timestamp best for true world ordering. Not UTC yet */
+  $rawEventProcessedTimestamp := null;     /* EPT is only set when centrally processed by event processors */
+  $rawEventReceivedTimestamp := null;      /* noth*/
+  $clientCode := "RND";
+  /* ------------ END OF RAW INPUT DATA ------------ */
+
+  
+  /* ------------ START OF XFUZE COMMON DERIVED CONSTS & BASE FIELDS ------------ */
+
+  /* Xfuze common event and entity constants used in derived mappings*/
+  $event_eventCategory := "Sales";
+  $event_entityType := "SalesOrder";
+  $event_defaultEventVerb := "Published"; 
+  $event_eventValueStream := "Order2Cash";
+  $event_eventType:= "TriggerEvent";
+  $event_eventPriority:= "5";
+
+  $entity_entityTypeHeader := "SalesOrder_Header" ;
+  $entity_entityIdType := "System"; /* system mappings at this stage by connectors not merged xfuze*/
+  $entity_parentEntityType := "PartyRole_Customer";
+  $entity_entityTypeCustomer := "PartyRole_Customer";
+  $entity_entityTypeSalesStaff := "PartyRole_SalesStaff";
+  $entity_entityIsSensitive := "Y";
+
+  $party_partyId := NULL;
+  $party_partyType := "Individual";
+  $party_partyRoleId := $entity_entityTypeCustomer  & "_" & $rawSourceSystem & "_" & $rawEntityCustomerId;
+  $party_rawPartyRoleId := $cleanStr(customer.id);
+
+  $location_locationId := ($rawLocationId != null ? "Location_" & $rawLocationId : NULL);
+  $location_locationType := NULL;
+
+
+  /* Xfuze event and entity derived values */
+  $event_eventName := ($rawEventName = null ? $event_entityType &  $event_defaultEventVerb : $rawEventName); /* convert to Xfuze eventName?*/
+  $event_entityId := ($event_entityType & "_" & $rawSourceSystem & "_" & $rawEntityId);
+  $event_parentEntityId := $entity_entityTypeCustomer  & "_" & $rawSourceSystem & "_" & $rawEntityCustomerId; /* Customer is parent of order*/
+  $event_eventOccurredType = "TrueTime";
+  $event_eventOccurredLocalTimeZone = $rawSourceTimeZone;
+  $event_eventOccurredTimestamp := ($rawEventOccurredTimestamp = null ? $rawEventReceivedTimestamp : $rawEventOccurredTimestamp);
+  $event_eventProcessedTimestamp := ($rawEventOccurredTimestamp = null ? $rawEventReceivedTimestamp : $rawEventOccurredTimestamp);
+  $event_eventReceivedTimestamp := ($rawEventOccurredTimestamp = null ? $rawEventReceivedTimestamp : $rawEventOccurredTimestamp);
+  $event_eventId := $event_eventName & "_" & $event_entityId & "_" & $event_eventOccurredTimestamp;  
+ 
+  /* ------------ END OF XFUZE COMMON DERIVED CONSTS & BASE FIELDS ------------ */
+  
+  /* ------------ START OF XFUZE ENTITY SPECIFIC DERIVED CONSTS & BASE FIELDS ------------ */
+  
+  $orderIds_orderId := $event_entityId;
+  $orderIds_headerId := $entity_entityTypeHeader & "_" & $rawSourceSystem & "_" & $rawEntityId;
+  $partyIds_customerId := $entity_entityTypeCustomer  & "_" & $rawSourceSystem & "_" & $rawEntityCustomerId;
+  $partyIds_salesStaffId := $entity_entityTypeSalesStaff  & "_" & $rawSourceSystem & "_" & $rawEntitySalesStaffId;
+  $attMetadata_asOf := $event_eventOccurredTimestamp;
+
+  /* Xfuze SalesOrder derived 'functions */
+
+  $status_getOrderStatusFn := function() {
+    cancelled_at != null ? "Cancelled" : 
+      ( closed_at != null ? "Completed" : 
+        ( confirmed = true ? "InProgress" : "Draft")
+        )
+  };
+
+  $qtys_QtyNetFn := function() {
+    $sum(line_items.($number(quantity)))
+  };
+
+  $qtys_qtyRefundedFn := function() {
+    $sum(refunds.refund_line_items.($number(quantity)))
+  };
+
+  $qtys_qtyShippedFn := function() {
+    $sum(fulfillments.line_items.($number(quantity)))
+  };
+
+  /* $qtys_qtyCancelledFn - Cancelled is an update in place so needs to compare adjacent events to derive*/
+
+  /* common Xfuze funcs*/
+  $getDateDimFn := function($dt,$isUTC,$tz) { /* TODO: make this really precise depending on local or UTC */
+    { 
+          "DateId": $fromMillis($toMillis($dt),"[Y0001][M01][D01]"),
+          "TimestampUTC": (isUTC ? $dt : NULL), /* TODO convert to utc*/
+          "DateUTC": (isUTC ? $dt : NULL), /* TODO convert to date */
+          "TimeZone": ($tz != null ? $tz : $rawSourceTimeZone),
+          "DateTimeLocal": $fromMillis($toMillis($dt)),
+          "DateLocal": $fromMillis($toMillis($dt),"[Y0001]-[M01]-[D01]"),
+          "HourId": $fromMillis($toMillis($dt),"[H01]"),
+          "Millis": $toMillis($dt)
+    }
+  };
+
+/* ------------ END OF XFUZE ENTITY SPECIFIC DERIVED CONSTS & BASE FIELDS ------------ */
+
+/* ------------ START OF XFUZE ENTITY SPECIFIC QUERY FUNCTIONS ------------ */
+
+  $filterHeaderTotalsByPriceName := function($prcName) {
+    $prcName != null
+      ? **.Header.Totals[PriceName = $prcName].{PriceCode : PriceIncTax}
+      : **.Header.Totals[].{PriceCode : PriceIncTax}
+  };
+
+/* ------------ END OF XFUZE ENTITY SPECIFIC QUERY FUNCTIONS ------------ */
+
+/* ------------ START OF XFUZE ENTITY SPECIFIC DERIVED CONSTS & BASE FIELDS ------------ */
+
+{
+  "EventId": $event_eventId,
+  "EntityId": $event_entityId,
+  "ParentEntityId": $event_parentEntityId,
+  "EventMetadata": {
+    "EventAtts": {
+      "EventId": $event_eventId,
+      "EventCategory": $event_eventCategory,
+      "EventName": $event_eventName,
+      "RawEventId": NULL,
+      "RawEventName": NULL,
+      "RawSourceSystem": $rawSourceSystem,
+      "EventType": $event_eventType,
+      "EventValueStream": $event_eventValueStream,
+      "EventPriority": $event_eventPriority,
+      "ClientCode": $clientCode,
+      "CustomAtts": NULL
+    },
+    "EntityAtts": {
+      "EntityId": $event_entityId,
+      "EntityType": $event_entityType,
+      "RawEntityId": $rawEntityId,
+      "ParentEntityId": $event_parentEntityId,
+      "ParentEntityType": $entity_parentEntityType,
+      "RawParentEntityId": $rawParentEntityId,
+      "IsSensitive": $entity_entityIsSensitive,
+      "MetaModellerURN": NULL,
+      "MetaModellerVersion": NULL,
+      "CustomAtts": NULL
+    },
+    "TimeAtts": {
+      "EventOccurredTimestamp": $event_eventOccurredTimestamp,
+      "EventOccurredDateDim": $getDateDimFn($event_eventOccurredTimestamp,true),
+      "EventOccurredType": $event_eventOccurredType, /* JW: why not showing up?*/
+      "EventOccurredLocalTimeZone": $event_eventOccurredLocalTimeZone, /* JW: why not showing up?*/
+      "EventReceivedTimestamp": $event_eventReceivedTimestamp,
+      "EventReceivedDateDim": $getDateDimFn($event_eventReceivedTimestamp,true),
+      "ExternalEventReceivedTimestamp": NULL,
+      "ExternalEventReceivedDateDim": NULL,
+      "EventProcessedDateDim": NULL,
+      "EventProcessedTimestamp": NULL,
+      "CustomTimeAtts": NULL
+    },
+    "PartyAtts": {
+      "PartyId": $party_partyId, /* Not determined until stateful event processing */
+      "PartyType": $party_partyType, /* Not determined until stateful event processing */
+      "RawPartyId": $rawEntityPartyId,
+      "PartyRoleId": $party_partyRoleId,
+      "PartyRoleType": $party_partyRoleType,
+      "RawPartyRoleId": $party_rawPartyRoleId,
+      "InvolvedReasonCode" : "Purchaser",
+      "ClientDeviceDetails": $string(client_details),
+      "CustomAtts": NULL
+    },
+    "LocationAtts": ($rawLocationId = null ? NULL :  { /* TODO: not quite excluding properly*/
+      "LocationId": $location_locationId, 
+      "LocationType": $location_locationType,
+      "RawLocationId": $rawLocationId,
+      "InvolvedReasonCode": "Delivery",
+      "GeoJSON": NULL,
+      "Latitude": $string(shipping_address.latitude),
+      "Longitude" : $string(shipping_address.longitude),
+      "CustomAtts": NULL
+    }),
+    /* TODO below */
+    "DeltaFieldAtts":  NULL, /* TODO, enrichement step needs before and after*/          
+    "FeatureAtts":  NULL, /* TODO, add dta features like orderTotal etc*/ 
+    "SensitiveFieldsAtts":  NULL, /* e.g jsonata to each sensitive element? */
+    "IngestAtts":  NULL, /* e.g from kafka, pubsub */
+    "DeliveryAtts":  NULL
+  },
+  "SalesOrderEvent": {
+    "TriggerEntity": {
+      "OrderId": $orderIds_orderId,
+      "Header": {
+        "HeaderId": $orderIds_headerId,
+        "OrderId": $orderIds_orderId, /* top level order composite id*/
+        "CustomerId": $partyIds_customerId, /* CHANGED partyIds_CustomerID - PartyRole_Customer_*/
+        "Type" : {
+          "ClassCode": "Sales",
+          "TypeCode": "Sales",
+          "TypeDesc": "Sales Order via B2C Channel",
+          "SubTypeCode": NULL,
+          "SubTypeDesc": NULL,
+          "AttMetadata": {
+              "RawChangeTrackingHash": NULL, /* TODO */
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": NULL /* No source atts*/
+            }
+        },
+        "HeaderIds": [
+          {
+            "EntityId": $orderIds_headerId,
+            "EntityIdType": $entity_entityIdType,
+            "RawEntityId": $rawEntityId, 
+            "EntityType": $entity_entityTypeHeader,
+            "EntitySubType": $entity_entitySubTypeHeader,
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "id",
+                  "RawSourceVal": $string(id)
+                }
+              ]
+            }
+          },
+          {
+            "EntityId": $orderIds_headerId,
+            "EntityIdType": $entity_entityIdType,
+            "RawEntityId": $string(customer.id) & "_" & $cleanStr(order_number), 
+            "EntityType": $entity_entityTypeHeader,
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "order_number",
+                  "RawSourceVal": $string(order_number)
+                },
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "customer.id",
+                  "RawSourceVal": $string(customer.id)
+                }
+              ]
+            }
+          },
+          {
+            "EntityId": $orderIds_headerId,
+            "EntityIdType": $entity_entityIdType,
+            "RawEntityId": $cleanStr(token), 
+            "EntityType": $entity_entityTypeHeader,
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "token",
+                  "RawSourceVal": $string(token)
+                }
+              ]
+            }
+          },          
+          {
+            "EntityId": $orderIds_headerId,
+            "EntityIdType": $entity_entityIdType,
+            "RawEntityId": $cleanStr(cart_token), 
+            "EntityType": $entity_entityTypeHeader,
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "cart_token",
+                  "RawSourceVal": $string(cart_token)
+                }
+              ]
+            }
+          },
+          {
+            "EntityId": $orderIds_headerId,
+            "EntityIdType": $entity_entityIdType,
+            "RawEntityId": $cleanStr(checkout_id), 
+            "EntityType": $entity_entityTypeHeader,
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "checkout_id",
+                  "RawSourceVal": $string(checkout_id)
+                }
+              ]
+            }
+          }
+        ],
+        "PartyIds": [
+          {
+            "EntityId": $partyIds_customerId,
+            "EntityIdType": $entity_entityIdType,
+            "RawEntityId": $rawpartyIds_CustomerId, 
+            "EntityType": $entity_entityTypePartyRole,
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL, /* TODO */
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "customer.id",
+                  "RawSourceVal": $string(customer.id)
+                }
+              ]
+            }
+          },
+          {
+            "EntityId": $partyIds_salesStaffId,
+            "EntityIdType": $entity_entityIdType,
+            "RawEntityId": $rawEntitySalesStaffId, 
+            "EntityType": $entity_entityTypePartyRole,
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL, /* TODO */
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "user_id",
+                  "RawSourceVal": $string(user_id)
+                }
+              ]
+            }
+          }
+        ],
+        "Status": [
+          {
+            "StatusId": $buildAttributeID($orderIds_headerId, "Status.OrderStatus",""),
+            "StatusType": "Derived",
+            "StatusCode": "Header.Status.OrderStatus",
+            "StatusValue" : $status_getOrderStatusFn(), /* JW: added this, as code by convention doesnt have the value in it? */
+            "StatusDesc": "Overall order status",
+            "SubStatusCode": NULL,
+            "SubStatusDesc": NULL,
+            "SeqNo": NULL,
+            "ReasonCode": NULL,
+            "ReasonDesc": NULL,
+            "StatusURL": $string(order_status_url),
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [ /* status_getOrderStatusFn uses below inputs */
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "cancelled_at",
+                  "RawSourceVal": $string(cancelled_at)
+                },
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "closed_at",
+                  "RawSourceVal": $string(closed_at)
+                },
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "confirmed",
+                  "RawSourceVal": $string(confirmed)
+                }
+              ]
+            }
+          },
+          {
+            "StatusId": $buildAttributeID($orderIds_headerId, "Status.FulfilmentStatus",""),
+            "StatusType": "Native",
+            "StatusCode": "Status.FulfilmentStatus",
+            "StatusValue" : $cleanStr(fulfillment_status),
+            "StatusDesc": "Overall fulfilment Status for the order",
+            "SubStatusCode": NULL,
+            "SubStatusDesc": NULL,
+            "SeqNo": NULL,
+            "ReasonCode": NULL,
+            "ReasonDesc": NULL,
+            "StatusURL": NULL,
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "fulfillment_status",
+                  "RawSourceVal": $string(fulfillment_status)
+                }
+              ]
+            }
+          },
+          {
+            "StatusId": $buildAttributeID($orderIds_headerId, "Status.PaymentStatus",""),
+            "StatusType": "Native",
+            "StatusCode": "Status.PaymentStatus",
+            "StatusValue" : $cleanStr(financial_status),
+            "StatusDesc": "Overall payment Status for the order",
+            "SubStatusCode": NULL,
+            "SubStatusDesc": NULL,
+            "SeqNo": NULL,
+            "ReasonCode": NULL,
+            "ReasonDesc": NULL,
+            "StatusURL": NULL,
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "financial_status",
+                  "RawSourceVal": $string(financial_status)
+                }
+              ]
+            }
+          }      
+        ],
+        "Times": [
+          {
+            "TimeId": $buildAttributeID($orderIds_headerId, "Times.PlacedOn",""), /* can be diff to created */
+            "TimeCode": "Times.PlacedOn",
+            "TimeDesc": "Native source timestamp when the order was placed in source system (UTC) - can be different to created time",
+            "DateDim": $getDateDimFn($rawEntityCreatedOn,true),
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "created_at",
+                  "RawSourceVal": $string(created_at)
+                }
+              ]
+            }
+          },
+          {
+            "TimeId": $buildAttributeID($orderIds_headerId, "Times.CreatedUpdatedOn",""),
+            "TimeCode": "Times.CreatedUpdatedOn",
+            "TimeDesc": "Native source timestamp when the entity was created in source system (UTC)",
+            "DateDim": $getDateDimFn($rawEntityCreatedOn,true),
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "created_at",
+                  "RawSourceVal": $string(created_at)
+                }
+              ]
+            }
+          },          
+          {
+            "TimeId": $buildAttributeID($orderIds_headerId, "Times.LastUpdatedOn",""),
+            "TimeCode": "Times.LastUpdatedOn",
+            "TimeDesc": "Native source timestamp when the entity was last updated in source system (UTC)",
+            "DateDim": $getDateDimFn($rawEntityLastUpdatedOn,true),
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "updated_at",
+                  "RawSourceVal": $string(updated_at)
+                }
+              ]
+            }
+          },
+          {
+            "TimeId": $buildAttributeID($orderIds_headerId, "Times.CancelledOn",""),
+            "TimeCode": "Times.CancelledOn",
+            "TimeDesc": "Native source timestamp when the order was 'cancelled' on (pre any returns) (Local - Europe/London)",
+            "DateDim": $getDateDimFn(cancelledOn,true),
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "cancelledOn",
+                  "RawSourceVal": $string(cancelledOn)
+                }
+              ]
+            }
+          },
+          {
+            "TimeId": $buildAttributeID($orderIds_headerId, "Times.CompletedOn",""),
+            "TimeCode": "Times.CompletedOn",
+            "TimeDesc": "Native source timestamp when the order was 'completed' on (pre any returns) (Local - Europe/London)",
+            "DateDim": $getDateDimFn(completed,true),
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "completed",
+                  "RawSourceVal": $string(completed)
+                }
+              ]
+            }
+          }      
+        ],
+        "Locations": [
+          {
+            "AttId": $buildAttributeID($orderIds_headerId, "Locations.Customer",""),
+            "AttCode": "Locations.Customer",
+            "AttDesc": "Customer Contact / Location",
+            "IsArray": "Y", /* "JW: IsSensitive at this level too for easy know whether to look into array*/
+            "AttType": NULL,
+            "AttValue": NULL,
+            "AttValues": [
+              {
+                "Type": "STRING",
+                "ValKey": "CustomerId",
+                "Value": $partyIds_customerId,
+                "IsEncrypted": "N",
+                "IsSensitive": "N"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "RawCustomerId",
+                "Value": $cleanStr(customer.id),
+                "IsEncrypted": "N",
+                "IsSensitive": "N"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "AddressId",
+                "Value": "Location_Address_Shopify_" & $cleanStr(customer.default_address.id),
+                "IsEncrypted": "N",
+                "IsSensitive": "N"
+              }, 
+              {
+                "Type": "STRING",
+                "ValKey": "RawAddressId",
+                "Value": $cleanStr(customer.default_address.id),
+                "IsEncrypted": "N",
+                "IsSensitive": "N"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "AddressType",
+                "Value": "Default",
+                "IsEncrypted": "N",
+                "IsSensitive": "N"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "ContactFirstName",
+                "Value": $cleanStr(customer.default_address.first_name),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "ContactLastName",
+                "Value": $cleanStr(customer.default_address.last_name),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "ContactLastName",
+                "Value": $cleanStr(customer.default_address.name),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "Y"
+              }, 
+              {
+                "Type": "STRING",
+                "ValKey": "CompanyName",
+                "Value": $cleanStr(customer.default_address.company),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "AddressLine1",
+                "Value": $cleanStr(customer.default_address.address1),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "AddressLine2",
+                "Value": $cleanStr(customer.default_address.address2),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "City",
+                "Value": $cleanStr(customer.default_address.city),
+                "IsEncrypted": "N", 
+                "IsSensitive": "N"  /* Not sensitive? */
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "County",
+                "Value": $cleanStr(customer.default_address.province),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "N" /* Not sensitive? */
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "County",
+                "Value": $cleanStr(customer.default_address.province_code),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "N" /* Not sensitive? */
+              }, 
+              {
+                "Type": "STRING",
+                "ValKey": "Country",
+                "Value": $cleanStr(customer.default_address.country),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "N" /* Not sensitive? */
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "CountryCode2", /* JW: need a code for ISO 2*/
+                "Value": $cleanStr(customer.default_address.country_code),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "N" /* Not sensitive? */
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "Postcode",
+                "Value": $cleanStr(customer.default_address.zip),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "ContactPhoneNumber",
+                "Value": $cleanStr(customer.default_address.phone),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "Y"
+              }
+            ],
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL, /*  TODO: hash of all raw values*/
+              "IsAnonymised": "N", 
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+              {
+                "RawSourceSystem": $rawSourceSystem,
+                "RawSourceId": "customer.default_address",
+                "RawSourceVal": $string(customer.default_address)
+              }
+              ]
+            }
+          },
+          {
+            "AttId": $buildAttributeID($orderIds_headerId, "Locations.Billing",""),
+            "AttCode": "Locations.Billing",
+            "AttDesc": "Billing Contact / Location",
+            "IsArray": "Y", /* "JW: IsSensitive at this level too for easy know whether to look into array*/
+            "AttType": NULL,
+            "AttValue": NULL,
+            "AttValues": [
+              {
+                "Type": "STRING",
+                "ValKey": "CustomerId",
+                "Value": $partyIds_customerId,
+                "IsEncrypted": "N",
+                "IsSensitive": "N"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "RawCustomerId",
+                "Value": $cleanStr(customer.id),
+                "IsEncrypted": "N",
+                "IsSensitive": "N"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "AddressType",
+                "Value": "Billing",
+                "IsEncrypted": "N",
+                "IsSensitive": "N"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "ContactFirstName",
+                "Value": $cleanStr(billing_address.first_name),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "ContactLastName",
+                "Value": $cleanStr(billing_address.last_name),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "ContactLastName",
+                "Value": $cleanStr(billing_address.name),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "Y"
+              }, 
+              {
+                "Type": "STRING",
+                "ValKey": "CompanyName",
+                "Value": $cleanStr(billing_address.company),
+                "IsEncrypted": "N",
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "AddressLine1",
+                "Value": $cleanStr(billing_address.address1),
+                "IsEncrypted": "N",
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "AddressLine2",
+                "Value": $cleanStr(billing_address.address2),
+                "IsEncrypted": "N", 
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "City",
+                "Value": $cleanStr(billing_address.city),
+                "IsEncrypted": "N", 
+                "IsSensitive": "N"  /* Not sensitive? */
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "County",
+                "Value": $cleanStr(billing_address.province),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "N" /* Not sensitive? */
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "County",
+                "Value": $cleanStr(billing_address.province_code),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "N" /* Not sensitive? */
+              }, 
+              {
+                "Type": "STRING",
+                "ValKey": "Country",
+                "Value": $cleanStr(billing_address.country),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "N" /* Not sensitive? */
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "CountryCode2", /* JW: need a code for ISO 2*/
+                "Value": $cleanStr(billing_address.country_code),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "N" /* Not sensitive? */
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "Postcode",
+                "Value": $cleanStr(billing_address.zip),
+                "IsEncrypted": "N",
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "ContactPhoneNumber",
+                "Value": $cleanStr(billing_address.phone),
+                "IsEncrypted": "N",
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "Latitude",
+                "Value": $cleanStr(billing_address.latitude),
+                "IsEncrypted": "N", 
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "Longitude",
+                "Value": $cleanStr(billing_address.longitude),
+                "IsEncrypted": "N",
+                "IsSensitive": "Y"
+              }
+            ],
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL, 
+              "IsAnonymised": "N", 
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+              {
+                "RawSourceSystem": $rawSourceSystem,
+                "RawSourceId": "billing_address",
+                "RawSourceVal": $string(billing_address) 
+              }
+              ]
+            }
+          },
+          {
+            "AttId": $buildAttributeID($orderIds_headerId, "Locations.Shipping",""),
+            "AttCode": "Locations.Shipping",
+            "AttDesc": "Shipping Contact / Location",
+            "IsArray": "Y", /* "JW: IsSensitive at this level too for easy know whether to look into array*/
+            "AttType": NULL,
+            "AttValue": NULL,
+            "AttValues": [
+              {
+                "Type": "STRING",
+                "ValKey": "CustomerId",
+                "Value": $partyIds_customerId,
+                "IsEncrypted": "N",
+                "IsSensitive": "N"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "RawCustomerId",
+                "Value": $cleanStr(customer.id),
+                "IsEncrypted": "N",
+                "IsSensitive": "N"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "AddressType",
+                "Value": "Shipping",
+                "IsEncrypted": "N",
+                "IsSensitive": "N"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "ContactFirstName",
+                "Value": $cleanStr(shipping_address.first_name),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "ContactLastName",
+                "Value": $cleanStr(shipping_address.last_name),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "ContactLastName",
+                "Value": $cleanStr(shipping_address.name),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "Y"
+              }, 
+              {
+                "Type": "STRING",
+                "ValKey": "CompanyName",
+                "Value": $cleanStr(shipping_address.company),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "AddressLine1",
+                "Value": $cleanStr(shipping_address.address1),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "AddressLine2",
+                "Value": $cleanStr(shipping_address.address2),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "City",
+                "Value": $cleanStr(shipping_address.city),
+                "IsEncrypted": "N", 
+                "IsSensitive": "N"  /* Not sensitive? */
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "County",
+                "Value": $cleanStr(shipping_address.province),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "N" /* Not sensitive? */
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "County",
+                "Value": $cleanStr(shipping_address.province_code),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "N" /* Not sensitive? */
+              }, 
+              {
+                "Type": "STRING",
+                "ValKey": "Country",
+                "Value": $cleanStr(shipping_address.country),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "N" /* Not sensitive? */
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "CountryCode2", 
+                "Value": $cleanStr(shipping_address.country_code),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "N" /* Not sensitive? */
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "Postcode",
+                "Value": $cleanStr(shipping_address.zip),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "ContactPhoneNumber",
+                "Value": $cleanStr(shipping_address.phone),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "Latitude",
+                "Value": $cleanStr(shipping_address.latitude),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "Y"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "Longitude",
+                "Value": $cleanStr(shipping_address.longitude),
+                "IsEncrypted": "N",                     
+                "IsSensitive": "Y"
+              }
+            ],
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL, 
+              "IsAnonymised": "N", 
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+              {
+                "RawSourceSystem": $rawSourceSystem,
+                "RawSourceId": "shipping_address",
+                "RawSourceVal": $string(shipping_address)
+              }
+              ]
+            }
+          }          
+        ],
+        "Qtys": [ /* QtySold, QtyNet, QtyCancelled, QtyShipped, QtyDelivered, QtyReturned, QtyExchanged */
+          {
+            "QtyId": $buildAttributeID($orderIds_headerId, "Qtys.QtyNet",""),
+            "QtyCode" : "Qtys.QtyNet",
+            "QtyDesc": "Total Net (post retractions like cancels & returns) Units across all lines",
+            "Amount": $qtys_QtyNetFn(),
+            "AmountFloat": NULL,
+            "AccountingMethodType": NULL,
+            "UnitMeasure": NULL,
+            "UnitType": NULL,
+            "UnitScheme": NULL,
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL, /*  TODO: hash of all raw values*/
+              "IsAnonymised": "N", 
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "$sum(line_items.($number(quantity)))",
+                  "RawSourceVal": $string(line_items.quantity)
+                }
+              ]
+            }
+          },
+          {
+            "QtyId": $buildAttributeID($orderIds_headerId, "Qtys.QtyShipped",""),
+            "QtyCode" : "Qtys.QtyShipped",
+            "QtyDesc": "Total Shipped Units across all lines",
+            "Amount": $qtys_QtyNetFn(),
+            "AmountFloat": NULL,
+            "AccountingMethodType": NULL,
+            "UnitMeasure": NULL,
+            "UnitType": NULL,
+            "UnitScheme": NULL,
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL, /*  TODO: hash of all raw values*/
+              "IsAnonymised": "N", 
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "$sum(fulfillments.line_items.($number(quantity)))",
+                  "RawSourceVal": $string(fulfillments.line_items.quantity)
+                }
+              ]
+            }
+          },          
+          {
+            "QtyId": $buildAttributeID($orderIds_headerId, "Qtys.QtyRefunded",""),
+            "QtyCode" : "Qtys.QtyRefunded",
+            "QtyDesc": "Total Refunded Units (post accepted returns) across all lines",
+            "Amount": -1 * $qtys_qtyRefundedFn(),
+            "AmountFloat": NULL,
+            "AccountingMethodType": "-Retractions",
+            "UnitMeasure": NULL,
+            "UnitType": NULL,
+            "UnitScheme": NULL,
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL, /*  TODO: hash of all raw values*/
+              "IsAnonymised": "N", 
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "$sum(refunds.refund_line_items.($number(quantity)))",
+                  "RawSourceVal": $string(refunds.refund_line_items.quantity)
+                }
+              ]
+            }
+          }       
+          
+        ],
+        "Totals": [
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.GrandTotal.CurrentBCY",""), 
+              "PriceType": "Sales",
+              "PriceCode": "Totals.GrandTotal.CurrentBCY",
+              "PriceName": "GrandTotal",
+              "PriceDesc": "Current Grand Total (BASE Currency) - Final 'Net' Total at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "BCY",
+              "PriceIncTax": $number(current_total_price_set.shop_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(current_total_price_set.shop_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "current_total_price_set.shop_money",
+                    "RawSourceVal": $string(current_total_price_set.shop_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.GrandTotal.CurrentLCY",""),
+              "PriceType": "Sales",
+              "PriceCode": "Totals.GrandTotal.CurrentLCY",
+              "PriceName": "GrandTotal",
+              "PriceDesc": "Current Grand Total (LOCAL Currency) - Final 'Net' Total at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "LCY",
+              "PriceIncTax": $number(current_total_price_set.presentment_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(current_total_price_set.presentment_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": $number(current_total_price_set.presentment_money.amount) / $number(current_total_price_set.shop_money.amount),
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "current_total_price_set.presentment_money",
+                    "RawSourceVal": $string(current_total_price_set.presentment_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.GrandTotal.OriginalBCY",""),
+              "PriceType": "Sales",
+              "PriceCode": "Totals.GrandTotal.OriginalBCY",
+              "PriceName": "GrandTotal",
+              "PriceDesc": "Original Grand Total (BASE Currency) - 'Net' Total at Purchase",
+              "PriceTimeClass": "OriginalPrice",
+              "PriceLocalisation": "BCY",
+              "PriceIncTax": $number(total_price_set.shop_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(total_price_set.shop_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "total_price_set.shop_money",
+                    "RawSourceVal": $string(total_price_set.shop_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.GrandTotal.OriginalLCY",""),
+              "PriceType": "Sales",
+              "PriceCode": "Totals.GrandTotal.OriginalLCY",
+              "PriceName": "GrandTotal",
+              "PriceDesc": "Original Grand Total (LOCAL Currency) - 'Net' Total at Purchase",
+              "PriceTimeClass": "OriginalPrice",
+              "PriceLocalisation": "LCY",
+              "PriceIncTax": $number(total_price_set.presentment_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(total_price_set.presentment_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": $number(total_price_set.presentment_money.amount) / $number(total_price_set.shop_money.amount),
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "total_price_set.presentment_money",
+                    "RawSourceVal": $string(total_price_set.presentment_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.OutstandingTotal.CurrentBCY",""), 
+              "PriceType": "Sales",
+              "PriceCode": "Totals.OutstandingTotal.CurrentBCY",
+              "PriceName": "OutstandingTotal",
+              "PriceDesc": "Current Outstanding Total (BASE Currency) - Final 'Net' Outstanding Total (grand - paid) at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "BCY",
+              "PriceIncTax": -1.0 * $number(total_outstanding.shop_money.amount), /* TODO: is this right?*/
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(total_outstanding.shop_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "-Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "total_outstanding.shop_money",
+                    "RawSourceVal": $string(total_outstanding.shop_money)
+                  }
+                ]
+              }
+            }
+          ],
+          "DiscountTotal": [
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.DiscountTotal.CurrentBCY",""), 
+              "PriceType": "Sales",
+              "PriceCode": "Totals.DiscountTotal.CurrentBCY",
+              "PriceName": "OutstandingTotal",
+              "PriceDesc": "Current Total Discounts (BASE Currency) - Final 'Net' Discount Total at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "BCY",
+              "PriceIncTax": -1.0 * $number(current_total_discounts_set.shop_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(current_total_discounts_set.shop_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "-Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "current_total_discounts_set.shop_money",
+                    "RawSourceVal": $string(current_total_discounts_set.shop_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.DiscountTotal.CurrentLCY",""),
+              "PriceType": "Sales",
+              "PriceCode": "Totals.DiscountTotal.CurrentLCY",
+              "PriceName": "DiscountTotal",
+              "PriceDesc": "Current Discount Total (LOCAL Currency) - Final 'Net' Total at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "LCY",
+              "PriceIncTax": -1.0 * $number(current_total_discounts_set.presentment_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(current_total_discounts_set.presentment_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "-Retractions",
+              "ExchangeRate": $number(current_total_discounts_set.presentment_money.amount) / $number(current_total_discounts_set.shop_money.amount),
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "current_total_discounts_set.presentment_money",
+                    "RawSourceVal": $string(current_total_discounts_set.presentment_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.DiscountTotal.OriginalBCY",""),
+              "PriceType": "Sales",
+              "PriceCode": "Totals.DiscountTotal.OriginalBCY",
+              "PriceName": "DiscountTotal",
+              "PriceDesc": "Original Discount Total (BASE Currency) - 'Net' Total at Purchase",
+              "PriceTimeClass": "OriginalPrice",
+              "PriceLocalisation": "BCY",
+              "PriceIncTax": -1.0 * $number(total_discounts_set.shop_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(total_discounts_set.shop_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "-Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "total_discounts_set.shop_money",
+                    "RawSourceVal": $string(total_discounts_set.shop_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.DiscountTotal.OriginalLCY",""),
+              "PriceType": "Sales",
+              "PriceCode": "Totals.DiscountTotal.OriginalLCY",
+              "PriceName": "DiscountTotal",
+              "PriceDesc": "Original Discount Total (LOCAL Currency) - 'Net' Total at Purchase",
+              "PriceTimeClass": "OriginalPrice",
+              "PriceLocalisation": "LCY",
+              "PriceIncTax": -1.0 * $number(total_discounts_set.presentment_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(total_discounts_set.presentment_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "-Retractions",
+              "ExchangeRate": $number(total_discounts_set.presentment_money.amount) / $number(total_discounts_set.shop_money.amount),
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "total_price_set.presentment_money",
+                    "RawSourceVal": $string(total_price_set.presentment_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.ProductTotalBeforeDiscounts.CurrentBCY",""), 
+              "PriceType": "Sales",
+              "PriceCode": "Totals.ProductTotalBeforeDiscounts.CurrentBCY",
+              "PriceName": "ProductTotalBeforeDiscounts",
+              "PriceDesc": "Current Total Product (from Lines) AFTER discounts (BASE Currency) - Final 'Net' (AFTER discounts but before shipping, duties, taxes, and tips) Total at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "BCY",
+              "PriceIncTax": $number(total_line_items_price_set.shop_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(total_line_items_price_set.shop_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "total_line_items_price_set.shop_money",
+                    "RawSourceVal": $string(total_line_items_price_set.shop_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.ProductTotalBeforeDiscounts.CurrentLCY",""),
+              "PriceType": "Sales",
+              "PriceCode": "Totals.ProductTotalBeforeDiscounts.CurrentLCY",
+              "PriceName": "ProductTotalBeforeDiscounts",
+              "PriceDesc": "Current Total Product (from Lines) BEFORE discounts (BASE Currency) - Final 'Net' Total at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "LCY",
+              "PriceIncTax": $number(total_line_items_price_set.presentment_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(total_line_items_price_set.presentment_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": $number(total_line_items_price_set.presentment_money.amount) / $number(total_line_items_price_set.shop_money.amount),
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "total_line_items_price_set.presentment_money",
+                    "RawSourceVal": $string(total_line_items_price_set.presentment_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.ProductTotalBeforeDiscounts.OriginalBCY",""),
+              "PriceType": "Sales",
+              "PriceCode": "Totals.ProductTotalBeforeDiscounts.OriginalBCY",
+              "PriceName": "ProductTotalBeforeDiscounts",
+              "PriceDesc": "Original Total Product (from Lines) BEFORE discounts (BASE Currency) - 'Net' Total at Purchase",
+              "PriceTimeClass": "OriginalPrice",
+              "PriceLocalisation": "BCY",
+              "PriceIncTax": $number(total_line_items_price_set.shop_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(total_line_items_price_set.shop_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "total_line_items_price_set.shop_money",
+                    "RawSourceVal": $string(total_line_items_price_set.shop_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.ProductTotalBeforeDiscounts.OriginalLCY",""),
+              "PriceType": "Sales",
+              "PriceCode": "Totals.ProductTotalBeforeDiscounts.OriginalLCY",
+              "PriceName": "ProductTotalBeforeDiscounts",
+              "PriceDesc": "Original Total Product (from Lines) BEFORE discounts (LOCAL Currency) - 'Net' Total at Purchase",
+              "PriceTimeClass": "OriginalPrice",
+              "PriceLocalisation": "LCY",
+              "PriceIncTax": $number(total_line_items_price_set.presentment_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(total_line_items_price_set.presentment_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": $number(total_line_items_price_set.presentment_money.amount) / $number(total_line_items_price_set.shop_money.amount),
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "total_line_items_price_set.presentment_money",
+                    "RawSourceVal": $string(total_line_items_price_set.presentment_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.ProductTotalAfterDiscounts.CurrentBCY",""), 
+              "PriceType": "Sales",
+              "PriceCode": "Totals.ProductTotalAfterDiscounts.CurrentBCY",
+              "PriceName": "ProductTotalAfterDiscounts",
+              "PriceDesc": "Current Total Product (from Lines) AFTER discounts (BASE Currency) - Final 'Net' (AFTER discounts but before shipping, duties, taxes, and tips) Total at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "BCY",
+              "PriceIncTax": $number(current_subtotal_price_set.shop_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(current_subtotal_price_set.shop_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "current_subtotal_price_set.shop_money",
+                    "RawSourceVal": $string(current_subtotal_price_set.shop_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.ProductTotalAfterDiscounts.CurrentLCY",""),
+              "PriceType": "Sales",
+              "PriceCode": "Totals.ProductTotalAfterDiscounts.CurrentLCY",
+              "PriceName": "ProductTotalAfterDiscounts",
+              "PriceDesc": "Current Total Product (from Lines) BEFORE discounts (BASE Currency) - Final 'Net' Total at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "LCY",
+              "PriceIncTax": $number(current_subtotal_price_set.presentment_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(current_subtotal_price_set.presentment_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": $number(current_subtotal_price_set.presentment_money.amount) / $number(current_subtotal_price_set.shop_money.amount),
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "current_subtotal_price_set.presentment_money",
+                    "RawSourceVal": $string(current_subtotal_price_set.presentment_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.ProductTotalAfterDiscounts.OriginalBCY",""),
+              "PriceType": "Sales",
+              "PriceCode": "Totals.ProductTotalAfterDiscounts.OriginalBCY",
+              "PriceName": "ProductTotalAfterDiscounts",
+              "PriceDesc": "Original Total Product (from Lines) BEFORE discounts (BASE Currency) - 'Net' Total at Purchase",
+              "PriceTimeClass": "OriginalPrice",
+              "PriceLocalisation": "BCY",
+              "PriceIncTax": $number(total_line_items_price_set.shop_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(total_line_items_price_set.shop_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "total_line_items_price_set.shop_money",
+                    "RawSourceVal": $string(total_line_items_price_set.shop_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.ProductTotalAfterDiscounts.OriginalLCY",""),
+              "PriceType": "Sales",
+              "PriceCode": "Totals.ProductTotalAfterDiscounts.OriginalLCY",
+              "PriceName": "ProductTotalAfterDiscounts",
+              "PriceDesc": "Original Total Product (from Lines) BEFORE discounts (LOCAL Currency) - 'Net' Total at Purchase",
+              "PriceTimeClass": "OriginalPrice",
+              "PriceLocalisation": "LCY",
+              "PriceIncTax": $number(total_line_items_price_set.presentment_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(total_line_items_price_set.presentment_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": $number(total_line_items_price_set.presentment_money.amount) / $number(total_line_items_price_set.shop_money.amount),
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "total_line_items_price_set.presentment_money",
+                    "RawSourceVal": $string(total_line_items_price_set.presentment_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.ShippingTotalBeforeDiscounts.CurrentBCY",""),
+              "PriceType": "Sales",
+              "PriceCode": "Totals.ShippingTotalBeforeDiscounts.CurrentBCY",
+              "PriceName": "ShippingTotalBeforeDiscounts",
+              "PriceDesc": "Current Total Shipping (BASE Currency) -  excluding adjustments (discounts and returns) - at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "BCY",
+              "PriceIncTax": -1.0 * $number(total_shipping_price_set.shop_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(total_shipping_price_set.shop_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "-Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "total_shipping_price_set.shop_money",
+                    "RawSourceVal": $string(total_shipping_price_set.shop_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.ShippingTotalBeforeDiscounts.CurrentLCY",""),
+              "PriceType": "Sales",
+              "PriceCode": "Totals.ShippingTotalBeforeDiscounts.CurrentBCY",
+              "PriceName": "ShippingTotalBeforeDiscounts",
+              "PriceDesc": "Current Total Shipping (LOCAL Currency) -  excluding adjustments (discounts and returns) - at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "LCY",
+              "PriceIncTax": -1.0 * $number(total_shipping_price_set.presentment_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(total_shipping_price_set.presentment_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "-Retractions",
+              "ExchangeRate": $number(total_shipping_price_set.presentment_money.amount) / $number(total_shipping_price_set.shop_money.amount),
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "total_shipping_price_set.presentment_money",
+                    "RawSourceVal": $string(total_shipping_price_set.presentment_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.TaxTotal.CurrentBCY",""), 
+              "PriceType": "Sales",
+              "PriceCode": "Totals.TaxTotal.CurrentBCY",
+              "PriceName": "TaxTotal",
+              "PriceDesc": "Current Total Tax (BASE Currency) - Current 'Net' excluding adjustments (discounts, cancels & returns)  Total Tax at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "BCY",
+              "PriceIncTax": $number(current_total_tax_set.shop_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(current_total_tax_set.shop_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": NULL, /* not a retraction */
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "current_total_tax_set.shop_money",
+                    "RawSourceVal": $string(current_total_tax_set.shop_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.TaxTotal.CurrentLCY",""),
+              "PriceType": "Sales",
+              "PriceCode": "Totals.TaxTotal.CurrentLCY",
+              "PriceName": "TaxTotal",
+              "PriceDesc": "Current Total Tax (LOCAL Currency) - Current 'Net' excluding adjustments (discounts, cancels & returns) Total Tax at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "LCY",
+              "PriceIncTax": $number(current_total_tax_set.presentment_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(current_total_tax_set.presentment_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": NULL,
+              "ExchangeRate": $number(current_total_tax_set.presentment_money.amount) / $number(current_total_tax_set.shop_money.amount),
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "current_total_tax_set.presentment_money",
+                    "RawSourceVal": $string(current_total_tax_set.presentment_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.TaxTotal.OriginalBCY",""),
+              "PriceType": "Sales",
+              "PriceCode": "Totals.TaxTotal.OriginalBCY",
+              "PriceName": "TaxTotal",
+              "PriceDesc": "Original Total Tax (BASE Currency) - Current 'Net' excluding adjustments (discounts, cancels & returns) Total Tax at Purchase",
+              "PriceTimeClass": "OriginalPrice",
+              "PriceLocalisation": "BCY",
+              "PriceIncTax": $number(total_tax_set.shop_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(total_tax_set.shop_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "-Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "total_tax_set.shop_money",
+                    "RawSourceVal": $string(total_tax_set.shop_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.TaxTotal.OriginalLCY",""),
+              "PriceType": "Sales",
+              "PriceCode": "Totals.TaxTotal.OriginalLCY",
+              "PriceName": "TaxTotal",
+              "PriceDesc": "Original Total Tax (LOCAL Currency) - Current 'Net' excluding adjustments (discounts, cancels & returns) Total Tax at Purchase",
+              "PriceTimeClass": "OriginalPrice",
+              "PriceLocalisation": "LCY",
+              "PriceIncTax": $number(total_tax_set.presentment_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(total_tax_set.presentment_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "-Retractions",
+              "ExchangeRate": $number(total_tax_set.presentment_money.amount) / $number(current_total_tax_set.shop_money.amount),
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "total_tax_set.presentment_money",
+                    "RawSourceVal": $string(total_tax_set.presentment_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($orderIds_headerId, "Totals.ChargesTotal.CurrentBCY",""), 
+              "PriceType": "Sales",
+              "PriceCode": "Totals.ChargesTotal.CurrentBCY",
+              "PriceName": "ChargesTotal",
+              "PriceDesc": "Current Total Charges (BASE Currency) - Current Total Charges at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "BCY",
+              "PriceIncTax": $number(total_tip_received), /* NOTE: would need to add other changes, only 'tips' for shopify*/
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(total_price_set.shop_money.currency_code), /* source it elsewhere */
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": NULL, /* not a retraction */
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "total_tip_received",
+                    "RawSourceVal": $string(total_tip_received)
+                  }
+                ]
+              }
+            }
+        ],
+        "PaymentAtts": [ /* should only be payment options not payment trans */
+        {
+          "AttId": $buildAttributeID($orderIds_headerId, "PaymentAtts.PaymentTerms",""), /* TODO Not right */
+          "AttCode": "PaymentAtts.PaymentTerms",
+          "AttDesc": "Order Payment Terms",
+          "IsArray": NULL,
+          "AttType": "STRING",
+          "AttValue": $cleanStr(payment_terms),
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsEncrypted": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $attMetadata_asOf, 
+            "EventId": $event_eventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": $rawSourceSystem,
+                "RawSourceId": "payment_terms",
+                "RawSourceVal": $string(payment_terms)
+              }
+            ]
+          }
+        }
+      ],
+      "ClientSourceAtts": [ /* NEW */
+          {
+            "AttId": $buildAttributeID($orderIds_headerId, "ClientSourceAtts.ClientDetails",""),
+            "AttCode": "ClientSourceAtts.ClientDetails",
+            "AttDesc": "End Client & Device Details",
+            "IsArray": "Y",
+            "IsEncrypted": "N", /* ALL sensitive fields need to be encrypted to be Y */
+            "IsSensitive": "Y", /* Has 'any' sensitive fields in the array */
+            "AttType": NULL,
+            "AttValue": NULL,
+            "AttValues": [
+              {
+                "Type": "STRING",
+                "ValKey": "deviceId",
+                "Value": $cleanStr(device_id),
+                "IsEncrypted": "N", 
+                "IsSensitive": "N"
+              },               
+              {
+                "Type": "STRING",
+                "ValKey": "AcceptLanguage",
+                "Value": $cleanStr(client_details.accept_language),
+                "IsEncrypted": "N",
+                "IsSensitive": "N"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "BrowserHeight",
+                "Value": $cleanStr(client_details.browser_height),
+                "IsEncrypted": "N",
+                "IsSensitive": "N"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "BrowserIp",
+                "Value": $cleanStr(client_details.browser_ip),
+                "IsEncrypted": "N",
+                "IsSensitive": "Y"
+              }, 
+              {
+                "Type": "STRING",
+                "ValKey": "BrowserWidth",
+                "Value": $cleanStr(client_details.browser_width),
+                "IsEncrypted": "N",
+                "IsSensitive": "N"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "SessionHash",
+                "Value": $cleanStr(client_details.session_hash),
+                "IsEncrypted": "N",
+                "IsSensitive": "N"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "UserAgent",
+                "Value": $cleanStr(client_details.user_agent),
+                "IsEncrypted": "N",
+                "IsSensitive": "N"
+              }
+            ],
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsAnonymised": "N", 
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "client_details",
+                  "RawSourceVal": $string(client_details)
+                }
+              ]
+            }
+          },
+          {
+            "AttId": $buildAttributeID($orderIds_headerId, "ClientSourceAtts.Attribution",""),
+            "AttCode": "ClientSourceAtts.Acquisition",
+            "AttDesc": "Landing & referal details for acquisition",
+            "IsArray": "Y",
+            "IsEncrypted": "N", 
+            "IsSensitive": "N", 
+            "AttType": NULL,
+            "AttValue": NULL,
+            "AttValues": [
+              {
+                "Type": "STRING",
+                "ValKey": "ReferringSite",
+                "Value": $cleanStr(referring_site),
+                "IsEncrypted": "N", 
+                "IsSensitive": "N"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "LandingSite",
+                "Value": $cleanStr(landing_site),
+                "IsEncrypted": "N", 
+                "IsSensitive": "N"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "LandingSiteRef",
+                "Value": $cleanStr(landing_site_ref),
+                "IsEncrypted": "N", 
+                "IsSensitive": "N"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "SourceName",
+                "Value": $cleanStr(source_name),
+                "IsEncrypted": "N", 
+                "IsSensitive": "N"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "SourceIdentifier",
+                "Value": $cleanStr(source_identifier),
+                "IsEncrypted": "N", 
+                "IsSensitive": "N"
+              },
+              {
+                "Type": "STRING",
+                "ValKey": "SourceURL",
+                "Value": $cleanStr(source_url),
+                "IsEncrypted": "N", 
+                "IsSensitive": "N"
+              }
+            ],
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsAnonymised": "N", 
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "landing_site",
+                  "RawSourceVal": $string(landing_site)
+                },
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "landing_site",
+                  "RawSourceVal": $string(landing_site_ref)
+                }
+              ]
+            }
+          } 
+        ],        
+        "FulfilmentAtts": [
+          {
+            "AttId": $buildAttributeID($orderIds_headerId, "FulfilmentAtts.FulfilmentStatus",""),
+            "AttCode": "FulfilmentAtts.FulfilmentStatus",
+            "AttDesc": "Order Fulfilment Status",
+            "IsArray": NULL,
+            "AttType": "STRING",
+            "AttValue": $cleanStr(fulfillment_status),
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL,
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "payment_terms",
+                  "RawSourceVal": $string(fulfillment_status)
+                }
+              ]
+            }
+          }
+        ],
+        "FinanceAtts": [
+          {
+            "AttId": $buildAttributeID($orderIds_headerId, "FinanceAtts.IsTaxEstimated",""),
+            "AttCode": "FinanceAtts.IsTaxEstimated",
+            "AttDesc": "Is Tax on this Order Estimated?",
+            "IsArray": NULL,
+            "AttType": "STRINGBOOL",
+            "AttValue": $stringBool(estimated_taxes),
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL,
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "payment_terms",
+                  "RawSourceVal": $string(estimated_taxes)
+                }
+              ]
+            }
+          },
+          {
+            "AttId": $buildAttributeID($orderIds_headerId, "FinanceAtts.IsTaxIncluded",""),
+            "AttCode": "FinanceAtts.IsTaxIncluded",
+            "AttDesc": "Is Tax included on this Order?",
+            "IsArray": NULL,
+            "AttType": "STRINGBOOL",
+            "AttValue": $stringBool(taxes_included),
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL,
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "payment_terms",
+                  "RawSourceVal": $string(taxes_included)
+                }
+              ]
+            }
+          }           
+        ],
+        "OccasionAtts": NULL,
+        "SupplierAtts": NULL,
+        "NotesTagsAtts": [ /* NEW */
+          {
+            "AttId": $buildAttributeID($orderIds_headerId, "NotesTagsAtts.Note",""),
+            "AttCode": "NotesTagsAtts.Note",
+            "AttDesc": "Single Notes field",
+            "AttType": "Single",
+            "AttValue": $cleanStr(note),
+            "AttValues": NULL,
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "note",
+                  "RawSourceVal": $string(note)
+                }
+              ]
+            }
+          },
+          {
+            "AttId": $buildAttributeID($orderIds_headerId, "NotesTagsAtts.NoteAttributes",""),
+            "AttCode": "NotesTagsAtts.NoteAttributes",
+            "AttDesc": "Multiple Notes field",
+            "AttType": "Single",
+            "AttValue": $cleanStr(note_attributes),
+            "AttValues": NULL,
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "note_attributes",
+                  "RawSourceVal": $string(note_attributes)
+                }
+              ]
+            }
+          },
+          {
+            "AttId": $buildAttributeID($orderIds_headerId, "NotesTagsAtts.Tags",""),
+            "AttCode": "NotesTagsAtts.Tags",
+            "AttDesc": "Tag Field",
+            "AttType": "Single",
+            "AttValue": $cleanStr(tags),
+            "AttValues": NULL,
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "tags",
+                  "RawSourceVal": $string(tags)
+                }
+              ]
+            }
+          }         
+        ],   
+        "Metrics": [ /* Key to support if breaking*/
+          {
+            "AttId": $buildAttributeID($orderIds_headerId, "Metrics.NumSalesLines",""),
+            "AttCode": "Header.Metrics.NumSalesLines",
+            "AttDesc": "Metric Field - Num sales lines at (relative) event time",
+            "AttType": "Single",
+            "AttValue": $count(line_items),
+            "AttValues": NULL,
+
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": NULL
+            }
+          },
+          {
+            "AttId": $buildAttributeID($orderIds_headerId, "Metrics.NumDiscountLines",""),
+            "AttCode": "Header.Metrics.NumDiscountLines",
+            "AttDesc": "Metric Field - Num discount lines at (relative) event time",
+            "AttType": "Single",
+            "AttValue": $count(discount_applications),
+            "AttValues": NULL,
+
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": NULL
+            }
+          },
+          {
+            "AttId": $buildAttributeID($orderIds_headerId, "Metrics.NumTaxLines",""),
+            "AttCode": "Header.Metrics.NumTaxLines",
+            "AttDesc": "Metric Field - Num tax lines at (relative) event time",
+            "AttType": "Single",
+            "AttValue": $count(tax_lines),
+            "AttValues": NULL,
+
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": NULL
+            }
+          },                               
+          {
+            "AttId": $buildAttributeID($orderIds_headerId, "Metrics.NumShipmentLines",""),
+            "AttCode": "Header.Metrics.NumShipmentLines",
+            "AttDesc": "Metric Field - Num shipper (1 per shipper) lines at (relative) event time",
+            "AttType": "Single",
+            "AttValue": $count(shipping_lines),
+            "AttValues": NULL,
+
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": NULL
+            }
+          },
+          {
+            "AttId": $buildAttributeID($orderIds_headerId, "Lines.LineMetrics.NumSalesLines",""),
+            "AttCode": "Lines.LineMetrics.NumFulfilmentLines",
+            "AttDesc": "Metric Field - Num fulfillment lines at (relative) event time",
+            "AttType": "Single",
+            "AttValue": $count(fulfillments),
+            "AttValues": NULL,
+
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": NULL
+            }
+          },
+          {
+            "AttId": $buildAttributeID($orderIds_headerId, "Lines.LineMetrics.NumReturnLines",""),
+            "AttCode": "Lines.LineMetrics.NumReturnLines",
+            "AttDesc": "Metric Field - Num return lines at (relative) event time",
+            "AttType": "Single",
+            "AttValue": $count(refunds),
+            "AttValues": NULL,
+
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": NULL
+            }
+          }                     
+        ],     
+        "Links": [ 
+          {
+            "LinkId": "dolore reprehenderit minim ut",
+            "LinkType": "amet laboris eu",
+            "LinkCode": "in consequat",
+            "FromEntityId": "irure",
+            "ToEntityId": "laboris do sunt consequat",
+            "LinkStatus": "non aute id nulla quis",
+            "LinkName": "laborum mollit incididunt",
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "sed",
+                  "RawSourceVal": "velit commodo ut"
+                }
+              ]
+            }
+          }
+        ],
+        "CustomAtts": NULL
+      }
+    }
+  }
+}
+)

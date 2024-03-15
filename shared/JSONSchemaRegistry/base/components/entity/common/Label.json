@@ -1,0 +1,22 @@
+{
+    "LabelObject": {
+        "type": "object",
+        "additionalProperties": {
+            "$ref": "#/LabelProperties"
+        }
+    },
+    "LabelProperties": {
+        "type": "object",
+        "properties": {
+            "LabelCode": {
+                "type": "string"
+            },
+            "LabelType": {
+                "type": "string"
+            },
+            "LabelContent": {
+                "type": "string"
+            }
+        }
+    }
+}

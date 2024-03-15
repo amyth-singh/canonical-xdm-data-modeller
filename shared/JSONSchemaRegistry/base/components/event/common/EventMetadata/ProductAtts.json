@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xfuze.io/xdm/schema/components/event/common/EventHeader/EventMetadata/ProductAtts",
+  "description": "XDM Schema for the common event component 'EventHeader/EventMetadata/ProductAtts'",
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "Xfuze": {
+      "type": "object",
+      "anyOf": [
+        {
+          "required": ["ProductId","ProductKey"]
+        },
+        {
+          "required": ["ProductIds","ProductKeys"]
+        }
+      ],
+      "description": "The (optional) Xfuze derived / enriched attributes that define the context of the product(s) involved in event",
+      "unevaluatedProperties": false,
+      "properties": {
+        "ProductId": {
+          "type": "string",
+          "description": "e.g PRODUCT_APP_DE_de_DE_D20165-7647-D578-XXL"
+        },
+        "ProductKey": {
+          "type": "string",
+          "description": "e.g D20165-7647-D578-XXL"
+        },
+        "ProductIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "e.g [\"PRODUCT_APP_DE_de_DE_D20165-7647-D578-XXL\", \"PRODUCT_APP_DE_de_DE_51001-C909-C762-3834\", \"PRODUCT_APP_DE_de_DE_D22284-D183-D338-3834\"]"
+        },
+        "ProductKeys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "e.g [\"D20165-7647-D578-XXL\", \"51001-C909-C762-3834\", \"D22284-D183-D338-3834\"]"
+        },
+        "InvolvedReasonCode": {
+          "type": "string",
+          "description": "e.g SoldProduct"
+        }
+      }
+    },
+    "Origin": {
+      "type": "object",
+      "description": "The 'origin' source / raw attributes provided as input and that were consumed as part of producing the companion 'Xfuze' representations",
+      "unevaluatedProperties": false,
+      "properties": {
+        "ProductId": {
+          "type": "string",
+          "description": "Raw form (optional) of the input ProductId from the source, used in transforming to 'Xfuze' representations e.g PRODUCT_APP_DE_de_DE_D20165-7647-D578-XXL"
+        },
+        "ProductKey": {
+          "type": "string",
+          "description": "Raw form (optional) of the input ProductKey from the source, used in transforming to 'Xfuze' representations e.g D20165-7647-D578-XXL"
+        }
+      }
+    }
+  }
+}

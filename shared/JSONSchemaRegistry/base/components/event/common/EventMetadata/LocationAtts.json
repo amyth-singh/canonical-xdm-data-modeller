@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xfuze.io/xdm/schema/components/event/common/EventHeader/EventMetadata/LocationAtts",
+  "description": "XDM Schema for the common event component 'EventHeader/EventMetadata/LocationAtts'",
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "Xfuze": {
+      "type": "object",
+      "description": "The Xfuze derived / enriched attributes that define the context of the primary location involved in event",
+      "unevaluatedProperties": false,
+      "properties": {
+        "ChannelCode": {
+          "type": "string", 
+          "description": "The (optional) Xfuze channel code e.g App"
+        },
+        "ChannelName": {
+          "type": "string", 
+          "description": "The (optional) Xfuze channel name e.g Mobile App"
+        },
+        "LocationId": {
+          "type": "string", 
+          "description": "The (optional) Xfuze locationId of the primary location of this event e.g Location_Crew_901"
+        },
+        "LocationNumber": {
+          "type": "string", 
+          "description": "The (optional) location type of the primary location of this event e.g 901"
+        },
+        "LocationType": {
+          "type": "string", 
+          "description": "The (optional) location type of the primary location of this event e.g Store"
+        },
+        "Country": {
+          "$ref": "../../../entity/common/Country.json#/CountryProperties",
+          "description": "The country of the event"
+        },
+        "Coordinates": {
+          "$ref": "../../../entity/common/Coordinates.json#/CoordinatesProperties",
+          "description": "The country of the channel"
+        },
+        "InvolvedReasonCode": {
+          "type": "string", 
+          "description": "The (optional) reason that this channel/location was involved in the event e.g SoldLocation"
+        }
+      }
+    },
+    "Origin": {
+      "type": "object",
+      "description": "The 'origin' source / raw attributes provided as input and that were consumed as part of producing the companion 'Xfuze' representations",
+      "unevaluatedProperties": false,
+      "properties": {
+        "ChannelCode": {
+          "type": "string", 
+          "description": "Raw form (optional) of the input ChannelCode from the source, used in transforming to 'Xfuze' representations e.g APP"
+        },
+        "ChannelName": {
+          "type": "string", 
+          "description": "Raw form (optional) of the input ChannelName from the source, used in transforming to 'Xfuze' representations e.g MOBILEAPP"
+        },
+        "LocationId": {
+          "type": "string",
+          "description": "Raw form (optional) of the input LocationId from the source, used in transforming to 'Xfuze' representations e.g Location_Hybris_f37f4592-da7e-4e59-bddc-6f6f2e17d3eb"
+        },
+        "LocationNumber": {
+          "type": "string",
+          "description": "Raw form (optional) of the input LocationNumber from the source, used in transforming to 'Xfuze' representations e.g 189"
+        },
+        "LocationType": {
+          "type": "string",
+          "description": "Raw form (optional) of the input LocationType from the source, used in transforming to 'Xfuze' representations e.g STORE"
+        },
+        "CountryCode": {
+          "type": "string",
+          "description": "Raw form (optional) of the input CountryCode from the source, used in transforming to 'Xfuze' representations e.g GB"
+        }
+      }
+    }
+  }
+}

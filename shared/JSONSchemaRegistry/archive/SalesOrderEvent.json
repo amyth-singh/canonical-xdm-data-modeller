@@ -1,0 +1,12 @@
+{
+  "$id": "SalesOrderEvent",
+  "description": "Sales Order (Composite) Event Model",
+  "type": "object",
+  "properties": {
+    "TriggerEntity": {"$ref": "../../../SalesOrder.json"},
+    "ProcessedEntity": {"$ref": "../../../SalesOrder.json"}
+  },
+  "required": [
+    "TriggerEntity"
+  ]
+}

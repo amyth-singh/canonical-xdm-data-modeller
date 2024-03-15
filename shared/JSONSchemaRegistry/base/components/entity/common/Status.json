@@ -1,0 +1,49 @@
+{
+  "StatusObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/StatusProperties"
+    }
+  },
+  "StatusProperties": {
+    "type": "object",
+    "required": [
+      "StatusCode"
+    ],
+    "unevaluatedProperties": false,
+    "properties": {
+      "StatusClass": {
+        "type": "string",
+        "description": "The class of the status e.g Retail, Hire, TailorMe"
+      },
+      "StatusCode": {
+        "type": "string",
+        "description": "The (required) unique code for the status e.g InProcessing"
+      },
+      "SubStatusCode": {
+        "type": "string",
+        "description": "A sub status if applicable e.g Invoiced"
+      },
+      "StatusDesc": {
+        "type": "string",
+        "description": "The description for the status"
+      },
+      "SeqNo": {
+        "type": "number",
+        "description": "The sequence number of this status in relation to all the possible values if naturally ordinal e.g 2"
+      },
+      "ReasonCode": {
+        "type": "string",
+        "description": "A reason code for the status being in this state e.g Faulty Product"
+      },
+      "ReasonDesc": {
+        "type": "string",
+        "description": "A reason description for the status being in this state"
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

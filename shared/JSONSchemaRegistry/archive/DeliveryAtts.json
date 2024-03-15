@@ -1,0 +1,12 @@
+{
+    "$id": "DeliveryAtts",
+    "description": "XDM Event (Technical) 'Delivery' atts definition",
+    "type": "object",
+    "properties": {
+      "ErrorCode": {"type": "string"},
+      "ErrorDesc": {"type": "string"},
+      "ErrorSeverity": {"type": "string"},
+      "IsReplay": {"$ref": "../../Definitions.json#/properties/StringBool"},
+      "CustomAtts": [{"$ref": "../../CustomAttribute.json"}]
+    }
+}

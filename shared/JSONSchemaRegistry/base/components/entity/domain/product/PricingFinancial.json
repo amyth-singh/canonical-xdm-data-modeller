@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "CostPrices": {"$ref": "../../common/Price.json#/PriceObject"},
+    "SellingPrices": {"$ref": "../../common/Price.json#/PriceObject"},
+    "Taxes": {"$ref": "../../common/Tax.json#/TaxObject"},
+    "PriceClassification": {"$ref": "../../common/PriceClassification.json"}
+  }
+}

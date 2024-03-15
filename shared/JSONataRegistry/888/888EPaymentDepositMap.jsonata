@@ -1,0 +1,283 @@
+(
+    $formatValue := function($value, $dType, $format){(
+        $formatString := $string ~> $trim;
+        $formatNumber := function($num){$type($num) = "number" ? $num : $type($num) = "string" ? $contains($num,/^-?\d+(\.\d+)?$/) ? $number($num) : null};
+        $formatDateTime := function($dt,$format) {(
+            $dateTimeRegexMap := {"[Y0001]-[M01]-[D01] [H01]:[m01]:[s01] [P]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]) (AM|PM)$/,
+                                  "[Y0001]-[M01]-[D01] [H01]:[m01]:[s01].[f001]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]).\d{3}$/,
+                                  "[M01]/[D01]/[Y0001]":/^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/[1-9][0-9]{3}$/,
+                                  "ISO8601":/^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d)(\.\d+)?([+-]([01]\d|2[0-3]):([0-5]\d)|Z)$/
+                                 };
+            $dateTimeFormatValidator := function($datetime,$dateTimeFormat){$exists($dateTimeFormat) ? $contains($datetime,$lookup($dateTimeRegexMap,$dateTimeFormat)): $contains($datetime,$lookup($dateTimeRegexMap,"ISO8601"))};
+
+            $exists($dt) ? $dateTimeFormatValidator($dt,$format) ? $exists($format) ? $fromMillis($toMillis($dt,$format)) : $fromMillis($toMillis($dt)) : null;
+            )};
+            $formatStringBool := function($value,$format){(
+            $stringBoolMap := {"Y":"Y","1":"Y","TRUE":"Y","N":"N","0":"N","FALSE":"N"};
+            $upperTrim := $string ~> $trim ~> $uppercase;
+            $stringBool := function($v){$exists($value)?$lookup($stringBoolMap, $upperTrim($value)):""};
+            $reverseBool := function($v){$v = "Y" ? "N" : $v = "N" ? "Y" : "U"};
+            $type($format)="null" ? $value ~> $stringBool : $format="reverse" ? $value ~> $stringBool ~> $reverseBool : null
+        )};
+
+        $dType = "TIMESTAMP"  ? $formatDateTime($value,$format) :
+        $dType = "STRINGBOOL" ? $formatStringBool($value,$format) :
+        $dType = "NUMERIC"    ? $formatNumber($value) :
+        $dType = "STRING"     ? $formatString($value) :
+        null;
+    )};
+
+    /* JW: need to handle better comparison of IsValueChanged */
+    $buildCustomAttribute := function($entityCode,$attributeId,$canonicalCode,$name,$value,$valueBefore,$rawValue,$rawValueBefore,$dType,$dFormat,$eot,$eventId, $isSensitive, $isEncrypted){(
+        $buildAttributeID := function($entityCode,$canonicalCode,$attributeId){$entityCode & "_" & $replace($canonicalCode,".","_") & ($type($attributeId) = "null" ? "" : "_" & $attributeId)};
+
+        {
+         "Id":$buildAttributeID($entityCode,$canonicalCode,$attributeId),
+         "Code":$canonicalCode,
+         "Name":$name,
+         "Value": $value != null ? $formatValue($value,$dType,$dFormat) : NULL,
+         "ValueBefore":$valueBefore != null ? $formatValue($valueBefore,$dType,$dFormat) : NULL,
+         "IsValueChanged":(($formatValue($value,$dType,$dFormat) != $formatValue($valueBefore,$dType,$dFormat)) ? "Y" : "N"),
+         "RawValue":$rawValue != null ? $formatValue($rawValue,$dType,$dFormat) : NULL,
+         "RawValueBefore":$rawValueBefore != null ? $formatValue($rawValueBefore,$dType,$dFormat) : NULL,
+         "IsRawValueChanged":($rawValue != $rawValueBefore ? "Y" : "N"),
+         "IsSensitive":$isSensitive,
+         "IsEncrypted":$isEncrypted,
+         "Type": $dType = "STRING" ? NULL : $dType, /* default = STRING if not present, saves on space*/
+         "AsOf":$eot,
+         "EventId":$eventId};
+         )
+    };
+
+    $buildCustomEventMetadataAttribute := function($canonicalCode,$name,$value,$dType,$dFormat,$isSensitive, $isEncrypted)  {
+        {
+         "Code":$canonicalEventMetadataCodePrefix & "." & $canonicalCode,
+         "Value":$formatValue($value,$dType,$dFormat),
+         "IsSensitive":$isSensitive,
+         "IsEncrypted":$isEncrypted,
+         "Type": $dType = "STRING" ? NULL : $dType /* default = STRING if not present, saves on space*/
+         }
+    };
+
+    $clientCode := "888WH";
+    $sourceSystem := "Cashier";
+    $canonicalCodePrefix:= "Customer.Accounts.Transactions.Deposit";
+    $canonicalEventMetadataCodePrefix:= "EventMetadata";
+    $tsFormat := "[Y0001]-[M01]-[D01] [H01]:[m01]:[s01].[f001]";
+    $tsIsoFormat := "YYYY-mm-DD HH:MM:SS.mmm";
+
+
+    /* Event Metadata / Info */
+    $rawSourceSystem := "Cashier";
+    $rawSourceSystemOrg := "888"; /* 888,WH,MRG */
+    $rawSourceSystemFull := $rawSourceSystemOrg & $rawSourceSystem;
+    $rawSourceTimeZone := "Europe/London";
+    $rawEventOccurredTimestamp := DepositStatusChangeDateTime; /*  EventDateTime seems to be source event sent time? */
+    $rawEventOccurredTimestampField := "DepositStatusChangeDateTime"; /*  EventDateTime seems to be source event sent time? */
+    $rawEventReceivedTimestamp := "";
+    $rawEntityId := $formatValue(TransactionID,"STRING");
+    $rawParentEntityId := $formatValue(AccountID,"STRING");
+    $rawEventId := EventID;
+    $rawEventName := EventName;
+
+    $rawEventNameList := [ /* source 'EventName' code made up for purpose of mapping */
+      {"systemCode": "deposit.status",                "xfuzeCode": "DepositStatusUpdated"}
+    ];
+    /* Lookup func for above */
+    $rawEventXrefFn := function($rawName) {
+      $rawEventNameList[systemCode = $trim($rawName)].xfuzeCode
+    };
+
+    $eventDomain := "Payments";
+    $eventCategory := "DepositPayment";
+    $eventValueStream := "Deposit2Wallet";
+    $eventChangePattern := "FullSnapshot";
+    $eventClass := "Trigger";
+    $eventPriority := 5;
+    $defaultEventVerb := "Published";
+    $entityType := "Deposit";
+    $parentEntityType := "Account";
+    $entityCode := ($entityType & "_" & $rawSourceSystemFull & "_" & $rawEntityId);
+    $entityId := $entityCode;
+    $parentEntityId := ($parentEntityType & "_" & $rawSourceSystemFull & "_" & $rawParentEntityId);
+    $eventName := ($rawEventXrefFn($rawEventName) = null ? $entityType &  $defaultEventVerb : $rawEventXrefFn($rawEventName)); /* convert to Xfuze eventName?*/
+    $eventId := $eventName & "_" & $entityCode;
+    $entityIsSensitive := "Y";
+    $eventOccurredType := "TrueEventTime"; /* using DepositStatusChangeDateTime not EventDateTime as that seems to be when event sent */
+    $eventOccurredLocalTimeZone = $rawSourceTimeZone;
+    $eventOccurredTimestamp := ($rawEventOccurredTimestamp = null ? "" : $rawEventOccurredTimestamp);
+    $eventProcessedTimestamp := "";
+    $eventReceivedTimestamp := ($rawEventReceivedTimestamp = null ? "" : $rawEventReceivedTimestamp);
+    $customerId := "Customer_SCV_" & $formatValue(CustomerId,"STRING");
+    $accountId := "Account_888NAP_" & $formatValue(AccountID,"STRING");
+    $sessionId := "Session_888LoginManager_" & $formatValue(PlayerSessionID,"STRING");
+
+    /* TODO doesnt work for +01:00 embedded timetamps */
+    $getDateDimFn := function($dt,$isUTC,$tz,$format) {$exists($dt) ? $dateTimeFormatValidator($dt,$format) ?
+    {
+          "DateId": $fromMillis($toMillis($dt,$format),"[Y0001][M01][D01]"),
+          "TimestampUTC": ($isUTC ? $dt : NULL),
+          "DateUTC": ($isUTC ? $dt : NULL), /* TODO convert to date */
+          "TimeZone": ($tz != null ? $tz : $rawSourceTimeZone),
+          "DateTimeLocal": $fromMillis($toMillis($dt,$format)),
+          "DateLocal": $fromMillis($toMillis($dt,$format),"[Y0001]-[M01]-[D01]"),
+          "HourId": $fromMillis($toMillis($dt,$format),"[H01]"),
+          "Millis": $toMillis($dt,$format)
+    }
+    : NULL
+  };
+
+  /* JW: Raw Ref data mappers */
+  $rawBrandIdList := [ /* Full lookup list and mappings can expect for 'Order' events from shopify with XF mappings*/
+    {"systemCode": "1",                "xfuzeCode": "888"},
+    {"systemCode": "2",                "xfuzeCode": "WH"},
+    {"systemCode": "5",                "xfuzeCode": "MGR"}
+  ];
+  /* Lookup func for above */
+  $mapRawBrandIdXrefFn := function($rawName) {
+    $rawBrandIdList[systemCode = $string($rawName)].xfuzeCode
+  };
+
+  $rawSubBrandIdList := [ /* Full lookup list and mappings can expect for 'Order' events from shopify with XF mappings*/
+    {"systemCode": "1",                "xfuzeCode": "sport"},
+    {"systemCode": "2",                "xfuzeCode": "poker"},
+    {"systemCode": "3",                "xfuzeCode": "casino"},
+    {"systemCode": "4",                "xfuzeCode": "bingo"}
+  ];
+  /* Lookup func for above */
+  $mapRawSubBrandIdXrefFn := function($rawName) {
+    $rawSubBrandIdList[systemCode = $string($rawName)].xfuzeCode
+  };
+
+  $rawProductPackageIDList := [
+    {"systemCode": "88",                "xfuzeCode": "SportWebApp"}
+  ];
+  /* Lookup func for above */
+  $mapRawProductPackageIDXrefFn := function($rawName) {
+    $rawProductPackageIDList[systemCode = $string($rawName)].xfuzeCode
+  };
+
+  $mapRawIsProcessedFn := function($rawVal) {
+    $rawVal ? "Processed" : "NotProcessed"
+  };
+
+/* Core Event mapping */
+/* NOTE: Need key top level fields concrete (i.e not just in EventMetadata array) to enable phsyical storage optimisations with PK/CK/Indexing */
+{
+  "EventId": $eventId,
+  "EventName": $eventName,
+  "EntityId": $entityId,
+  "ParentEntityId": $parentEntityId,
+  "CustomerId": $customerId,
+  "AccountId": $accountId,
+  "SessionId": $sessionId,
+  "EventOccurredTimestamp":$formatValue($eventOccurredTimestamp,"TIMESTAMP",$tsFormat),
+
+  /* Consistent core event metadata */
+  "EventMetadata" : [
+    /* -----EventAtts----- */
+    /* canonical event atts: key event level features/atts defining core context related to the change event*/
+    $buildCustomEventMetadataAttribute("EventAtts.EventId","EventId",$eventId,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EventAtts.EventDomain","EventDomain",$eventDomain,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EventAtts.EventCategory","EventCategory",$eventCategory,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EventAtts.EventName","EventName",$eventName,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EventAtts.EventClass","EventClass",$eventClass,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EventAtts.EventChangePattern","EventChangePattern",$eventChangePattern,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EventAtts.EventValueStream","EventValueStream",$eventValueStream,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EventAtts.ClientCode","ClientCode",$clientCode,"STRING",$tsFormat,NULL,NULL),
+
+    /* raw source event atts: key raw event level atts, from source/trigger event, defining core context related to the raw change event*/
+    $buildCustomEventMetadataAttribute("EventAtts.RawEventId","RawEventId",$string($rawEventId),"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EventAtts.RawEventName","RawEventName",$string($rawEventName),"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EventAtts.RawSourceSystemFullCode","RawSourceSystemFullCode",$rawSourceSystemFull,"STRING",$tsFormat,NULL,NULL),
+
+    /* -----EntityAtts----- */
+    /* entity atts: key entity features/atts contextualising the entity subject to change from the event*/
+    $buildCustomEventMetadataAttribute("EntityAtts.EntityId","EntityId",$entityId,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EntityAtts.EntityType","EntityType",$entityType,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EntityAtts.ParentEntityId","ParentEntityId",$parentEntityId,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EntityAtts.ParentEntityType","ParentEntityType",$parentEntityType,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EntityAtts.IsSensitiveEntity","IsSensitiveEntity",$entityIsSensitive,"STRING",$tsFormat,NULL,NULL),
+
+    /* raw source entity atts: key raw event level atts, from source/trigger event, defining core context related to the raw change event*/
+    $buildCustomEventMetadataAttribute("EntityAtts.RawEntityId","RawEntityId",$string($rawEntityId),"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EntityAtts.RawParentEntityId","RawParentEntityId",$string($rawParentEntityId),"STRING",$tsFormat,NULL,NULL),
+
+    /* -----TimeAtts----- */
+    /* time atts: key event 'time' features/atts contextualising the entity subject to change from the event*/
+    $buildCustomEventMetadataAttribute("TimeAtts.EventOccurredTimestamp","EventOccurredTimestamp",$eventOccurredTimestamp,"TIMESTAMP",$tsFormat,NULL,NULL),
+    /*$buildCustomEventMetadataAttribute("TimeAtts.EventOccurredDateDim","EventOccurredDateDim", $getDateDimFn($eventOccurredTimestamp,false,$rawSourceTimeZone,$tsIsoFormat),"STRING",$tsFormat,NULL,NULL),*/
+    $buildCustomEventMetadataAttribute("TimeAtts.EventOccurredType","EventOccurredType",$eventOccurredType,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("TimeAtts.EventOccurredLocalTimeZone","EventOccurredLocalTimeZone",$rawSourceTimeZone,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("TimeAtts.EventReceivedTimestamp","EventReceivedTimestamp",$eventReceivedTimestamp,"TIMESTAMP",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("TimeAtts.ExternalEventReceivedTimestamp","ExternalEventReceivedTimestamp",NULL,"TIMESTAMP",$tsFormat,NULL,NULL),
+
+    /* raw source time atts: key raw event level time based atts, from source/trigger event, defining core context related to the raw change event*/
+    $buildCustomEventMetadataAttribute("TimeAtts.RawEventPublishedTimestamp","RawEventPublishedTimestamp",$string(EventDateTime),"TIMESTAMP",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("TimeAtts.RawEventOccurredTimestamp","RawEventOccurredTimestamp",$string(DepositStatusChangeDateTime),"TIMESTAMP",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("TimeAtts.RawEventOccurredTimestampFieldName","RawEventOccurredTimestampFieldName",$rawEventOccurredTimestampField,"STRING",$tsFormat,NULL,NULL),
+
+    /* -----CustomerAtts----- */
+    /* customer / account atts: key event 'customer' features/atts contextualising the entity subject to change from the event*/
+    $buildCustomEventMetadataAttribute("CustomerAtts.CustomerId","CustomerId",$customerId,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("CustomerAtts.AccountId","AccountId",$accountId,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("CustomerAtts.GaSessionId","GaSessionId","Session_GA360_" & $formatValue(GaSessionId,"STRING"),"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("CustomerAtts.PlayerSessionId","PlayerSessionId",$sessionId,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("CustomerAtts.InvolvedReasonCode","InvolvedReasonCode","Depositor","STRING",$tsFormat,NULL,NULL),
+
+    /* raw source customer / account atts: key raw event level time customer atts, from source/trigger event, defining core context related to the raw change event*/
+    $buildCustomEventMetadataAttribute("CustomerAtts.RawAccountId","RawAccountId",$string(AccountID),"STRING",$tsFormat,null,NULL),
+    $buildCustomEventMetadataAttribute("CustomerAtts.RawGaSessionId","RawGaSessionId",$string(GaSessionId),"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("CustomerAtts.RawPlayerSessionId","RawPlayerSessionId",$string(PlayerSessionID),"STRING",$tsFormat,NULL,NULL),
+
+    /* -----ProduductAtts----- */
+    /* product atts: key event 'location' based features/atts contextualising the entity subject to change from the event*/
+    $buildCustomEventMetadataAttribute("LocationAtts.ISO3CountryCode","ISO3CountryCode",$uppercase(LocationCountry),"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("LocationAtts.InvolvedReasonCode","InvolvedReasonCode","DepositLocation","STRING",$tsFormat,NULL,NULL),
+
+    /* raw source product / brand atts: key raw event level product based atts, from source/trigger event, defining core context related to the raw change event*/
+    $buildCustomEventMetadataAttribute("ProductAtts.BrandId","BrandId",$mapRawBrandIdXrefFn($string(BrandID)),"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("ProductAtts.SubBrandId","SubBrandId",$mapRawSubBrandIdXrefFn($string(BrandID)),"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("ProductAtts.ProductId","ProductId",$mapRawProductPackageIDXrefFn($string(ProductPackageID)),"STRING",$tsFormat,NULL,NULL)
+
+  ],
+
+  /* Business event metadata */
+  "EventData" : [
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".BrandAtts.BrandId","BrandId",$mapRawBrandIdXrefFn($string(BrandID)),null,$string(BrandID),null,"STRING",$tsFormat,EventDateTime,$eventId,null,null),
+      /*$buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Times.DepositRequestDateTime","DepositRequestDateTime",DepositRequestDateTime,null,$string(DepositRequestDateTime),null,"TIMESTAMP",$tsFormat,DepositRequestDateTime,$eventId,null,null)
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Times.DepositApprovalDateTime","DepositApprovalDateTime",DepositApprovalDateTime,"","TIMESTAMP",$tsFormat,DepositApprovalDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Times.DepositStatusChangeDateTime","DepositStatusChangeDateTime",DepositStatusChangeDateTime,"","TIMESTAMP",$tsFormat,DepositStatusChangeDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Times.EventSentTime","EventSentTime",EventDateTime,null,"TIMESTAMP",$tsFormat,EventSentTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Times.EventSentTime.UTCTimeStamp","",EventDateTime,null,"TIMESTAMP",$tsFormat,EventDateTime,$eventId,NULL,NULL),*/
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Status.ProcessingStatus.StatusCode","ProcessingStatus.StatusCode",$mapRawIsProcessedFn(IsProcessed),null,$string(IsProcessed),null,"STRING","",EventDateTime,$eventId,null,null)
+      /*$buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Status.TransactionStatus.StatusCode","TransactionStatus.StatusCode",TransactionStatus,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Status.TransactionStatus.StatusReasonCode","TransactionStatus.StatusReasonCode",TransactionStatusReason,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Status.RiskManagementStatus.StatusCode","",RiskManagementStatus,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Amounts.DepositAmountBankroll.LCY.PriceIncTax","",DepositAmountBankrollCurrency,"","NUMERIC","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Amounts.DepositAmountBankroll.LCY.CurrencyCode","",BankrollCurrency,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Amounts.DepositAmountBankroll.BCY.CurrencyCode","","USD","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Amounts.DepositAmountBankroll.BCY.ExchangeRateDerived","",(DepositAmountUSD / DepositAmountBankrollCurrency),"","NUMERIC","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Amounts.DepositClearingAmount.LCY.PriceIncTax","",DepositClearingAmount,"","NUMERIC","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".Amounts.DepositClearingAmount.LCY.CurrencyCode","",DepositRequestCurrencyISO,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".ProductAtts.ProductId","",ProductPackageID,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PromoAtts.PromoCode.PromoAtts","",PromoCode,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PromoAtts.PromoCode","",PromoCode,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PromoAtts.PromotionId","",GrantedPromotionsID,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.CashierType","",CashierType,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.PSPName","",PSPName,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.Bin","",Bin,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.BankName","",BankName,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.IsSentTo3D","",IsSentTo3D,"","STRINGBOOL","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.ID3DSVersion","",ID3DSVersion,"","STRINGBOOL","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.Is3DwithChallenged","",Is3DwithChallenged,"","STRINGBOOL","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.IsRerouted","",IsRerouted,"","STRINGBOOL","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.MFTUnitID","",MFTUnitID,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.PaymentPlatformId","",PaymentPlatformID,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.IsPayPalInstantPayment","",IsPayPalInstantPayment,"","STRINGBOOL","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.MFTID","",MFTID,"","STRINGBOOL","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.ExternalResponse","",ExternalResponse,"","STRING","",EventDateTime,$eventId,NULL,NULL),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".PaymentAtts.MFTExternalSubResponseID","",ExternalSubResponse,"","STRING","",EventDateTime,$eventId,NULL,NULL)*/
+  ]
+}
+)

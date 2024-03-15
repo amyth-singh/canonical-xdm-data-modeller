@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xfuze.io/xdm/schema/components/event/common/EventHeader/EventMetadata/PrivacyAtts",
+  "description": "XDM Schema for the common event component 'EventHeader/EventMetadata/PrivacyAtts'",
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "Xfuze": {
+      "type": "object",
+      "description": "The (required)  Xfuze derived / enriched attributes that define the context of the privacy of the data involved in event",
+      "unevaluatedProperties": false,
+      "properties": {
+        "IsSensitiveEntity": {
+          "type": "string",
+          "description": "Is this a sensitive entity that needs sensitive handling for GDRP / PII? etc e.g Y",
+          "enum": [
+            "Y",
+            "N",
+            "U"
+          ]
+        },
+        "IsEncrypted": {
+          "type": "string",
+          "description": "Is this entities sensitive fields encrypted by Xfuze in this event? e.g N",
+          "enum": [
+            "Y",
+            "N",
+            "U"
+          ]
+        },
+        "EncryptionKeyId": {
+          "type": "string",
+          "description": "The ID (typically a cloud Id) of the key used in encryption e.g 1234abcd-12ab-34cd-56ef-1234567890ab"
+        },
+        "EncryptionKeyURI": {
+          "type": "string",
+          "description": "The URI (typically a cloud Id) of the key used in encryption  e.g arn:aws:kms:us-east-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab"
+        },
+        "EncryptionKeyName": {
+          "type": "string",
+          "description": "e.g The name (typically a cloud Id) of the key used in encryption xfuze-default-key"
+        },
+        "EncryptionKeyHost": {
+          "type": "string",
+          "description": "The encryption key host provider e.g AWS::KMS"
+        },
+        "SensitiveFieldPaths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The array of canonical codes of those sensitive fields contained in this event e.g Party.Profile.Name.FirstName"
+        }
+      },
+      "required": [
+        "IsSensitiveEntity",
+        "IsEncrypted"
+      ]
+    },
+    "Origin": {
+      "type": "object",
+      "description": "The (optional) 'origin' source / raw attributes provided as input and that were consumed as part of producing the companion 'Xfuze' representations",
+      "unevaluatedProperties": false,
+      "properties": {
+        "IsEncrypted": {
+          "type": "string",
+          "description": "Raw form (optional) of the input ProductId from the source, used in transforming to 'Xfuze' representations e.g 1"
+        }
+      },
+      "required": [
+        "IsEncrypted"
+      ]
+    }
+  }
+}

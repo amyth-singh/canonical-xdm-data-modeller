@@ -1,0 +1,434 @@
+(
+
+/* Common Functions Start */
+
+$formatValue := function($value, $dType, $format){(
+    $formatString := $string ~> $trim;
+    $formatObject := function($object){$type($object) = "object" ? "TEST" : null};
+    $formatArray := function($array){$type($array) = "array" ? $array : [$array]};
+    $formatNumber := function($num){$type($num) = "number" ? $num : $type($num) = "string" ? $contains($num,/^-?\d+(\.\d+)?$/) ? $number($num) : $format = "ZERO" ? 0 : null : $format = "ZERO" ? 0 : null};
+    $formatStringBool := function($value,$format){(
+        $stringBoolMap := {"Y":"Y","1":"Y","TRUE":"Y","N":"N","0":"N","FALSE":"N","false":"N","true":"Y","F":"N","T":"Y"};
+        $upperTrim := $string ~> $trim ~> $uppercase;
+        $stringBool := function($v){$exists($value) ? $lookup($stringBoolMap, $upperTrim($value)) : null} ~> function($v){$v="Y" or $v="N" ? $v : "U"};
+        $reverseBool := function($v){$v = "Y" ? "N" : $v = "N" ? "Y" : "U"};
+        $exists($format) ? $value ~> $stringBool : $format="reverse" ? $value ~> $stringBool ~> $reverseBool : null
+    )};
+
+    $dType = "STRINGBOOL"  ? $formatStringBool($value,$format) :
+    $dType = "NUMERIC"     ? $formatNumber($value) :
+    $dType = "STRING"      ? $formatString($value) :
+    $dType = "ARRAY"       ? $formatArray($value) :
+    $dType = "OBJECT"      ? $value :
+    $dType = "PASSTHROUGH" ? $value :
+    null;
+)};
+
+$attributeSplitter := function($v,$sep,$pos){$split($v, $sep) ~> function($v){$trim($v[$pos])}};
+
+$buildCustomAttribute := function(
+     $canonicalCode    /* Hierarchical code in dot notation, indicating position in hierarchy */
+    ,$value            /* Value of the attribute */
+    ,$dType            /* Type of data (options: TIMESTAMP, STRINGBOOL, NUMERIC, STRING) */
+    ,$dFormat          /* Format details e.g. input time format or bool direction */
+    )
+{(
+    {"Code":$canonicalCode,
+     "Value":$formatValue($value,$dType,$dFormat),
+     "Type":$dType
+     }
+)};
+
+$buildEventMetadata := function($EventMetadataAtts){{"EventMetadata":$merge($EventMetadataAtts)}};
+
+$buildBaseMetadata := function(
+
+    $eventVerb,                /* Descriptive name for the event within the Xfuze system */
+    $dynamicMetadataObject,
+
+    /* Entity Atts */
+    $originEntityId,            /* Identifier for the entity */
+    $originParentEntityId,      /* Identifier for the parent entity */
+    $originCompositeEntityId,
+    $orginEntityStatusCode,    
+    $entityType,          /* Specific type of the entity */
+    $entitySubType,       /* Specific sub-type of the entity */
+    $entityVariation,     /* Variation or version of the entity */
+    $entityDomain,        /* Domain or category to which the entity belongs */
+    $entityClass,         /* Classification of the entity (e.g., Composite, Primitive) */
+    $parentEntityType,    /* Type of the parent entity */
+    $compositeEntityType, /* Type of the composite entity */
+    $EntityStatusCode,    /* Entity status code */
+    $EntityStatusDesc,    /* Entity status description */
+    $isSensitive,         /* Flag indicating if the entity contains sensitive data ("Y" or "N") */
+
+    /* Event Atts */
+    $bizCapL0,           /* Top-level business capability category */
+    $bizCapL1,           /* Second-level business capability category */
+    $bizCapL2,           /* Third-level business capability category */
+    $eventCategory,      /* General category of the event (e.g., Sales, Inventory) */
+    $eventChangePattern, /* Pattern or type of event change (e.g., FullSnapshot, Delta) */
+    $eventClass,         /* Classification of the event (e.g., TriggerEvent, StateEvent) */
+    $eventValueStream,   /* Stream or flow to which the event belongs */
+    $isDerivedEvent,     /* Flag indicating if the event is derived from other events ("Y" or "N") */
+    $note,               /* Any context note or comments related to the event */
+
+    /* Time Atts */
+    $eventOccurredTimeObject,
+    $eventOccurredType,
+    $eventRecievedTimeObject,
+    $homeTimeZone,
+    $homeTimeZoneOffset,
+    
+    /* Privacy Atts */
+    $isSensitiveEntity,       /* Is this a sensitive entity? Values: "Y", "N", "U" */
+    $isEncrypted,             /* Is the entity's sensitive fields encrypted by Xfuze? Values: "Y", "N", "U" */
+    $encryptionKeyId,         /* ID of the key used for encryption (optional) */
+    $encryptionKeyURI,        /* URI of the key used for encryption (optional) */
+    $encryptionKeyName,       /* Name of the encryption key (optional) */
+    $encryptionKeyHost,       /* Host provider of the encryption key (optional) */
+    $sensitiveFieldPaths,     /* Array of canonical codes of sensitive fields (optional) */
+
+    /* Payload Atts */
+    $xfuzeDataPayloadHash,      /* Data Payload Hash for Xfuze */
+    $xfuzeEventPayloadHash,     /* Event Payload Hash for Xfuze */
+    $xfuzeHashScheme            /* Hash Scheme for Xfuze (e.g., "MD5") */
+) {
+    (
+    /* Process Dynamic Metadata */
+    $dynamicMetadata := $objectsToDocument(
+    $each($dynamicMetadataObject,function($v, $k) {$buildCustomAttribute($k, $v, "PASSTHROUGH", "")})
+    );
+    
+    /* Derive Metadata */
+    $xfuzeEntityId := $join([$entityType,$entitySubType,$originEntityId],"_");
+    $xfuzeParentEntityId := $join([$parentEntityType,$originParentEntityId],"_");
+    $xfuzeCompositeEntityId := $join([$compositeEntityType,$originCompositeEntityId],"_");
+    
+    $xfuzeEventName := $join([$entityType,$entitySubType,$eventVerb],"");
+    $xfuzeEventId := $join([$xfuzeEventName,$xfuzeEntityId,$string($eventOccurredTimeObject.DateTimeKey)],"_");
+    $xfuzeEventExternalReceivedTimestampUTC := $dateTimeDim($dynamicMetadata.EventMetadata.TimeAtts.Xfuze.Times.EventExternalReceivedTimestamp.UTC,"2006-01-02T15:04:05.000Z",$homeTimeZone, $homeTimeZone);
+    $xfuzeEventReceivedTimestampUTC := $dateTimeDim($dynamicMetadata.EventMetadata.TimeAtts.Xfuze.Times.EventReceivedTimestamp.UTC,"2006-01-02T15:04:05.000Z",$homeTimeZone, $homeTimeZone);
+    
+    /* Build Metadata Array */
+    
+    [{"EntityAtts": {
+                    "Origin": {
+                        "EntityId": $originEntityId,
+                        "ParentEntityId": $originParentEntityId,
+                        "CompositeEntityId": $originCompositeEntityId,
+                        "EntityStatusCode": $orginEntityStatusCode
+                    },
+                    "Xfuze": {
+                        "EntityId": $xfuzeEntityId,
+                        "EntityType": $entityType,
+                        "EntitySubType": $entitySubType,
+                        "EntityVariation": $entityVariation,
+                        "EntityDomain": $entityDomain,
+                        "EntityClass": $entityClass,
+                        "ParentEntityId": $xfuzeParentEntityId,
+                        "ParentEntityType": $parentEntityType,
+                        "CompositeEntityId": $xfuzeCompositeEntityId,
+                        "CompositeEntityType": $compositeEntityType,
+                        "EntityStatusCode" : $EntityStatusCode,
+                        "EntityStatusDesc" : $EntityStatusDesc,
+                        "IsSensitive": $isSensitive
+                        }
+                    }
+      },
+      
+     {"IngestAtts": $dynamicMetadata.EventMetadata.IngestAtts.Xfuze
+        },
+     
+     {"PayloadAtts": {
+        "Origin": 
+            $dynamicMetadata.EventMetadata.PayloadAtts.Origin
+        ,
+        "Xfuze": {
+            "DataPayloadHash": $xfuzeDataPayloadHash,
+            "EventPayloadHash": $xfuzeEventPayloadHash,
+            "HashScheme": $xfuzeHashScheme
+                 }
+        }
+    },
+     
+     {"PrivacyAtts": {
+                     "Origin": {
+                     	"IsEncrypted": $dynamicMetadata.EventMetadata.PrivacyAtts.Origin.IsEncrypted
+                     },
+                     "Xfuze": {
+                     	"IsSensitiveEntity": $isSensitive,
+                        "IsEncrypted": $isEncrypted,
+                        "EncryptionKeyId": $encryptionKeyId,
+                        "EncryptionKeyURI": $encryptionKeyURI,
+                        "EncryptionKeyName": $encryptionKeyName,
+                        "EncryptionKeyHost": $encryptionKeyHost,
+                        "SensitiveFieldPaths": $sensitiveFieldPaths
+                     	}
+                     }
+     },
+      
+     {"EventAtts": {"Origin": $dynamicMetadata.EventMetadata.EventAtts.Origin,
+                    "Xfuze": {
+                        "BizCapabilityL0": $bizCapL0,
+                        "BizCapabilityL1": $bizCapL1,
+                        "BizCapabilityL2": $bizCapL2,
+                        "ClientCode": $dynamicMetadata.EventMetadata.EventAtts.Xfuze.ClientCode,
+                        "EnvCode": $dynamicMetadata.EventMetadata.EventAtts.Xfuze.EnvCode,
+                        "ConnectorInstance": $dynamicMetadata.EventMetadata.EventAtts.Xfuze.ConnectorInstance,
+                        "ConnectorType": $dynamicMetadata.EventMetadata.EventAtts.Xfuze.ConnectorType,
+                        "EventCategory": $eventCategory,
+                        "EventChangePattern": $eventChangePattern,
+                        "EventClass": $eventClass,
+                        "EventId": $xfuzeEventId,
+                        "EventName": $xfuzeEventName,
+                        "EventValueStream": $eventValueStream,
+                        "IsDerivedEvent": $isDerivedEvent,
+                        "Note": $note}
+                  }
+     },
+     
+     {"TimeAtts": {
+     	"Origin": {
+     		"Times": {
+        		"EventOccurredTimestamp": $eventOccurredTimeObject.RawValue
+            	}
+     },
+     
+        "Xfuze": {
+            "TimeZones": {
+                "EventTimeZone": {
+                    "TimeZone": $eventOccurredTimeObject.TimeZone,
+                    "TimeZoneOffset": $eventOccurredTimeObject.TimeZoneOffset
+                },
+                "HomeTimeZone": {
+                    "TimeZone": $homeTimeZone,
+                    "TimeZoneOffset": $homeTimeZoneOffset
+                }
+            },
+            
+            "Times": {
+                "EventOccurredTimestamp": $eventOccurredTimeObject,
+                "EventOccurredType": $eventOccurredType,
+                "EventExternalReceivedTimestamp": $xfuzeEventExternalReceivedTimestampUTC,
+                "EventReceivedTimestamp": $xfuzeEventReceivedTimestampUTC
+            }
+        }
+       }
+     },
+     {
+      "EventId": $xfuzeEventId,
+      "EntityId": $xfuzeEntityId,
+      "EventName": $xfuzeEventName,
+      "EntityType": $entityType,
+      "ParentEntityId": $xfuzeParentEntityId,
+      "ParentEntityType": $parentEntityType,
+      "CompositeEntityId": $xfuzeCompositeEntityId,
+      "CompositeEntityType": $compositeEntityType,
+      "EventOccurredTimestampUTC": $eventOccurredTimeObject.UTC,
+      "EventOccurredTimestampLocal": $eventOccurredTimeObject.Local,
+      "EventOccurredDateUTC": $eventOccurredTimeObject.DateUTC,
+      "EventOccurredDateLocal": $eventOccurredTimeObject.DateLocal,
+      "EventReceivedTimestampUTC" : $eventReceivedTimeObject.UTC
+    },
+    {
+      "EntityId" : $xfuzeEntityId,
+      "EntityType": $entityType,
+      "ParentEntityId": $xfuzeParentEntityId,
+      "ParentEntityType": $parentEntityType,
+      "CompositeEntityId": $xfuzeCompositeEntityId,
+      "CompositeEntityType": $compositeEntityType
+    }
+    ]
+  )
+};
+/* Common Functions End */
+
+/* Mapping Start */
+
+$eventOccurredTimeObject := $dateTimeDim(`last updated`,"01/02/2006 15:04:05","Europe/London", "Europe/London");
+$eventReceivedTimeObject := $dateTimeDim(`last updated`,"01/02/2006 15:04:05","Europe/London", "Europe/London");
+$styleId := $formatValue(`style id`,"STRING");
+$optionId := $formatValue(`style id`,"STRING"); /* This should be style id + colour code but we are not receiving colour code yet */
+$skuId := $join([$styleId,$formatValue(`size`,"STRING")],"_");
+$productCreatedTimeObject := (`product created` = "" ? "01/04/2023 12:00:00" : `product created`) ~> $dateTimeDim("01/02/2006 15:04:05","Europe/London", "Europe/London");
+$concessionGoLiveTimeObject := `live date` = "" ? null : `live date` ~> $dateTimeDim("01/02/2006 15:04:05","Europe/London", "Europe/London");
+
+$triggerEntityHeader := $objectsToDocument(
+    [$buildCustomAttribute("Status.AvailabilityStatus.StatusCode",`discontinued`,"STRINGBOOL","reverse"),
+     $buildCustomAttribute("Type.TypeCode","ProductVariant","STRING",null),
+     $buildCustomAttribute("Type.TypeDesc","Daily Product Variant Catalogue","STRING",null),
+
+     $buildCustomAttribute("Times.CreatedOn",$productCreatedTimeObject,"OBJECT",""),
+     $buildCustomAttribute("Times.UpdatedOn",$eventOccurredTimeObject,"OBJECT",""),
+     $buildCustomAttribute("Times.ConcessionLiveOn",$concessionGoLiveTimeObject,"OBJECT",""),
+     $buildCustomAttribute("XRefIds",[{"Id":`sku`,"SystemCode":"Retail247","Code":"SKU"},
+                                      {"Id":`ean`,"SystemCode":"Retail247","Code":"EAN"},
+                                      {"Id":`product code`,"SystemCode":"Retail247","Code":"Product Code"},
+                                      {"Id":`sku id`,"SystemCode":"Retail247","Code":"SKU ID"},
+                                      {"Id":`john lewis product code`,"SystemCode":"Retail247","Code":"John Lewis Product Code"}
+                                     ],"ARRAY","")]);
+                                                        
+$triggerEntityBody := $objectsToDocument(
+    [$buildCustomAttribute('Classifications.Gender.Code',`gender`,"STRING",""),
+     $buildCustomAttribute('Classifications.Phase.Code',`phase`,"STRING",""),
+     $buildCustomAttribute('Classifications.ProductGroup.Code',$attributeSplitter(`product group`,":",0),"STRING",""),
+     $buildCustomAttribute('Classifications.ProductGroup.Desc',$attributeSplitter(`product group`,":",1),"STRING",""),
+     $buildCustomAttribute('Classifications.CrewProductType.Code',$attributeSplitter(`crew type`,":",0),"STRING",""),
+     $buildCustomAttribute('Classifications.CrewProductType.Desc',$attributeSplitter(`crew type`,":",1),"STRING",""),
+     $buildCustomAttribute('Classifications.Range.Code',`range`,"STRING",""),
+     $buildCustomAttribute('Classifications.Season.Code',`season`,"STRING",""),
+     $buildCustomAttribute('Classifications.ProductSegment.Code',`product segment`,"STRING",""),	
+     $buildCustomAttribute('Classifications.ProductType.Code',`product type`,"STRING",""),	
+     $buildCustomAttribute('Classifications.EndUse.Code',`end use`,"STRING",""),	        
+     $buildCustomAttribute('Classifications.ProductArea.Code',`product area`,"STRING",""),
+     $buildCustomAttribute('Classifications.Style.Code',`style code`,"STRING",""),
+     $buildCustomAttribute('Classifications.Style.Desc',`style`,"STRING",""),
+     $buildCustomAttribute('Classifications.Template.Code',`product template`,"STRING",""),
+     
+     $buildCustomAttribute('CoreAtts.Description',`description`,"STRING",""),
+     
+     $buildCustomAttribute('DigitalAttributes.Web.WebExclusive',`web exclusive`,"STRINGBOOL",""),
+     $buildCustomAttribute('DigitalAttributes.Web.WebDescription.WebDescriptionShort',`short web description`,"STRING",""),
+     $buildCustomAttribute('DigitalAttributes.Web.WebDescription.WebDescriptionLong',`long web description`,"STRING",""),
+     $buildCustomAttribute('DigitalAttributes.Bundles.Outfit1.BundleID',$join(["Bundle",ean,"Outfit1"],"_"),"STRING",""),
+     $buildCustomAttribute('DigitalAttributes.Bundles.Outfit2.BundleID',$join(["Bundle",ean,"Outfit2"],"_"),"STRING",""),
+     $buildCustomAttribute('DigitalAttributes.Bundles.Outfit3.BundleID',$join(["Bundle",ean,"Outfit3"],"_"),"STRING",""),
+     $buildCustomAttribute('DigitalAttributes.Bundles.Outfit4.BundleID',$join(["Bundle",ean,"Outfit4"],"_"),"STRING",""),
+     $buildCustomAttribute('DigitalAttributes.Images.Model.Height',`model height`,"STRING",""),
+     $buildCustomAttribute('DigitalAttributes.Images.Model.Wears',`model wears`,"STRING",""),
+
+     $buildCustomAttribute('InventoryLogistics.Supplier.ProfileName.FullName',`supplier id`,"STRING",""),
+     $buildCustomAttribute('InventoryLogistics.Supplier.ProfileName.NameType',"Organisation","STRING",""),
+     $buildCustomAttribute('InventoryLogistics.TradeClassification.HS.HSCode',`commodity code`,"STRING",""),
+     $buildCustomAttribute('InventoryLogistics.InventoryManagement.Stock.StockAge.Amount',`age of intake`,"NUMERIC",""),
+     $buildCustomAttribute('InventoryLogistics.InventoryManagement.Stock.StockAge.UnitMeasure',"Days","STRING",""),
+     $buildCustomAttribute('InventoryLogistics.InventoryManagement.Stock.IsReturnable',`non-returnable`,"STRINGBOOL",""),
+     $buildCustomAttribute('InventoryLogistics.Distribution.Packaging.PackagingCode',`packing format`,"STRING",""),
+
+     $buildCustomAttribute('PhysicalAttributes.Colour.ColourCode',`design colour`,"STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Colour.ColourDescription',`colour`,"STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Colour.ColourGroup',`colour group`,"STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Measurements.Weight.Amount',`weight (kg)`,"NUMERIC",""),
+     $buildCustomAttribute('PhysicalAttributes.Measurements.Weight.UnitMeasure',"KG","STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Measurements.Volume.Amount',`volume (ml)`,"NUMERIC",""),
+     $buildCustomAttribute('PhysicalAttributes.Measurements.Volume.UnitMeasure',"mL","STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Measurements.Dimensions.Height.Amount',`height (cm)`,"NUMERIC",""),
+     $buildCustomAttribute('PhysicalAttributes.Measurements.Dimensions.Height.UnitMeasure',"cm","STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Measurements.Dimensions.Width.Amount',`width (cm)`,"NUMERIC",""),
+     $buildCustomAttribute('PhysicalAttributes.Measurements.Dimensions.Width.UnitMeasure',"cm","STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Measurements.Dimensions.Depth.Amount',`depth (cm)`,"NUMERIC",""),
+     $buildCustomAttribute('PhysicalAttributes.Measurements.Dimensions.Depth.UnitMeasure',"cm","STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Measurements.Dimensions.Length.Amount',`length (cm)`,"NUMERIC",""),
+     $buildCustomAttribute('PhysicalAttributes.Measurements.Dimensions.Length.UnitMeasure',"cm","STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Measurements.StandardSize.SizeCode',`size`,"STRING",""),
+
+     $buildCustomAttribute('PhysicalAttributes.Garment.Tops.Sleeve.Length.SleeveLengthType',`sleeve length`,"STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Garment.Tops.Neckline.NecklineType',`neckline/collar`,"STRING",""),
+     
+     $buildCustomAttribute('PhysicalAttributes.Garment.Bottoms.Waistband.WaistbandPosition',`waistband position`,"STRING",""),
+
+     $buildCustomAttribute('PhysicalAttributes.Garment.Footwear.Toe.Style.ToeStyleType',`toe style`,"STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Garment.Footwear.Heel.Height.HeelHeightType',`heel height`,"STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Garment.Footwear.Heel.HeelType',`heel type`,"STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Garment.Footwear.Composition.Main.MainCompositionType',`main/upper comp`,"STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Garment.Footwear.Composition.Lining.LiningCompositionType',`lining comp`,"STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Garment.Footwear.Composition.Sole.SoleCompositionType',`sole comp`,"STRING",""),
+
+     $buildCustomAttribute('PhysicalAttributes.Garment.Style.StyleCode',`style code`,"STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Garment.Style.StyleType',`style`,"STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Garment.Style.Length.LengthType',`length`,"STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Garment.Style.Fit.FitType',`fit`,"STRING",""),
+     
+     $buildCustomAttribute('PhysicalAttributes.Garment.Fabric.Pattern.PatternType',`pattern`,"STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Garment.Fabric.FabricType',`fabric type`,"STRING",""),
+     
+     $buildCustomAttribute('PhysicalAttributes.Garment.Feature.Padding.PaddingType',`padding`,"STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Garment.Feature.Wiring.WiringType',`wiring`,"STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Garment.Feature.WaterResistance.WaterResistanceType',`water resistance`,"STRING",""),
+     $buildCustomAttribute('PhysicalAttributes.Garment.Feature.Fastening.FasteningType',`fastening`,"STRING",""),
+     
+	 $buildCustomAttribute('PricingFinancial.CostPrices.CostPrice.BCY.ExTax',`cost price`,"NUMERIC",""),
+     $buildCustomAttribute('PricingFinancial.Taxes.SalesTax.TaxCode',`vat code`,"STRING",""),
+     $buildCustomAttribute('PricingFinancial.Taxes.SalesTax.TaxSchemeCode',"VAT","STRING",""),
+     $buildCustomAttribute('PricingFinancial.PriceClassification.PriceLevel.PriceLevelCode',`price level`,"STRING",""),
+     $buildCustomAttribute('PricingFinancial.PriceClassification.IsHighValue',`high value`,"STRINGBOOL",""),
+     $buildCustomAttribute('PricingFinancial.PriceClassification.IsMarkdown',`markdown`,"STRINGBOOL",""),
+
+     $buildCustomAttribute('RegulatoryCompliance.SupplyChain.CountryOfOrigin.ISO3',`country of origin`,"STRING",""),
+     $buildCustomAttribute('RegulatoryCompliance.Environmental.EcoFriendly.Code',`eco friendly`,"STRING",""),
+     $buildCustomAttribute('RegulatoryCompliance.SafetyAndStandards.DangerousGoods.Code',`dangerous goods`,"STRING",""),
+     $buildCustomAttribute('RegulatoryCompliance.SafetyAndStandards.Care.WashingInstructions',`washing instructions`,"STRING",""),
+     $buildCustomAttribute('RegulatoryCompliance.SafetyAndStandards.Care.DryingInstructions',`drying instructions`,"STRING",""),
+     $buildCustomAttribute('RegulatoryCompliance.SafetyAndStandards.Care.IroningInstructions',`ironing instructions`,"STRING",""),
+     $buildCustomAttribute('RegulatoryCompliance.SafetyAndStandards.Labels.WashcareLabel.LabelContent',`washcare label`,"STRING","")
+    ]);
+    
+/* Mapping End */
+
+/* Build Event Start */
+
+$baseMetadata := $buildBaseMetadata(
+    
+    $eventVerb := "Published",
+    $dynamicMetadataObject := EventMetadata,
+
+    /* Entity Atts */
+    $originEntityId := $skuId,          
+    $originParentEntityId := $optionId,
+    $originCompositeEntityId := $styleId,
+    $orginEntityStatusCode,    
+    $entityType := "ProductVariant",        
+    $entitySubType,       
+    $entityVariation,     
+    $entityDomain := "Product",        
+    $entityClass,         
+    $parentEntityType := "ProductOption",   
+    $compositeEntityType := "ProductStyle",
+    $EntityStatusCode,    
+    $EntityStatusDesc,    
+    $isSensitive := "N",         
+
+    /* Event Atts */
+    $bizCapL0,           
+    $bizCapL1,           
+    $bizCapL2,           
+    $eventCategory := "Product",      
+    $eventChangePattern := "FullSnapshot", 
+    $eventClass := "TriggerEvent",         
+    $eventValueStream,   
+    $isDerivedEvent,     
+    $note,
+
+    /* Time Atts */
+    $eventOccurredTimeObject,
+    $eventOccurredType := "TrueTime",
+    $eventRecievedTimeObject,
+    $homeTimeZone := $eventOccurredTimeObject.TimeZone,
+    $homeTimeZoneOffset := $eventOccurredTimeObject.TimeZoneOffset,
+    
+    /* Privacy Atts */      
+    $isEncrypted := "N",
+    $encryptionKeyId,         
+    $encryptionKeyURI,        
+    $encryptionKeyName,       
+    $encryptionKeyHost,       
+    $sensitiveFieldPaths,     
+
+    /* Payload Atts */
+    $xfuzeDataPayloadHash  := $hashmd5($string($TriggerEntity)),
+    $xfuzeEventPayloadHash := null,
+    $xfuzeHashScheme       := "MD5"
+);
+
+$eventHeader   := $baseMetadata[-2];
+$entityIds     := $baseMetadata[-1];
+$triggerEntity := {$entityType:$merge([$entityIds,$triggerEntityHeader,$triggerEntityBody])};
+$domainEvent   := {"DomainEvent":{"TriggerEntity":$triggerEntity}};
+$eventMetadata := $buildEventMetadata([$baseMetadata[[0..5]]]);
+$eventPayload  := $merge([$eventHeader,$eventMetadata,$domainEvent]);
+$event := $eventPayload ~> |EventMetadata.PayloadAtts.Xfuze|{"EventPayloadHash":$hashmd5($string($eventPayload))}|;
+
+/* Build Event End */
+
+)

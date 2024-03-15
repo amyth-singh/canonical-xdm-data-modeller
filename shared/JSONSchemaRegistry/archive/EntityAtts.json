@@ -1,0 +1,22 @@
+{
+    "$id": "EntityAtts",
+    "description": "XDM Event 'Entity' atts definition",
+    "type": "object",
+    "properties": {
+      "EntityId": {"type": "string"},
+      "EntityType": {"type": "string"},    
+      "RawEntityId": {"type": "string"},    
+      "ParentEntityId": {"type": "string"},  
+      "RawParentEntityId": {"type": "string"},
+      "IsSensitive": {"$ref": "../../Definitions.json#/properties/StringBool"},
+      "MetaModellerURN": {"type": "string"}, 
+      "MetaModellerVersion": {"type": "string"}, 
+      "CustomAtts": [{"$ref": "../../CustomAttribute.json"}]
+    },
+    "required": [
+      "EntityId",
+      "EntityType",
+      "RawEntityId",
+      "IsSensitive"
+    ]
+}

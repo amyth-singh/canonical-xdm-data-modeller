@@ -1,0 +1,16 @@
+{
+    "type": "object",
+    "unevaluatedProperties": false,
+    "properties": {
+      "StockLocationId": {
+        "type": "string"
+      },
+      "StockLocationKey": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "required": [
+      "StockLocationKey"
+    ]
+  }

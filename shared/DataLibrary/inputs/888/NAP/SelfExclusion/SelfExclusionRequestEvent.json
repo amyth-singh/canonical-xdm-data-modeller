@@ -1,0 +1,83 @@
+cid
+
+888 account unique identifier
+
+loginCountryIsoCode
+
+will identify UK player (826 = countryIsoCode)
+
+registrationCountryofIPIsoCode
+
+Registration Country of IP will identify UK player; domain value: 826 - UK
+
+countryIsoCode
+
+Player Country will identify UK player; domain value: 826 - UK
+
+regulationTypeId
+
+player regulation
+
+brandId
+
+888 Brand Id
+
+AccountOperationalStatusId
+
+Account Operational Status Id
+
+AccountOperationalStatusReasonId
+
+Account Operational Status Reason Id
+
+startDate
+
+Self-Exclusion Start Date
+
+endDate
+
+Self-Exclusion End Date
+
+updateDate
+
+Self-Exclusion Status Update Date in System
+
+SEPeriodId
+
+Self-Exclusion Period Id
+
+SEPeriod
+
+Self-Exclusion Period
+
+SEStatusId
+
+Self-Exclusion Status; domain values: 1 - Confirmed, 2 - Canceled, 3 - Expired, 4 - Expired Confirmed by Operator ...
+
+SEStatus
+
+Self-Exclusion Status
+
+SELevelId
+
+Self-Exclusion Level Id
+
+SERequestedBy
+
+Self-Exclusion Requested By
+
+OriginalPlayerId
+
+if 888 (then same as cid); if WH then received value from WH
+
+OriginalSystem
+
+888 or WH
+
+OriginalBrandId
+
+OriginalBrandName
+
+OriginalEvent
+
+the OriginalEvent received from crossBrand DB; if initiator is 888 then will be null

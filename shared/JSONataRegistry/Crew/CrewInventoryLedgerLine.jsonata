@@ -1,0 +1,539 @@
+(
+$formatValue := function($value, $dType, $format){(
+    $formatString := $string ~> $trim ~> function($v){$v = "" ? null : $v };
+    $formatObject := function($object){$type($object) = "object" ? "TEST" : null};
+    $formatArray := function($array){$type($array) = "array" ? $array : [$array]};
+    $formatNumber := function($num){$type($num) = "number" ? $num : $type($num) = "string" ? $contains($num,/^-?\d+(\.\d+)?$/) ? $number($num) : $format = "ZERO" ? 0 : null : $format = "ZERO" ? 0 : null};
+    $formatStringBool := function($value,$format){(
+        $stringBoolMap := {"Y":"Y","1":"Y","TRUE":"Y","N":"N","0":"N","FALSE":"N","false":"N","true":"Y","F":"N","T":"Y"};
+        $upperTrim := $string ~> $trim ~> $uppercase;
+        $stringBool := function($v){$exists($value) ? $lookup($stringBoolMap, $upperTrim($value)) : null} ~> function($v){$v="Y" or $v="N" ? $v : "U"};
+        $reverseBool := function($v){$v = "Y" ? "N" : $v = "N" ? "Y" : "U"};
+        $exists($format) ? $value ~> $stringBool : $format="reverse" ? $value ~> $stringBool ~> $reverseBool : null
+    )};
+
+    $dType = "STRINGBOOL" ? $formatStringBool($value,$format) :
+    $dType = "NUMERIC"    ? $formatNumber($value) :
+    $dType = "STRING"     ? $formatString($value) :
+    $dType = "ARRAY"      ? $formatArray($value) :
+    $dType = "OBJECT"     ? $value :
+    null;
+)};
+
+$stringJoin := function($array, $separator) {(
+    $allStrings := $count($array) = $count($array[$type($)="string"]);
+    $allStrings ? $join($array, $separator) : null
+    )
+};
+
+$attributeSplitter := function($v,$sep,$pos){$split($v, $sep) ~> function($v){$trim($v[$pos])}};
+
+$buildCustomAttribute := function(
+    $canonicalCode    /* Hierarchical code in dot notation, indicating position in hierarchy */
+    ,$value            /* Value of the attribute */
+    ,$dType            /* Type of data (options: TIMESTAMP, STRINGBOOL, NUMERIC, STRING) */
+    ,$dFormat          /* Format details e.g. input time format or bool direction */
+        )
+{
+    {"Code":$canonicalCode,
+     "Value":$formatValue($value,$dType,$dFormat),
+     "Type":$dType
+     }
+};
+
+
+
+$buildBaseMetadata := function(
+    $originEntityId,            /* Identifier for the entity */
+    $originParentEntityId,      /* Identifier for the parent entity */
+    $originCompositeEntityId,
+    $orginEntityStatusCode,
+    
+    $originCorrelationId,      /* Correlation ID for tracing related events across systems */
+    $originEventId,            /* Unique identifier for the event */
+    $originEventName,          /* Descriptive name for the event */
+    
+    $originSourceFormatType,   /* Format type of the source data (e.g., JSON, XML) */
+    $originSourceSystem,       /* Name of the source subsystem generating the event */
+    $originSourceSubSystem,    /* Name of the source system generating the event */
+    
+    $entityClass,         /* Classification of the entity (e.g., Composite, Primitive) */
+    $entityDomain,        /* Domain or category to which the entity belongs */
+    $entityType,          /* Specific type of the entity */
+    $entitySubType,       /* Specific sub-type of the entity */
+    $entityVariation,     /* Variation or version of the entity */
+    $isSensitive,         /* Flag indicating if the entity contains sensitive data ("Y" or "N") */
+    $parentEntityType,    /* Type of the parent entity */
+    $compositeEntityType, /* Type of the composite entity */
+    $EntityStatusCode,    /* Entity status code */
+    $EntityStatusDesc,    /* Entity status description */
+    
+
+    $bizCapL0,           /* Top-level business capability category */
+    $bizCapL1,           /* Second-level business capability category */
+    $bizCapL2,           /* Third-level business capability category */
+    
+    $clientCode,         /* Code representing the client or user group */
+    $envCode,
+    
+    $eventCategory,      /* General category of the event (e.g., Sales, Inventory) */
+    $eventChangePattern, /* Pattern or type of event change (e.g., FullSnapshot, Delta) */
+    
+    $eventClass,         /* Classification of the event (e.g., TriggerEvent, StateEvent) */
+    $eventVerb,          /* Descriptive name for the event within the Xfuze system */
+    
+    $eventValueStream,   /* Stream or flow to which the event belongs */
+    
+    $isDerivedEvent,     /* Flag indicating if the event is derived from other events ("Y" or "N") */
+    $note,               /* Any context note or comments related to the event */
+   
+    $eventOccurredTimeObject,
+    $eventOccurredType,
+    $eventRecievedTimeObject,
+    $homeTimeZone,
+    $homeTimeZoneOffset
+) {
+    (
+    $xfuzeEntityId := $stringJoin([$entityType,$entitySubType,$originEntityId],"_");
+    $xfuzeParentEntityId := $stringJoin([$parentEntityType,$originParentEntityId],"_");
+    $xfuzeCompositeEntityId := $stringJoin([$compositeEntityType,$originCompositeEntityId],"_");
+    
+    $xfuzeEventName := $stringJoin([$entityType,$entitySubType,$eventVerb],"");
+    $xfuzeEventId := $stringJoin([$xfuzeEventName,$xfuzeEntityId,$string($eventOccurredTimeObject.DateTimeKey)],"_");
+    
+    [{"EntityAtts": {
+                    "Origin": {
+                        "EntityId": $originEntityId,
+                        "ParentEntityId": $originParentEntityId,
+                        "EntityStatusCode": $orginEntityStatusCode
+                    },
+                    "Xfuze": {
+                        
+                        
+                        "EntityId": $xfuzeEntityId,
+                        "EntityType": $entityType,
+                        "EntitySubType": $entitySubType,
+                        "EntityVariation": $entityVariation,
+                        "EntityDomain": $entityDomain,
+                        "EntityClass": $entityClass,
+                        "ParentEntityId": $xfuzeParentEntityId,
+                        "ParentEntityType": $parentEntityType,
+                        "CompositeEntityId": $xfuzeCompositeEntityId,
+                        "CompositeEntityType": $compositeEntityType,
+                        "EntityStatusCode" : $EntityStatusCode,
+                        "EntityStatusDesc" : $EntityStatusDesc,
+                        "IsSensitive": $isSensitive
+                        }
+                    }
+      },
+     {"EventAtts": {"Origin": {
+                      "CorrelationId": $originCorrelationId,
+                      "EventId": $originEventId,
+                      "EventName": $originEventName,
+                      "SourceFormatType": $originSourceFormatType,
+                      "SourceSystem": $originSourceSystem,
+                      "SourceSubSystem": $originSourceSubSystem},
+                  "Xfuze": {
+                      "BizCapabilityL0": $bizCapL0,
+                      "BizCapabilityL1": $bizCapL1,
+                      "BizCapabilityL2": $bizCapL2,
+                      "ClientCode": $clientCode,
+                      "EnvCode": $envCode,
+                      "EventCategory": $eventCategory,
+                      "EventChangePattern": $eventChangePattern,
+                      "EventClass": $eventClass,
+                      "EventId": $xfuzeEventId,
+                      "EventName": $xfuzeEventName,
+                      "EventValueStream": $eventValueStream,
+                      "IsDerivedEvent": $isDerivedEvent,
+                      "Note": $note}
+                  }
+     },
+     {"TimeAtts": {
+        "Origin": {
+            "Times": {
+                "EventOccurredTimestamp": $eventOccurredTimeObject.RawValue
+            }
+        },
+        "Xfuze": {
+            "TimeZones": {
+                "EventTimeZone": {
+                    "TimeZone": $eventOccurredTimeObject.TimeZone,
+                    "TimeZoneOffset": $eventOccurredTimeObject.TimeZoneOffset
+                },
+                "HomeTimeZone": {
+                    "TimeZone": $homeTimeZone,
+                    "TimeZoneOffset": $homeTimeZoneOffset
+                }
+            },
+            
+            "Times": {
+                "EventOccurredTimestamp": $eventOccurredTimeObject,
+                "EventOccurredType": $eventOccurredType,
+                "EventReceivedTimestamp": $eventReceivedTimeObject
+            }
+        }
+       }
+     },
+     {
+      "EventId": $xfuzeEventId,
+      "EntityId": $xfuzeEntityId,
+      "EventName": $xfuzeEventName,
+      "EntityType": $entityType,
+      "ParentEntityId": $xfuzeParentEntityId,
+      "ParentEntityType": $parentEntityType,
+      "CompositeEntityId": $xfuzeCompositeEntityId,
+      "CompositeEntityType": $compositeEntityType,
+      "EventOccurredTimestampUTC": $eventOccurredTimeObject.UTC,
+      "EventOccurredTimestampLocal": $eventOccurredTimeObject.Local,
+      "EventOccurredDateUTC": $eventOccurredTimeObject.DateUTC,
+      "EventOccurredDateLocal": $eventOccurredTimeObject.DateLocal,
+      "EventReceivedTimestampUTC" : $eventReceivedTimeObject.UTC
+    },
+    {
+      "EntityId" : $xfuzeEntityId,
+      "EntityType": $entityType,
+      "ParentEntityId": $xfuzeParentEntityId,
+      "ParentEntityType": $parentEntityType,
+      "CompositeEntityId": $xfuzeCompositeEntityId,
+      "CompositeEntityType": $compositeEntityType
+    }
+    ]
+  )
+};
+
+
+    
+$buildIngestAtts := function(
+    $apiName,           /* API Name */
+    $patternType,       /* API Pattern Type (e.g., "Scheduled Poll", "Event Driven", etc.) */
+    $apiResource,       /* Specific API resource path */
+    $apiURI             /* The full URI of the API */
+) {
+    {"IngestAtts": {
+        "Xfuze": {
+            "API": {
+                "Name": $apiName,
+                "PatternType": $patternType,
+                "Resource": $apiResource,
+                "URI": $apiURI
+                   }
+                 }
+                   }
+    }
+};
+
+$buildPayloadAtts := function(
+    $originDataPayloadHash,     /* Data Payload Hash for Origin */
+    $originEventPayloadHash,    /* Event Payload Hash for Origin */
+    $originHashScheme,          /* Hash Scheme for Origin (e.g., "MD5") */
+    $xfuzeDataPayloadHash,      /* Data Payload Hash for Xfuze */
+    $xfuzeEventPayloadHash,     /* Event Payload Hash for Xfuze */
+    $xfuzeHashScheme            /* Hash Scheme for Xfuze (e.g., "MD5") */
+) {
+    {"PayloadAtts": {
+        "Origin": {
+            "DataPayloadHash": $originDataPayloadHash,
+            "EventPayloadHash": $originEventPayloadHash,
+            "HashScheme": $originHashScheme
+        },
+        "Xfuze": {
+            "DataPayloadHash": $xfuzeDataPayloadHash,
+            "EventPayloadHash": $xfuzeEventPayloadHash,
+            "HashScheme": $xfuzeHashScheme
+        }
+    }
+    }
+};
+
+
+$buildIngestFileAtts := function(
+    $SystemCode,
+    $URI,
+    $Path,
+    $Name,
+    $BatchId,
+    $BatchNumber,
+    $LineNumber,
+    $TotalBatchLines,
+    $OriginalFileSizeBytes,
+    $OriginalRowSizeBytes,
+    $BytesOffsetInOriginalFile,
+    $FormatType,
+    $PatternType,
+    $ChangeTimestampUTC,
+    $ObjectNotificationPayload
+) {
+    {"IngestAtts": {
+        "Xfuze": {
+            "File": {
+                "SystemCode": $SystemCode,
+                "URI": $URI,
+                "Path": $Path,
+                "Name": $Name,
+                "BatchId": $BatchId,
+                "BatchNumber": $BatchNumber,
+                "LineNumber": $LineNumber,
+                "TotalBatchLines": $TotalBatchLines,
+                "OriginalFileSizeBytes": $OriginalFileSizeBytes,
+                "OriginalRowSizeBytes": $OriginalRowSizeBytes,
+                "BytesOffsetInOriginalFile": $BytesOffsetInOriginalFile,
+                "FormatType": $FormatType,
+                "PatternType": $PatternType,
+                "ChangeTimestampUTC": $ChangeTimestampUTC,
+                "ObjectNotificationPayload": $ObjectNotificationPayload
+                }}}
+     }
+};
+
+$buildIngestStreamAtts := function(
+    $SystemCode,
+    $ChannelURI,
+    $ChannelName,
+    $ChannelType,
+    $Partition,
+    $Offset,
+    $ExternalMessageId,
+    $FormatType,
+    $PatternType,
+    $PublishTimestampUTC
+) {
+    {"IngestAtts": {
+        "Xfuze": {
+            "Stream": {
+                "SystemCode": $SystemCode,
+                "ChannelURI": $ChannelURI,
+                "ChannelName": $ChannelName,
+                "ChannelType": $ChannelType,
+                "Partition": $Partition,
+                "Offset": $Offset,
+                "ExternalMessageId": $ExternalMessageId,
+                "FormatType": $FormatType,
+                "PatternType": $PatternType,
+                "PublishTimestampUTC": $PublishTimestampUTC
+            }
+        }
+    }}
+};
+
+$buildIngestApiAtts := function(
+    $SystemCode,
+    $URI,
+    $Name,
+    $Resource,
+    $HttpMethod,
+    $QueryString,
+    $FormatType,
+    $PatternType,
+    $InvokeTimestampUTC
+) {
+    {"IngestAtts": {
+        "Xfuze": {
+            "API": {
+                "SystemCode": $SystemCode,
+                "URI": $URI,
+                "Name": $Name,
+                "Resource": $Resource,
+                "HttpMethod": $HttpMethod,
+                "QueryString": $QueryString,
+                "FormatType": $FormatType,
+                "PatternType": $PatternType,
+                "InvokeTimestampUTC": $InvokeTimestampUTC
+            }
+        }
+    }}
+};
+
+$buildIngestTableAtts := function(
+    $SystemCode,
+    $DatabaseURI,
+    $DatabaseName,
+    $SchemaName,
+    $TableName,
+    $RowKey,
+    $Method,
+    $PatternType,
+    $ReceiveTimestampUTC
+) {
+    {"IngestAtts": {
+        "Xfuze": {
+            "Table": {
+                "SystemCode": $SystemCode,
+                "DatabaseURI": $DatabaseURI,
+                "DatabaseName": $DatabaseName,
+                "SchemaName": $SchemaName,
+                "TableName": $TableName,
+                "RowKey": $RowKey,
+                "Method": $Method,
+                "PatternType": $PatternType,
+                "ReceiveTimestampUTC": $ReceiveTimestampUTC
+            }
+        }
+    }}
+};
+
+$buildPrivacyAtts := function(
+    $isSensitiveEntity,       /* Is this a sensitive entity? Values: "Y", "N", "U" */
+    $isEncrypted,             /* Is the entity's sensitive fields encrypted by Xfuze? Values: "Y", "N", "U" */
+    $encryptionKeyId,         /* ID of the key used for encryption (optional) */
+    $encryptionKeyURI,        /* URI of the key used for encryption (optional) */
+    $encryptionKeyName,       /* Name of the encryption key (optional) */
+    $encryptionKeyHost,       /* Host provider of the encryption key (optional) */
+    $sensitiveFieldPaths,     /* Array of canonical codes of sensitive fields (optional) */
+    $originIsEncrypted        /* Raw form indicating if the origin source is encrypted (required) */
+) {
+    {"PrivacyAtts": {
+    "Xfuze": {
+        "IsSensitiveEntity": $isSensitiveEntity,
+        "IsEncrypted": $isEncrypted,
+        "EncryptionKeyId": $encryptionKeyId,
+        "EncryptionKeyURI": $encryptionKeyURI,
+        "EncryptionKeyName": $encryptionKeyName,
+        "EncryptionKeyHost": $encryptionKeyHost,
+        "SensitiveFieldPaths": $sensitiveFieldPaths
+    },
+    "Origin": {
+        "IsEncrypted": $originIsEncrypted
+    }
+    }}
+};
+
+
+$buildEventMetadata := function($EventMetadataAtts){{"EventMetadata":$merge($EventMetadataAtts)}};
+
+$eventOccurredTimeObject := $dateTimeDim(`date`,"02/01/2006 15:04","Europe/London", "Europe/London");
+$eventReceivedTimeObject := $dateTimeDim(`date`,"02/01/2006 15:04","Europe/London", "Europe/London");
+
+$StockDayId := $formatValue($eventOccurredTimeObject.DateTimeKey,"STRING");
+$SiteId := $formatValue(`site`,"STRING");
+$SkuId := $formatValue(`sku`,"STRING");
+
+$BaseMetadata := $buildBaseMetadata(
+    $originEntityId := $stringJoin([$StockDayId,$SiteId,$SkuId],"_"),            
+    $originParentEntityId := $stringJoin([$StockDayId,$SiteId],"_"),
+    $originCompositeEntityId := $StockDayId,
+    $orginEntityStatusCode,
+
+    $originCorrelationId,   
+    $originEventId := $StockDayId & "_" & $SiteId & "_" & $SkuId,         
+    $originEventName,       
+
+    $originSourceFormatType := "CSV",
+    $originSourceSystem := "Archaean", 
+    $originSourceSubSystem,
+        
+    $entityClass,        
+    $entityDomain := "Inventory",                 
+    $entityType := "InventoryLedgerLine",
+    $entitySubType,
+    $entityVariation,     
+    $isSensitive := "N",
+    $parentEntityType := "InventoryLedgerLocation",
+    $compositeEntityType := "InventoryLedger",
+    $EntityStatusCode,
+    $EntityStatusDesc,
+    
+    $bizCapL0,
+    $bizCapL1,
+    $bizCapL2,          
+    $clientCode         := "Crew",
+    $envCode            := "dev",        
+    $eventCategory      := "Stock",     
+    $eventChangePattern := "FullSnapshot",
+    $eventClass         := "TriggerEvent",             
+    $eventVerb          := "Published",    
+    $eventValueStream,  
+    $isDerivedEvent,    
+    $note,
+        
+    $eventOccurredTimeObject,                
+    $eventOccurredType := "TrueTime",                
+    $eventReceivedTimeObject,          
+    $homeTimeZone := $eventOccurredTimeObject.TimeZone,  
+    $homeTimeZoneOffset := $eventOccurredTimeObject.TimeZoneOffset
+);
+
+$IngestAtts := $buildIngestFileAtts(
+    $SystemCode := "GCS",
+    $URI := null,
+    $Path := null,
+    $Name := null,
+    $BatchId := null,
+    $BatchNumber := null,
+    $LineNumber := 0,
+    $TotalBatchLines := 0,
+    $OriginalFileSizeBytes := 0,
+    $OriginalRowSizeBytes := 0,
+    $BytesOffsetInOriginalFile := 0,
+    $FormatType := "CSV",
+    $PatternType := "CloudObjectNotification",
+    $ChangeTimestampUTC := null,
+    $ObjectNotificationPayload := null
+);
+
+$PrivacyAtts := $buildPrivacyAtts(
+    $isSensitiveEntity := "N",
+    $isEncrypted := "N",
+    $encryptionKeyId,         
+    $encryptionKeyURI,        
+    $encryptionKeyName,       
+    $encryptionKeyHost,       
+    $sensitiveFieldPaths,     
+    $originIsEncrypted := "N"        
+);
+
+$EventHeader := $BaseMetadata[-2];
+$EntityIds := $BaseMetadata[-1];
+
+$TriggerEntityHeader := $objectsToDocument(
+    [$buildCustomAttribute("Status.AvailablityStatus.StatusCode",$formatValue(book,"NUMERIC","ZERO") <= 0 ? 'Out-of-Stock' : 'In Stock',"STRING"),
+     $buildCustomAttribute("Type.TypeCode","InventorySnapshot","STRING",""),
+     $buildCustomAttribute("Type.TypeDesc","Daily Inventory Snapshot","STRING",""),
+
+     $buildCustomAttribute("Times.CreatedOn",$eventOccurredTimeObject,"OBJECT",""),
+     $buildCustomAttribute("Times.UpdatedOn",$eventOccurredTimeObject,"OBJECT",""),
+     $buildCustomAttribute("XRefIds",[
+                                                        {"Id":$formatValue(`sku`,"STRING",""),"SystemCode":"Archean","Code":"SKU"},
+                                                        {"Id":$formatValue(`site`,"STRING",""),"SystemCode":"Archean","Code":"Site"}],"ARRAY","")]);
+
+$TriggerEntity := $objectsToDocument(
+    [$buildCustomAttribute("StockLocation.StockLocationKey",site,"STRING",""),
+     $buildCustomAttribute("Product.ProductIds.ProductVariantId",$stringJoin(["ProductVariant",$formatValue(sku,"STRING")],"_"),"STRING",""),
+     $buildCustomAttribute("Product.ProductIds.ProductVariantKey",sku,"STRING",""),
+     $buildCustomAttribute("Product.ProductIds.ProductVariantKeyType","SKU","STRING",""),
+     $buildCustomAttribute("Product.ProductIds.SKU",sku,"STRING",""),
+     
+     $buildCustomAttribute("StockLevel.Availability.OnHand.Total.Amount",$sum([$formatValue(book,"NUMERIC","ZERO"), $formatValue(dcpick,"NUMERIC","ZERO"), $formatValue(onpick,"NUMERIC","ZERO"), $formatValue(onwebpick,"NUMERIC","ZERO")]),"NUMERIC",""),
+     $buildCustomAttribute("StockLevel.Allocation.Allocated.Total.Amount",$sum([$formatValue(dcpick,"NUMERIC","ZERO"), $formatValue(onpick,"NUMERIC","ZERO"), $formatValue(onwebpick,"NUMERIC","ZERO")]),"NUMERIC",""),
+     $buildCustomAttribute("StockLevel.Allocation.Unallocated.Total.Amount",book,"NUMERIC","ZERO"),
+     $buildCustomAttribute("StockLevel.Allocation.BackOrder.Total.Amount",onorder,"NUMERIC","ZERO"),
+     $buildCustomAttribute("StockLevel.Fulfilment.Picking.Total.Amount",$sum([$formatValue(dcpick,"NUMERIC","ZERO"), $formatValue(onpick,"NUMERIC","ZERO"), $formatValue(onwebpick,"NUMERIC","ZERO")]),"NUMERIC",""),
+     $buildCustomAttribute("StockLevel.Fulfilment.Picking.Other.Amount",onpick,"NUMERIC","ZERO"),
+     $buildCustomAttribute("StockLevel.Fulfilment.Picking.B2C.Amount",onwebpick,"NUMERIC","ZERO"),
+     $buildCustomAttribute("StockLevel.Fulfilment.Picking.Pending.Amount",dcpick,"NUMERIC","ZERO"),
+     $buildCustomAttribute("StockLevel.Transit.Inbound.Total.Amount",intransitin,"NUMERIC","ZERO"),
+     $buildCustomAttribute("StockLevel.Transit.Outbound.Total.Amount",intransitout,"NUMERIC","ZERO"),
+     $buildCustomAttribute("StockLevel.Return.ExpectedReturns.Total.Amount",returnsexpected,"NUMERIC","ZERO"),
+     $buildCustomAttribute("StockLevel.Return.ReceivedReturns.Total.Amount",returnsreceived,"NUMERIC","ZERO")
+    ]);
+
+$TriggerEntity := {$entityType:$merge([$EntityIds,$TriggerEntityHeader,$TriggerEntity])};
+    
+$DomainEvent := {"DomainEvent":{"TriggerEntity":$TriggerEntity}};
+
+$PayloadAtts := $buildPayloadAtts(
+    $originDataPayloadHash := $hashmd5($string($$)),     
+    $originEventPayloadHash := $hashmd5($string($$)),    
+    $originHashScheme := "MD5",          
+    $xfuzeDataPayloadHash := $hashmd5($string($TriggerEntity)),      
+    $xfuzeEventPayloadHash := null,     
+    $xfuzeHashScheme := "MD5"
+);
+
+$EventMetadata := $buildEventMetadata([$BaseMetadata[[0,1,2]],$IngestAtts, $PrivacyAtts, $PayloadAtts]);
+
+$eventPayload := $merge([$EventHeader,$EventMetadata,$DomainEvent]);
+
+$event := $eventPayload ~> |EventMetadata.PayloadAtts.Xfuze|{"EventPayloadHash":$hashmd5($string($eventPayload))}|;
+
+)

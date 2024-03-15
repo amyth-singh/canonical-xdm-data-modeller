@@ -1,0 +1,435 @@
+[
+    {
+        "SKU": "1200677",
+        "deliveryGroup": "1",
+        "deliveryMethod": "3",
+        "description": "RIVERTON BLAZER | MNA053 | 44 | IVY",
+        "descriptions": [],
+        "fullfilmentId": "628",
+        "itemDiscounts": {
+            "refundPortion": 0,
+            "trnDiscountsPortion": 2.828,
+            "trnPromotionsPortion": 0
+        },
+        "itemLineId": "1",
+        "lineDiscounts": [
+            {
+                "discountAmount": 5.5,
+                "discountType": "AMOUNT",
+                "discountedLinePrice": 104.5,
+                "itemLineId": "1",
+                "name": "LD Wrong Price",
+                "percentageDiscountManagerOverride": {
+                    "automaticApprove": "false",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                },
+                "percentageDiscountReasonCode": "9901",
+                "percentageDiscountReasonName": "LD Wrong Price",
+                "percentageDiscountValue": 5,
+                "priceManagerOverride": {
+                    "automaticApprove": "true",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                },
+                "unitPrice": 104.5
+            }
+        ],
+        "lineOrderDiscounts": [
+            {
+                "cncDiscountAmount": 0,
+                "discountAmount": 10,
+                "discountType": "amount",
+                "inStoreDiscountAmount": 12.09,
+                "itemLineId": 1,
+                "itemLineIds": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6
+                ],
+                "override": {
+                    "automaticApprove": "true",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                },
+                "reasonCode": "9901",
+                "reasonDisplayText": "Variable TD",
+                "scope": "Order",
+                "type": "Discount",
+                "webOrderDiscountAmount": 0
+            }
+        ],
+        "linePromotions": [
+            {
+                "displayText": "10percentline",
+                "itemLineId": "1",
+                "name": "10percentline",
+                "promotionAmount": 10.45,
+                "promotionId": "74931dbf-a8c1-451c-b29a-d482c90078cb",
+                "promotionInfo": "undefined",
+                "promotionLinePrice": 94.05,
+                "promotionType": "PERCENTAGE_OFF",
+                "trigger": [
+                    {
+                        "itemLineId": "1",
+                        "quantity": 1
+                    }
+                ]
+            }
+        ],
+        "originFullfillmentId": "N/A",
+        "price": 110,
+        "quantity": 1,
+        "taxLines": [
+            {
+                "PreTax": 76.018,
+                "VAT": 20,
+                "VATCode": "H",
+                "itemLineId": 1,
+                "taxLineTotal": 15.203,
+                "taxableAmount": 91.222
+            }
+        ],
+        "totalLinePrice": 110
+    },
+    {
+        "SKU": "1184873",
+        "deliveryGroup": "1",
+        "deliveryMethod": "3",
+        "description": "STRIPE KNITTED RUGBY | MMC030 | XS | BRCBLTNVY",
+        "descriptions": [],
+        "excludePromotion": false,
+        "fullfilmentId": "628",
+        "itemDiscounts": {
+            "refundPortion": 0,
+            "trnDiscountsPortion": 1.503,
+            "trnPromotionsPortion": 0
+        },
+        "itemLineId": "2",
+        "lineDiscounts": [
+            {
+                "discountAmount": 17,
+                "discountType": "AMOUNT",
+                "discountedLinePrice": 50,
+                "itemLineId": "2",
+                "name": "Price override - wrong price",
+                "percentageDiscountManagerOverride": {
+                    "automaticApprove": "false",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                },
+                "priceManagerOverride": {
+                    "automaticApprove": "true",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                },
+                "priceOverrideAmount": 50,
+                "priceOverrideReasonCode": "100",
+                "priceOverrideReasonName": "Price override - wrong price",
+                "unitPrice": 50
+            }
+        ],
+        "lineOrderDiscounts": [
+            {
+                "cncDiscountAmount": 0,
+                "discountAmount": 10,
+                "discountType": "amount",
+                "inStoreDiscountAmount": 12.09,
+                "itemLineId": 2,
+                "itemLineIds": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6
+                ],
+                "override": {
+                    "automaticApprove": "true",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                },
+                "reasonCode": "9901",
+                "reasonDisplayText": "Variable TD",
+                "scope": "Order",
+                "type": "Discount",
+                "webOrderDiscountAmount": 0
+            }
+        ],
+        "originFullfillmentId": "N/A",
+        "price": 67,
+        "quantity": 1,
+        "taxLines": [
+            {
+                "PreTax": 40.414,
+                "VAT": 20,
+                "VATCode": "H",
+                "itemLineId": 2,
+                "taxLineTotal": 8.082,
+                "taxableAmount": 48.497
+            }
+        ],
+        "totalLinePrice": 67
+    },
+    {
+        "SKU": "1212479",
+        "deliveryGroup": "1",
+        "deliveryMethod": "3",
+        "description": "LW RUGBY | OMOE018 | XXL | INK",
+        "descriptions": [],
+        "excludePromotion": false,
+        "fullfilmentId": "628",
+        "itemDiscounts": {
+            "refundPortion": 0,
+            "trnDiscountsPortion": 1.052,
+            "trnPromotionsPortion": 0
+        },
+        "itemLineId": "3",
+        "lineOrderDiscounts": [
+            {
+                "cncDiscountAmount": 0,
+                "discountAmount": 10,
+                "discountType": "amount",
+                "inStoreDiscountAmount": 12.09,
+                "itemLineId": 3,
+                "itemLineIds": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6
+                ],
+                "override": {
+                    "automaticApprove": "true",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                },
+                "reasonCode": "9901",
+                "reasonDisplayText": "Variable TD",
+                "scope": "Order",
+                "type": "Discount",
+                "webOrderDiscountAmount": 0
+            }
+        ],
+        "originFullfillmentId": "N/A",
+        "price": 35,
+        "quantity": 1,
+        "taxLines": [
+            {
+                "PreTax": 28.29,
+                "VAT": 20,
+                "VATCode": "H",
+                "itemLineId": 3,
+                "taxLineTotal": 5.658,
+                "taxableAmount": 33.948
+            }
+        ],
+        "totalLinePrice": 35
+    },
+    {
+        "SKU": "1212469",
+        "deliveryGroup": "1",
+        "deliveryMethod": "3",
+        "description": "LW RUGBY | OMOE018 | L | INK",
+        "descriptions": [],
+        "fullfilmentId": "628",
+        "itemDiscounts": {
+            "refundPortion": 0,
+            "trnDiscountsPortion": 1.052,
+            "trnPromotionsPortion": 0
+        },
+        "itemLineId": "4",
+        "lineOrderDiscounts": [
+            {
+                "cncDiscountAmount": 0,
+                "discountAmount": 10,
+                "discountType": "amount",
+                "inStoreDiscountAmount": 12.09,
+                "itemLineId": 4,
+                "itemLineIds": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6
+                ],
+                "override": {
+                    "automaticApprove": "true",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                },
+                "reasonCode": "9901",
+                "reasonDisplayText": "Variable TD",
+                "scope": "Order",
+                "type": "Discount",
+                "webOrderDiscountAmount": 0
+            }
+        ],
+        "originFullfillmentId": "N/A",
+        "price": 35,
+        "quantity": 1,
+        "taxLines": [
+            {
+                "PreTax": 28.29,
+                "VAT": 20,
+                "VATCode": "H",
+                "itemLineId": 4,
+                "taxLineTotal": 5.658,
+                "taxableAmount": 33.948
+            }
+        ],
+        "totalLinePrice": 35
+    },
+    {
+        "SKU": "1189147",
+        "deliveryGroup": "1",
+        "deliveryMethod": "3",
+        "description": "LOZENGE LS CLASSIC PRINT | MMB081 | M | BLUWHT",
+        "descriptions": [],
+        "fullfilmentId": "628",
+        "itemDiscounts": {
+            "refundPortion": 0,
+            "trnDiscountsPortion": 1.759,
+            "trnPromotionsPortion": 0
+        },
+        "itemLineId": "5",
+        "lineOrderDiscounts": [
+            {
+                "cncDiscountAmount": 0,
+                "discountAmount": 10,
+                "discountType": "amount",
+                "inStoreDiscountAmount": 12.09,
+                "itemLineId": 5,
+                "itemLineIds": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6
+                ],
+                "override": {
+                    "automaticApprove": "true",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                },
+                "reasonCode": "9901",
+                "reasonDisplayText": "Variable TD",
+                "scope": "Order",
+                "type": "Discount",
+                "webOrderDiscountAmount": 0
+            }
+        ],
+        "linePromotions": [
+            {
+                "displayText": "10percentline",
+                "itemLineId": "5",
+                "name": "10percentline",
+                "promotionAmount": 6.5,
+                "promotionId": "74931dbf-a8c1-451c-b29a-d482c90078cb",
+                "promotionInfo": "undefined",
+                "promotionLinePrice": 58.5,
+                "promotionType": "PERCENTAGE_OFF",
+                "trigger": [
+                    {
+                        "itemLineId": "5",
+                        "quantity": 1
+                    }
+                ]
+            }
+        ],
+        "originFullfillmentId": "N/A",
+        "price": 65,
+        "quantity": 1,
+        "taxLines": [
+            {
+                "PreTax": 47.284,
+                "VAT": 20,
+                "VATCode": "H",
+                "itemLineId": 5,
+                "taxLineTotal": 9.457,
+                "taxableAmount": 56.741
+            }
+        ],
+        "totalLinePrice": 65
+    },
+    {
+        "SKU": "1201761",
+        "deliveryGroup": "1",
+        "deliveryMethod": "3",
+        "description": "OXFORD SHIRT DRESS | OWNJ001 | 12 | NAVY",
+        "descriptions": [],
+        "excludePromotion": false,
+        "fullfilmentId": "628",
+        "itemDiscounts": {
+            "refundPortion": 0,
+            "trnDiscountsPortion": 1.804,
+            "trnPromotionsPortion": 0
+        },
+        "itemLineId": "6",
+        "lineOrderDiscounts": [
+            {
+                "cncDiscountAmount": 0,
+                "discountAmount": 10,
+                "discountType": "amount",
+                "inStoreDiscountAmount": 12.09,
+                "itemLineId": 6,
+                "itemLineIds": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6
+                ],
+                "override": {
+                    "automaticApprove": "true",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                },
+                "reasonCode": "9901",
+                "reasonDisplayText": "Variable TD",
+                "scope": "Order",
+                "type": "Discount",
+                "webOrderDiscountAmount": 0
+            }
+        ],
+        "linePromotions": [
+            {
+                "displayText": "MT3for2new",
+                "itemLineId": "6",
+                "name": "MT3for2new",
+                "promotionAmount": 30,
+                "promotionId": "c9098744-3daa-4836-bfe2-07e95a21a4c1",
+                "promotionInfo": "undefined",
+                "promotionLinePrice": 60,
+                "promotionType": "MULTY_BUY",
+                "trigger": [
+                    {
+                        "itemLineId": "6",
+                        "quantity": 3
+                    }
+                ]
+            }
+        ],
+        "originFullfillmentId": "N/A",
+        "price": 30,
+        "quantity": 3,
+        "taxLines": [
+            {
+                "PreTax": 48.496,
+                "VAT": 20,
+                "VATCode": "H",
+                "itemLineId": 6,
+                "taxLineTotal": 9.699,
+                "taxableAmount": 58.196
+            }
+        ],
+        "totalLinePrice": 90
+    }
+]

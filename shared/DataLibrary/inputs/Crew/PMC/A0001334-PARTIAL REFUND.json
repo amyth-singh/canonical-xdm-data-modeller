@@ -1,0 +1,666 @@
+{
+    "id": "6a124465-1b23-4e88-a84d-c1b0ec15812d",
+    "createdAt": "2023-11-06T17:16:27.287Z",
+    "transCompletedAt": "2023-11-06T17:16:44.566Z",
+    "originalTime": "2023-11-06T17:14:43.536Z",
+    "type": "SALE_REFUND",
+    "transactionId": "A0001334",
+    "offlineTransactionId": "",
+    "originalTransId": "A0001333",
+    "operationStatus": "PAY_SUCCESS",
+    "saleTotal": 317.55,
+    "transactionRef": "H6jdoJ6282023-11-06T17:16:27.285Ze33b",
+    "initiatingModule": "eBasket",
+    "storeId": "628",
+    "deviceId": "429785ecd794e35d",
+    "terminalId": "62862",
+    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+    "userName": "taylorm",
+    "baseCurrency": "GBP",
+    "basketSummary": {
+        "webOrder": {
+            "totalItems": 0,
+            "saleTotal": 0,
+            "discountTotal": 0,
+            "refundTotal": 0,
+            "basketTotal": 0,
+            "VATTotal": 0
+        },
+        "totalItems": 7,
+        "saleTotal": 387,
+        "discountTotal": 139.16,
+        "inStore": {
+            "totalItems": 4,
+            "saleTotal": 387,
+            "discountTotal": 137.039,
+            "refundTotal": -207.55,
+            "basketTotal": 316.49,
+            "VATTotal": 52.372
+        },
+        "refundTotal": -207.55,
+        "cnc": {
+            "totalItems": 0,
+            "saleTotal": 0,
+            "discountTotal": 0,
+            "refundTotal": 0,
+            "basketTotal": 0,
+            "VATTotal": 0
+        },
+        "basketTotal": 318.61,
+        "VATTotal": 52.372
+    },
+    "basket": {
+        "products": [
+            {
+                "itemLineId": "1",
+                "refundedPromotionalQuantity": 4,
+                "isLastExchanged": false,
+                "quantity": 1,
+                "refundedReasonDescription": "Does not suit",
+                "deliveryMethod": "3",
+                "refundedReason": "600-1",
+                "refundedTotal": -94.05,
+                "excludePromotion": false,
+                "description": "RIVERTON BLAZER | MNA053 | 44 | IVY",
+                "refundedQuantity": 1,
+                "deliveryGroup": "1",
+                "itemDiscounts": {
+                    "trnDiscountsPortion": 2.828,
+                    "refundPortion": 2.828,
+                    "trnPromotionsPortion": 0,
+                    "currentRefundPortion": 2.828
+                },
+                "descriptions": [],
+                "totalLinePrice": 110,
+                "originFullfillmentId": "N/A",
+                "fullfilmentId": "628",
+                "price": 110,
+                "refunded": true,
+                "SKU": "1200677"
+            },
+            {
+                "itemLineId": "2",
+                "quantity": 1,
+                "deliveryMethod": "3",
+                "excludePromotion": false,
+                "description": "STRIPE KNITTED RUGBY | MMC030 | XS | BRCBLTNVY",
+                "deliveryGroup": "1",
+                "itemDiscounts": {
+                    "trnDiscountsPortion": 1.503,
+                    "refundPortion": 0,
+                    "trnPromotionsPortion": 0
+                },
+                "descriptions": [],
+                "originFullfillmentId": "N/A",
+                "totalLinePrice": 67,
+                "fullfilmentId": "628",
+                "price": 67,
+                "SKU": "1184873"
+            },
+            {
+                "itemLineId": "5",
+                "refundedPromotionalQuantity": 2,
+                "isLastExchanged": false,
+                "quantity": 1,
+                "refundedReasonDescription": "Changed Mind",
+                "deliveryMethod": "3",
+                "refundedReason": "601-1",
+                "refundedTotal": -58.5,
+                "excludePromotion": false,
+                "description": "LOZENGE LS CLASSIC PRINT | MMB081 | M | BLUWHT",
+                "refundedQuantity": 1,
+                "itemDiscounts": {
+                    "trnDiscountsPortion": 1.759,
+                    "refundPortion": 1.759,
+                    "trnPromotionsPortion": 0,
+                    "currentRefundPortion": 1.759
+                },
+                "deliveryGroup": "1",
+                "descriptions": [],
+                "totalLinePrice": 65,
+                "originFullfillmentId": "N/A",
+                "fullfilmentId": "628",
+                "price": 65,
+                "refunded": true,
+                "SKU": "1189147"
+            },
+            {
+                "itemLineId": "6",
+                "quantity": 3,
+                "deliveryMethod": "3",
+                "excludePromotion": false,
+                "description": "OXFORD SHIRT DRESS | OWNJ001 | 12 | NAVY",
+                "deliveryGroup": "1",
+                "itemDiscounts": {
+                    "trnDiscountsPortion": 1.804,
+                    "refundPortion": 0,
+                    "trnPromotionsPortion": 0
+                },
+                "descriptions": [],
+                "originFullfillmentId": "N/A",
+                "totalLinePrice": 90,
+                "fullfilmentId": "628",
+                "price": 30,
+                "SKU": "1201761"
+            },
+            {
+                "itemLineId": "7",
+                "refundedPromotionalQuantity": 0,
+                "isLastExchanged": false,
+                "quantity": 1,
+                "refundedReasonDescription": "Two sizes purchased",
+                "deliveryMethod": "3",
+                "refundedReason": "602-1",
+                "refundedTotal": -55,
+                "excludePromotion": false,
+                "description": "COOMBE DRESS | WNJ009 | 14 | GREEN",
+                "refundedQuantity": 1,
+                "itemDiscounts": {
+                    "trnDiscountsPortion": 0,
+                    "refundPortion": 0,
+                    "trnPromotionsPortion": 0,
+                    "currentRefundPortion": 0
+                },
+                "deliveryGroup": "1",
+                "descriptions": [],
+                "totalLinePrice": 55,
+                "originFullfillmentId": "N/A",
+                "fullfilmentId": "628",
+                "price": 55,
+                "refunded": true,
+                "SKU": "1207941"
+            }
+        ],
+        "lineDiscount": [
+            {
+                "unitPrice": 104.5,
+                "percentageDiscountValue": 5,
+                "discountedLinePrice": 104.5,
+                "name": "LD Wrong Price",
+                "itemLineId": "1",
+                "discountAmount": 5.5,
+                "discountType": "AMOUNT",
+                "percentageDiscountManagerOverride": {
+                    "automaticApprove": "false",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                },
+                "percentageDiscountReasonCode": "9901",
+                "priceManagerOverride": {
+                    "automaticApprove": "true",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                },
+                "percentageDiscountReasonName": "LD Wrong Price"
+            },
+            {
+                "unitPrice": 50,
+                "priceOverrideReasonName": "Price override - wrong price",
+                "priceOverrideAmount": 50,
+                "discountedLinePrice": 50,
+                "name": "Price override - wrong price",
+                "discountAmount": 17,
+                "itemLineId": "2",
+                "discountType": "AMOUNT",
+                "percentageDiscountManagerOverride": {
+                    "automaticApprove": "false",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                },
+                "priceOverrideReasonCode": "100",
+                "priceManagerOverride": {
+                    "automaticApprove": "true",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                }
+            }
+        ],
+        "transactionDiscount": [
+            {
+                "cncDiscountAmount": 0,
+                "inStoreDiscountAmount": -1.06,
+                "webOrderDiscountAmount": 0,
+                "discountAmount": -1.06,
+                "itemLineIds": [
+                    3
+                ],
+                "discountType": "Amount",
+                "reasonCode": "Refunded Discount"
+            }
+        ],
+        "taxBreakdown": {
+            "totalTaxableAmount": 314.243,
+            "taxLines": [
+                {
+                    "taxableAmount": 94.05,
+                    "PreTax": 78.375,
+                    "VATCode": "H",
+                    "VAT": 20,
+                    "itemLineId": 1,
+                    "taxLineTotal": 15.674
+                },
+                {
+                    "taxableAmount": 48.497,
+                    "PreTax": 40.414,
+                    "VATCode": "H",
+                    "VAT": 20,
+                    "itemLineId": 2,
+                    "taxLineTotal": 8.082
+                },
+                {
+                    "PreTax": 48.75,
+                    "taxableAmount": 58.5,
+                    "VATCode": "H",
+                    "VAT": 20,
+                    "itemLineId": 5,
+                    "taxLineTotal": 9.75
+                },
+                {
+                    "taxableAmount": 58.196,
+                    "PreTax": 48.496,
+                    "VATCode": "H",
+                    "VAT": 20,
+                    "itemLineId": 6,
+                    "taxLineTotal": 9.699
+                },
+                {
+                    "taxableAmount": 55,
+                    "PreTax": 45.833,
+                    "VATCode": "H",
+                    "VAT": 20,
+                    "itemLineId": 7,
+                    "taxLineTotal": 9.167
+                }
+            ]
+        },
+        "exchange": [
+            {
+                "exchangeId": 1,
+                "reason": "601-1",
+                "newItems": [
+                    {
+                        "lineItemId": 7,
+                        "Quantity": 1
+                    }
+                ],
+                "quantity": 1,
+                "lineItemId": 3
+            }
+        ],
+        "totalTaxSummary": [
+            {
+                "PreTaxSum": 261.868,
+                "VATCode": "H",
+                "TaxSum": 52.372,
+                "VAT": 20,
+                "TXrateSum": 314.24
+            }
+        ],
+        "linePromotion": [
+            {
+                "displayText": "10percentline",
+                "promotionType": "PERCENTAGE_OFF",
+                "promotionLinePrice": 94.05,
+                "name": "10percentline",
+                "itemLineId": "1",
+                "promotionInfo": "undefined",
+                "trigger": [
+                    {
+                        "quantity": 1,
+                        "itemLineId": "1"
+                    }
+                ],
+                "promotionAmount": 10.45,
+                "promotionId": "74931dbf-a8c1-451c-b29a-d482c90078cb"
+            },
+            {
+                "displayText": "10percentline",
+                "promotionType": "PERCENTAGE_OFF",
+                "promotionLinePrice": 58.5,
+                "name": "10percentline",
+                "itemLineId": "5",
+                "promotionInfo": "undefined",
+                "trigger": [
+                    {
+                        "quantity": 1,
+                        "itemLineId": "5"
+                    }
+                ],
+                "promotionAmount": 6.5,
+                "promotionId": "74931dbf-a8c1-451c-b29a-d482c90078cb"
+            },
+            {
+                "displayText": "MT3for2new",
+                "promotionType": "MULTY_BUY",
+                "promotionLinePrice": 60,
+                "name": "MT3for2new",
+                "itemLineId": "6",
+                "trigger": [
+                    {
+                        "quantity": 3,
+                        "itemLineId": "6"
+                    }
+                ],
+                "promotionInfo": "undefined",
+                "promotionAmount": 30,
+                "promotionId": "c9098744-3daa-4836-bfe2-07e95a21a4c1"
+            }
+        ],
+        "transactionPromotion": []
+    },
+    "currentTransactionDetails": {
+        "products": [
+            {
+                "itemLineId": 1,
+                "isLastExchanged": false,
+                "deliveryMethod": "3",
+                "selectedVATCode": "H",
+                "refundedReason": "600-1",
+                "description": "RIVERTON BLAZER | MNA053 | 44 | IVY",
+                "inReturnItem": true,
+                "itemDiscounts": {
+                    "trnDiscountsPortion": 2.828,
+                    "refundPortion": 2.828,
+                    "trnPromotionsPortion": 0,
+                    "currentRefundPortion": 2.828
+                },
+                "deliveryGroup": "1",
+                "descriptions": [],
+                "totalLinePrice": 94.05,
+                "total": 94.05,
+                "fullfilmentId": "628",
+                "selectedPrice": 110,
+                "refunded": true,
+                "currency": "GBP",
+                "quantity": 1,
+                "refundedReasonDescription": "Does not suit",
+                "lineDiscount": {
+                    "unitPrice": 104.5,
+                    "percentageDiscountValue": 5,
+                    "discountedLinePrice": 104.5,
+                    "name": "LD Wrong Price",
+                    "itemLineId": "1",
+                    "discountAmount": 5.5,
+                    "discountType": "AMOUNT",
+                    "percentageDiscountManagerOverride": {
+                        "automaticApprove": "false",
+                        "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                        "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                    },
+                    "percentageDiscountReasonCode": "9901",
+                    "priceManagerOverride": {
+                        "automaticApprove": "true",
+                        "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                        "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                    },
+                    "percentageDiscountReasonName": "LD Wrong Price"
+                },
+                "refundedTotal": -94.05,
+                "refundPromotionalQuantity": 4,
+                "refundedQuantity": 1,
+                "selectedVAT": 20,
+                "linePromotions": {
+                    "displayText": "10percentline",
+                    "promotionType": "PERCENTAGE_OFF",
+                    "promotionLinePrice": 94.05,
+                    "name": "10percentline",
+                    "itemLineId": "1",
+                    "trigger": [
+                        {
+                            "quantity": 1,
+                            "itemLineId": "1"
+                        }
+                    ],
+                    "promotionInfo": "undefined",
+                    "promotionAmount": 10.45,
+                    "promotionId": "74931dbf-a8c1-451c-b29a-d482c90078cb"
+                },
+                "SKU": "1200677"
+            },
+            {
+                "itemLineId": 5,
+                "isLastExchanged": false,
+                "selectedVATCode": "H",
+                "deliveryMethod": "3",
+                "refundedReason": "601-1",
+                "description": "LOZENGE LS CLASSIC PRINT | MMB081 | M | BLUWHT",
+                "inReturnItem": true,
+                "deliveryGroup": "1",
+                "itemDiscounts": {
+                    "trnDiscountsPortion": 1.759,
+                    "refundPortion": 1.759,
+                    "trnPromotionsPortion": 0,
+                    "currentRefundPortion": 1.759
+                },
+                "descriptions": [],
+                "totalLinePrice": 58.5,
+                "total": 58.5,
+                "selectedPrice": 65,
+                "fullfilmentId": "628",
+                "currency": "GBP",
+                "refunded": true,
+                "quantity": 1,
+                "refundedReasonDescription": "Changed Mind",
+                "refundedTotal": -58.5,
+                "excludePromotion": false,
+                "selectedVAT": 20,
+                "refundedQuantity": 1,
+                "refundPromotionalQuantity": 2,
+                "linePromotions": {
+                    "displayText": "10percentline",
+                    "promotionType": "PERCENTAGE_OFF",
+                    "promotionLinePrice": 58.5,
+                    "name": "10percentline",
+                    "itemLineId": "5",
+                    "trigger": [
+                        {
+                            "quantity": 1,
+                            "itemLineId": "5"
+                        }
+                    ],
+                    "promotionInfo": "undefined",
+                    "promotionAmount": 6.5,
+                    "promotionId": "74931dbf-a8c1-451c-b29a-d482c90078cb"
+                },
+                "SKU": "1189147"
+            },
+            {
+                "itemLineId": 7,
+                "isLastExchanged": false,
+                "selectedVATCode": "H",
+                "deliveryMethod": "3",
+                "refundedReason": "602-1",
+                "description": "COOMBE DRESS | WNJ009 | 14 | GREEN",
+                "inReturnItem": true,
+                "deliveryGroup": "1",
+                "itemDiscounts": {
+                    "trnDiscountsPortion": 0,
+                    "refundPortion": 0,
+                    "trnPromotionsPortion": 0,
+                    "currentRefundPortion": 0
+                },
+                "descriptions": [],
+                "totalLinePrice": 55,
+                "total": 55,
+                "selectedPrice": 55,
+                "fullfilmentId": "628",
+                "refunded": true,
+                "currency": "GBP",
+                "quantity": 1,
+                "refundedReasonDescription": "Two sizes purchased",
+                "refundedTotal": -55,
+                "refundedQuantity": 1,
+                "refundPromotionalQuantity": 0,
+                "selectedVAT": 20,
+                "SKU": "1207941"
+            }
+        ],
+        "lineDiscount": [],
+        "transactionDiscount": [
+            {
+                "cncDiscountAmount": 0,
+                "inStoreDiscountAmount": -4.59,
+                "webOrderDiscountAmount": 0,
+                "discountAmount": -4.59,
+                "itemLineIds": [
+                    1,
+                    5,
+                    7
+                ],
+                "discountType": "Amount",
+                "reasonCode": "Refunded Discount"
+            }
+        ],
+        "taxBreakdown": {
+            "totalTaxableAmount": -202.963,
+            "taxLines": [
+                {
+                    "taxableAmount": -91.222,
+                    "PreTax": -76.019,
+                    "VATCode": "H",
+                    "VAT": 20,
+                    "itemLineId": 1,
+                    "taxLineTotal": -15.203
+                },
+                {
+                    "taxableAmount": -56.741,
+                    "PreTax": -47.285,
+                    "VATCode": "H",
+                    "VAT": 20,
+                    "itemLineId": 5,
+                    "taxLineTotal": -9.457
+                },
+                {
+                    "taxableAmount": -55,
+                    "PreTax": -45.834,
+                    "VATCode": "H",
+                    "VAT": 20,
+                    "itemLineId": 7,
+                    "taxLineTotal": -9.166
+                }
+            ]
+        },
+        "totalTaxSummary": [
+            {
+                "PreTaxSum": -169.138,
+                "VATCode": "H",
+                "TaxSum": -33.826,
+                "VAT": 20,
+                "TXrateSum": -202.965
+            }
+        ],
+        "linePromotion": [],
+        "basketSummary": {
+            "webOrder": {
+                "totalItems": 0,
+                "saleTotal": 0,
+                "discountTotal": 0,
+                "refundTotal": 0,
+                "basketTotal": 0,
+                "VATTotal": 0
+            },
+            "totalItems": 3,
+            "saleTotal": 207.55,
+            "discountTotal": 4.59,
+            "inStore": {
+                "totalItems": 0,
+                "saleTotal": 207.55,
+                "discountTotal": 206.49,
+                "refundTotal": -207.55,
+                "basketTotal": -206.49,
+                "VATTotal": -33.826
+            },
+            "refundTotal": -207.55,
+            "basketTotal": -202.96,
+            "cnc": {
+                "totalItems": 0,
+                "saleTotal": 0,
+                "discountTotal": 0,
+                "refundTotal": 0,
+                "basketTotal": 0,
+                "VATTotal": 0
+            },
+            "VATTotal": -33.826
+        }
+
+    },
+    "override": {
+        "automaticApprove": "true",
+        "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+        "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+    },
+    "paymentDetails": [
+        {
+            "amount": "-202.96",
+            "hostReferenceId": "NA",
+            "transactionReference": "H6jdoJ6282023-11-06T17:16:27.285Ze33b",
+            "cardType": "NA",
+            "transactionDate": "2023-11-06T17:16:27.285Z",
+            "paymentType": "PDQ",
+            "transactionType": "SALE_REFUND",
+            "cncAmount": "0",
+            "authcode": "NA",
+            "result": "AUTHORISED",
+            "inStoreAmount": "-201.61",
+            "totalamount": "-202.96",
+            "webOrderAmount": "0",
+            "shippingAmount": "0",
+            "currency": "GBP",
+            "pan": "NA",
+            "aid": "NA",
+            "entryMethod": "NA"
+        }
+    ],
+    "transactionStructure": [
+        {
+            "isGiftRefund": false,
+            "type": "SALE",
+            "storeId": "628",
+            "transactionId": "A0001331",
+            "parentId": "NA"
+        },
+        {
+            "isGiftRefund": false,
+            "type": "SALE_REFUND",
+            "storeId": "628",
+            "parentId": "A0001331",
+            "transactionId": "A0001332"
+        },
+        {
+            "isGiftRefund": false,
+            "type": "SALE_EXCHANGE",
+            "storeId": "628",
+            "parentId": "A0001332",
+            "transactionId": "A0001333"
+        },
+        {
+            "isGiftRefund": false,
+            "type": "SALE_REFUND",
+            "storeId": "628",
+            "transactionId": "A0001334",
+            "parentId": "A0001333"
+        }
+    ],
+    "storeNodeStructure": [
+        {
+            "name": "Berkhamsted Test",
+            "nodeType": "STORE"
+        },
+        {
+            "name": "South East & Central",
+            "nodeType": "STORE_GROUP"
+        },
+        {
+            "name": "UK",
+            "nodeType": "TRADING_REGION"
+        },
+        {
+            "name": "Crew Clothing",
+            "nodeType": "COMPANY"
+        },
+        {
+            "name": "Crew Clothing",
+            "nodeType": "ORGANIZATION"
+        }
+    ]
+}

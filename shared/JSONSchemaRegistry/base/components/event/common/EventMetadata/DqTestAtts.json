@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xfuze.io/xdm/schema/components/event/common/EventHeader/EventMetadata/DqTestAtts",
+  "description": "XDM Schema for the common event component 'EventHeader/EventMetadata/DqTestAtts'",
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "Xfuze": {
+      "type": "object",
+      "description": "The Xfuze derived / enriched attributes that define the schema and transforms and metadata used in generating this transform",
+      "unevaluatedProperties": false,
+      "properties": {
+        "DqTestAtts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "unevaluatedProperties": false,
+            "properties": {
+              "TestId": {
+                "type": "null"
+              },
+              "TestName": {
+                "type": "null"
+              },
+              "TestType": {
+                "type": "null"
+              },
+              "TestVersion": {
+                "type": "null"
+              },
+              "ActualResultCode": {
+                "type": "null"
+              },
+              "ActualResultValue": {
+                "type": "null"
+              },
+              "ExpectedResultCode": {
+                "type": "null"
+              },
+              "ExpectedResultValue": {
+                "type": "null"
+              },
+              "Note": {
+                "type": "null"
+              },
+              "SeverityCode": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "DqTestAtts"
+  ]
+}

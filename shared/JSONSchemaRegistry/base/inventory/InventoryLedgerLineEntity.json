@@ -1,0 +1,33 @@
+{
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "InventoryLedgerLine": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "allOf": [
+        {
+          "$ref": "../components/entity/common/Entity.json#/EntityHeader"
+        },
+        {
+          "properties": {
+            "Product": {
+              "$ref": "../components/entity/domain/inventory/Product.json"
+            },
+            "StockLocation": {
+              "$ref": "../components/entity/domain/inventory/StockLocation.json"
+            },
+            "StockLevel": {
+              "$ref": "../components/entity/domain/inventory/StockLevels.json"
+            }
+          },
+          "required": [
+            "Product",
+            "StockLocation",
+            "StockLevel"
+          ]
+        }
+      ]
+    }
+  }
+}

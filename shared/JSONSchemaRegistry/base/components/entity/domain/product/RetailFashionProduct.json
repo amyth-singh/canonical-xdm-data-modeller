@@ -1,0 +1,357 @@
+{
+    "GarmentObject": {
+        "Garment": {
+            "type": "object",
+            "unevaluatedProperties": false,
+            "properties": {
+                "Bottoms": {
+                    "type": "object",
+                    "unevaluatedProperties": false,
+                    "properties": {
+                        "Waistband": {
+                            "type": "object",
+                            "properties": {
+                                "WaistbandCode": {
+                                    "type": "string"
+                                },
+                                "WaistbandType": {
+                                    "type": "string"
+                                },
+                                "WaistbandDesc": {
+                                    "type": "string"
+                                },
+                                "WaistbandPosition": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "Fabric": {
+                    "type": "object",
+                    "unevaluatedProperties": false,
+                    "properties": {
+                        "FabricCode": {
+                            "type": "string"
+                        },
+                        "FabricType": {
+                            "type": "string"
+                        },
+                        "FasbricDesc": {
+                            "type": "string"
+                        },
+                        "Pattern": {
+                            "type": "object",
+                            "unevaluatedProperties": false,
+                            "properties": {
+                                "PatternCode": {
+                                    "type": "string"
+                                },
+                                "PatternType": {
+                                    "type": "string"
+                                },
+                                "PatternDesc": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "Feature": {
+                    "type": "object",
+                    "unevaluatedProperties": false,
+                    "properties": {
+                        "Fastening": {
+                            "type": "object",
+                            "unevaluatedProperties": false,
+                            "properties": {
+                                "FasteningCode": {
+                                    "type": "string"
+                                },
+                                "FasteningType": {
+                                    "type": "string"
+                                },
+                                "FasteningDesc": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "Padding": {
+                            "type": "object",
+                            "unevaluatedProperties": false,
+                            "properties": {
+                                "PaddingCode": {
+                                    "type": "string"
+                                },
+                                "PaddingType": {
+                                    "type": "string"
+                                },
+                                "PaddingDesc": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "WaterResistance": {
+                            "type": "object",
+                            "unevaluatedProperties": false,
+                            "properties": {
+                                "WaterResistanceCode": {
+                                    "type": "string"
+                                },
+                                "WaterResistanceType": {
+                                    "type": "string"
+                                },
+                                "WaterResistanceDesc": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "Wiring": {
+                            "type": "object",
+                            "unevaluatedProperties": false,
+                            "properties": {
+                                "WiringCode": {
+                                    "type": "string"
+                                },
+                                "WiringType": {
+                                    "type": "string"
+                                },
+                                "WiringDesc": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "Footwear": {
+                    "type": "object",
+                    "unevaluatedProperties": false,
+                    "properties": {
+                        "Composition": {
+                            "type": "object",
+                            "unevaluatedProperties": false,
+                            "properties": {
+                                "Lining": {
+                                    "type": "object",
+                                    "unevaluatedProperties": false,
+                                    "properties": {
+                                        "LiningCompositionCode": {
+                                            "type": "string"
+                                        },
+                                        "LiningCompositionType": {
+                                            "type": "string"
+                                        },
+                                        "LiningCompositionDesc": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "Main": {
+                                    "type": "object",
+                                    "unevaluatedProperties": false,
+                                    "properties": {
+                                        "MainCompositionCode": {
+                                            "type": "string"
+                                        },
+                                        "MainCompositionType": {
+                                            "type": "string"
+                                        },
+                                        "MainCompositionDesc": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "Sole": {
+                                    "type": "object",
+                                    "unevaluatedProperties": false,
+                                    "properties": {
+                                        "SoleCompositionCode": {
+                                            "type": "string"
+                                        },
+                                        "SoleCompositionType": {
+                                            "type": "string"
+                                        },
+                                        "SoleCompositionDesc": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "Heel": {
+                            "type": "object",
+                            "unevaluatedProperties": false,
+                            "properties": {
+                                "HeelCode": {
+                                    "type": "string"
+                                },
+                                "HeelType": {
+                                    "type": "string"
+                                },
+                                "HeelDesc": {
+                                    "type": "string"
+                                },
+                                "Height": {
+                                    "type": "object",
+                                    "unevaluatedProperties": false,
+                                    "properties": {
+                                        "HeelHeightCode": {
+                                            "type": "string"
+                                        },
+                                        "HeelHeightType": {
+                                            "type": "string"
+                                        },
+                                        "HeelHeightDesc": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "Toe": {
+                            "type": "object",
+                            "unevaluatedProperties": false,
+                            "properties": {
+                                "ToeCode": {
+                                    "type": "string"
+                                },
+                                "ToeType": {
+                                    "type": "string"
+                                },
+                                "ToeDesc": {
+                                    "type": "string"
+                                },
+                                "Style": {
+                                    "type": "object",
+                                    "unevaluatedProperties": false,
+                                    "properties": {
+                                        "ToeStyleCode": {
+                                            "type": "string"
+                                        },
+                                        "ToeStyleType": {
+                                            "type": "string"
+                                        },
+                                        "ToeStyleDesc": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "Style": {
+                    "type": "object",
+                    "unevaluatedProperties": false,
+                    "properties": {
+                        "StyleCode": {
+                            "type": "string"
+                        },
+                        "StyleType": {
+                            "type": "string"
+                        },
+                        "StyleDesc": {
+                            "type": "string"
+                        },
+                        "Fit": {
+                            "type": "object",
+                            "properties": {
+                                "FitCode": {
+                                    "type": "string"
+                                },
+                                "FitType": {
+                                    "type": "string"
+                                },
+                                "FitDesc": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "Length": {
+                            "type": "object",
+                            "unevaluatedProperties": false,
+                            "properties": {
+                                "LengthCode": {
+                                    "type": "string"
+                                },
+                                "LengthType": {
+                                    "type": "string"
+                                },
+                                "LengthDesc": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "Tops": {
+                    "type": "object",
+                    "unevaluatedProperties": false,
+                    "properties": {
+                        "Neckline": {
+                            "type": "object",
+                            "unevaluatedProperties": false,
+                            "properties": {
+                                "NecklineCode": {
+                                    "type": "string"
+                                },
+                                "NecklineType": {
+                                    "type": "string"
+                                },
+                                "NecklineDesc": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "Sleeve": {
+                            "type": "object",
+                            "unevaluatedProperties": false,
+                            "properties": {
+                                "Length": {
+                                    "type": "object",
+                                    "unevaluatedProperties": false,
+                                    "properties": {
+                                        "SleeveLengthCode": {
+                                            "type": "string"
+                                        },
+                                        "SleeveLengthType": {
+                                            "type": "string"
+                                        },
+                                        "SleeveLengthDesc": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "GarmentCareInstructionProperties": {
+        "WashingInstructions": {
+            "type": "string"
+        },
+        "DryingInstructions": {
+            "type": "string"
+        },
+        "IroningInstructions": {
+            "type": "string"
+        }
+    },
+    "ImageModelObject": {
+        "Model": {
+            "type": "object",
+            "unevaluatedProperties": false,
+            "properties": {
+                "Height": {
+                    "type": "string"
+                },
+                "Wears": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

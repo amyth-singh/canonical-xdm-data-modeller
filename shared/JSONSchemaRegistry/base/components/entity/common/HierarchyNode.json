@@ -1,0 +1,154 @@
+{
+  "HierarchyNodeObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/HierarchyNodeProperties"
+    }
+  },
+  "HierarchyNodeProperties": {
+    "type": "object",
+    "description": "A generic hierarchy node, a 'level' in a generic hierarchy that can be used for things like a store or product category hierarchy",
+    "unevaluatedProperties": false,
+    "properties": {
+      "NodeId": {
+        "type": "string",
+        "description": "The HierarchyId Id, in Xfuze canonical form, identifying this hierarchy node amongst other nodes, in the form of Hierarchy::[type]_[sourceSystem]_[HierarchyKey] e.g Hierarchy::Category_Retail247_123456789"
+      },
+      "NodeKey": {
+        "type": "string",
+        "description": "The 'natural' hierarchy number"
+      },
+      "NodeCode": {
+        "type": "string",
+        "description": "The code of this hierarchy node/level"
+      },
+      "ParentNodeId": {
+        "type": "string",
+        "description": "The parent (direct parent) HierarchyId Id, in Xfuze canonical form, identifying this hierarchy node amongst other nodes, in the form of Hierarchy::[type]_[sourceSystem]_[HierarchyKey] e.g Hierarchy::Category_Retail247_123456789"
+      },
+      "ParentNodeKey": {
+        "type": "string",
+        "description": "The 'natural' parent (direct parent) number"
+      },
+      "ParentNodeCode": {
+        "type": "string",
+        "description": "The code of this parent (direct parent) hierarchy node/level"
+      },      
+      "NodeStatus": {
+        "$ref": "./Status.json#/StatusObject",
+        "description": "The status code of this hierarchy node/level"
+      },
+      "NodeName": {
+        "type": "string",
+        "description": "The name of this hierarchy node/level"
+      },
+      "NodeClass": {
+        "type": "string",
+        "description": "The class of this hierarchy type depending on nature/usage of the hierarchy / node e.g Store, Product "
+      },
+      "NodeType": {
+        "type": "string",
+        "description": "The type of this hierarchy node/level itself depending on nature/usage of the hierarchy / node e.g Company level in a store heirarchy "
+      },
+      "NodeDesc": {
+        "type": "string",
+        "description": "The description of this hierarchy node/level"
+      },
+      "NodeLevel": {
+        "type": "number",
+        "description": "The number of the level of this level e.g 1..5"
+      },
+      "L1": {
+        "type": "string",
+        "description": "The hierarchy value for the top level (1) in flat/expanded form of this level and up, rather then array form"
+      },
+      "L1Name": {
+        "type": "string",
+        "description": "The hierarchy name for the top level (1) in flat/expanded form of this level and up, rather then array form"
+      },
+      "L1Type": {
+        "type": "string",
+        "description": "The hierarchy type for the top level (1) in flat/expanded form of this level and up, rather then array form"
+      },
+      "L2": {
+        "type": "string",
+        "description": "The hierarchy value for the 2nd level (2) in flat/expanded form of this level and up, rather then array form"
+      },
+      "L2Name": {
+        "type": "string",
+        "description": "The hierarchy name for the 2nd level (2) in flat/expanded form of this level and up, rather then array form"
+      },
+      "L2Type": {
+        "type": "string",
+        "description": "The hierarchy type for the 2nd level (2) in flat/expanded form of this level and up, rather then array form"
+      },
+      "L3": {
+        "type": "string",
+        "description": "The hierarchy value for the 3rd level (3) in flat/expanded form of this level and up, rather then array form"
+      },
+      "L3Name": {
+        "type": "string",
+        "description": "The hierarchy name for the 3rd level (3) in flat/expanded form of this level and up, rather then array form"
+      },
+      "L3Type": {
+        "type": "string",
+        "description": "The hierarchy type for the 3rd level (3) in flat/expanded form of this level and up, rather then array form"
+      },
+      "L4": {
+        "type": "string",
+        "description": "The hierarchy value for the 4th level (4) in flat/expanded form of this level and up, rather then array form"
+      },
+      "L4Name": {
+        "type": "string",
+        "description": "The hierarchy name for the 4th level (4) in flat/expanded form of this level and up, rather then array form"
+      },
+      "L4Type": {
+        "type": "string",
+        "description": "The hierarchy type for the 4th level (4) in flat/expanded form of this level and up, rather then array form"
+      },
+      "L5": {
+        "type": "string",
+        "description": "The hierarchy value for the 5th level (5) in flat/expanded form of this level and up, rather then array form"
+      },
+      "L5Name": {
+        "type": "string",
+        "description": "The hierarchy name for the 5th level (5) in flat/expanded form of this level and up, rather then array form"
+      },
+      "L5Type": {
+        "type": "string",
+        "description": "The hierarchy type for the 5th level (5) in flat/expanded form of this level and up, rather then array form"
+      },
+      "IsOverride": {
+        "type": "string",
+        "description": "Can this be overriden? e.g Y",
+        "enum": ["Y","N","U"]
+      },
+      "IsChecked": {
+        "type": "string",
+        "description": "Has this been checked? e.g Y",
+        "enum": ["Y","N","U"]
+      },
+      "Lang": {
+        "type": "string",
+        "description": "The language used for localisation of this hierarchy node/level"
+      },
+      "Locale": {
+        "type": "string",
+        "description": "The locale used for localisation of this hierarchy node/level"
+      },
+      "Keywords": {
+        "type": "string",
+        "description": "The keywords associated with the hierarchy node/level"
+      },
+      "Country": {
+        "$ref": "./Country.json#/CountryObject",
+        "description": "The description of this hierarchy node/level"
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}
+

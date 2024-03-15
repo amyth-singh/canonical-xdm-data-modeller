@@ -1,0 +1,48 @@
+{
+  "MeasureObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/MeasureProperties"
+    }
+  },
+  "MeasureProperties": {
+    "type": "object",
+    "required": [
+      "Amount"
+    ],
+    "unevaluatedProperties": false,
+    "properties": {
+      "Code": {
+        "type": "string",
+        "description": "The code of the quantity e.g QtySold, QtyReturned"
+      },
+      "Desc": {
+        "type": "string",
+        "description": "The description of the quantity"
+      },
+      "Amount": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "description": "The (required) actual quantity amount measure as a numerical e.g 1"
+      },
+      "UnitMeasure": {
+        "type": "string",
+        "description": "The quantity unit measure e.g Each, Package, Bundle, Parcel"
+      },
+      "UnitType": {
+        "type": "string",
+        "description": "The quantity unit type. e.g Metric, Imperial"
+      },
+      "UnitScheme": {
+        "type": "string",
+        "description": "The quantity unit scheme e.g ISO xx"
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "TaxJurisdictionObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/TaxJurisdictionProperties"
+    }
+  },
+  "TaxJurisdictionProperties": {
+    "type": "object",
+    "unevaluatedProperties": false,
+    "properties": {
+      "JurisCode": {
+        "type": "string",
+        "description": "The unique code of the TaxJurisdiction"
+      },
+      "JurisName": {
+        "type": "string",
+        "description": "The scheme of the TaxJurisdiction"
+      },
+      "DutiableValue": {
+        "$ref": "./Price.json#/PriceProperties",
+        "description": "The taxable duty amount in the jurisdiction"
+      },
+      "DutiableTaxRate": {
+        "type": "number",
+        "description": "The duty rate as a percentage for the jurisdiction e.g 20.00"
+      },
+      "JuriCountry": {
+        "$ref": "./Country.json#/CountryProperties",
+        "description": "The country this"
+      },
+      "DutyCountryOfOrigin": {
+        "$ref": "./Country.json#/CountryProperties",
+        "description": "The country of origin"
+      },
+      "IsJuriTaxExempt": {
+        "type": "string",
+        "description": "Is this TaxJurisdiction a tex exempt one? e.g Y",
+        "enum": ["Y","N","U"]
+      },
+      "GLCode": {
+        "type": "string",
+        "description": "A GL code associated with this TaxJurisdiction"
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

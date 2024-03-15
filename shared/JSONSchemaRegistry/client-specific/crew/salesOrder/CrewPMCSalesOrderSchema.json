@@ -1,0 +1,9 @@
+{
+    "type": "object",
+    "unevaluatedProperties": false,
+    "allOf": [
+        {
+            "$ref": "../../../base/salesOrder/SalesOrderEventSchema.json"
+        }
+    ]
+}

@@ -1,0 +1,1371 @@
+(
+  /*
+    Desc: Shopify Sales Order Mapper
+    Author: Kurt Maile
+    Status: In Dev
+    Exclude Filter: test = true (.e dont map) - we need to ignore 'test' events
+    Other Comments:
+
+    Links:
+      Order Events: https://shopify.dev/docs/api/admin-rest/2023-01/resources/event#order-events
+      Order Entity: https://shopify.dev/docs/api/admin-rest/2023-01/resources/order
+      Draft Order Entity: https://shopify.dev/docs/api/admin-rest/2023-01/resources/draftorder
+
+    Todo:
+     Look at the actual event resource itself not just the Order resource.
+
+  */
+
+  $upperTrim := $string ~> $trim ~> $uppercase;
+  $cleanStr := $string ~> $trim;
+  $stringBoolMap := {"Y":"Y","1":"Y","TRUE":"Y","N":"N","0":"N","FALSE":"Y"};
+  $stringBool := function($value){$lookup($stringBoolMap, $upperTrim($value))};
+  $buildEntityID := function($entityCode,$system,$rawEntityId){$replace($entityCode,".","_") & "_" & $system & "_" & $rawEntityId};
+  $buildAttributeID := function($entityID,$AttributeCode,$AttributeId){$entityID & "_" & $replace($AttributeCode,".","_") & ($AttributeId = "" ? "" : "_" & $AttributeId)};
+
+ 
+  /* ------------ START OF RAW INPUT DATA ------------ (Injected inn e.g Go / Dataform supplied) */
+  
+  /* Raw input data (injected config) enabling xdm derived values and actiing as templates */
+  $rawSourceSystem := "Shopify";
+  $rawSourceTimeZone := "Europe/London";
+  $rawEventId := null; /*  TODO: 'id' for an event is the id, but sample is resource only so far*/
+  $rawEventName := null;
+  $rawEventNameList := [ /* Full lookup list and mappings can expect for 'Order' events from shopify with XF mappings*/
+    {"systemEventName": "placed",                "xfuzeEventName": "SalesOrderPlaced"},
+    {"systemEventName": "updated",               "xfuzeEventName": "SalesOrderUpdated"},
+    {"systemEventName": "authorization_failure", "xfuzeEventName": "SalesOrderPaymentAuthFailed"},
+    {"systemEventName": "authorization_pending", "xfuzeEventName": "SalesOrderPaymentAuthPending"},
+    {"systemEventName": "authorization_success", "xfuzeEventName": "SalesOrderPaymentAuthSucceded"},
+    {"systemEventName": "cancelled",             "xfuzeEventName": "SalesOrderCancelled"},
+    {"systemEventName": "capture_failure",       "xfuzeEventName": "SalesOrderPaymentFailed"},
+    {"systemEventName": "capture_pending",       "xfuzeEventName": "SalesOrderPaymentPending"},
+    {"systemEventName": "capture_success",       "xfuzeEventName": "SalesOrderPaid"},
+    {"systemEventName": "closed",                "xfuzeEventName": "SalesOrderClosed"},
+    {"systemEventName": "re_opened",             "xfuzeEventName": "SalesOrderReopened"},
+    {"systemEventName": "confirmed",             "xfuzeEventName": "SalesOrderAccepted"},
+    {"systemEventName": "fulfillment_cancelled", "xfuzeEventName": "SalesOrderItemsFulfilmentCancelled"},
+    {"systemEventName": "fulfillment_pending",   "xfuzeEventName": "SalesOrderItemsFulfilmentPending"},
+    {"systemEventName": "fulfillment_success",   "xfuzeEventName": "SalesOrderItemsFulfilled"},
+    {"systemEventName": "refund_failure",        "xfuzeEventName": "SalesOrderRefundFailed"},
+    {"systemEventName": "refund_pending",        "xfuzeEventName": "SalesOrderRefundPending"},
+    {"systemEventName": "refund_success",        "xfuzeEventName": "SalesOrderRefunded"},
+    {"systemEventName": "restock_line_items",    "xfuzeEventName": "SalesOrderItemsRefunded"},
+    {"systemEventName": "sale_failure",          "xfuzeEventName": "SalesOrderPaymentFailed"}, /*  TODO: whats diff to capture*/
+    {"systemEventName": "sale_pending",          "xfuzeEventName": "SalesOrderPaymentPending"},
+    {"systemEventName": "sale_success",          "xfuzeEventName": "SalesOrderPaid"},
+    {"systemEventName": "void_failure",          "xfuzeEventName": "SalesOrderVoidFailed"},
+    {"systemEventName": "void_pending",          "xfuzeEventName": "SalesOrderVoidPending"},
+    {"systemEventName": "void_success",          "xfuzeEventName": "SalesOrderVoided"}    
+  ];
+  /* Lookup func for above */
+  $rawEventXrefFn := function($rawName) {
+    $rawEventNameList[systemEventName = $trim($rawName)].xfuzeEventName
+  };
+
+  $rawEntityId := $cleanStr(id); /* TODO: also 'subject_id' on the event*/
+  $rawEntityType := NULL;  /* TODO: 'subject_type' on the event */
+  $rawParentEntityId := (customer.id != null ? $cleanStr(customer.id) : NULL);
+  $rawEntityPartyId := (customer.id != null ? $cleanStr(customer.id) : NULL);
+  $rawEntityCustomerId := (customer.id != null ? $cleanStr(customer.id) : NULL);
+  $rawEntitySalesStaffId := (customer.id != null ? $cleanStr(user_id) : NULL);
+  $rawLocationId := (loction_id != null ? $cleanStr(loction_id) : NULL);
+  $rawEntityLastUpdatedOn := updated_at;
+  $rawEntityCreatedOn := created_at;
+  /* Raw but mapped for derived event metadata usage */
+  $rawEventOccurredTimestamp := updated_at;  /* clean update timestamp best for true world ordering. Not UTC yet */
+  $rawEventProcessedTimestamp := null;     /* EPT is only set when centrally processed by event processors */
+  $rawEventReceivedTimestamp := null;      /* noth*/
+  $clientCode := "RND";
+  /* ------------ END OF RAW INPUT DATA ------------ */
+
+  
+  /* ------------ START OF XFUZE COMMON DERIVED CONSTS & BASE FIELDS ------------ */
+
+  /* Xfuze common event and entity constants used in derived mappings*/
+  $event_eventCategory := "Sales";
+  $event_entityType := "SalesOrder";
+  $event_defaultEventVerb := "Published"; 
+  $event_eventValueStream := "Order2Cash";
+  $event_eventType:= "TriggerEvent";
+  $event_eventPriority:= "5";
+
+  $entity_entityTypeHeader := "SalesOrder_Header" ;
+  $entity_entityIdType := "System"; /* system mappings at this stage by connectors not merged xfuze*/
+
+
+  /* Xfuze event and entity derived values */
+  $event_eventName := ($rawEventName = null ? $event_entityType &  $event_defaultEventVerb : $rawEventName); /* convert to Xfuze eventName?*/
+  $event_entityId := ($event_entityType & "_" & $rawSourceSystem & "_" & $rawEntityId);
+  $event_parentEntityId := $entity_entityTypeCustomer  & "_" & $rawSourceSystem & "_" & $rawEntityCustomerId; /* Customer is parent of order*/
+  $event_eventOccurredType = "TrueTime";
+  $event_eventOccurredLocalTimeZone = $rawSourceTimeZone;
+  $event_eventOccurredTimestamp := ($rawEventOccurredTimestamp = null ? $rawEventReceivedTimestamp : $rawEventOccurredTimestamp);
+  $event_eventProcessedTimestamp := ($rawEventOccurredTimestamp = null ? $rawEventReceivedTimestamp : $rawEventOccurredTimestamp);
+  $event_eventReceivedTimestamp := ($rawEventOccurredTimestamp = null ? $rawEventReceivedTimestamp : $rawEventOccurredTimestamp);
+  $event_eventId := $event_eventName & "_" & $event_entityId & "_" & $event_eventOccurredTimestamp;  
+ 
+  /* ------------ END OF XFUZE COMMON DERIVED CONSTS & BASE FIELDS ------------ */
+  
+  /* ------------ START OF XFUZE ENTITY SPECIFIC DERIVED CONSTS & BASE FIELDS ------------ */
+  
+  $orderIds_orderId := $event_entityId;
+  $orderIds_headerId := $entity_entityTypeHeader & "_" & $rawSourceSystem & "_" & $rawEntityId;
+  $partyIds_customerId := $entity_entityTypeCustomer  & "_" & $rawSourceSystem & "_" & $rawEntityCustomerId;
+  $attMetadata_asOf := $event_eventOccurredTimestamp;
+
+  /* Xfuze SalesOrder derived 'functions */
+
+
+  /* $qtys_qtyCancelledFn - Cancelled is an update in place so needs to compare adjacent events to derive*/
+
+  /* common Xfuze funcs*/
+  $getDateDimFn := function($dt,$isUTC,$tz) { /* TODO: make this really precise depending on local or UTC */
+    { 
+          "DateId": $fromMillis($toMillis($dt),"[Y0001][M01][D01]"),
+          "TimestampUTC": (isUTC ? $dt : NULL), /* TODO convert to utc*/
+          "DateUTC": (isUTC ? $dt : NULL), /* TODO convert to date */
+          "TimeZone": ($tz != null ? $tz : $rawSourceTimeZone),
+          "DateTimeLocal": $fromMillis($toMillis($dt)),
+          "DateLocal": $fromMillis($toMillis($dt),"[Y0001]-[M01]-[D01]"),
+          "HourId": $fromMillis($toMillis($dt),"[H01]"),
+          "Millis": $toMillis($dt)
+    }
+  };
+
+$entity_entityIdType := "System"; /* system mappings at this stage by connectors not merged xfuze*/
+$entity_salesOrder_entityCode := "SalesOrder";
+$entity_salesOrder_entityId := $buildEntityID($entity_salesOrder_entityCode, $rawSourceSystem, $rawEntityId);
+$entity_salesOrder_header_entityCode := "SalesOrder.Header";
+$entity_salesOrder_header_entityId := $buildEntityID($entity_salesOrder_header_entityCode, $rawSourceSystem, $rawEntityId);
+$entity_salesOrder_line_entityCode := "SalesOrder.Lines";
+$entity_party_customer_entityCode := "PartyRole.Customer";
+$entity_party_customer_entityId := $buildEntityID($entity_party_customer_entityCode, $rawSourceSystem, $rawEntityCustomerId);
+$entity_product_base_entityCode := "Product.Base";
+$entity_product_variant_entityCode := "Product.Variant";
+
+
+/* ------------ END OF XFUZE ENTITY SPECIFIC DERIVED CONSTS & BASE FIELDS ------------ */
+
+/* ------------ START OF XFUZE ENTITY SPECIFIC DERIVED CONSTS & BASE FIELDS ------------ */
+
+{
+  "SalesOrderEvent": {
+    "TriggerEntity": {
+      "OrderId": $orderIds_orderId,
+      "EntityCode" : $entity_salesOrder_line_entityCode & ".Sales",
+      "Lines": line_items#$i[].(
+        {
+          "LineId" :  $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(%.id)), "Sales",$string(id)),
+          "LineSeq" : $i+1,
+          "HeaderId": $entity_salesOrder_header_entityId,
+          "OrderId:": $entity_salesOrder_entityId,
+          "CustomerId": $entity_party_customer_entityId,
+          "ProductId": $entity_product_base_entityId,
+          "Type" : { 
+            "ClassCode": "Sales",
+            "TypeCode": "Lines.Type.Sales",
+            "TypeDesc": "Sales Line - capturing a puchase of a qty of single product", 
+            "SubTypeCode": NULL,
+            "SubTypeDesc": NULL,
+            "AttMetadata": {
+                "RawChangeTrackingHash": NULL, 
+                "IsEncrypted": NULL, 
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": NULL 
+              }
+          },
+          "LineIds": [ /* Cross references from LineId to (*) othyer system specific ids.  Merge all systems xref in event processor */
+            {
+              "Id": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(%.id)), "Sales",$string(id)),
+              "RawId": $string(id),
+              "Code": "Lines.Sales.LineIds",
+              "Name": "LineId",
+              "Desc": "Global, Unique LineId in the canonical format, linked to native key - 'id'",
+
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL,
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf,
+                "EventId": $event_eventId,
+                "RawSourceAtts": NULL
+              }
+            },
+            {
+              "Id": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(%.id)), "Sales",$string(id)),
+              "RawId": $string(%.id) & "_" & ($i+1),
+              "Code": "Lines.Sales.LineIds", 
+              "Name": "LineId",
+              "Desc": "Global, Unique LineId in the canonical format, linked to derived key - 'orderNUmber' + 'seq'",
+
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL,
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf,
+                "EventId": $event_eventId,
+                "RawSourceAtts": NULL
+              }
+            }
+          ],
+          "PartyIds": NULL,
+          "ProductIds" : [
+            {
+              "Id": $buildEntityID($entity_product_base_entityCode, $rawSourceSystem, $string(product_id)), /* Line id?*/
+              "RawId": $string(product_id),
+              "Code": "Lines.Sales.ProductIds.ProductNumber", 
+              "Name": "ProductIds.ProductNumber",
+              "Desc": "Global, Unique ProductId in the canonical format, linked to native product number",
+
+              "AttMetadata": {
+                  "RawChangeTrackingHash": NULL,
+                  "IsEncrypted": NULL,
+                  "SecuringKeyId": NULL,
+                  "AsOf": $attMetadata_asOf,
+                  "EventId": $event_eventId,
+                  "RawSourceAtts": NULL
+                }
+            },
+            {
+              "Id": $buildEntityID($entity_product_base_entityCode, $rawSourceSystem, $string(variant_id)), /* Line id?*/
+              "RawId": $string(variant_id),
+              "Code": "Lines.Sales.ProductIds.ProductVariantNumber", 
+              "Name": "ProductIds.ProductVariantNumber",
+              "Desc": "Global, Unique ProductId in the canonical format, linked to native variant number",
+
+              "AttMetadata": {
+                  "RawChangeTrackingHash": NULL,
+                  "IsEncrypted": NULL,
+                  "SecuringKeyId": NULL,
+                  "AsOf": $attMetadata_asOf,
+                  "EventId": $event_eventId,
+                  "RawSourceAtts": NULL
+                }
+            },
+            {
+              "Id": $buildEntityID($entity_product_base_entityCode, $rawSourceSystem, $string(sku)), /* Line id?*/
+              "RawId": $string(sku),
+              "Code": "Lines.Sales.ProductIds.SKU", 
+              "Name": "ProductIds.SKU",
+              "Desc": "Global, Unique ProductId in the canonical format, linked to native sku",
+
+              "AttMetadata": {
+                  "RawChangeTrackingHash": NULL,
+                  "IsEncrypted": NULL,
+                  "SecuringKeyId": NULL,
+                  "AsOf": $attMetadata_asOf,
+                  "EventId": $event_eventId,
+                  "RawSourceAtts": NULL
+                }
+              }                
+          ],
+          "Status": [
+            {
+              "StatusId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(id)), "Lines.Sales.Status.FulfillmentStatus",""),
+              "StatusType": "Native",
+              "StatusCode": "Lines.Sales.Status.FulfillmentStatus",
+              "StatusValue" : $cleanStr(fulfillment_status),
+              "StatusDesc": "Line fulfilment Status - possible values are ....",
+              "SubStatusCode": NULL,
+              "SubStatusDesc": NULL,
+              "SeqNo": NULL,
+              "ReasonCode": NULL,
+              "ReasonDesc": NULL,
+              "StatusURL": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "fulfillment_status",
+                    "RawSourceVal": $string(fulfillment_status)
+                  }
+                ]
+              }
+            }
+          ],
+          "Times": [ /* no native timestamps so inherit from parent */
+          {
+            "TimeId": $buildAttributeID($orderIds_headerId, "Lines.Sales.Times.PlacedOn",""), /* can be diff to created */
+            "TimeCode": "Lines.Sales.Times.PlacedOn",
+            "TimeDesc": "Native source timestamp when the order was placed in source system (UTC) - can be different to created time",
+            "DateDim": $getDateDimFn($rawEntityCreatedOn,true),
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "created_at",
+                  "RawSourceVal": $string(created_at)
+                }
+              ]
+            }
+          },
+          {
+            "TimeId": $buildAttributeID($orderIds_headerId, "Lines.Sales.Times.CreatedUpdatedOn",""),
+            "TimeCode": "Lines.Sales.Times.CreatedUpdatedOn",
+            "TimeDesc": "Native source timestamp when the entity was created in source system (UTC)",
+            "DateDim": $getDateDimFn($rawEntityCreatedOn,true),
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "created_at",
+                  "RawSourceVal": $string(created_at)
+                }
+              ]
+            }
+          },          
+          {
+            "TimeId": $buildAttributeID($orderIds_headerId, "Lines.Sales.Times.LastUpdatedOn",""),
+            "TimeCode": "Lines.Sales.Times.LastUpdatedOn",
+            "TimeDesc": "Native source timestamp when the entity was last updated in source system (UTC)",
+            "DateDim": $getDateDimFn($rawEntityLastUpdatedOn,true),
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "updated_at",
+                  "RawSourceVal": $string(updated_at)
+                }
+              ]
+            }
+          },
+          {
+            "TimeId": $buildAttributeID($orderIds_headerId, "Lines.Sales.Times.CancelledOn",""),
+            "TimeCode": "Lines.Sales.Times.CancelledOn",
+            "TimeDesc": "Native source timestamp when the order was 'cancelled' on (pre any returns) (Local - Europe/London)",
+            "DateDim": $getDateDimFn(cancelledOn,true),
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "cancelledOn",
+                  "RawSourceVal": $string(cancelledOn)
+                }
+              ]
+            }
+          },
+          {
+            "TimeId": $buildAttributeID($orderIds_headerId, "Lines.Sales.Times.CompletedOn",""),
+            "TimeCode": "Lines.Sales.Times.CompletedOn",
+            "TimeDesc": "Native source timestamp when the order was 'completed' on (pre any returns) (Local - Europe/London)",
+            "DateDim": $getDateDimFn(completed,true),
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsEncrypted": NULL, /* Assumed N*/
+              "SecuringKeyId": NULL,
+              "AsOf": $attMetadata_asOf, 
+              "EventId": $event_eventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": $rawSourceSystem,
+                  "RawSourceId": "completed",
+                  "RawSourceVal": $string(completed)
+                }
+              ]
+            }
+          }    
+          ],
+          "ProductAtts": [
+            {
+              "AttId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(id)), "Lines.ProductAtts",""),
+              "AttCode": "Lines.ProductAtts",
+              "AttDesc": "Line Product Atts",
+              "IsArray": "Y", /* "JW: IsSensitive at this level too for easy know whether to look into array*/
+              "AttType": NULL,
+              "AttValue": NULL,
+              "AttValues": [
+                {
+                  "Type": "STRING",
+                  "ValKey": "ProductNumber",
+                  "Value": $cleanStr(product_id),
+                  "IsEncrypted": "N",
+                  "IsSensitive": "N"
+                },
+                {
+                  "Type": "STRING",
+                  "ValKey": "ProductVariantNumber",
+                  "Value": $cleanStr(variant_id),
+                  "IsEncrypted": "N",
+                  "IsSensitive": "N"
+                },
+                {
+                  "Type": "STRING",
+                  "ValKey": "ProductName",
+                  "Value": $cleanStr(name),
+                  "IsEncrypted": "N",
+                  "IsSensitive": "N"
+                },
+                {
+                  "Type": "STRING",
+                  "ValKey": "ProductVariantName",
+                  "Value": $cleanStr(variant_title),
+                  "IsEncrypted": "N",
+                  "IsSensitive": "N"
+                },
+                {
+                  "Type": "STRING",
+                  "ValKey": "SKU",
+                  "Value": $cleanStr(sku),
+                  "IsEncrypted": "N",
+                  "IsSensitive": "N"
+                },
+                {
+                  "Type": "STRING",
+                  "ValKey": "ProductVendor",
+                  "Value": $cleanStr(vendor),
+                  "IsEncrypted": "N",
+                  "IsSensitive": "N"
+                },
+                {
+                  "Type": "STRING",
+                  "ValKey": "IsGiftCard",
+                  "Value": $stringBool(gift_card),
+                  "IsEncrypted": "N",
+                  "IsSensitive": "N"
+                },
+                {
+                  "Type": "STRING",
+                  "ValKey": "WeightGrams",
+                  "Value": $cleanStr(grams),
+                  "IsEncrypted": "N",
+                  "IsSensitive": "N"
+                }
+              ],
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL, 
+                "IsEncrypted": "N", 
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "line_items.name",
+                    "RawSourceVal": $string(name)
+                  },
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "line_items.variant_title",
+                    "RawSourceVal": $string(variant_title)
+                  },
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "line_items.gift_card",
+                    "RawSourceVal": $string(gift_card)
+                  },
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "line_items.vendor",
+                    "RawSourceVal": $string(vendor)
+                  },
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "line_items.grams",
+                    "RawSourceVal": $string(grams)
+                  }
+                ]
+              }
+            }
+          ],
+          "Qtys": [ /* QtySold, QtyFulfillable, QtyNet, QtyCancelled, QtyShipped, QtyDelivered, QtyReturned, QtyExchanged */
+            {
+              "QtyId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(id)), "Lines.Sales.Qtys.QtyNet",""), /* to discuss */
+              "QtyCode" : "Lines.Sales.Qtys.QtyNet",
+              "QtyDesc": "Line Net (post retractions like cancels & returns) Quantity for this line only",
+              "Amount": quantity,
+              "AmountFloat": NULL,
+              "AccountingMethodType": NULL,
+              "UnitMeasure": NULL,
+              "UnitType": NULL,
+              "UnitScheme": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL, 
+                "IsAnonymised": "N", 
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "line_items.quantity",
+                    "RawSourceVal": $string(quantity)
+                  }
+                ]
+              }
+            },
+            {
+              "QtyId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(id)), id & ".Lines.Sales.Qtys.QtyFulfillable",""), /* to discuss */
+              "QtyCode" : "Lines.Sales.Qtys.QtyFulfillable",
+              "QtyDesc": "Line Net Fulfillable Qty [quantity - max(refunded_quantity, fulfilled_quantity) - pending_fulfilled_quantity - open_fulfilled_quantity)]",
+              "Amount": fulfillable_quantity,
+              "AmountFloat": NULL,
+              "AccountingMethodType": NULL,
+              "UnitMeasure": NULL,
+              "UnitType": NULL,
+              "UnitScheme": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL, 
+                "IsAnonymised": "N", 
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "line_items.fulfillable_quantity",
+                    "RawSourceVal": $string(fulfillable_quantity)
+                  }
+                ]
+              }
+            }
+          ],
+          "Prices": [
+            {
+              "PriceId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(id)), "Lines.Sales.Prices.LineUnitPriceBeforeDiscounts.CurrentBCY",""), 
+              "PriceType": "Sales",
+              "PriceCode": "Lines.Sales.Prices.LineUnitPriceBeforeDiscounts.CurrentBCY",
+              "PriceName": "LineUnitPriceBeforeDiscounts",
+              "PriceDesc": "Current Line (Product) Unit Price (BASE Currency) BEFORE discounts - at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "BCY",
+              "PriceIncTax": $number(price_set.shop_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(price_set.shop_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "price_set.shop_money",
+                    "RawSourceVal": $string(price_set.shop_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(id)), "Lines.Sales.Prices.LineUnitPriceBeforeDiscounts.CurrentLCY",""), 
+              "PriceType": "Sales",
+              "PriceCode": "Lines.Sales.Prices.LineUnitPriceBeforeDiscounts.CurrentLCY",
+              "PriceName": "LineUnitPriceBeforeDiscounts",
+              "PriceDesc": "Current Line (Product) Unit Price (LOCAL Currency) BEFORE discounts - at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "LCY",
+              "PriceIncTax": $number(price_set.presentment_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(price_set.presentment_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "price_set.presentment_money",
+                    "RawSourceVal": $string(price_set.presentment_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(id)), "Lines.Sales.Prices.LineUnitDiscounts.CurrentBCY",""), 
+              "PriceType": "Sales",
+              "PriceCode": "Lines.Sales.Prices.LineUnitDiscounts.CurrentBCY",
+              "PriceName": "LineUnitDiscounts",
+              "PriceDesc": "Current Line Unit Discounts (BASE Currency) - at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "BCY",
+              "PriceIncTax": $number(price_set.shop_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(price_set.shop_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "price_set.shop_money",
+                    "RawSourceVal": $string(price_set.shop_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(id)), "Lines.Sales.Prices.LineUnitDiscounts.CurrentLCY",""), 
+              "PriceType": "Sales",
+              "PriceCode": "Lines.Sales.Prices.LineUnitDiscounts.CurrentLCY",
+              "PriceName": "LineUnitDiscounts",
+              "PriceDesc": "Current Line Unit Discounts (LOCAL Currency) - at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "LCY",
+              "PriceIncTax": $number(price_set.presentment_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(price_set.presentment_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "price_set.presentment_money",
+                    "RawSourceVal": $string(price_set.presentment_money)
+                  }
+                ]
+              }
+            },            
+            {
+              "PriceId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(id)), "Lines.Sales.Prices.LineUnitPriceAfterDiscounts.CurrentBCY",""), 
+              "PriceType": "Sales",
+              "PriceCode": "Lines.Sales.Prices.LineUnitPriceAfterDiscounts.CurrentBCY",
+              "PriceName": "LineUnitPriceAfterDiscounts",
+              "PriceDesc": "Current Line (Product) Unit Price (BASE Currency) AFTER apportioned discounts - at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "BCY",
+              "PriceIncTax": $number(price_set.shop_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(price_set.shop_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "price_set.shop_money",
+                    "RawSourceVal": $string(price_set.shop_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(id)), "Lines.Sales.Prices.LineUnitPriceAfterDiscounts.CurrentLCY",""), 
+              "PriceType": "Sales",
+              "PriceCode": "Lines.Sales.Prices.LineUnitPriceAfterDiscounts.CurrentLCY",
+              "PriceName": "LineUnitPriceAfterDiscounts",
+              "PriceDesc": "Current Line (Product) Unit Price (LOCAL Currency) AFTER apportioned discounts - at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "LCY",
+              "PriceIncTax": $number(price_set.presentment_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(price_set.presentment_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "price_set.presentment_money",
+                    "RawSourceVal": $string(price_set.presentment_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(id)), "Lines.Sales.Prices.LineUnitSoldPrice.CurrentBCY",""), 
+              "PriceType": "Sales",
+              "PriceCode": "Lines.Sales.Prices.LineUnitSoldPrice.CurrentBCY",
+              "PriceName": "LineUnitSoldPrice",
+              "PriceDesc": "Current Sold Unit Price (BASE Currency) AFTER apportioned discounts & any other retractions (i.e as sold) - at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "BCY",
+              "PriceIncTax": $number(price_set.shop_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(price_set.shop_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "price_set.shop_money",
+                    "RawSourceVal": $string(price_set.shop_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(id)), "Lines.Sales.Prices.LineUnitSoldPrice.CurrentLCY",""), 
+              "PriceType": "Sales",
+              "PriceCode": "Lines.Sales.Prices.LineUnitSoldPrice.CurrentLCY",
+              "PriceName": "LineUnitSoldPrice",
+              "PriceDesc": "Current Sold Unit Price (LOCAL Currency) AFTER apportioned discounts & any other retractions (i.e as sold) - at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "LCY",
+              "PriceIncTax": $number(price_set.presentment_money.amount),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(price_set.presentment_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "price_set.presentment_money",
+                    "RawSourceVal": $string(price_set.presentment_money)
+                  }
+                ]
+              }
+            }                       
+          ],
+          "Totals": [
+            {
+              "PriceId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(id)), "Lines.Sales.Totals.LineSubTotalBeforeDiscounts.CurrentBCY",""), 
+              "PriceType": "Sales",
+              "PriceCode": "Lines.Sales.Totals.LineSubTotalBeforeDiscounts.CurrentBCY",
+              "PriceName": "LineSubTotalBeforeDiscounts",
+              "PriceDesc": "Current Line Sub Total (BASE Currency) BEFORE discounts - at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "BCY",
+              "PriceIncTax": $number(price_set.shop_money.amount) * $number(quantity),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(price_set.shop_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "price_set.shop_money",
+                    "RawSourceVal": $string(price_set.shop_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(id)), "Lines.Sales.Totals.LineSubTotalBeforeDiscounts.CurrentLCY",""), 
+              "PriceType": "Sales",
+              "PriceCode": "Lines.Sales.Totals.LineSubTotalBeforeDiscounts.CurrentLCY",
+              "PriceName": "LineSubTotalBeforeDiscounts",
+              "PriceDesc": "Current Line Sub Total (LOCAL Currency) BEFORE discounts - at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "LCY",
+              "PriceIncTax": $number(price_set.presentment_money.amount) * $number(quantity),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(price_set.presentment_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": $number(price_set.presentment_money.amount) / $number(price_set.shop_money.amount),
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "price_set.presentment_money",
+                    "RawSourceVal": $string(price_set.presentment_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(id)), "Lines.Sales.Totals.LineTotalDiscounts.CurrentBCY",""), 
+              "PriceType": "Sales",
+              "PriceCode": "Lines.Sales.Totals.LineTotalDiscounts.CurrentBCY",
+              "PriceName": "LineTotalDiscounts",
+              "PriceDesc": "Current Line Total Discounts (BASE Currency) - at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "BCY",
+              "PriceIncTax": -1.0 * $sum(discount_allocations.($number(amount_set.shop_money.amount))),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(discount_allocations.amount_set.shop_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "-Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "discount_allocations.amount_set.shop_money",
+                    "RawSourceVal": $string(discount_allocations.amount_set.shop_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(id)), "Lines.Sales.Totals.LineSubTotalBeforeDiscounts.CurrentLCY",""), 
+              "PriceType": "Sales",
+              "PriceCode": "Lines.Sales.Totals.LineTotalDiscounts.CurrentLCY",
+              "PriceName": "LineTotalDiscounts",
+              "PriceDesc": "Current Line Total Discounts (LOCAL Currency) - at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "LCY",
+              "PriceIncTax": -1.0 * $sum(discount_allocations.($number(amount_set.presentment_money.amount))),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(discount_allocations.amount_set.presentment_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "-Retractions",
+              "ExchangeRate": $number(discount_allocations.amount_set.presentment_money.amount) / $number(discount_allocations.amount_set.shop_money.amount),
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "discount_allocations.amount_set.presentment_money",
+                    "RawSourceVal": $string(discount_allocations.amount_set.presentment_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(id)), "Lines.Sales.Totals.LineSubTotalAfterDiscounts.CurrentBCY",""), 
+              "PriceType": "Sales",
+              "PriceCode": "Lines.Sales.Totals.LineSubTotalAfterDiscounts.CurrentBCY",
+              "PriceName": "LineSubTotalAfterDiscounts",
+              "PriceDesc": "Current Line Sub Total (BASE Currency) AFTER discounts - at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "BCY",
+              "PriceIncTax": ($number(price_set.shop_money.amount) * $number(quantity)) - $sum(discount_allocations.($number(amount_set.shop_money.amount))),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(price_set.shop_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": 1.0,
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "price_set.shop_money",
+                    "RawSourceVal": $string(price_set.shop_money)
+                  }
+                ]
+              }
+            },
+            {
+              "PriceId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(id)), "Lines.Sales.Totals.LineSubTotalAfterDiscounts.CurrentLCY",""), 
+              "PriceType": "Sales",
+              "PriceCode": "Lines.Sales.Totals.LineSubTotalAfterDiscounts.CurrentLCY",
+              "PriceDesc": "Current Line Sub Total (LOCAL Currency) BEFORE discounts - at Current (relative) Event time",
+              "PriceTimeClass": "CurrentPrice",
+              "PriceLocalisation": "LCY",
+              "PriceIncTax": ($number(price_set.presentment_money.amount) * $number(quantity)) - $sum(discount_allocations.($number(amount_set.presentment_money.amount))),
+              "PriceExTax": NULL,
+              "PriceTax": NULL,
+              "CurrencyCode": $cleanStr(price_set.presentment_money.currency_code),
+              "TaxRate": NULL,
+              "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+              "TaxRateCode": NULL,
+              "AccountingMethodType": "+Retractions",
+              "ExchangeRate": $number(price_set.presentment_money.amount) / $number(price_set.shop_money.amount),
+              "ExchangeRateHistoryId": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "price_set.presentment_money",
+                    "RawSourceVal": $string(price_set.presentment_money)
+                  }
+                ]
+              }
+            }
+          ],
+          "Taxes" : tax_lines#$d[].(
+            {
+              "Title" : $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(%.id)), "Lines.Sales.Taxes",""),
+              "IsChannelLiable" : $stringBool(channel_liable),
+              "TaxRate" : rate,
+              "TaxAmounts" : [
+                {
+                  "PriceId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(%.id)), "Lines.Sales.Taxes.TaxAmount.CurrentBCY",""), 
+                  "PriceType": "Sales",
+                  "PriceCode": "Lines.Sales.Taxes.TaxAmount.CurrentBCY",
+                  "PriceDesc": "Current Line Sales Tax Amount (BASE Currency) - at Current (relative) Event time",
+                  "PriceTimeClass": "CurrentPrice",
+                  "PriceLocalisation": "BCY",
+                  "PriceIncTax": $number(price_set.shop_money.amount),
+                  "PriceExTax": NULL,
+                  "PriceTax": NULL,
+                  "CurrencyCode": $cleanStr(price_set.shop_money.currency_code),
+                  "TaxRate": NULL,
+                  "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+                  "TaxRateCode": NULL,
+                  "AccountingMethodType": "+Retractions",
+                  "ExchangeRate": $number(price_set.presentment_money.amount) / $number(price_set.shop_money.amount),
+                  "ExchangeRateHistoryId": NULL,
+                  "AttMetadata": {
+                    "RawChangeTrackingHash": NULL,
+                    "IsEncrypted": NULL, /* Assumed N*/
+                    "SecuringKeyId": NULL,
+                    "AsOf": $attMetadata_asOf, 
+                    "EventId": $event_eventId,
+                    "RawSourceAtts": [
+                      {
+                        "RawSourceSystem": $rawSourceSystem,
+                        "RawSourceId": "shop_money.presentment_money",
+                        "RawSourceVal": $string(shop_money.presentment_money)
+                      }
+                    ]
+                  }
+                },
+                {
+                  "PriceId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(%.id)), "Lines.Sales.Taxes.TaxAmount.CurrentLCY",""), 
+                  "PriceType": "Sales",
+                  "PriceCode": "Lines.Sales.Taxes.TaxAmount.CurrentLCY",
+                  "PriceDesc": "Current Line Sales Tax Amount (LOCAL Currency) - at Current (relative) Event time",
+                  "PriceTimeClass": "CurrentPrice",
+                  "PriceLocalisation": "LCY",
+                  "PriceIncTax": $number(price_set.presentment_money.amount),
+                  "PriceExTax": NULL,
+                  "PriceTax": NULL,
+                  "CurrencyCode": $cleanStr(price_set.presentment_money.currency_code),
+                  "TaxRate": NULL,
+                  "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+                  "TaxRateCode": NULL,
+                  "AccountingMethodType": "+Retractions",
+                  "ExchangeRate": $number(price_set.presentment_money.amount) / $number(price_set.shop_money.amount),
+                  "ExchangeRateHistoryId": NULL,
+                  "AttMetadata": {
+                    "RawChangeTrackingHash": NULL,
+                    "IsEncrypted": NULL, /* Assumed N*/
+                    "SecuringKeyId": NULL,
+                    "AsOf": $attMetadata_asOf, 
+                    "EventId": $event_eventId,
+                    "RawSourceAtts": [
+                      {
+                        "RawSourceSystem": $rawSourceSystem,
+                        "RawSourceId": "price_set.presentment_money",
+                        "RawSourceVal": $string(price_set.presentment_money)
+                      }
+                    ]
+                  }
+                } 
+              ]
+            }
+          ),
+          "Duties" : duties#$d[].(
+            {
+              "DutyId" : $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(%.id)), id & "_" & "Lines.Duties",""),
+              "SystemCode" : $cleanStr(harmonized_system_code),
+              "CountryCodeOfOrigin": $cleanStr(country_code_of_origin),
+              "TotalDuty" : [
+                {
+                  "PriceId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(%.id)), "Lines.Sales.Totals.TotalDuty.CurrentLCY",""), 
+                  "PriceType": "Sales",
+                  "PriceCode": "Lines.Sales.Totals.TotalDuty.CurrentLCY",
+                  "PriceDesc": "Current Line Total Duty (LOCAL Currency) - at Current (relative) Event time",
+                  "PriceTimeClass": "CurrentPrice",
+                  "PriceLocalisation": "LCY",
+                  "PriceIncTax": $number(presentment_money.amount),
+                  "PriceExTax": NULL,
+                  "PriceTax": NULL,
+                  "CurrencyCode": $cleanStr(presentment_money.currency_code),
+                  "TaxRate": NULL,
+                  "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+                  "TaxRateCode": NULL,
+                  "AccountingMethodType": "+Retractions",
+                  "ExchangeRate": $number(presentment_money.amount) / $number(shop_money.amount),
+                  "ExchangeRateHistoryId": NULL,
+                  "AttMetadata": {
+                    "RawChangeTrackingHash": NULL,
+                    "IsEncrypted": NULL, /* Assumed N*/
+                    "SecuringKeyId": NULL,
+                    "AsOf": $attMetadata_asOf, 
+                    "EventId": $event_eventId,
+                    "RawSourceAtts": [
+                      {
+                        "RawSourceSystem": $rawSourceSystem,
+                        "RawSourceId": "duties.presentment_money",
+                        "RawSourceVal": $string(presentment_money)
+                      }
+                    ]
+                  }
+                } 
+              ],
+              "Taxes" : tax_lines#$dt[].(
+                {
+                "Title" : title,
+                "IsChannelLiable" : $stringBool(channel_liable),
+                "TaxRate" : rate,
+                "TaxAmounts" : [
+                  {
+                    "PriceId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(%.id)), "Lines.Duties.Taxes.TaxAmount.CurrentBCY",""), 
+                    "PriceType": "Sales",
+                    "PriceCode": "Lines.Duties.Taxes.TaxAmount.CurrentBCY",
+                    "PriceDesc": "Current Line Duties Sales Tax Amount (BASE Currency) - at Current (relative) Event time",
+                    "PriceTimeClass": "CurrentPrice",
+                    "PriceLocalisation": "BCY",
+                    "PriceIncTax": $number(price_set.shop_money.amount),
+                    "PriceExTax": NULL,
+                    "PriceTax": NULL,
+                    "CurrencyCode": $cleanStr(price_set.shop_money.currency_code),
+                    "TaxRate": NULL,
+                    "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+                    "TaxRateCode": NULL,
+                    "AccountingMethodType": "+Retractions",
+                    "ExchangeRate": $number(price_set.presentment_money.amount) / $number(price_set.shop_money.amount),
+                    "ExchangeRateHistoryId": NULL,
+                    "AttMetadata": {
+                      "RawChangeTrackingHash": NULL,
+                      "IsEncrypted": NULL, /* Assumed N*/
+                      "SecuringKeyId": NULL,
+                      "AsOf": $attMetadata_asOf, 
+                      "EventId": $event_eventId,
+                      "RawSourceAtts": [
+                        {
+                          "RawSourceSystem": $rawSourceSystem,
+                          "RawSourceId": "shop_money.presentment_money",
+                          "RawSourceVal": $string(shop_money.presentment_money)
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "PriceId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(%.id)), "Lines.Duties.Taxes.TaxAmount.CurrentLCY",""), 
+                    "PriceType": "Sales",
+                    "PriceCode": "Lines.Sales.Taxes.Duties.TaxAmount.CurrentLCY",
+                    "PriceDesc": "Current Line Duties Sales Tax Amount (LOCAL Currency) - at Current (relative) Event time",
+                    "PriceTimeClass": "CurrentPrice",
+                    "PriceLocalisation": "LCY",
+                    "PriceIncTax": $number(price_set.presentment_money.amount),
+                    "PriceExTax": NULL,
+                    "PriceTax": NULL,
+                    "CurrencyCode": $cleanStr(price_set.presentment_money.currency_code),
+                    "TaxRate": NULL,
+                    "IsTaxRateEstimated": $stringBool(estimated_taxes), 
+                    "TaxRateCode": NULL,
+                    "AccountingMethodType": "+Retractions",
+                    "ExchangeRate": $number(price_set.presentment_money.amount) / $number(price_set.shop_money.amount),
+                    "ExchangeRateHistoryId": NULL,
+                    "AttMetadata": {
+                      "RawChangeTrackingHash": NULL,
+                      "IsEncrypted": NULL, /* Assumed N*/
+                      "SecuringKeyId": NULL,
+                      "AsOf": $attMetadata_asOf, 
+                      "EventId": $event_eventId,
+                      "RawSourceAtts": [
+                        {
+                          "RawSourceSystem": $rawSourceSystem,
+                          "RawSourceId": "price_set.presentment_money",
+                          "RawSourceVal": $string(price_set.presentment_money)
+                        }
+                      ]
+                    }
+                  }
+                ]
+              } 
+            )
+            }
+          ),
+    
+          "FulfilmentAtts": [
+            {
+              "AttId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(id)), "Lines.Sales.FulfillmentAtts",""),
+              "AttCode": "Lines.Sales.FulfillmentAtts",
+              "AttDesc": "Line Fulfilment Attributes",
+              "IsArray": "Y",
+              "AttType": NULL,
+              "AttValue": NULL,
+              "AttValues": [
+                {
+                  "Type": "STRING",
+                  "ValKey": "FulfillmentService",
+                  "Value": $cleanStr(fulfillment_service),
+                  "IsEncrypted": "N",
+                  "IsSensitive": "N"
+                },
+                {
+                  "Type": "STRING",
+                  "ValKey": "IsShippingRequired",
+                  "Value": $stringBool(requires_shipping),
+                  "IsEncrypted": "N",
+                  "IsSensitive": "N"
+                },
+                {
+                  "Type": "STRING",
+                  "ValKey": "VariantInventoryManagement",
+                  "Value": $cleanStr(variant_inventory_management),
+                  "IsEncrypted": "N",
+                  "IsSensitive": "N"
+                }
+              ],
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL, 
+                "IsAnonymised": "N", 
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "line_items.fulfillment_service",
+                    "RawSourceVal": $string(fulfillment_service)
+                  },
+                   {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "line_items.requires_shipping",
+                    "RawSourceVal": $string(requires_shipping)
+                  },
+                   {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "line_items.variant_inventory_management",
+                    "RawSourceVal": $string(variant_inventory_management)
+                  }
+                ]
+              }
+            }
+          ],
+
+          "FinanceAtts": [
+            {
+              "AttId": $buildAttributeID($buildEntityID($entity_salesOrder_line_entityCode, $rawSourceSystem, $string(id)), "Lines.Sales.FinanceAtts",""),
+              "AttCode": "Lines.Sales.FinanceAtts.IsTaxable",
+              "AttDesc": "Line Financial Attributes",
+              "IsArray": "N",
+              "AttType": "STRING",
+              "AttValue": $stringBool(taxable),
+              "AttValues": NULL,
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL, 
+                "IsAnonymised": "N", 
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "line_items.taxable",
+                    "RawSourceVal": $string(taxable)
+                  }
+                ]
+              }
+            }
+          ],
+          "Metrics": [ /* Key to support if breaking*/
+            {
+              "AttId": $buildAttributeID($orderIds_headerId, "Metrics.NumDiscountLines",""),
+              "AttCode": "Lines.Sales.Metrics.NumDiscountLines",
+              "AttDesc": "Metric Field - Num discount lines at (relative) event time",
+              "AttType": "Single",
+              "AttValue": $count(discount_allocations),
+              "AttValues": NULL,
+
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": NULL
+              }
+            },
+            {
+              "AttId": $buildAttributeID($orderIds_headerId, "Metrics.NumTaxLines",""),
+              "AttCode": "Lines.Sales.Metrics.NumTaxLines",
+              "AttDesc": "Metric Field - Num tax lines at (relative) event time",
+              "AttType": "Single",
+              "AttValue": $count(tax_lines),
+              "AttValues": NULL,
+
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": NULL
+              }
+            },            
+            {
+              "AttId": $buildAttributeID($orderIds_headerId, "Metrics.NumDutyLines",""),
+              "AttCode": "Lines.Sales.Metrics.NumDutyLines",
+              "AttDesc": "Metric Field - Num duty lines at (relative) event time",
+              "AttType": "Single",
+              "AttValue": $count(duties),
+              "AttValues": NULL,
+
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": NULL
+              }
+            }                   
+          ],
+          "Links": [ 
+            {
+              "LinkId": "dolore reprehenderit minim ut",
+              "LinkType": "amet laboris eu",
+              "LinkCode": "in consequat",
+              "FromEntityId": "irure",
+              "ToEntityId": "laboris do sunt consequat",
+              "LinkStatus": "non aute id nulla quis",
+              "LinkName": "laborum mollit incididunt",
+              "AttMetadata": {
+                "RawChangeTrackingHash": NULL,
+                "IsEncrypted": NULL, /* Assumed N*/
+                "SecuringKeyId": NULL,
+                "AsOf": $attMetadata_asOf, 
+                "EventId": $event_eventId,
+                "RawSourceAtts": [
+                  {
+                    "RawSourceSystem": $rawSourceSystem,
+                    "RawSourceId": "sed",
+                    "RawSourceVal": "velit commodo ut"
+                  }
+                ]
+              }
+            }
+          ],
+          "CustomAtts": NULL
+        }
+      )
+    }
+  }
+}
+
+)

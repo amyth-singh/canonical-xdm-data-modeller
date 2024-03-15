@@ -1,0 +1,57 @@
+[
+  [
+    {
+      "Amount": 8
+    }
+  ],
+  [
+    {
+      "Amount": 8
+    },
+    {
+      "Amount": -1
+    }
+  ],
+  [
+    {
+      "Amount": 8
+    },
+    {
+      "Amount": -1
+    },
+    {
+      "Amount": 0
+    }
+  ],
+  [
+    {
+      "Amount": 8
+    },
+    {
+      "Amount": -1
+    },
+    {
+      "Amount": 0
+    },
+    {
+      "Amount": -3
+    }
+  ],
+  [
+    {
+      "Amount": 8
+    },
+    {
+      "Amount": -1
+    },
+    {
+      "Amount": 0
+    },
+    {
+      "Amount": -3
+    },
+    {
+      "Amount": -4
+    }
+  ]
+]

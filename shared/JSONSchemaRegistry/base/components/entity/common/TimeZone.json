@@ -1,0 +1,41 @@
+{
+  "TimeZoneObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/TimeZoneProperties"
+    }
+  },
+  "TimeZoneProperties": {
+    "type": "object",
+    "required": [
+      "TimeZone"
+    ],
+    "unevaluatedProperties": false,
+    "properties": {
+      "TimeZone": {
+        "type": "string",
+        "description": "The Time Zone e.g Europe/London"
+      },
+      "TimeZoneOffset": {
+        "type": "string",
+        "description": "UTC+01:00"
+      },
+      "TimeZoneExplicitCode": {
+        "type": "string",
+        "description": "Indicates whether the timeZone offset is explicit in the source (e.g +01:00) or implicit (e.g assumed to be +01:00, and thus reformatting work is needed to make explicit)",
+        "enum": [
+          "ExplicitOffsetInSource",
+          "ImplicitOffsetNotInSource"
+        ]
+      },
+      "Country": {
+        "$ref": "./Country.json#/CountryProperties",
+        "description": "The country of the timezone"
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

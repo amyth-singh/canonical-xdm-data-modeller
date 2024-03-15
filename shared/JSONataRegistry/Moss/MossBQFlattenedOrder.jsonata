@@ -1,0 +1,28 @@
+($reduceAttValues := function($attValues){$map($attValues,function($v){{$v.AttKey:$v.AttValue}})~>$merge};
+ $mapAttValuesFn := function($v){{$string($v.AttHeader.Name):$v.IsArray = "Y" ? $reduceAttValues($v.AttValues) : $v.AttValue}};
+ $mapAttValues := function($v){$map($v,$mapAttValuesFn)~> $merge};
+ $removeMetadata := function($v){$v.$sift(function($v, $k) {$k ~> /^(?!AttHeader|AttMetadata).*$/})};
+ $mapValuesFn := function($v){{$string($v.AttHeader.Name): $removeMetadata($v)}};
+ $mapValues := function($v){$map($v,$mapValuesFn) ~> $merge};
+
+$extractHeader := function(){$each(Header,function($value,$name){
+                                 $name in ["CustomerID","HeaderId","OrderId"] ? {$name:$value} :
+                                 $name in ["Times","Totals","Type"] ? {$name:$mapValues($value)} :
+                                 {$name:$mapAttValues($value)}
+                             
+                             }
+                             ) ~> $merge};
+
+$extractLine := function($v){$each($v,function($value,$name){
+                                 $name in ["LineId","HeaderId","OrderId"] ? {$name:$value} :
+                                 $name in ["Times","Totals","Type"] ? {$name:$mapValues($value)} :
+                                 {$name:$mapAttValues($value)}
+
+                             }
+                             ) ~> $merge};
+
+$extractLines := function(){$map(Line,$extractLine)};
+
+{"Header":$extractHeader(),
+ "Lines":$extractLines()}
+)

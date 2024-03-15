@@ -1,0 +1,81 @@
+{
+    "EntityHeader": {
+        "type": "object",
+        "allOf": [
+            {
+                "$ref": "#/EntityIds"
+            },
+            {
+                "properties": {
+                    "XRefIds": {
+                        "$ref": "./XRefId.json",
+                        "description": "The list of cross reference lookups, i.e all the ways to look up this entity by the various data points, both in canonical Ids and system specific ones"
+                    },
+                    "TimeZones": {
+                        "$ref": "./TimeZone.json#/TimeZoneObject"
+                    },
+                    "Times": {
+                        "$ref": "./Time.json#/TimeObject"
+                    },
+                    "Status": {
+                        "$ref": "./Status.json#/StatusObject"
+                    },
+                    "Type": {
+                        "$ref": "./Type.json#/TypeProperties"
+                    }
+                },
+                "required": [
+                    "XRefIds",
+                    "Times",
+                    "Status",
+                    "Type"
+                ]
+            }
+        ]
+    },
+    "EntityIds": {
+        "properties": {
+            "EntityId": {
+                "type": "string",
+                "description": "The (required) globally unique synthetic Xfuze Id for the entity instance this event is related to and whose payload is the subject of change, unique across all entities. Typically of the format [EntityType::EntitySubType]_[SystemCode]_[RawEntityId] where RawEntityId can be composed of 1 or more source fields to create singular uniqueness e.g SalesOrderLine::Return_Hybris_8106008620_RET1"
+            },
+            "EntityType": {
+                "type": "string",
+                "description": "The (required) entity type, allowing for a typing system (top level) for entities, where the type is sourced from the master Xfuze control list e.g SalesOrderLine"
+            },
+            "EntitySubType": {
+                "type": "string",
+                "description": "An (optional) entity subtype, allowing for further, more refined typing of the core type for accuracy of interpretation e.g ReturnLine, CancelLine, VoidLine etc"
+            },
+            "ParentEntityId": {
+                "type": "string",
+                "description": "An (required) canonical Xfuze parent entity Id, where there is a natural parent a level above, this importantly allows natural grouping by the parent for different access patterns e.g SalesOrder_Hybris_8106008620"
+            },
+            "ParentEntityType": {
+                "type": "string",
+                "description": "An (required) canonical Xfuze parent entity type.  Ideally this should always be created even if the top parent (would have same values as EntityId and EntityType) allowing a consistent place to group by to get all records in the hierarchy  e.g SalesOrder"
+            },
+            "CompositeEntityId": {
+                "type": "string",
+                "description": "An (optional) canonical Xfuze parent entity Id, where there is a natural 'composition' and containing parent, this importantly allows natural grouping by the parent for different access patterns e.g SalesOrder_Hybris_8106008620"
+            },
+            "CompositeEntityType": {
+                "type": "string",
+                "description": "An (optional) canonical Xfuze parent entity type.  Ideally this should always be created even if the top parent (would have same values as EntityId and EntityType) allowing a consistent place to group by to get all records in the hierarchy  e.g SalesOrder"
+            },
+            "RawEntityId": {
+                "type": "string",
+                "description": "An (optional) raw/native key used to derived EntityId.  Ideally this should always be created even if the top parent (would have same values as EntityId and EntityType) allowing a consistent place to group by to get all records in the hierarchy  e.g SalesOrder"
+            }
+        },
+        "required": [
+            "EntityId",
+            "EntityType",
+            "ParentEntityId",
+            "ParentEntityType",
+            "CompositeEntityId",
+            "CompositeEntityType"
+        ]
+    }
+}
+

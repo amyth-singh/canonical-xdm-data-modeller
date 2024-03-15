@@ -1,0 +1,27 @@
+{
+  "$id": "EventAtts",
+  "description": "XDM Event 'EventInfo' definition",
+  "type": "object",
+  "properties": {
+    "EventId": {"type": "string"},
+    "EventCategory": {"type": "string"},      
+    "EventName": {"type": "string"},  
+    "RawEventId": {"type": "string"},    
+    "RawEventName": {"type": "string"},
+    "RawSourceSystem": {"type": "string"},   
+    "EventType": {"type": "string"},  
+    "EventValueStream": {"type": "string"},  
+    "EventPriority": {"type": "string"}, 
+    "ClientCode": {"type": "string"}, 
+    "CustomAtts": [{"$ref": "../../CustomAttribute.json"}]
+  },
+  "required": [
+    "EventId",
+    "EventCategory",
+    "EventName",
+    "RawSourceSystem",
+    "EventType",
+    "EventValueStream",
+    "ClientCode"
+  ]
+}

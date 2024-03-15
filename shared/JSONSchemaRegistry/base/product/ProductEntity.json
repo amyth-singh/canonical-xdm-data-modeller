@@ -1,0 +1,49 @@
+{
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "ProductVariant": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "allOf": [
+        {
+          "$ref": "../components/entity/common/Entity.json#/EntityHeader"
+        },
+        {
+          "properties": {
+            "ProductIds": {
+              "$ref": "../components/entity/domain/product/ProductIds.json#/ProductIdsProperties"
+            },
+            "CoreAtts": {
+              "$ref": "../components/entity/domain/product/CoreAtts.json"
+            },
+            "Classifications": {
+              "$ref": "../components/entity/domain/product/Classifications.json#/ClassificationObject"
+            },
+            "PricingFinancial": {
+              "$ref": "../components/entity/domain/product/PricingFinancial.json"
+            },
+            "PhysicalAttributes": {
+              "$ref": "../components/entity/domain/product/PhysicalAttributes.json"
+            },
+            "InventoryLogistics": {
+              "$ref": "../components/entity/domain/product/InventoryLogistics.json"
+            },
+            "SalesPerformance": {
+              "$ref": "../components/entity/domain/product/SalesPerformance.json"
+            },
+            "DigitalAttributes": {
+              "$ref": "../components/entity/domain/product/DigitalAttributes.json"
+            },
+            "RegulatoryCompliance": {
+              "$ref": "../components/entity/domain/product/RegulatoryCompliance.json"
+            }
+          },
+          "required": [
+            "CoreAtts"
+          ]
+        }
+      ]
+    }
+  }
+}

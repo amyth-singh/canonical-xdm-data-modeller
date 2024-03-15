@@ -1,0 +1,52 @@
+{
+  "LineIdsObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/LineIdsProperties"
+    }
+  },
+  "LineIdsProperties": {
+    "type": "object",
+    "description": "A collection of all sales order line related ids as a common set",
+    "unevaluatedProperties": false,
+    "properties": {
+      "LineId": {
+        "type": "string",
+        "description": "The (required) LineId Id, in Xfuze canonical form, identifying this sales order line amongst other lines, in the form of Line::[type]_[sourceSystem]_[LineKey] e.g ::Sale_PMC_123456789_1"
+      },
+      "LineKey": {
+        "type": "string",
+        "description": "The 'natural' sales order line number key, typically either a combination of Number & a 'sequence number' (derived) OR explicitly supplied unique Id from source - also used to construct the synthetic SOL Xfuze Ids. e.g 123456789_1"
+      },
+      "LineProductKey": {
+        "type": "string",
+        "description": "The 'natural' sales order line product key, typically either a combination of Number & a 'product id' (e.g SKU, EAN) OR explicitly supplied unique Id from source - also used to construct the synthetic SOL Xfuze Ids. e.g 123456789_1201764"
+      },
+      "LineProductKeyType": {
+        "type": "string",
+        "description": "The type of the product part of LineProductKey e.g Sku, EAN"
+      },
+      "LineSeq": {
+        "type": "number",
+        "description": "The ordinal line sequence number e.g 2"
+      },
+      "OriginalLineId": {
+        "type": "string",
+        "description": "The LineId Id, in Xfuze canonical form, identifying an 'original' sales order, in the form of ::[type]_[sourceSystem]_[OriginalKey] e.g ::Sale_PMC_987654321"
+      },
+      "OriginalLineKey": {
+        "type": "string",
+        "description": "The original 'natural' sales order 'key' / 'number', typically as a way to link related orders together the can be physically seperate and need a linking e.g Return,Exchange,"
+      },
+      "OriginalLineSeq": {
+        "type": "number",
+        "description": "The original ordinal line sequence number e.g 1"
+      },
+      "Ids": {
+        "$ref": "./OrderIds.json#/OrderIdsProperties",
+        "description": "The (required) common set of order Ids for this order, not all a required individually, only what can be mapped & derived"
+      }
+    },
+    "required": ["Id","Number","LineId","LineKey"]
+  }
+}

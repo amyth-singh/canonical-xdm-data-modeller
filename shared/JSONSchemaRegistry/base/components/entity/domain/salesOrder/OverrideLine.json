@@ -1,0 +1,70 @@
+{
+  "type": "object",
+  "description": "A override line related to a single override against a sales order entity (SOH, SOL).  Multiple override lines are possible (1:*), thus this line object is typically in an array",
+  "unevaluatedProperties": false,
+  "allOf": [
+    {
+      "$ref": "../../common/Entity.json#/EntityHeader"
+    },
+    {
+      "properties": {
+        "LineIds": {
+          "$ref": "./LineIds.json#/LineIdsProperties",
+          "description": "The (required) common set of order line Ids for this Override line, not all a required individually, only what can be mapped & derived."
+        },
+        "OverrideOrderId": {
+          "type": "string",
+          "description": "The Xfuze Override Order ID, e.g based on a shipmentId, typically a header for a number of overrideLines"
+        },
+        "OverrideOrderKey": {
+          "type": "string",
+          "description": "The natural key/number of the override order e.g based on a shipmentId"
+        },
+        "OverrideLineKey": {
+          "type": "string",
+          "description": "The 'natural' Override line key/number, typically either a combination of SalesOrderNumber & a 'sequence number' (derived) OR explicitly supplied unique Id from source - also used to construct the synthetic SOL Xfuze Ids. e.g 123456789_1"
+        },
+        "OverrideLineSeq": {
+          "type": "number",
+          "description": "The ordinal line sequence number e.g 2"
+        },
+        "OverrideType": {
+          "type": "string",
+          "description": "The type of the override e.g DeliveryToCustomer, CollectFromStore",
+          "enum": [
+            "Price",
+            "Payment",
+            "Return",
+            "Refund",
+            "Discount",
+            "Loyalty",
+            "Age",
+            "Other"
+          ]
+        },
+        "OverrideAtts": {
+          "type": "array",
+          "description": "A collection (array) of extended override attributes",
+          "items": {
+            "$ref" : "../../common/CustomAtt.json#/CustomAttProperties"
+          }
+        },
+        "ReasonCode": {
+          "type": "string",
+          "description": "The reason code for this Override line"
+        },
+        "ReasonDesc": {
+          "type": "string",
+          "description": "The reason desc for this Override line"
+        },
+        "Lineage": {
+        "$ref": "../../common/EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+      },
+      "required": [
+        "LineIds"
+      ]
+    }
+  ]
+}

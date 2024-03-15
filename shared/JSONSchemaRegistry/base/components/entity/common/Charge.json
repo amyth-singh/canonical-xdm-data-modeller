@@ -1,0 +1,155 @@
+{
+  "ChargeObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/ChargeProperties"
+    }
+  },
+  "ChargeProperties": {
+    "type": "object",
+    "oneOf": [
+      {
+        "required": [
+          "Id",
+          "Number"
+        ]
+      },
+      {
+        "required": [
+          "Code"
+        ]
+      }
+    ],
+    "unevaluatedProperties": false,
+    "properties": {
+      "Id": {
+        "type": "string",
+        "description": "The canonical (synthetic) Xfuze Charge ID, if identifiable, format Charge_[SourceSystem]_[Number] e.g Charge_D365_AD123456"
+      },
+      "Key": {
+        "type": "string",
+        "description": "The natural Charge number / key, if identifiable e.g AD123456"
+      },
+      "Code": {
+        "type": "string",
+        "description": "The unique code of the charge"
+      },
+      "Type": {
+        "type": "string",
+        "description": "The type of the Charge",
+        "enum": [
+          "Service",
+          "Product",
+          "Fee",
+          "Other"
+        ]
+      },
+      "Purpose": {
+        "type": "string",
+        "description": "The purpose of the Charge e.g Usage, Penalty",
+        "enum": [
+          "Usage",
+          "Penalty",
+          "Other"
+        ]
+      },
+      "Name": {
+        "type": "string",
+        "description": "The name of the Charge"
+      },
+      "Desc": {
+        "type": "string",
+        "description": "The description of the Charge instance"
+      },
+      "Status": {
+        "type": "object",
+        "description": "The collection of Status for this Charge",
+        "unevaluatedProperties": false,
+        "properties": {
+          "ProcessingStatus": {
+            "description": "",
+            "$ref": "../../common/Status.json#/StatusProperties"
+          }
+        }
+      },
+      "Times": {
+        "type": "object",
+        "description": "The collection of key Time points for this Charge",
+        "oneOf": [
+          {
+            "required": [
+              "AppliedOn"
+            ]
+          },
+          {
+            "required": [
+              "CreatedOn"
+            ]
+          }
+        ],
+        "unevaluatedProperties": false,
+        "properties": {
+          "AppliedOn": {
+            "description": "",
+            "$ref": "../../common/Time.json#/TimeProperties"
+          },
+          "CancelledOn": {
+            "description": "",
+            "$ref": "../../common/Time.json#/TimeProperties"
+          },
+          "VoidedOn": {
+            "description": "",
+            "$ref": "../../common/Time.json#/TimeProperties"
+          },
+          "CreatedOn": {
+            "description": "",
+            "$ref": "../../common/Time.json#/TimeProperties"
+          },
+          "LastUpdatedOn": {
+            "description": "",
+            "$ref": "../../common/Time.json#/TimeProperties"
+          },
+          "LastStatusUpdatedOn": {
+            "description": "",
+            "$ref": "../../common/Time.json#/TimeProperties"
+          }
+        }
+      },
+      "Totals": {
+        "type": "object",
+        "description": "The collection of possible totals, related to the Charge.  Actual usage and ability to populate depends on the richness of the sources..",
+        "unevaluatedProperties": false,
+        "properties": {
+          "ChargeTotal": {
+            "description": "",
+            "$ref": "../../common/Price.json#/PriceProperties"
+          }
+        },
+        "required": [
+          "ChargeTotal"
+        ]
+      },
+      "GLCode": {
+        "type": "string",
+        "description": "A GL code associated with this Charge"
+      },
+      "ReasonCode": {
+        "type": "string",
+        "description": "The reason code for this Charge"
+      },
+      "ReasonDesc": {
+        "type": "string",
+        "description": "The reason desc for this Charge"
+      },
+      "EventId": {
+        "type": "string",
+        "description": "The Xfuze EventId that was the source of this data"
+      },
+      "AsOf": {
+        "type": "string",
+        "format": "date-time",
+        "description": "The timestamp at which the Charge instance usage was valid 'as of', if known and applicable"
+      }
+    }
+  }
+}

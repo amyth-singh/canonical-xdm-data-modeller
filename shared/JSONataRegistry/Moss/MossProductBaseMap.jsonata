@@ -1,0 +1,2949 @@
+(
+  $upperTrim := $string ~> $trim ~> $uppercase;
+  $cleanStr := $string ~> $trim;
+  $cleanNum := function($num){$type($num) = "number" ? $num : $type($num) = "string" ? $contains($num,/^-?\d+(\.\d+)?$/) ? $number($num) : null};
+  $dateTimeRegexMap := {"[Y0001]-[M01]-[D01] [H01]:[m01]:[s01] [P]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]) (AM|PM)$/,
+                        "[M01]/[D01]/[Y0001]":/^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/[1-9][0-9]{3}$/,
+                        "ISO8601":/^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d)(\.\d+)?([+-]([01]\d|2[0-3]):([0-5]\d)|Z)$/
+                       };
+  $dateTimeFormatValidator := function($datetime,$dateTimeFormat){$exists($dateTimeFormat) ? $contains($datetime,$lookup($dateTimeRegexMap,$dateTimeFormat)): $contains($datetime,$lookup($dateTimeRegexMap,"ISO8601"))};
+  $stringBoolMap := {"Y":"Y","1":"Y","TRUE":"Y","N":"N","0":"N","FALSE":"Y"};
+  $stringBool := function($value){$exists($value)?$lookup($stringBoolMap, $upperTrim($value)):""};
+  $reverseBool := function($value){$value = "Y" ? "N" : $value = "N" ? "Y" : "U"};
+  $reverseStringBool := $stringBool ~> $reverseBool;
+  $buildEntityID := function($entityCode,$system,$rawEntityId){$replace($entityCode,".","_") & "_" & $system & "_" & $rawEntityId};
+  $buildAttributeID := function($entityID,$AttributeCode,$AttributeId){$entityID & "_" & $replace($AttributeCode,".","_") & ($exists($AttributeId) ? "_" & $AttributeId : "")};
+  $buildEventID := function($entityType,$eventVerb,$entityId,$eventOccurredTimestamp){$entityType & "_" & $eventVerb & "_" & $entityId & "_" & $eventOccurredTimestamp};
+
+  $getDateDimFn := function($dt,$isUTC,$tz,$format) {$exists($dt) ? $dateTimeFormatValidator($dt,$format) ?
+    { 
+          "DateId": $fromMillis($toMillis($dt,$format),"[Y0001][M01][D01]"),
+          "TimestampUTC": (isUTC ? $dt : NULL),
+          "DateUTC": (isUTC ? $dt : NULL), /* TODO convert to date */
+          "TimeZone": ($tz != null ? $tz : $rawSourceTimeZone),
+          "DateTimeLocal": $fromMillis($toMillis($dt,$format)),
+          "DateLocal": $fromMillis($toMillis($dt,$format),"[Y0001]-[M01]-[D01]"),
+          "HourId": $fromMillis($toMillis($dt,$format),"[H01]"),
+          "Millis": $toMillis($dt,$format)
+    } 
+    : NULL
+  };
+
+ $eventOccurredTimestamp := $now();
+ $ProductId := $buildEntityID("Product","Dolfin",ProductCode);
+ $EventId := $buildEventID("Product","Published",$ProductId,$eventOccurredTimestamp);
+ $AsOf := $eventOccurredTimestamp;
+{
+  "ProductId": $ProductId,
+  "Header": {
+    "ProductId": $ProductId,
+    "ProductIds": [
+      {
+        "AttHeader": {
+          "Id": $ProductId,
+          "RawId": $cleanStr(ProductCode),
+          "Class": "Product",
+          "Code": "Header.Product.ID.ProductCode",
+          "Name": "ProductCode",
+          "Desc": "Dolfin Product Code"
+        },
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ProductCode",
+              "RawSourceVal": $string(ProductCode)
+            }
+          ]
+        }
+      }
+    ],
+    "PartyIds": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Party.ID.OriginalBuyer",""),
+          "RawId": $cleanStr(OrigBuyer),
+          "Class": "Party",
+          "Code": "Header.Party.ID.OriginalBuyer",
+          "Name": "OriginalBuyer",
+          "Desc": "Original buyer"
+        },
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "OrigBuyer",
+              "RawSourceVal": $string(OrigBuyer)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Party.ID.CurrentBuyer",""),
+          "RawId": $cleanStr(CurrBuyer),
+          "Class": "Party",
+          "Code": "Header.Party.ID.CurrentBuyer",
+          "Name": "CurrentBuyer",
+          "Desc": "Current buyer"
+        },
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CurrBuyer",
+              "RawSourceVal": $string(CurrBuyer)
+            }
+          ]
+        }
+      }
+    ],
+    "Times": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Time.CreatedOn",""),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Header.Time.CreatedOn",
+          "Name": "CreatedOn",
+          "Desc": "Date Product Created"
+        },
+        "DateDim": $getDateDimFn(CreatedOn,FALSE,'Europe/London'),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CreatedOn",
+              "RawSourceVal": $string(CreatedOn)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Time.LastUpdatedOn",""),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Header.Time.LastUpdatedOn",
+          "Name": "CreatedOn",
+          "Desc": "Date Product Last Updated On"
+        },
+        "DateDim": $getDateDimFn(ProductAmendedOn,FALSE,'Europe/London'),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ProductAmendedOn",
+              "RawSourceVal": $string(ProductAmendedOn)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Time.SellOnWebFromDate",""),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Header.Time.SellOnWebFromDate",
+          "Name": "SellOnWebFromDate",
+          "Desc": "Date Product Created"
+        },
+        "DateDim": $getDateDimFn(SellOnWebFromDate,FALSE,'Europe/London'),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "SellOnWebFromDate",
+              "RawSourceVal": $string(SellOnWebFromDate)
+            }
+          ]
+        }
+      }
+    ],
+    "Type": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Type.RetailProduct",""),
+          "RawId": NULL,
+          "Class": "Type",
+          "Code": "Header.Type.RetailProduct",
+          "Name": "RetailProduct",
+          "Desc": "Product sold rather than hired"
+        },
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": NULL
+        }
+      }
+    ],
+    "Status": NULL,
+    "PrimaryAtts": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Primary.Brand",""),
+          "RawId": $cleanStr(Brand),
+          "Class": "Product",
+          "Code": "Header.Primary.Brand",
+          "Name": "Brand",
+          "Desc": "Brand associated with Product"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": BrandDesc,
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "Brand",
+              "RawSourceVal": $string(Brand)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "Brand",
+              "RawSourceVal": $string(BrandDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Primary.Descriptions",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Primary.Descriptions",
+          "Name": "Descriptions",
+          "Desc": "All attributes that describe product features"
+        },
+        "IsArray": "Y",
+        "AttType": NULL,
+        "AttValue": NULL,
+        "AttValues": [
+          {
+            "AttType": "STRING",
+            "AttKey": "Description",
+            "AttValue": $cleanStr(Description)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "ShortDescription",
+            "AttValue": $cleanStr(ShortDescription)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "TechnicalSpec",
+            "AttValue": $cleanStr(TechnicalSpec)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "SpecialFeatures",
+            "AttValue": $cleanStr(SpecialFeatures)
+          }
+
+        ],
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "Description",
+            "RawSourceVal": $string(Description)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "ShortDescription",
+            "RawSourceVal": $string(ShortDescription)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "TechnicalSpec",
+            "RawSourceVal": $string(TechnicalSpec)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "SpecialFeatures",
+            "RawSourceVal": $string(SpecialFeatures)
+          }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Primary.CountryOfOrigin",""),
+          "RawId": $cleanStr(CountryOfOriginCode),
+          "Class": "Product",
+          "Code": "Header.Primary.CountryOfOrigin",
+          "Name": "CountryOfOriginCode",
+          "Desc": "Country product was manufactured in"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": CountryOfOriginCode,
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CountryOfOriginCode",
+              "RawSourceVal": $string(CountryOfOriginCode)
+            }
+          ]
+        }
+      }
+    ],
+    "Classifications": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Classification.ProductGroup",""),
+          "RawId": $cleanStr(ProductGroupCode),
+          "Class": "Product",
+          "Code": "Header.Classification.ProductGroup",
+          "Name": "ProductGroup",
+          "Desc": "Product grouping"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(ProductGroupDesc),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ProductGroupCode",
+              "RawSourceVal": $string(ProductGroupCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ProductGroupDesc",
+              "RawSourceVal": $string(ProductGroupDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Classification.ProductClassification",""),
+          "RawId": $cleanStr(ClassificationCode),
+          "Class": "Product",
+          "Code": "Header.Classification.ProductClassification",
+          "Name": "ProductClassification",
+          "Desc": "Product classification"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(ProductClassificationDesc),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ProductGroupCode",
+              "RawSourceVal": $string(ClassificationCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ProductGroupDesc",
+              "RawSourceVal": $string(ProductClassificationDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Classification.ProductCluster",""),
+          "RawId": $cleanStr(ProductClusterCode),
+          "Class": "Product",
+          "Code": "Header.Classification.ProductCluster",
+          "Name": "ProductCluster",
+          "Desc": "Product cluster"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(ProductClusterDesc),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ProductGroupCode",
+              "RawSourceVal": $string(ProductClusterCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ProductGroupDesc",
+              "RawSourceVal": $string(ProductClusterDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Classification.ProductType",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Classification.ProductType",
+          "Name": "ProductType",
+          "Desc": "Product Type"
+        },
+        "IsArray": "Y",
+        "AttType": NULL,
+        "AttValue": NULL,
+        "AttValues": [   
+          {
+            "AttType": "STRING",
+            "RawId": $cleanStr(ProductType),
+            "AttKey": "ProductType",
+            "AttValue": $cleanStr(ProductTypeDesc)
+          },
+          {
+            "AttType": "STRING",
+            "RawId": $cleanStr(ProductSubType),
+            "AttKey": "ProductSubType",
+            "AttValue": $cleanStr(ProdSubTypeDesc)
+          },
+          {
+            "AttType": "STRING",
+            "RawId": $cleanStr(LowerLevelProductTypeCode),
+            "AttKey": "LowerLevelProductType",
+            "AttValue": $cleanStr(LowerLevelProductTypeDesc)
+          }
+          ],
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ProductGroupCode",
+              "RawSourceVal": $string(ProductType)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ProductGroupDesc",
+              "RawSourceVal": $string(ProductTypeDesc)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ProductSubType",
+              "RawSourceVal": $string(ProductSubType)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ProdSubTypeDesc",
+              "RawSourceVal": $string(ProdSubTypeDesc)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "LowerLevelProductTypeCode",
+              "RawSourceVal": $string(LowerLevelProductTypeCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "LowerLevelProductTypeDesc",
+              "RawSourceVal": $string(LowerLevelProductTypeDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Classification.ProductCategory",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Classification.ProductCategory",
+          "Name": "ProductCategory",
+          "Desc": "Product category hierarchy"
+        },
+        "IsArray": "Y",
+        "AttType": NULL,
+        "AttValue": NULL,
+        "AttValues": [   
+          {
+            "AttType": "STRING",
+            "RawId": $cleanStr(DepartmentCode),
+            "AttKey": "Department",
+            "AttValue": $cleanStr(DeptDesc)
+          },
+          {
+            "AttType": "STRING",
+            "RawId": $cleanStr(SubDepartmentCode),
+            "AttKey": "SubDepartment",
+            "AttValue": $cleanStr(SubDeptDesc)
+          },
+          {
+            "AttType": "STRING",
+            "RawId": $cleanStr(CategoryCode),
+            "AttKey": "Category",
+            "AttValue": $cleanStr(CatDesc)
+          },
+          {
+            "AttType": "STRING",
+            "RawId": $cleanStr(SubCategoryCode),
+            "AttKey": "SubCategory",
+            "AttValue": $cleanStr(SubCatDesc)
+          },
+          {
+            "AttType": "STRING",
+            "RawId": $cleanStr(RangeCode),
+            "AttKey": "Range",
+            "AttValue": $cleanStr(RangeDesc)
+          }
+          ],
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "DeptDesc",
+            "RawSourceVal": $cleanStr(DeptDesc)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "SubDeptDesc",
+            "RawSourceVal": $cleanStr(SubDeptDesc)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "CatDesc",
+            "RawSourceVal": $cleanStr(CatDesc)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "SubCatDesc",
+            "RawSourceVal": $cleanStr(SubCatDesc)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "RangeDesc",
+            "RawSourceVal": $cleanStr(RangeDesc)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "DepartmentCode",
+            "RawSourceVal": $cleanStr(DepartmentCode)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "SubDepartmentCode",
+            "RawSourceVal": $cleanStr(SubDepartmentCode)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "CategoryCode",
+            "RawSourceVal": $cleanStr(CategoryCode)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "SubCategoryCode",
+            "RawSourceVal": $cleanStr(SubCategoryCode)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "RangeCode",
+            "RawSourceVal": $cleanStr(RangeCode)
+          }
+          ]
+        }
+      }
+    ],
+    "SellingAtts": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Selling.CanBeAltered",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Selling.CanBeAltered",
+          "Name": "CanBeAltered",
+          "Desc": "Indicates whether the product can be altered"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(AlterationsInd),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "AlterationsInd",
+              "RawSourceVal": $string(AlterationsInd)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Selling.HSNCode",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Selling.HSNCode",
+          "Name": "HSNCode",
+          "Desc": NULL
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(HSNCode),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "HSNCode",
+              "RawSourceVal": $string(HSNCode)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Selling.IsNonInventoryCount",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Selling.IsNonInventoryCount",
+          "Name": "IsNonInventoryCount",
+          "Desc": NULL
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(NonInventoryCountInd),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "NonInventoryCountInd",
+              "RawSourceVal": $string(NonInventoryCountInd)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Selling.IsOffRange",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Selling.IsOffRange",
+          "Name": "IsOffRange",
+          "Desc": NULL
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(OffRange),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "OffRange",
+              "RawSourceVal": $string(OffRange)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Selling.IsPOSDeleted",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Selling.IsPOSDeleted",
+          "Name": "IsPOSDeleted",
+          "Desc": NULL
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(POSDeleteInd),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "POSDeleteInd",
+              "RawSourceVal": $string(POSDeleteInd)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Selling.Royalty",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Selling.Royalty",
+          "Name": "Royalty",
+          "Desc": "Royalty attributes"
+        },
+        "IsArray": "Y",
+        "AttType": NULL,
+        "AttValue": NULL,
+        "AttValues": [   
+          {
+            "AttType": "STRING",
+            "AttId": NULL,
+            "AttKey": "RoyaltyAgentCode",
+            "AttValue": $cleanStr(RoyaltyAgentCode)
+          },
+          {
+            "AttType": "STRING",
+            "AttId": NULL,
+            "AttKey": "RoyaltyAgentCountry",
+            "AttValue": $cleanStr(RoyaltyAgentCountry)
+          },
+          {
+            "AttType": "NUMBER",
+            "AttId": NULL,
+            "AttKey": "RoyaltyAgentPercentage",
+            "AttValue": RoyaltyAgentPercentage
+          },
+          {
+            "AttType": "NUMBER",
+            "AttId": NULL,
+            "AttKey": "RoyaltyPercentage",
+            "AttValue": RoyaltyPerc
+          }
+          ],
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "RoyaltyAgentCode",
+            "RawSourceVal": $string(RoyaltyAgentCode)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "RoyaltyAgentCountry",
+            "RawSourceVal": $string(RoyaltyAgentCountry)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "RoyaltyAgentPercentage",
+            "RawSourceVal": $string(RoyaltyAgentPercentage)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "RoyaltyPerc",
+            "RawSourceVal": $string(RoyaltyPerc)
+          }
+          ]
+        }
+      }
+    ],
+    "WebMerchAtts": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.WebMerch.IsWebEnabled",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.WebMerch.IsWebEnabled",
+          "Name": "IsWebEnabled",
+          "Desc": "Is product enabled to display on website"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(WebEnabled),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "WebEnabled",
+              "RawSourceVal": $string(WebEnabled)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.WebMerch.CanSellOnWeb",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.WebMerch.CanSellOnWeb",
+          "Name": "CanSellOnWeb",
+          "Desc": "Enabled to sell on website"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(SellOnWeb),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "SellOnWeb",
+              "RawSourceVal": $string(SellOnWeb)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.WebMerch.WebProductName",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.WebMerch.WebProductName",
+          "Name": "WebProductName",
+          "Desc": "Name of product displayed on website"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(WebName),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "WebName",
+              "RawSourceVal": $string(WebName)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.WebMerch.WebProductDescription",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.WebMerch.WebProductDescription",
+          "Name": "WebProductDescription",
+          "Desc": "Name of product displayed on website"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(WebFullDescr),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "WebFullDescr",
+              "RawSourceVal": $string(WebFullDescr)
+            }
+          ]
+        }
+      }
+    ],
+    "SupplierBuyerAtts": NULL,
+    "StyleAtts": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Style.Occasion",""),
+          "RawId": $cleanStr(OccasionCode),
+          "Class": "Product",
+          "Code": "Header.Style.Occasion",
+          "Name": "Occasion",
+          "Desc": "Occasion product has been designed for"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(OccasionDesc),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "OccasionCode",
+              "RawSourceVal": $string(OccasionCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "OccasionDesc",
+              "RawSourceVal": $string(OccasionDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Style.StylingBlock",""),
+          "RawId": $cleanStr(StylingBlockCode),
+          "Class": "Product",
+          "Code": "Header.Style.StylingBlock",
+          "Name": "StylingBlock",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(SylingBlockDesc),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "StylingBlockCode",
+              "RawSourceVal": $string(SylingBlockCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "StylingBlockDesc",
+              "RawSourceVal": $string(SylingBlockDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Style.Style",""),
+          "RawId": $cleanStr(StyleCode),
+          "Class": "Product",
+          "Code": "Header.Style.Style",
+          "Name": "Style",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(StyleDescription),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "StyleCode",
+              "RawSourceVal": $string(StyleCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "StyleDescription",
+              "RawSourceVal": $string(StyleDescription)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Style.Fit",""),
+          "RawId": $cleanStr(FitCode),
+          "Class": "Product",
+          "Code": "Header.Style.Fit",
+          "Name": "Fit",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(FitCodeDesc),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "FitCode",
+              "RawSourceVal": $string(FitCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "FitCodeDesc",
+              "RawSourceVal": $string(FitCodeDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Style.Fabric",""),
+          "RawId": $cleanStr(FabricCode),
+          "Class": "Product",
+          "Code": "Header.Style.Fabric",
+          "Name": "Fabric",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(FabricDesc),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "FabricCode",
+              "RawSourceVal": $string(FabricCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "FabricDesc",
+              "RawSourceVal": $string(FabricDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Style.Pattern",""),
+          "RawId": $cleanStr(PatternCode),
+          "Class": "Product",
+          "Code": "Header.Style.Pattern",
+          "Name": "Pattern",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(PatternDesc),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "PatternCode",
+              "RawSourceVal": $string(PatternCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "PatternDesc",
+              "RawSourceVal": $string(PatternDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Style.Mill",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Style.Mill",
+          "Name": "Mill",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(MillDesc),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "MillDesc",
+              "RawSourceVal": $string(MillDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Style.Collar",""),
+          "RawId": $cleanStr(CollarCode),
+          "Class": "Product",
+          "Code": "Header.Style.Collar",
+          "Name": "Collar",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(CollarDesc),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CollarCode",
+              "RawSourceVal": $string(CollarCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CollarDesc",
+              "RawSourceVal": $string(CollarDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Style.Sleeve",""),
+          "RawId": $cleanStr(SleeveCode),
+          "Class": "Product",
+          "Code": "Header.Style.Sleeve",
+          "Name": "Sleeve",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(SleeveDesc),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "SleeveCode",
+              "RawSourceVal": $string(SleeveCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "SleeveDesc",
+              "RawSourceVal": $string(SleeveDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Style.Cuff",""),
+          "RawId": $cleanStr(CuffCode),
+          "Class": "Product",
+          "Code": "Header.Style.Cuff",
+          "Name": "Cuff",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(CuffCodeDesc),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CuffCode",
+              "RawSourceVal": $string(CuffCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CuffCodeDesc",
+              "RawSourceVal": $string(CuffCodeDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Style.Pocket",""),
+          "RawId": $cleanStr(PocketCode),
+          "Class": "Product",
+          "Code": "Header.Style.Pocket",
+          "Name": "Pocket",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(PocketDesc),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "PocketCode",
+              "RawSourceVal": $string(PocketCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "PocketDesc",
+              "RawSourceVal": $string(PocketDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Style.WashingInstructions",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Style.WashingInstructions",
+          "Name": "WashingInstructions",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(WashingInstrDesc),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "WashingInstrDesc",
+              "RawSourceVal": $string(WashingInstrDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Style.Fashionability",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Style.Fashionability",
+          "Name": "Fashionability",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(FashionabilityDesc),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "FashionabilityDesc",
+              "RawSourceVal": $string(FashionabilityDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Style.Customisation",""),
+          "RawId": $cleanStr(CustomisationCode),
+          "Class": "Product",
+          "Code": "Header.Style.Customisation",
+          "Name": "Customisation",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(CustomisationDesc),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CustomisationCode",
+              "RawSourceVal": $string(CustomisationCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CustomisationDesc",
+              "RawSourceVal": $string(CustomisationDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Style.StorageType",""),
+          "RawId": $cleanStr(StorageTypeCode),
+          "Class": "Product",
+          "Code": "Header.Style.StorageType",
+          "Name": "StorageType",
+          "Desc": "Description of how the garment should be stored"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(StorageDesc),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "StorageTypeCode",
+              "RawSourceVal": $string(StorageTypeCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "StorageDesc",
+              "RawSourceVal": $string(StorageDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Style.TicketType",""),
+          "RawId": $cleanStr(TicketTypeCode),
+          "Class": "Product",
+          "Code": "Header.Style.TicketType",
+          "Name": "TicketType",
+          "Desc": "Description of the type of garment labels used"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(TicketTypeDesc),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "TicketTypeCode",
+              "RawSourceVal": $string(TicketTypeCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "TicketTypeDesc",
+              "RawSourceVal": $string(TicketTypeDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Style.Season",""),
+          "RawId": $cleanStr(SeasonCode),
+          "Class": "Product",
+          "Code": "Header.Style.Season",
+          "Name": "Season",
+          "Desc": "Current season of product"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(SeasonDesc),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "SeasonCode",
+              "RawSourceVal": $string(SeasonCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "TicketTypeDesc",
+              "RawSourceVal": $string(TicketTypeDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Style.IsDistressed",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Style.IsDistressed",
+          "Name": "IsDistressed",
+          "Desc": "Is garment distressed"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(Distressed),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "Distressed",
+              "RawSourceVal": $string(Distressed)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Style.IsSuperFine",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Style.IsSuperFine",
+          "Name": "IsSuperFine",
+          "Desc": "Is garment made from super fine fabric"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(IsSuperFineProductInd),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "IsSuperFineProductInd",
+              "RawSourceVal": $string(IsSuperFineProductInd)
+            }
+          ]
+        }
+      }
+    ],
+    "SizeAtts": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Size.SizeMatrix",""),
+          "RawId": $cleanStr(SizeMatrixCode),
+          "Class": "Product",
+          "Code": "Header.Size.SizeMatrix",
+          "Name": "SizeMatrix",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(SizeMatrixDesc),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "SizeMatrixCode",
+              "RawSourceVal": $string(SizeMatrixCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "SizeMatrixDesc",
+              "RawSourceVal": $string(SizeMatrixDesc)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Size.HasSize",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Size.HasSize",
+          "Name": "HasSize",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(HasSize),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "HasSize",
+              "RawSourceVal": $string(HasSize)
+            }
+          ]
+        }
+      }
+    ],
+    "ColourAtts": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Colour.Colour",""),
+          "RawId": $cleanStr(Col),
+          "Class": "Product",
+          "Code": "Header.Colour.Colour",
+          "Name": "SizeMatrix",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(ColD),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "Col",
+              "RawSourceVal": $string(Col)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ColD",
+              "RawSourceVal": $string(ColD)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Colour.ColourGroup",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Colour.ColourGroup",
+          "Name": "ColourGroup",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(ColGrpD),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ColGrpD",
+              "RawSourceVal": $string(ColGrpD)
+            }
+          ]
+        }
+      }
+    ],
+    "HireAtts": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Hire.HireReference",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Hire.HireReference",
+          "Name": "HireReference",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(HireReference),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "HireReference",
+              "RawSourceVal": $string(HireReference)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Hire.MustBeSizedForHire",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Hire.MustBeSizedForHire",
+          "Name": "MustBeSizedForHire",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(MustBeSizedForHire),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "MustBeSizedForHire",
+              "RawSourceVal": $string(MustBeSizedForHire)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Hire.IsHireableAllStores",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Hire.IsHireableAllStores",
+          "Name": "IsHireableAllStores",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(AllStoresForHire),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "AllStoresForHire",
+              "RawSourceVal": $string(AllStoresForHire)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Hire.IsHireReplenishable",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Hire.IsAvailableForHireAllStores",
+          "Name": "IsAvailableForHireAllStores",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(HireReplenishableInd),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "HireReplenishableInd",
+              "RawSourceVal": $string(HireReplenishableInd)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Hire.IsHireNonReturnable",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Hire.IsHireNonReturnable",
+          "Name": "IsHireNonReturnable",
+          "Desc": ""
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(IsNonReturnableHire),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "IsNonReturnableHire",
+              "RawSourceVal": $string(IsNonReturnableHire)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Hire.CanHireOutOfPackage",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Hire.CanHireOutOfPackage",
+          "Name": "CanHireOutOfPackage",
+          "Desc": "Can Hire Out Of Package"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(CanHireOutOfPackage),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CanHireOutOfPackage",
+              "RawSourceVal": $string(CanHireOutOfPackage)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Hire.IsLaundryRequired",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Hire.IsLaundryRequired",
+          "Name": "IsLaundryRequired",
+          "Desc": "Garment requires laundry"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(HireLaundryRequired),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "HireLaundryRequired",
+              "RawSourceVal": $string(HireLaundryRequired)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Hire.IsHireFromExternalSupplier",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Hire.IsHireFromExternalSupplier",
+          "Name": "IsHireFromExternalSupplier",
+          "Desc": "Is Hire From External Supplier"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(HireIsFromExternalSupplier),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "HireIsFromExternalSupplier",
+              "RawSourceVal": $string(HireIsFromExternalSupplier)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Hire.IsHirePackedFromExternalSupplier",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Hire.IsHirePackedFromExternalSupplier",
+          "Name": "IsHirePackedFromExternalSupplier",
+          "Desc": "Is Hire Packed From External Supplier"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(HireIsPackedFromExternalSupplier),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "HireIsPackedFromExternalSupplier",
+              "RawSourceVal": $string(HireIsPackedFromExternalSupplier)
+            }
+          ]
+        }
+      }
+    ],
+    "Qtys": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Qty.QtyOnHand",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Hire.QtyOnHand",
+          "Name": "QtyOnHand",
+          "Desc": "Quantity on hand"
+        },
+        "Amount": $cleanNum(QtyOnHand),
+        "AmountFloat": NULL,
+        "AccountingMethodType": NULL,
+        "UnitMeasure": NULL,
+        "UnitType": NULL,
+        "UnitScheme": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "QtyOnHand",
+              "RawSourceVal": $string(QtyOnHand)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Qty.QtyInTransit",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Qty.QtyInTransit",
+          "Name": "QtyOnHand",
+          "Desc": "Quantity on hand"
+        },
+        "Amount": $cleanNum(QtyInTransit),
+        "AmountFloat": NULL,
+        "AccountingMethodType": NULL,
+        "UnitMeasure": NULL,
+        "UnitType": NULL,
+        "UnitScheme": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "QtyInTransit",
+              "RawSourceVal": $string(QtyInTransit)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Qty.QtyOnOrder",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Qty.QtyOnOrder",
+          "Name": "QtyOnOrder",
+          "Desc": "Quantity on hand"
+        },
+        "Amount": $cleanNum(QtyOnOrder),
+        "AmountFloat": NULL,
+        "AccountingMethodType": NULL,
+        "UnitMeasure": NULL,
+        "UnitType": NULL,
+        "UnitScheme": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "QtyOnOrder",
+              "RawSourceVal": $string(QtyOnOrder)
+            }
+          ]
+        }
+      }
+    ],
+    "Totals": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Totals.EstimatedTotalStockValue",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Totals.EstimatedTotalStockValue",
+          "Name": "EstimatedTotalStockValue",
+          "Desc": "Total stock value estimated using average unit price"
+        },
+        "PriceLocalisation": "BCY",
+        "IsRecurring": "Y",
+        "RecurranceFrequency": "nostrud ullamco",
+        "PriceIncTax": $cleanNum(ValueAtAvg),
+        "PriceExTax": $cleanNum(ValueAtAvg) - $cleanNum(ValueAtAvgTax),
+        "PriceTax": $cleanNum(ValueAtAvgTax),
+        "CurrencyCode": "GBP",
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "IsExchangeRateEstimated": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "EntityLinks": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ValueAtAvg",
+              "RawSourceVal": $string(ValueAtAvg)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ValueAtAvgTax",
+              "RawSourceVal": $string(ValueAtAvgTax)
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "Variants": $.Sku.
+    {
+      "ProductId": $ProductId,
+      "ProductVariantId": $buildEntityID("Product_Variant","Dolfin",SKU),
+      "ProductVariantIds": [
+        {
+        "AttHeader": {
+          "Id": $buildAttributeID($buildEntityID("Product_Variant","Dolfin",SKU),"ProductVariant.ID.SKU",""),
+          "RawId": $cleanStr(SKU),
+          "Class": "ProductVariant",
+          "Code": "Variant.ID.SKU",
+          "Name": "SKU",
+          "Desc": ""
+        },
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "SKU",
+                "RawSourceVal": $string(SKU)
+              }
+            ]
+          }
+        },
+        {
+        "AttHeader": {
+          "Id": $buildAttributeID($buildEntityID("Product_Variant","Dolfin",SKU),"ProductVariant.ID.EAN",""),
+          "RawId": $cleanStr(EAN),
+          "Class": "ProductVariant",
+          "Code": "ProductVariant.ID.EAN",
+          "Name": "EAN",
+          "Desc": ""
+        },
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "EAN",
+                "RawSourceVal": $string(EAN)
+              }
+            ]
+          }
+        }
+      ],
+      "VariantAtts": [
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($buildEntityID("Product_Variant","Dolfin",SKU),"ProductVariant.VariantAtt.CanTryOn",""),
+            "RawId": NULL,
+            "Class": "ProductVariant",
+            "Code": "ProductVariant.VariantAtt.CanTryOn",
+            "Name": "CanTryOn",
+            "Desc": ""
+          },
+          "IsArray": "N",
+          "AttType": "STRING",
+          "AttValue": $stringBool(TryOnInd),
+          "AttValues": NULL,
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "TryOnInd",
+                "RawSourceVal": $string(TryOnInd)
+              }
+            ]
+          }
+        }
+      ],
+      "SizeAtts": [
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($buildEntityID("Product_Variant","Dolfin",SKU),"ProductVariant.Size.Size",""),
+            "RawId": NULL,
+            "Class": "ProductVariant",
+            "Code": "ProductVariant.Size.Size",
+            "Name": "Size",
+            "Desc": ""
+          },
+          "IsArray": "N",
+          "AttType": "STRING",
+          "AttValue": $cleanStr(Size),
+          "AttValues": NULL,
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "Size",
+                "RawSourceVal": $string(Size)
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ,
+  "Prices": [
+    {
+      "ProductId": $ProductId,
+      "PriceId": $buildEntityID("Product_Prices","Dolfin", "CostPrices_" & ProductCode),
+      "PriceIds": NULL,
+      "Times": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($buildEntityID("Product_Prices","Dolfin","ListPrice_" & ProductCode),"Prices.Time.ListPriceSetOn",""),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Prices.Time.ListPriceSetOn",
+          "Name": "ListPriceSetOn",
+          "Desc": "Date Product List Price Set On"
+        },
+        "DateDim": $getDateDimFn(ListPriceSetOn,FALSE,'Europe/London'),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ListPriceSetOn",
+              "RawSourceVal": $string(ListPriceSetOn)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($buildEntityID("Product_Prices","Dolfin", "ListPrice_" & ProductCode),"Prices.Time.TaxRateSetOn",""),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Prices.Time.TaxRateSetOn",
+          "Name": "TaxRateSetOn",
+          "Desc": "Date Product Tax Rate Set On"
+        },
+        "DateDim": $getDateDimFn(TaxRateSetOn,FALSE,'Europe/London'),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "TaxRateSetOn",
+              "RawSourceVal": $string(TaxRateSetOn)
+            }
+          ]
+        }
+      }
+      ],
+      "Location": NULL,
+      "Price": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Prices.Price.ListPrice",""),
+          "RawId": NULL,
+          "Class": "Cost",
+          "Code": "Prices.Price.ListPrice",
+          "Name": "ListPrice",
+          "Desc": ""
+        },
+        "PriceLocalisation": "BCY",
+        "IsRecurring": NULL,
+        "RecurranceFrequency": NULL,
+        "PriceIncTax": $cleanNum(ListPriceExc) * (1 + ($cleanNum(TaxRate)/100)),
+        "PriceExTax": $cleanNum(ListPriceExc),
+        "PriceTax": $cleanNum(ListPriceExc) * ($cleanNum(TaxRate)/100),
+        "CurrencyCode": "GBP",
+        "TaxRate": $cleanNum(TaxRate),
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "IsExchangeRateEstimated": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "EntityLinks": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ListPriceExc",
+              "RawSourceVal": $string(ListPriceExc)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "TaxRate",
+              "RawSourceVal": $string(TaxRate)
+            }
+            ]
+          }
+        },
+        {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Prices.Price.AverageCostPrice",""),
+          "RawId": NULL,
+          "Class": "Cost",
+          "Code": "Prices.Price.AverageCostPrice",
+          "Name": "AverageCostPrice",
+          "Desc": ""
+        },
+        "PriceLocalisation": "BCY",
+        "IsRecurring": NULL,
+        "RecurranceFrequency": NULL,
+        "PriceIncTax": $cleanNum(AvgCP),
+        "PriceExTax": $cleanNum(AvgCP) / (1 + ($cleanNum(TaxRate)/100)),
+        "PriceTax": ($cleanNum(AvgCP) / (1 + ($cleanNum(TaxRate)/100))) * ($cleanNum(TaxRate)/100),
+        "CurrencyCode": "GBP",
+        "TaxRate": $cleanNum(TaxRate),
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "IsExchangeRateEstimated": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "EntityLinks": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "AvgCP",
+              "RawSourceVal": $string(AvgCP)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "TaxRate",
+              "RawSourceVal": $string(TaxRate)
+            }
+            ]
+          }
+        },
+        {
+        "AttHeader": {
+          "Id": $buildAttributeID($buildEntityID("Product_Prices","Dolfin", "ListPriceSupplierCurrency_" & ProductCode),"Prices.Price.ListPriceSupplierCurrency",""),
+          "RawId": NULL,
+          "Class": "Cost",
+          "Code": "Prices.Price.ListPriceSupplierCurrency",
+          "Name": "ListPriceSupplierCurrency",
+          "Desc": ""
+        },
+        "PriceLocalisation": "BCY",
+        "IsRecurring": NULL,
+        "RecurranceFrequency": NULL,
+        "PriceIncTax": $cleanNum(ListPriceSuppCurrExc) * (1 + ($cleanNum(TaxRate)/100)),
+        "PriceExTax": $cleanNum(ListPriceSuppCurrExc),
+        "PriceTax": $cleanNum(ListPriceSuppCurrExc) * ($cleanNum(TaxRate)/100),
+        "CurrencyCode": "GBP",
+        "TaxRate": $cleanNum(TaxRate),
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "IsExchangeRateEstimated": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "EntityLinks": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ListPriceSuppCurrExc",
+              "RawSourceVal": $string(ListPriceSuppCurrExc)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "TaxRate",
+              "RawSourceVal": $string(TaxRate)
+            }
+            ]
+          }
+        },
+        {
+        "AttHeader": {
+          "Id": $buildAttributeID($buildEntityID("Product_Prices","Dolfin", "StandardCost_" & ProductCode),"Prices.Price.StandardCost",""),
+          "RawId": NULL,
+          "Class": "Cost",
+          "Code": "Prices.Price.StandardCost",
+          "Name": "StandardCost",
+          "Desc": ""
+        },
+        "PriceLocalisation": "BCY",
+        "IsRecurring": NULL,
+        "RecurranceFrequency": NULL,
+        "PriceIncTax": $cleanNum(StdCostExc) * (1 + ($cleanNum(TaxRate)/100)),
+        "PriceExTax": $cleanNum(StdCostExc),
+        "PriceTax": $cleanNum(StdCostExc) * ($cleanNum(TaxRate)/100),
+        "CurrencyCode": "GBP",
+        "TaxRate": $cleanNum(TaxRate),
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "IsExchangeRateEstimated": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "EntityLinks": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "StdCostExc",
+              "RawSourceVal": $string(StdCostExc)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "TaxRate",
+              "RawSourceVal": $string(TaxRate)
+            }
+            ]
+          }
+        },
+        {
+        "AttHeader": {
+          "Id": $buildAttributeID($buildEntityID("Product_Prices","Dolfin", "LastGRNCost_" & ProductCode),"Prices.Price.LastGRNCost",""),
+          "RawId": NULL,
+          "Class": "Cost",
+          "Code": "Prices.Price.LastGRNCost",
+          "Name": "LastGRNCost",
+          "Desc": ""
+        },
+        "PriceLocalisation": "BCY",
+        "IsRecurring": NULL,
+        "RecurranceFrequency": NULL,
+        "PriceIncTax": $cleanNum(LastGRNCostExc) * (1 + ($cleanNum(TaxRate)/100)),
+        "PriceExTax": $cleanNum(LastGRNCostExc),
+        "PriceTax": $cleanNum(LastGRNCostExc) * ($cleanNum(TaxRate)/100),
+        "CurrencyCode": "GBP",
+        "TaxRate": $cleanNum(TaxRate),
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "IsExchangeRateEstimated": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "EntityLinks": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "LastGRNCostExc",
+              "RawSourceVal": $string(LastGRNCostExc)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "TaxRate",
+              "RawSourceVal": $string(TaxRate)
+            }
+            ]
+          }
+        },
+        {
+        "AttHeader": {
+          "Id": $buildAttributeID($buildEntityID("Product_Prices","Dolfin", "RoyaltyCostPriceBase_" & ProductCode),"Prices.Price.RoyaltyCostPriceBase",""),
+          "RawId": NULL,
+          "Class": "Cost",
+          "Code": "Prices.Price.RoyaltyCostPriceBase",
+          "Name": "RoyaltyCostPriceBase",
+          "Desc": ""
+        },
+        "PriceLocalisation": "BCY",
+        "IsRecurring": NULL,
+        "RecurranceFrequency": NULL,
+        "PriceIncTax": $cleanNum(RoyaltyCostPriceBaseExc) * (1 + ($cleanNum(TaxRate)/100)),
+        "PriceExTax": $cleanNum(RoyaltyCostPriceBaseExc),
+        "PriceTax": $cleanNum(RoyaltyCostPriceBaseExc) * ($cleanNum(TaxRate)/100),
+        "CurrencyCode": "GBP",
+        "TaxRate": $cleanNum(TaxRate),
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "IsExchangeRateEstimated": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "EntityLinks": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "RoyaltyCostPriceBaseExc",
+              "RawSourceVal": $string(RoyaltyCostPriceBaseExc)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "TaxRate",
+              "RawSourceVal": $string(TaxRate)
+            }
+            ]
+          }
+        },
+        {
+        "AttHeader": {
+          "Id": $buildAttributeID($buildEntityID("Product_Prices","Dolfin", "RoyaltyUnitCost_" & ProductCode),"Prices.Price.RoyaltyUnitCost",""),
+          "RawId": NULL,
+          "Class": "Cost",
+          "Code": "Prices.Price.RoyaltyUnitCost",
+          "Name": "RoyaltyUnitCost",
+          "Desc": ""
+        },
+        "PriceLocalisation": "BCY",
+        "IsRecurring": NULL,
+        "RecurranceFrequency": NULL,
+        "PriceIncTax": $cleanNum(RoyaltyUnitCost),
+        "PriceExTax": $cleanNum(RoyaltyUnitCost) / (1 + ($cleanNum(TaxRate)/100)),
+        "PriceTax": ($cleanNum(RoyaltyUnitCost) / (1 + ($cleanNum(TaxRate)/100))) * ($cleanNum(TaxRate)/100),
+        "CurrencyCode": "GBP",
+        "TaxRate": $cleanNum(TaxRate),
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "IsExchangeRateEstimated": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "EntityLinks": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "RoyaltyUnitCost",
+              "RawSourceVal": $string(RoyaltyUnitCost)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "TaxRate",
+              "RawSourceVal": $string(TaxRate)
+            }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "Suppliers": Suppliers.
+    {
+      "ProductId": $ProductId,
+      "SupplierId": $buildEntityID("Product_Supplier","Dolfin",SupplierNumber),
+      "SupplierIds": [
+        {
+          "AttHeader": {
+          "Id": $buildAttributeID($buildEntityID("Product_Supplier","Dolfin",SupplierNumber),"ProductSupplier.ID.SupplierNumber",""),
+          "RawId": $cleanStr(SupplierNumber),
+          "Class": "ProductSupplier",
+          "Code": "ProductSupplier.ID.SupplierNumber",
+          "Name": "SupplierNumber",
+          "Desc": ""
+        },
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "SupplierNumber",
+                "RawSourceVal": $string(SupplierNumber)
+              }
+            ]
+          }
+        }
+      ],
+      "Status": [
+        {
+          "AttHeader": {
+          "Id": $buildAttributeID($buildEntityID("Product_Supplier","Dolfin",SupplierNumber),"ProductSupplier.Status.Active",""),
+          "RawId": NULL,
+          "Class": "ProductSupplier",
+          "Code": "ProductSupplier.Status.Active",
+          "Name": "Active",
+          "Desc": ""
+          },
+          "IsArray": "N",
+          "AttType": "STRING",
+          "AttValue": $reverseStringBool(Deactivated),
+          "AttValues": NULL,
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "Deactivated",
+                "RawSourceVal": $string(Deactivated)
+              }
+            ]
+          }
+        },
+        {
+          "AttHeader": {
+          "Id": $buildAttributeID($buildEntityID("Product_Supplier","Dolfin",SupplierNumber),"ProductSupplier.Status.PreferredSupplier",""),
+          "RawId": NULL,
+          "Class": "ProductSupplier",
+          "Code": "ProductSupplier.Status.PreferredSupplier",
+          "Name": "PreferredSupplier",
+          "Desc": ""
+          },
+          "IsArray": "N",
+          "AttType": "STRING",
+          "AttValue": $stringBool(PreferredSupplier),
+          "AttValues": NULL,
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "PreferredSupplier",
+                "RawSourceVal": $string(PreferredSupplier)
+              }
+            ]
+          }
+        }
+      ],
+      "SupplierAtts": [
+        {
+          "AttHeader": {
+          "Id": $buildAttributeID($buildEntityID("Product_Supplier","Dolfin",SupplierNumber),"ProductSupplier.Supplier.SupplierName",""),
+          "RawId": NULL,
+          "Class": "ProductSupplier",
+          "Code": "ProductSupplier.Supplier.SupplierName",
+          "Name": "SupplierName",
+          "Desc": ""
+          },
+          "IsArray": "N",
+          "AttType": "STRING",
+          "AttValue": $cleanStr(SupplierName),
+          "AttValues": NULL,
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "SupplierName",
+                "RawSourceVal": $string(SupplierName)
+              }
+            ]
+          }
+        },
+        {
+          "AttHeader": {
+          "Id": $buildAttributeID($buildEntityID("Product_Supplier","Dolfin",SupplierNumber),"ProductSupplier.Supplier.Product",""),
+          "RawId": $cleanStr(SupplierProductCode),
+          "Class": "Product",
+          "Code": "ProductSupplier.Supplier.Product",
+          "Name": "Product",
+          "Desc": ""
+          },
+          "IsArray": "N",
+          "AttType": "STRING",
+          "AttValue": $cleanStr(SupplierProductDescription),
+          "AttValues": NULL,
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "SupplierProductCode",
+                "RawSourceVal": $string(SupplierProductCode)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "SupplierProductDescription",
+                "RawSourceVal": $string(SupplierProductDescription)
+              }
+            ]
+          }
+        },
+        {
+          "AttHeader": {
+          "Id": $buildAttributeID($buildEntityID("Product_Supplier","Dolfin",SupplierNumber),"ProductSupplier.Supplier.SupplierType",""),
+          "RawId": $cleanStr(SupplierTypeCode),
+          "Class": "Product",
+          "Code": "ProductSupplier.Supplier.SupplierType",
+          "Name": "SupplierType",
+          "Desc": ""
+          },
+          "IsArray": "N",
+          "AttType": "STRING",
+          "AttValue": $cleanStr(SupplierTypeDesc),
+          "AttValues": NULL,
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "SupplierTypeCode",
+                "RawSourceVal": $string(SupplierTypeCode)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "SupplierTypeDesc",
+                "RawSourceVal": $string(SupplierTypeDesc)
+              }
+            ]
+          }
+        },
+        {
+          "AttHeader": {
+          "Id": $buildAttributeID($buildEntityID("Product_Supplier","Dolfin",SupplierNumber),"ProductSupplier.Supplier.CurrencyCode",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "ProductSupplier.Supplier.CurrencyCode",
+          "Name": "CurrencyCode",
+          "Desc": ""
+          },
+          "IsArray": "N",
+          "AttType": "STRING",
+          "AttValue": $cleanStr(CurrencyCode),
+          "AttValues": NULL,
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CurrencyCode",
+                "RawSourceVal": $string(CurrencyCode)
+              }
+            ]
+          }
+        },
+        {
+          "AttHeader": {
+          "Id": $buildAttributeID($buildEntityID("Product_Supplier","Dolfin",SupplierNumber),"ProductSupplier.Supplier.CountryCode",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "ProductSupplier.Supplier.CountryCode",
+          "Name": "CountryCode",
+          "Desc": ""
+          },
+          "IsArray": "N",
+          "AttType": "STRING",
+          "AttValue": $cleanStr(CountryCode),
+          "AttValues": NULL,
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CountryCode",
+                "RawSourceVal": $string(CountryCode)
+              }
+            ]
+          }
+        },
+        {
+          "AttHeader": {
+          "Id": $buildAttributeID($buildEntityID("Product_Supplier","Dolfin",SupplierNumber),"ProductSupplier.Supplier.WarehouseToStoreDistributionChargePercentage",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "ProductSupplier.Supplier.WarehouseToStoreDistributionChargePercentage",
+          "Name": "WarehouseToStoreDistributionChargePercentage",
+          "Desc": ""
+          },
+          "IsArray": "N",
+          "AttType": "NUMBER",
+          "AttValue": WHSToStoreDistrChgPerc,
+          "AttValues": NULL,
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "WHSToStoreDistrChgPerc",
+                "RawSourceVal": $string(WHSToStoreDistrChgPerc)
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ,
+  "Availability": NULL,
+  "Features": FABS.
+    {
+      "ProductId": $ProductId,
+      "FeatureId": $buildEntityID("Product_Features","Dolfin",Fabscode & "_" & Fabsoptioncode),
+      "FeatureIds": [
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($buildEntityID("Product_Features","Dolfin",Fabscode & "_" & Fabsoptioncode),"Features.ID.FabsCode",""),
+            "RawId": $cleanStr(Fabscode),
+            "Class": "Feature",
+            "Code": "Features.ID.FabsCode",
+            "Name": "FabsCode",
+            "Desc": "Features and Benefits Code"
+          },
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "Fabscode",
+                "RawSourceVal": $string(Fabscode)
+              }
+            ]
+          }
+        },
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($buildEntityID("Product_Features","Dolfin",Fabscode & "_" & Fabsoptioncode),"Features.Feature.FabsOptionCode",""),
+            "RawId": $cleanStr(Fabsoptioncode),
+            "Class": "Feature",
+            "Code": "Features.ID.FabsOptionCode",
+            "Name": "FabsOptionCode",
+            "Desc": "Features and Benefits Option Code"
+          },
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "Fabsoptioncode",
+                "RawSourceVal": $string(Fabsoptioncode)
+              }
+            ]
+          }
+        }
+      ],
+      "FeatureAtts": [
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($buildEntityID("Product_Features","Dolfin",Fabscode & "_" & Fabsoptioncode),"Features.Feature.FeatureOrBenifit",""),
+            "RawId": $cleanStr(Fabscode),
+            "Class": "Feature",
+            "Code": "Features.Feature.FeatureOrBenifit",
+            "Name": "FeatureOrBenifit",
+            "Desc": "Features and Benefits Code"
+          },
+          "IsArray": "N",
+          "AttType": "STRING",
+          "AttValue": FABSDescription,
+          "AttValues": NULL,
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "Fabscode",
+                "RawSourceVal": $string(Fabscode)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "Fabscode",
+                "RawSourceVal": $string(FABSDescription)
+              }
+            ]
+          }
+        },
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($buildEntityID("Product_Features","Dolfin",Fabscode & "_" & Fabsoptioncode),"Features.Feature.FeatureOrBenifitOption",""),
+            "RawId": $cleanStr(Fabsoptioncode),
+            "Class": "Feature",
+            "Code": "Features.Feature.FeatureOrBenifitOption",
+            "Name": "FeatureOrBenifitOption",
+            "Desc": "Features and Benefits Option Code"
+          },
+          "IsArray": "N",
+          "AttType": "STRING",
+          "AttValue": FABSOptionDescription,
+          "AttValues": NULL,
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "Fabsoptioncode",
+                "RawSourceVal": $string(Fabsoptioncode)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "FABSOptionDescription",
+                "RawSourceVal": $string(FABSOptionDescription)
+              }
+            ]
+          }
+        }
+      ]
+    }
+  
+}
+)

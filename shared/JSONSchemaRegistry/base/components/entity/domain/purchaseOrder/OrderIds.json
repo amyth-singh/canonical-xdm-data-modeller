@@ -1,0 +1,48 @@
+{
+  "OrderIdsObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/OrderIdsProperties"
+    }
+  },
+  "OrderIdsProperties": {
+    "type": "object",
+    "description": "A generic object for capturing all purchase order ids as a common set",
+    "unevaluatedProperties": false,
+    "properties": {
+      "PurchaseOrderId": {
+        "type": "string",
+        "description": "The (required) PurchaseOrderId Id, in Xfuze canonical form, identifying this purchase order, in the form of PurchaseOrder::[type]_[sourceSystem]_[PurchaseOrderKey] e.g PurchaseOrder::Return_PMC_RET123456789"
+      },
+      "PurchaseOrderKey": {
+        "type": "string",
+        "description": "The (required) 'natural' purchase order key/number, typically as the system of entry defines (online or retail), and also used to construct the synthetic SO Xfuze Ids. e.g RET123456789"
+      },
+      "OriginalPurchaseOrderId": {
+        "type": "number",
+        "description": "The PurchaseOrderId Id, in Xfuze canonical form, identifying an 'original' purchase order, in the form of PurchaseOrder::[type]_[sourceSystem]_[OriginalPurchaseOrderKey] e.g PurchaseOrder::Sale_PMC_987654321"
+      },
+      "OriginalPurchaseOrderKey": {
+        "type": "string",
+        "description": "The original 'natural' purchase order key/number, typically as a way to link related orders together the can be physically separate and need a linking (Return,Exchange etc) e.g 987654321"
+      },
+      "ParentPurchaseOrderId": {
+        "type": "number",
+        "description": "The PurchaseOrderId Id, in Xfuze canonical form, identifying an 'original' purchase order, in the form of PurchaseOrder::[type]_[sourceSystem]_[OriginalPurchaseOrderKey] e.g PurchaseOrder::Sale_PMC_987654321"
+      },
+      "ParentPurchaseOrderKey": {
+        "type": "string",
+        "description": "The parent 'natural' purchase order key/number, typically as a way to link to parent orders in an order hierarchy, where one child order has a single parent e.g HireOrder parent order sits above individual hire orders for formal wear hire. NOTE: PurchaseOrderId should contain a parent part if this is the case in its ID construction "
+      },
+      "ReceiptNumber": {
+        "type": "string",
+        "description": "The customer facing reference number/code, as a customer would see externally, as opposed to an internal key e.g ORD-RET-2044534"
+      },
+      "OriginalReferenceCode": {
+        "type": "string",
+        "description": "The original 'natural' customer facing reference number/code, typically as a way to link related order together (Return,Exchange) e.g ORD-2044534"
+      }
+    },
+    "required": ["PurchaseOrderId","PurchaseOrderNumber"]
+  }
+}

@@ -1,0 +1,165 @@
+(
+    $formatValue := function($value, $dType, $format){(
+        $formatString := $string ~> $trim;
+        $formatArray := function($array){$type($array) = "array" ? $array : [$array]};
+        $formatNumber := function($num){$type($num) = "number" ? $num : $type($num) = "string" ? $contains($num,/^-?\d+(\.\d+)?$/) ? $number($num) : null};
+        $formatDateTime := function($dt,$format) {(
+            $dateTimeRegexMap := {"[Y0001]-[M01]-[D01] [H01]:[m01]:[s01] [P]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]) (AM|PM)$/,
+                                  "[Y0001]-[M01]-[D01] [H01]:[m01]:[s01].[f001]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]).\d{3}$/,
+                                  "[M01]/[D01]/[Y0001]":/^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/[1-9][0-9]{3}$/,
+                                  "[M01]/[D01]/[Y0001] [H01]:[m01]:[s01]":/^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/[1-9][0-9]{3} ([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/,
+                                  "ISO8601":/^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d)(\.\d+)?([+-]([01]\d|2[0-3]):([0-5]\d)|Z)$/
+                                 };
+            $dateTimeFormatValidator := function($datetime,$dateTimeFormat){$boolean($dateTimeFormat) ? $contains($datetime,$lookup($dateTimeRegexMap,$dateTimeFormat)): $contains($datetime,$lookup($dateTimeRegexMap,"ISO8601"))};
+
+            $exists($dt) ? $dateTimeFormatValidator($dt,$format) ? $boolean($format) and $not($format = "ISO8601") ? $fromMillis($toMillis($dt,$format)) : $fromMillis($toMillis($dt)) : null;
+            )};
+        $formatStringBool := function($value,$format){(
+            $stringBoolMap := {"Y":"Y","1":"Y","TRUE":"Y","N":"N","0":"N","FALSE":"N","false":"N","true":"Y","F":"N","T":"Y"};
+            $upperTrim := $string ~> $trim ~> $uppercase;
+            $stringBool := function($v){$exists($value)?$lookup($stringBoolMap, $upperTrim($value)):""};
+            $reverseBool := function($v){$v = "Y" ? "N" : $v = "N" ? "Y" : "U"};
+            $type($format)="null" ? $value ~> $stringBool : $format="reverse" ? $value ~> $stringBool ~> $reverseBool : null
+        )};
+
+        $dType = "TIMESTAMP"  ? $formatDateTime($value,$format) :
+        $dType = "STRINGBOOL" ? $formatStringBool($value,$format) :
+        $dType = "NUMERIC"    ? $formatNumber($value) :
+        $dType = "STRING"     ? $formatString($value) :
+        $dType = "ARRAY"      ? $formatArray($value) :
+        null;
+    )};
+
+    $unifiedBasket := $oneToManyJoin(basket.products,basket.taxBreakdown.taxLines,"itemLineId","itemLineId","taxLines");
+    $count(basket.lineDiscount) > 0 ? $unifiedBasket := $oneToManyJoin([$unifiedBasket],basket.lineDiscount,"itemLineId","itemLineId","lineDiscounts");
+    $count(basket.linePromotion) > 0 ? $unifiedBasket := $oneToManyJoin([$unifiedBasket],basket.linePromotion,"itemLineId","itemLineId","linePromotions");
+    $exists(basket.exchange.quantity) ? $unifiedBasket := $oneToManyJoin([$unifiedBasket],basket.exchange,"itemLineId","lineItemId","exchangeLines");
+    $exists(currentTransactionDetails.products) ? $unifiedBasket := $oneToManyJoin([$unifiedBasket],currentTransactionDetails.products,"itemLineId","itemLineId","currentLines");
+    $count(currentTransactionDetails.lineDiscount) > 0 ? $unifiedBasket := $oneToManyJoin([$unifiedBasket],currentTransactionDetails.lineDiscount,"itemLineId","itemLineId","currentDiscountLines");
+    $count(currentTransactionDetails.linePromotion) > 0 ? $unifiedBasket := $oneToManyJoin([$unifiedBasket],currentTransactionDetails.linePromotion,"itemLineId","itemLineId","currentPromotionLines");
+    $count(currentTransactionDetails.taxBreakdown.taxLines) > 0 ? $unifiedBasket := $oneToManyJoin([$unifiedBasket],currentTransactionDetails.taxBreakdown.taxLines,"itemLineId","itemLineId","currentTaxLines");
+
+    	/* START: Reusable base measures from UnifiedBasket */
+
+    $lineMeasures := $unifiedBasket.(
+      {
+      	"ItemLineId": 												$formatValue(itemLineId,"NUMERIC","ZERO"),
+        "Source": 													"basket.products[]",
+        "Type": 													$$.type,
+        "QtySold" : 												quantity,
+        "QtyRefunded" : 											-1.0 * ($exists(refundedQuantity) ? $formatValue(refundedQuantity,"NUMERIC","ZERO") : 0),
+        "QtyRefundedPromotional" : 									-1.0 * ($exists(refundedPromotionalQuantity) ? $formatValue(refundedPromotionalQuantity,"NUMERIC","ZERO") : 0),
+        "QtyExchanged" : 											-1.0 * ($exists(exchange.quantity) ? $formatValue(exchange.quantity, "NUMERIC","ZERO") : 0),
+        "QtyExchangedNew" :       									-1.0 * ($exists(exchange.newItems) ? $formatValue($sum(exchange.newItems.Quantity), "NUMERIC","ZERO") : 0),
+        "QtyChanged" :       										-1.0 * ($exists(changeQty) ? $formatValue(changeQty,"NUMERIC","ZERO") : 0),
+        "GrandTotalBeforeAdjustmentsIncTax" : 						totalLinePrice,
+        "GrandTotalTax" : 											$sum(taxLines.taxLineTotal),
+        "LineDiscountsTotalIncTax" : 								-1.0 * ($exists(lineDiscounts.discountAmount) ? $sum($formatValue(lineDiscounts.discountAmount,"NUMERIC","ZERO")) : 0.00),
+        "LinePromotionsTotalIncTax" : 								-1.0 * ($exists(linePromotions.promotionAmount) ? $sum($formatValue(linePromotions.promotionAmount,"NUMERIC","ZERO")) : 0.00),
+ 		"LineRefundsTotalIncTax" : 							    	$formatValue(refundedTotal,"NUMERIC","ZERO"),
+        "LineUnitPriceIncTax" : 									$formatValue(price,"NUMERIC","ZERO"),
+        "LineUnitPriceAfterDiscountsIncTax" : 						$formatValue(lineDiscounts[0].unitPrice,"NUMERIC","ZERO"),
+        "OrderDiscountsApportionedTotalIncTax" : 					-1.0 * ($exists(itemDiscounts.trnDiscountsPortion) ? $formatValue(itemDiscounts.trnDiscountsPortion,"NUMERIC","ZERO") : 0.00),
+        "OrderPromotionsApportionedTotalIncTax" : 					-1.0 * ($exists(itemDiscounts.trnPromotionsPortion) ? $formatValue(itemDiscounts.trnPromotionsPortion,"NUMERIC","ZERO") : 0.00),
+        "OrderDiscountsRefundApportionedTotalIncTax": 				-1.0 * ($exists(itemDiscounts.refundPortion) ? $formatValue(itemDiscounts.refundPortion,"NUMERIC","ZERO") : 0.00),
+        "OrderCurrDiscountsRefundApportionedTotalIncTax" : 		-1.0 * ($exists(itemDiscounts.currentRefundPortion) ? $formatValue(itemDiscounts.currentRefundPortion,"NUMERIC","ZERO") : 0.00)
+        /* could be double counting current and non current here */
+       }
+    );
+
+    $lineMeasures := $lineMeasures.(
+    	$merge([$,
+              {
+                "AdjustmentsTotalIncTax" :
+                    $.OrderDiscountsApportionedTotalIncTax + $.OrderPromotionsApportionedTotalIncTax + $.OrderDiscountsRefundApportionedTotalIncTax +
+                    $.OrderCurrDiscountsRefundApportionedTotalIncTax + $.LineDiscountsTotalIncTax + $.LinePromotionsTotalIncTax,
+                 "QtyNet" : $.QtySold + $.QtyRefunded
+              }
+           ])
+
+    );
+
+    $lineMeasures := $lineMeasures.(
+    	$merge([$,
+              {
+                 "GrandTotalIncTax" :
+                    $.GrandTotalBeforeAdjustmentsIncTax + $.AdjustmentsTotalIncTax,
+                  "GrandTotalExTax" :
+                    $.GrandTotalBeforeAdjustmentsIncTax + $.AdjustmentsTotalIncTax - $.GrandTotalTax
+              }
+           ])
+
+    );
+
+	$orderMeasuresByLineAggs := {
+    	"GrandTotalIncTax" : 						$sum($lineMeasures.GrandTotalIncTax),
+		"GrandTotalExTax" : 						$sum($lineMeasures.GrandTotalExTax),
+        "GrandTotalTax" : 							$sum($lineMeasures.GrandTotalTax),
+		"GrandTotalAfterAdjustmentsIncTax" : 		$sum($lineMeasures.GrandTotalAfterAdjustmentsIncTax),
+        "AdjustmentsTotalIncTax" : 					$sum($lineMeasures.AdjustmentsTotalIncTax),
+        "QtySold" : 								$sum($lineMeasures.QtySold),
+        "QtyNet" : 									$sum($lineMeasures.QtyNet),
+        "QtyRefunded" : 							$sum($lineMeasures.QtyRefunded),
+        "QtyRefundedPromotional": 					$sum($lineMeasures.QtyRefundedPromotional),
+        "QtyExchanged": 							$sum($lineMeasures.QtyExchanged),
+        "QtyExchangedNew": 							$sum($lineMeasures.QtyExchangedNew)
+
+    };
+
+    $orderMeasuresTopLevel := {
+        "Type": 											$$.type,
+        "RawTopLevelSaleTotal" : 							$formatValue(saleTotal,"NUMERIC","ZERO"),
+        "QtySold" : 										$formatValue(basketSummary.totalItems,"NUMERIC","ZERO"),
+        "QtyNet" : 											$formatValue(basketSummary.inStore.totalItems,"NUMERIC","ZERO") + $formatValue(basketSummary.webOrder.totalItems,"NUMERIC","ZERO") + $formatValue(basketSummary.cnc.totalItems,"NUMERIC","ZERO"),
+        "QtyPayments" : 									$count(paymentDetails),
+        "QtyOrderDiscounts" : 								$count(basket.transactionDiscount),
+        "QtyOrderPromotions" : 								$count(basket.transactionPromotion),
+        "GrandTotalIncTax" : 								$formatValue(basketSummary.basketTotal,"NUMERIC","ZERO"),
+        "GrandTotalExTax" : 								$formatValue(basketSummary.basketTotal,"NUMERIC","ZERO") - $formatValue(basketSummary.VATTotal,"NUMERIC","ZERO"),
+        "GrandTotalTax" : 									$formatValue(basketSummary.VATTotal,"NUMERIC","ZERO"),
+        "GrandTotalBeforeAdjustmentsIncTax" : 				$formatValue(basketSummary.saleTotal,"NUMERIC","ZERO"),
+        "AdjustmentsTotalIncTax" : 							-1.00 * $formatValue(basketSummary.discountTotal,"NUMERIC","ZERO"),
+        "DiscountsTotalIncTax" : 							-1.00 * $sum($formatValue(basket.transactionDiscount.discountAmount,"NUMERIC","ZERO")),
+        "PromotionsTotalIncTax" : 							-1.00 * $sum($formatValue(basket.transactionPromotion.promotionAmount,"NUMERIC","ZERO")),
+        "PaymentTotalIncTax" : 								$sum($formatValue(paymentDetails.amount,"NUMERIC","ZERO")),
+        "TaxTotalReconBySummaryLines" : 					$sum($formatValue(basket.taxBreakdown.taxLines.taxLineTotal,"NUMERIC","ZERO")),
+        "TaxTotalReconByDetailedLines" : 					$sum($formatValue(basket.totalTaxSummary.TaxSum,"NUMERIC","ZERO")),
+        "TaxableAmountExTax" : 								$formatValue(basket.taxBreakdown.totalTaxableAmount,"NUMERIC","ZERO"),
+        "OrderDiscountIds" : 								$formatValue(basket.transactionDiscount.(reasonCode),"ARRAY",null),
+        "OrderDiscountIdsFlat" : 							$join(basket.transactionDiscount.(reasonCode),","),
+        "OrderPromotionIds" : 								$formatValue(basket.transactionPromotion.(promotionId),"ARRAY",null),
+        "OrderPromotionIdsFlat" : 							$join(basket.transactionPromotion.(promotionId),","),
+        "ProductIds" : 										$formatValue(basket.products.(SKU),"ARRAY",null),
+        "ProductIdsFlat" : 									$join(basket.products.(SKU),","),
+		"PaymentTypeIds" : 									$formatValue(paymentDetails.(paymentType),"ARRAY",null),
+        "PaymentTypeIdsFlat" : 								$join(paymentDetails.(paymentType),","),
+        "CurrQtySold" : 									$formatValue(currentTransactionDetails.basketSummary.totalItems,"NUMERIC","ZERO"),
+        "CurrQtyNet" : 										$formatValue(currentTransactionDetails.basketSummary.inStore.totalItems,"NUMERIC","ZERO") + $formatValue(currentTransactionDetails.basketSummary.webOrder.totalItems,"NUMERIC","ZERO") + $formatValue(currentTransactionDetails.basketSummary.cnc.totalItems,"NUMERIC","ZERO"),
+        "CurrGrandTotalIncTax" : 							$formatValue(currentTransactionDetails.basketSummary.basketTotal,"NUMERIC","ZERO"),
+        "CurrGrandTotalExTax" : 							$formatValue(currentTransactionDetails.basketSummary.basketTotal,"NUMERIC","ZERO") - $formatValue(currentTransactionDetails.basketSummary.VATTotal,"NUMERIC","ZERO"),
+        "CurrGrandTotalTax" : 								$formatValue(currentTransactionDetails.basketSummary.VATTotal,"NUMERIC","ZERO"),
+        "CurrGrandTotalBeforeAdjustmentsIncTax" : 			$formatValue(currentTransactionDetails.basketSummary.saleTotal,"NUMERIC","ZERO"),
+        "CurrAdjustmentsTotalIncTax" : 						-1.00 * $formatValue(currentTransactionDetails.basketSummary.discountTotal,"NUMERIC","ZERO"),
+        "CurrDiscountsTotalIncTax" : 						-1.00 * $sum($formatValue(currentTransactionDetails.transactionDiscount.discountAmount,"NUMERIC","ZERO")),
+        "CurrPromotionsTotalIncTax" :    					-1.00 * $sum($formatValue(currentTransactionDetails.transactionPromotion.promotionAmount,"NUMERIC","ZERO")),
+        "CurrTaxTotalReconBySummaryLines" : 				$sum($formatValue(currentTransactionDetails.taxBreakdown.taxLines.taxLineTotal,"NUMERIC","ZERO")),
+        "CurrTaxTotalReconByDetailedLines" : 				$sum($formatValue(currentTransactionDetails.totalTaxSummary.TaxSum,"NUMERIC","ZERO")),
+        "CurrTaxableAmountExTax" : 							$formatValue(currentTransactionDetails.taxBreakdown.totalTaxableAmount,"NUMERIC","ZERO"),
+        "CurrOrderDiscountIds" : 							$formatValue(currentTransactionDetails.transactionDiscount.(reasonCode),"ARRAY",null),
+        "CurrOrderDiscountIdsFlat" : 						$join(currentTransactionDetails.transactionDiscount.(reasonCode),","),
+        "CurrOrderPromotionIds" : 							$formatValue(currentTransactionDetails.transactionPromotion.(promotionId),"ARRAY",null),
+        "CurrOrderPromotionIdsFlat" : 						$join(currentTransactionDetails.transactionPromotion.(promotionId),","),
+		"CurrProductIds" : 									$formatValue(currentTransactionDetails.products.(SKU),"ARRAY",null),
+        "CurrProductIdsFlat" : 								$join(currentTransactionDetails.products.(SKU),",")
+
+     };
+
+    $unifiedBasket := $oneToManyJoin([$unifiedBasket],$lineMeasures,"itemLineId","ItemLineId","LineMeasures");
+    $unifiedBasket := $merge([$unifiedBasket,{"OrderMeasuresTopLevel" :$orderMeasuresTopLevel}]);
+
+    $unifiedBasket;
+
+
+
+
+)

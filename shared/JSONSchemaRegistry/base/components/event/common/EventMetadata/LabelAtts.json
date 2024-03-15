@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xfuze.io/xdm/schema/components/event/common/EventHeader/EventMetadata/LabelAtts",
+  "description": "XDM Schema for the common event component 'EventHeader/EventMetadata/LabelAtts'",
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "LabelAtts": {
+      "type": "object",
+      "description": "The Xfuze derived / enriched customer extension atts as a generic placeholder for new values not in the core schema of the XDM event",
+      "unevaluatedProperties": false,
+      "properties": {
+        "Atts": {
+          "type": "array",
+          "items": {
+            "$ref": "../../../entity/common/CustomAtt.json#/CustomAttProperties"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "LabelAtts"
+  ]
+}

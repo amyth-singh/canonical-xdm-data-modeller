@@ -1,0 +1,43 @@
+{
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "SupplyChain": {
+      "type": "object",
+      "properties": {
+        "CountryOfOrigin": {
+          "$ref": "../../common/Country.json#/CountryProperties"
+        }
+      }
+    },
+    "Environmental": {
+      "type": "object",
+      "properties": {
+        "EcoFriendly": {
+          "$ref": "../../common/CustomAtt.json#/CustomAttProperties"
+        }
+      }
+    },
+    "SafetyAndStandards": {
+      "type": "object",
+      "properties": {
+        "ShelfLife": {
+          "$ref": "../../common/Measure.json#/MeasureProperties"
+        },
+        "AgeRestriction": {
+          "$ref": "../../common/CustomAtt.json#/CustomAttProperties"
+        },
+        "DangerousGoods": {
+          "$ref": "../../common/CustomAtt.json#/CustomAttProperties"
+        },
+        "Care": {
+          "type": "object",
+          "properties": {}
+        },
+        "Labels": {
+          "$ref": "../../common/Label.json#/LabelObject"
+        }
+      }
+    }
+  }
+}

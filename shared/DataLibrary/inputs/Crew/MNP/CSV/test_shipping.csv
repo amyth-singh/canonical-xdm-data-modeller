@@ -1,0 +1,157 @@
+101         ,101 Battersea                                               
+102         ,102 Hoopers-Torquay                                         
+103         ,103 Salcombe                                                
+104         ,104 Cowes                                                   
+105         ,105 Aldeburgh                                               
+106         ,106 Chester                                                 
+107         ,107 Rock                                                    
+108         ,108 Bristol                                                 
+109         ,109 Cheltenham                                              
+110         ,110 Guildford                                               
+111         ,111 Padstow                                                 
+113         ,113 Portsmouth                                              
+114         ,114 Lymington                                               
+115         ,115 Chichester                                              
+116         ,116 Abersoch                                                
+117         ,117 Marlow                                                  
+118         ,118 Sevenoaks                                               
+121         ,121 Bath                                                    
+124         ,124 Wimbledon                                               
+125         ,125 Haslemere                                               
+127         ,127 Winchester                                              
+129         ,129 Cobham                                                  
+130         ,130 Falmouth                                                
+131         ,131 Dartmouth                                               
+132         ,132 Tunbridge                                               
+133         ,133 York                                                    
+134         ,134 Tenterden                                               
+135         ,135 Swindon                                                 
+136         ,136 Salisbury                                               
+137         ,137 Exeter                                                  
+138         ,138 TynwaldMills                                            
+139         ,139 Marlborough                                             
+140         ,140 Walton                                                  
+141         ,141 Edinburgh                                               
+142         ,142 Oxford                                                  
+143         ,143 Henley                                                  
+145         ,145 Cambridge                                               
+146         ,146 Harrogate                                               
+147         ,147 Windsor                                                 
+148         ,148 Southampton                                             
+149         ,149 Reigate                                                 
+151         ,151 Street                                                  
+153         ,153 ilkley                                                  
+154         ,154 Ringwood                                                
+155         ,155 Bristol                                                 
+156         ,156 Bury St Edmunds                                         
+157         ,157 Kingston                                                
+159         ,159 Reading                                                 
+160         ,160 Cardiff                                                 
+161         ,161 Morpeth                                                 
+162         ,162 Cirencester                                             
+163         ,163 Beaconsfield                                            
+164         ,164 Stamford                                                
+165         ,165 Wilmslow                                                
+166         ,166 Wimborne Minster                                        
+167         ,167 Taunton                                                 
+168         ,168 St Albans                                               
+169         ,169 Witney                                                  
+170         ,170 Farnham                                                 
+171         ,171 Northallerton                                           
+172         ,172 Southwold                                               
+173         ,173 Norwich                                                 
+174         ,174 Canterbury                                              
+175         ,175 Beverley                                                
+176         ,176 Lewes                                                   
+177         ,177 St Ives                                                 
+178         ,178 Newbury                                                 
+179         ,179 Richmond                                                
+180         ,180 Saffron Walden                                          
+181         ,181 St Davids                                               
+182         ,182 Cheshire Oaks                                           
+183         ,183 Ashford                                                 
+184         ,184 Bishops Stortford                                       
+185         ,185 Dorchester                                              
+186         ,186 Horsham                                                 
+187         ,187 Horsham 2                                               
+188         ,188 Totnes                                                  
+189         ,189 Swindon                                                 
+190         ,190 Petersfield                                             
+2OFF        ,DPD 2Day Offshore                                           
+3           ,Branch 3                                                    
+CCDPDND     ,DPD Next Day                                                
+CCHEMEXP    ,Hermes Expedited                                            
+CCHERM24NS  ,Hermes Expedited                                            
+CCHERM48NS  ,Hermes Standard                                             
+CCHERMPS    ,Hermes Parcelshop                                           
+CCHERMSTD   ,Hermes 2 Day                                                
+CCJLP       ,John Lewis Partnership                                      
+CCNEXTPP    ,Next PP                                                     
+CCVRY       ,Very Marketplace                                            
+CL10        ,City Linked 10.30                                           
+CL12        ,City Link 12.30                                             
+CLCC        ,Click and Collect Charged Orders                            
+CLCCND      ,Click and Collect NEXT DAY                                  
+CLCCT       ,Thread Shipping                                             
+CLIC        ,Click & Collect                                             
+CLND        ,Click and Collect Next Day                                  
+CLS         ,City Link Standard                                          
+CLSA        ,City Link Saturday                                          
+DEDHL       ,DHL Germany                                                 
+DEINT       ,DE DHL International                                        
+DHL         ,DHL                                                         
+DHLINT      ,DHL International                                           
+DX24        ,DX Next Day                                                 
+DXMON       ,DX Secure Exp Mon                                           
+DXNI        ,DXNI                                                        
+DXNI48      ,DXNI48                                                      
+DXNIPre1    ,DXNIPre1                                                    
+DXPRE1      ,DX Next Day Pre 1PM                                         
+DXRural48   ,DXRural48                                                   
+DXRural72   ,DXRural72                                                   
+DXSAT       ,DX Saturday                                                 
+EXGIFT      ,Express Gift                                                
+FRL         ,FRL - FREE RETURNS LABEL                                    
+GC          ,GIFT CARD                                                   
+GEXP        ,Global-e Express                                            
+GIN         ,Salcombe Gin                                                
+GSTD        ,Global-e Standard                                           
+HC          ,DPD HomeCall                                                
+HDN24       ,HDN 24HR POD                                                
+HDNNON      ,48HR NON POD                                                
+HDNPOD      ,48HR POD                                                    
+HEMEXP      ,Hermes Expedited                                            
+HEMSTD      ,Hermes Standard                                             
+HQ          ,HQ Shipping                                                 
+INT         ,International                                               
+INTERRET    ,Tracker Return                                              
+INTERSOFT   ,Intersoft Test                                              
+OSGIFT      ,Overseas Gift Card                                          
+P2P         ,P2P Standard                                                
+P2PSTD      ,P2P Standard                                                
+RM2         ,Next Day 2nd Class                                          
+RMGIFT      ,Gift Vouchers                                               
+RMINT       ,International                                               
+RMSD1A      ,RM SD 1pm £500 Comp                                         
+RMSG1A      ,RM SD SG 1pm £500 Comp                                      
+RMT         ,Royal Mail Tracked                                          
+RMT24       ,Royal Mail Tracked 24                                       
+SIG-ND      ,Signatue Next Day DX                                        
+SIG-SAT     ,Signature Saturday DX                                       
+STAFF       ,Staff Sales                                                 
+STD         ,UK Standard                                                 
+STORE24     ,Royal Mail Store 24                                         
+STORE48     ,Royal Mail Store 48                                         
+TEST        ,TEST ORDERS                                                 
+TPN01N      ,Royal Mail 24 Non Signature                                 
+TPN01S      ,Royal Mail 24 Signature                                     
+TPS01N      ,RM Tracked 48 Non Signature                                 
+TPS01P      ,RM Tracked 48 SafePlace                                     
+TPS01S      ,RM Tracked 48 Signature                                     
+UKM12       ,DX NextDay Pre 1                                            
+UKMEXPM     ,DX Express Monday                                           
+UKMND       ,DX Next Day                                                 
+UKMSA       ,DX Saturday Delivery                                        
+UKSD        ,UK Same Day                                                 
+
+(155 rows affected)

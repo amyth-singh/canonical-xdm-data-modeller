@@ -1,0 +1,56 @@
+{
+  "OrderIdsObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/OrderIdsProperties"
+    }
+  },
+  "OrderIdsProperties": {
+    "type": "object",
+    "description": "A generic object for capturing all sales order ids as a common set",
+    "unevaluatedProperties": false,
+    "properties": {
+      "OrderId": {
+        "type": "string",
+        "description": "The (required) OrderId Id, in Xfuze canonical form, identifying this sales order, in the form of Order::[type]_[sourceSystem]_[OrderKey] e.g Order::Return_PMC_RET123456789"
+      },
+      "OrderKey": {
+        "type": "string",
+        "description": "The (required) 'natural' sales order key/number, typically as the system of entry defines (online or retail), and also used to construct the synthetic SO Xfuze Ids. e.g RET123456789"
+      },
+      "OriginalOrderId": {
+        "type": "string",
+        "description": "The OrderId Id, in Xfuze canonical form, identifying an 'original' sales order, in the form of Order::[type]_[sourceSystem]_[OriginalOrderKey] e.g Order::Sale_PMC_987654321"
+      },
+      "OriginalOrderKey": {
+        "type": "string",
+        "description": "The original 'natural' sales order key/number, typically as a way to link related orders together the can be physically separate and need a linking (Return,Exchange etc) e.g 987654321"
+      },
+      "ParentOrderId": {
+        "type": "string",
+        "description": "The OrderId Id, in Xfuze canonical form, identifying an 'original' sales order, in the form of Order::[type]_[sourceSystem]_[OriginalOrderKey] e.g Order::Sale_PMC_987654321"
+      },
+      "ParentOrderKey": {
+        "type": "string",
+        "description": "The parent 'natural' sales order key/number, typically as a way to link to parent orders in an order hierarchy, where one child order has a single parent e.g HireOrder parent order sits above individual hire orders for formal wear hire. NOTE: OrderId should contain a parent part if this is the case in its ID construction "
+      },
+      "OrderReferenceNumber": {
+        "type": "string",
+        "description": "The customer facing reference number/code, as a customer would see externally, as opposed to an internal key e.g ORD-RET-2044534"
+      },
+      "OriginalOrderReferenceNumber": {
+        "type": "string",
+        "description": "The original 'natural' customer facing reference number/code, typically as a way to link related order together (Return,Exchange) e.g ORD-2044534"
+      },
+      "ReceiptNumber": {
+        "type": "string",
+        "description": "The customer facing receipt number/code, as a customer would see externally, as opposed to an internal key e.g ORD-RET-2044534"
+      },
+      "OriginalReceiptNumber": {
+        "type": "string",
+        "description": "The original 'natural' customer facing receipt number/code, typically as a way to link related order together (Return,Exchange) e.g ORD-2044534"
+      }
+    },
+    "required": ["OrderId","OrderNumber"]
+  }
+}

@@ -1,0 +1,290 @@
+{
+  "id": "7588ede7-36ac-45a0-90d4-e2f41da7510f",
+  "type": "SALE",
+  "transactionId": "A0001191",
+  "transactionRef": "H6jdoJ1892023-04-14T08:20:15.746Z2f9e",
+  "dateTime": "2023-04-14T08:20:15.748Z",
+  "createdAt": "2023-04-14T08:20:15.755Z",
+  "updatedAt": "2023-04-14T08:21:24.670Z",
+  "updated_date": "2023-04-14T08:21:28.793Z",
+  "transCompletedAt": "2023-04-14T08:21:24.670Z",
+  "baseCurrency": "GBP",
+  "subsidiaryId": "1",
+  "initiatingModule": "eBasket",
+  "basket": {
+    "products": [
+      {
+        "SKU": "1201764",
+        "barcodes": [
+          "5.05441E+12"
+        ],
+        "description": "OXFORD SHIRT DRESS | OWNJ001 | 18 | NAVY",
+        "imageUrls": [
+          "https://www.crewclothing.co.uk/images/products/large/OWNJ001_NAVY.jpg\r"
+        ],
+        "price": 55,
+        "attributes": [],
+        "itemLineId": "1",
+        "quantity": 1,
+        "deliveryMethod": "3",
+        "excludePromotion": false,
+        "leadTime": {
+          "type": "Days",
+          "value": "0"
+        },
+        "deliveryGroup": "1",
+        "totalLinePrice": 55,
+        "fullfilmentId": "189",
+        "itemDiscounts": {
+          "refundPortion": 0,
+          "trnDiscountsPortion": 11,
+          "trnPromotionsPortion": 0
+        },
+        "originFullfillmentId": "N/A"
+      },
+      {
+        "SKU": "1201761",
+        "barcodes": [
+          "5.05441E+12"
+        ],
+        "description": "OXFORD SHIRT DRESS | OWNJ001 | 12 | NAVY",
+        "imageUrls": [
+          "https://www.crewclothing.co.uk/images/products/large/OWNJ001_NAVY.jpg\r"
+        ],
+        "price": 30,
+        "attributes": [],
+        "itemLineId": "2",
+        "quantity": 1,
+        "deliveryMethod": "3",
+        "excludePromotion": false,
+        "leadTime": {
+          "type": "Days",
+          "value": "0"
+        },
+        "deliveryGroup": "1",
+        "totalLinePrice": 30,
+        "fullfilmentId": "189",
+        "itemDiscounts": {
+          "refundPortion": 0,
+          "trnDiscountsPortion": 6,
+          "trnPromotionsPortion": 0
+        },
+        "originFullfillmentId": "N/A"
+      },
+      {
+        "SKU": "1207940",
+        "barcodes": [
+          "5.05441E+12"
+        ],
+        "description": "COOMBE DRESS | WNJ009 | 12 | GREEN",
+        "imageUrls": [
+          "https://www.crewclothing.co.uk/images/products/large/WNJ009_GREEN.jpg\r"
+        ],
+        "price": 55,
+        "attributes": [],
+        "itemLineId": "3",
+        "quantity": 1,
+        "deliveryMethod": "3",
+        "excludePromotion": false,
+        "leadTime": {
+          "type": "Days",
+          "value": "0"
+        },
+        "deliveryGroup": "1",
+        "totalLinePrice": 55,
+        "fullfilmentId": "189",
+        "itemDiscounts": {
+          "refundPortion": 0,
+          "trnDiscountsPortion": 11,
+          "trnPromotionsPortion": 0
+        },
+        "originFullfillmentId": "N/A"
+      }
+    ],
+    "lineDiscount": [],
+    "taxBreakdown": {
+      "taxLines": [
+        {
+          "VAT": 20,
+          "VATCode": "H",
+          "taxableAmount": 44,
+          "PreTax": 36.66,
+          "itemLineId": 1,
+          "taxLineTotal": 7.34
+        },
+        {
+          "VAT": 20,
+          "VATCode": "H",
+          "taxableAmount": 24,
+          "PreTax": 20,
+          "itemLineId": 2,
+          "taxLineTotal": 4
+        },
+        {
+          "VAT": 20,
+          "VATCode": "H",
+          "taxableAmount": 44,
+          "PreTax": 36.66,
+          "itemLineId": 3,
+          "taxLineTotal": 7.34
+        }
+      ],
+      "totalTaxableAmount": 112
+    },
+    "totalTaxSummary": [
+      {
+        "VAT": 20,
+        "VATCode": "H",
+        "PreTaxSum": 93.3,
+        "TaxSum": 18.68,
+        "TXrateSum": 111.95999999999998
+      }
+    ],
+    "linePromotion": [],
+    "transactionDiscount": [
+      {
+        "discountType": "Pe rcent",
+        "reasonCode": "Test20",
+        "override": {
+          "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+          "automaticApprove": "true",
+          "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+        },
+        "discountAmount": 28,
+        "itemLineIds": [
+          1,
+          2,
+          3
+        ],
+        "cncDiscountAmount": 0,
+        "inStoreDiscountAmount": 28,
+        "reasonDisplayText": "test",
+        "webOrderDiscountAmount": 0
+      }
+    ],
+    "transactionPromotion": []
+  },
+  "operationStatus": "PAY_SUCCESS",
+  "terminalId": "18968",
+  "deviceId": "3d56c68cd0dbdbbc",
+  "storeNodeId": "f37f4592-da7e-4e59-bddc-6f6f2e17d3eb",
+  "orgCode": "H6jdoJ",
+  "export": "true",
+  "externalDeviceId": "",
+  "saleTotal": null,
+  "storeId": "189",
+  "userName": "taylorm",
+  "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+  "basketSummary": {
+    "webOrder": {
+      "saleTotal": 0,
+      "totalItems": 0,
+      "discountTotal": 0,
+      "refundTotal": 0,
+      "basketTotal": 0,
+      "VATTotal": 0
+    },
+    "inStore": {
+      "saleTotal": 140,
+      "totalItems": 3,
+      "discountTotal": 28,
+      "refundTotal": 0,
+      "basketTotal": 112,
+      "VATTotal": 18.68
+    },
+    "saleTotal": 140,
+    "totalItems": 3,
+    "discountTotal": 28,
+    "refundTotal": 0,
+    "basketTotal": 112,
+    "VATTotal": 18.68,
+    "cnc": {
+      "saleTotal": 0,
+      "totalItems": 0,
+      "discountTotal": 0,
+      "refundTotal": 0,
+      "basketTotal": 0,
+      "VATTotal": 0
+    }
+  },
+  "splitPayment": false,
+  "paymentDetails": [
+    {
+      "result": "AUTHORISED",
+      "amount": "112.00",
+      "hostReferenceId": "NA",
+      "cardType": "NA",
+      "transactionDate": "2023-04-14T08:20:15.748Z",
+      "paymentType": "PDQ",
+      "authcode": "NA",
+      "transactionType": "SALE",
+      "cncAmount": "0",
+      "inStoreAmount": "112",
+      "totalamount": "112.00",
+      "webOrderAmount": "0",
+      "currency": "GBP",
+      "shippingAmount": "0",
+      "pan": "NA",
+      "entryMethod": "NA",
+      "aid": "NA",
+      "transactionReference": "H6jdoJ1892023-04-14T08:20:15.746Z2f9e"
+    }
+  ],
+  "currentTransactionDetails": {},
+  "externalTerminalId": "",
+  "isPaymentCompleted": true,
+  "offlineTransactionId": "",
+  "storeNodeStructure": [
+    {
+      "name": "PMC Abingdon",
+      "parentId": "NODE::0682036f-579b-42df-83a2-e5242ef4faf3",
+      "isOverride": true,
+      "nodeId": "NODE::f37f4592-da7e-4e59-bddc-6f6f2e17d3eb",
+      "nodeType": "STORE",
+      "status": true
+    },
+    {
+      "name": "Stores",
+      "parentId": "NODE::4d385484-9a44-4809-b83f-2ea142078599",
+      "isOverride": false,
+      "nodeId": "NODE::0682036f-579b-42df-83a2-e5242ef4faf3",
+      "nodeType": "STORE_GROUP",
+      "status": true
+    },
+    {
+      "name": "UK",
+      "parentId": "NODE::92a82e7c-e106-4c2c-af6a-7965ad711206",
+      "isOverride": true,
+      "nodeId": "NODE::4d385484-9a44-4809-b83f-2ea142078599",
+      "nodeType": "TRADING_REGION",
+      "status": true
+    },
+    {
+      "name": "Crew Clothing",
+      "parentId": "NODE::05b41253-65e1-4d7e-ae9c-da1a34841f3c",
+      "isOverride": true,
+      "nodeId": "NODE::92a82e7c-e106-4c2c-af6a-7965ad711206",
+      "nodeType": "COMPANY",
+      "status": true
+    },
+    {
+      "name": "Crew Clothing",
+      "parentId": "",
+      "isOverride": false,
+      "nodeId": "NODE::05b41253-65e1-4d7e-ae9c-da1a34841f3c",
+      "nodeType": "ORGANIZATION",
+      "status": true,
+      "checked": true
+    }
+  ],
+  "transactionStructure": [
+    {
+      "id": "7588ede7-36ac-45a0-90d4-e2f41da7510f",
+      "parentId": "NA",
+      "type": "SALE",
+      "storeId": "189",
+      "transactionId": "A0001191",
+      "isGiftRefund": false
+    }
+  ]
+}

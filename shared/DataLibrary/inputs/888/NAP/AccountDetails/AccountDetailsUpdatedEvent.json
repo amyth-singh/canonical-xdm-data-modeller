@@ -1,0 +1,24 @@
+{
+  "MessageID": "8bda8806-a8e2-4696-8326-6e94323faff3",
+  "Cid": 714188958,
+  "AdditionalData": {
+    "RegistrationCountryOfIPIsoCodeId": "156",
+    "CountryIsoCodeId": "642",
+    "RegulationTypeId": "9",
+    "BrandId": "76",
+    "BrandName": "888.ro",
+    "Remark": null,
+    "RequestedBy": "Requested by operator"
+  },
+  "ChangedDetails": {
+    "RegulationStatusId": "0",
+    "RegulationStatusReasonId": "5",
+    "RegulationStatusDate": "3/26/2023 6:53:03 PM"
+  },
+  "OldDetails": {
+    "RegulationStatusId": "1",
+    "RegulationStatusReasonId": "9",
+    "RegulationStatusDate": ""
+  },
+  "EventTime": "2023-03-26T18:53:03.3305468Z"
+}

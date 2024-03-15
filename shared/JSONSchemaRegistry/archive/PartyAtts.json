@@ -1,0 +1,16 @@
+{
+  "$id": "PartyAtts",
+  "description": "XDM EventMetadata 'Party' definition",
+  "type": "object",
+  "properties": {
+    "PartyId": {"type": "string"},
+    "PartyType": {"type": "string"},
+    "RawPartyId": {"type": "string"},
+    "PartyRoleId": {"type": "string"},
+    "PartyRoleType": {"type": "string"},
+    "RawPartyRoleId": {"type": "string"},            
+    "InvolvedReasonCode": {"type": "string"},            
+    "ClientDeviceDetails": {"type": "string"},            
+    "CustomAtts": [{"$ref": "../../CustomAttribute.json"}]
+  }
+}

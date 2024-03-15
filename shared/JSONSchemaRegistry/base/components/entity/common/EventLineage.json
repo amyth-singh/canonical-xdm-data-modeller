@@ -1,0 +1,35 @@
+{
+  "EventLineageObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/EventLineageProperties"
+    }
+  },
+  "EventLineageProperties": {
+    "type": "object",
+    "description": "An event 'lineage' object to capture core source lineage for any data part under SV management",
+    "unevaluatedProperties": false,
+    "properties": {
+      "EntityId": {
+        "type": "string",
+        "description": "The Xfuze EntityId that was the target of the change required from the event that resulted in this data / part"
+      },
+      "EventId": {
+        "type": "string",
+        "description": "The Xfuze EventId that was the source of change that resulted in this data / part"
+      },
+      "AsOf": {
+        "type": "string",
+        "format": "date-time",
+        "description": "The timestamp (event occurred timestamp typically) at which the data was valid 'as of', if known and applicable.  As of does not mean changed at, rather, the  time we know this data was true and valid, its possible it didnt change between adjacent events for example."
+      },
+      "SourceSystem": {
+        "type": "string",
+        "description": "The source system of the most recent impacting change that the above event (details) are related to"
+      }
+    },
+    "required": [
+      "EntityId,EventId,AsOf"
+    ]
+  }
+}

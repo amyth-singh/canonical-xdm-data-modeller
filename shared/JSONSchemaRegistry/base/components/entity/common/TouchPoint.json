@@ -1,0 +1,77 @@
+{
+  "TouchPointObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/TouchPointProperties"
+    }
+  },
+  "TouchPointProperties": {
+    "type": "object",
+    "required": [
+      "TouchPointCode"
+    ],
+    "unevaluatedProperties": false,
+    "properties": {
+      "TouchPointId": {
+        "type": "string",
+        "description": "The canonical (synthetic) Xfuze touch point id, if the touch point is identifiable, format TouchPoint_[sourceSystem]_[TouchPointNumber] e.g TouchPoint_D365_012"
+      },
+      "TouchPointKey": {
+        "type": "string",
+        "description": "The native touch point number from source, if the touch point is identifiable e.g 012"
+      },
+      "TouchPointClass": {
+        "type": "string",
+        "description": "The class of the touch-point device used for the transaction e.g ConsumerDigital",
+        "enum": [
+          "ConsumerDigital",
+          "RetailerDigital",
+          "RetailerPhysical",
+          "Other"
+        ]
+      },
+      "TouchPointDeviceType": {
+        "type": "string",
+        "description": "The class of the touch-point device used for the transaction e.g Tablet",
+        "enum": [
+          "Tablet",
+          "Mobile",
+          "Kiosk",
+          "POS",
+          "mPOS",
+          "VendingMachine",
+          "Wearable",
+          "QRCodeReader",
+          "TV",
+          "Scanner",
+          "PaymentDevice",
+          "Other"
+        ]
+      },
+      "TouchPointSystem": {
+        "type": "string",
+        "description": "The touch-point system the transaction originated from, if it has a name e.g eBasket, EndlessAisle"
+      },
+      "TerminalId": {
+        "type": "string",
+        "description": "The terminal Id if identifiable"
+      },
+      "ExternalTerminalId": {
+        "type": "string",
+        "description": "The external terminal id ifidentifiable"
+      },
+      "Device": {
+        "$ref": "./Device.json#/DeviceProperties",
+        "description": "The devive details of the device used in the context of this touch point"
+      },
+      "IPAddress": {
+        "type": "string",
+        "description": "The IP address of the touch-point device"
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

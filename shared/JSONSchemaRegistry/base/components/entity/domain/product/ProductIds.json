@@ -1,0 +1,79 @@
+{
+  "ProductIdsObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/ProductIdsProperties"
+    }
+  },
+  "ProductIdsProperties": {
+    "type": "object",
+    "description": "A collection of product ids as a common set",
+    "unevaluatedProperties": false,
+    "properties": {
+      "EntityId": {
+        "type": "string",
+        "description": "The (base) product Id, in Xfuze canonical form, identifying the (base not variant) product e.g Product_Retail247_123456"
+      },
+      "EntityType": {
+        "type": "string",
+        "description": "The type of the product the EntityId references e.g ProductVariant"
+      },
+      "ProductId": {
+        "type": "string",
+        "description": "The (base) product Id, in Xfuze canonical form, identifying the (base not variant) product e.g Product_Retail247_123456"
+      },
+      "ProductKey": {
+        "type": "string",
+        "description": "The (base) product number (native form like SKU), identifying the (base not variant) product e.g 123456"
+      },
+      "ProductVariantId": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The (variant) product Id, in Xfuze canonical form, identifying the (base not variant) product Often the base [ProductId]_[VariantPart] where variant part can be for example a native key, a size code etc e.g ProductVariant_Retail247_123456789_32R"
+      },
+      "ProductVariantKey": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The (variant) product number (native form like SKU), identifying the (base not variant) product e.g 123456789_32R"
+      },
+      "ProductVariantKeyType": {
+        "type": "string",
+        "description": "The (variant) product number (native form like SKU), identifying the (base not variant) product  e.g 123456789",
+        "enum": [
+          "SKU",
+          "EAN",
+          "UPC",
+          "OptionId"
+        ]
+      },
+      "SKU": {
+        "type": "string",
+        "description": "The SKU of the product e.g 123456789"
+      },
+      "EAN": {
+        "type": "string",
+        "description": "The EAN (a type of barcode, but here in explicit form) of the product e e.g 5059595842972"
+      },
+      "UPC": {
+        "type": "string",
+        "description": "The UPC (a type of barcode, but here in explicit form) of the product e.g 85059595842972"
+      },
+      "Barcode": {
+        "$ref": "../../common/Barcode.json#/BarcodeProperties",
+        "description": "The barcode of the product e.g 869893435059595842972"
+      },
+      "Barcodes": {
+        "type": "array",
+        "description": "A collection (array) of barcodes where 1 or more in array form",
+        "items": {
+          "$ref": "../../common/Barcode.json#/BarcodeProperties"
+        }
+      },
+      "ItemOptionNumber": {
+        "type": "string",
+        "description": "The item option number of the product e.g 1111111"
+      }
+    },
+    "required": ["ProductVariantKey","ProductVariantId"]
+  }
+}

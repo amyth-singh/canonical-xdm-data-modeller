@@ -1,0 +1,102 @@
+{
+  "ContactProfileObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/ContactProfileProperties"
+    }
+  },
+  "ContactProfileProperties": {
+    "type": "object",
+    "oneOf": [
+      {
+        "required": [
+          "Name"
+        ]
+      },
+      {
+        "required": [
+          "Address"
+        ]
+      },
+      {
+        "required": [
+          "Email"
+        ]
+      },
+      {
+        "required": [
+          "Phone"
+        ]
+      }
+    ],
+    "unevaluatedProperties": false,
+    "properties": {
+      "ProfileId": {
+        "type": "string",
+        "description": "The canonical (synthetic) Xfuze contact profile id if identifiable e.g ContactProfile_D365_987654"
+      },
+      "ProfileNumber": {
+        "type": "string",
+        "description": "The native contact profile number of the contact profile master if identifiable e.g 987654"
+      },
+      "ProfileType": {
+        "type": "string",
+        "description": "The type of the contact profile"
+      },
+      "ProfilePurpose": {
+        "type": "string",
+        "description": "The purpose of the usage of the contact profile",
+        "enum": [
+          "Billing",
+          "Invoice",
+          "Delivery",
+          "Contact",
+          "Customer",
+          "Shipping",
+          "ReturnExchange",
+          "Store",
+          "Warehouse",
+          "Marketing",
+          "LegitimateInterest",
+          "Supplier",
+          "Franchisee",
+          "Employee",
+          "PhysicalEvent",
+          "DropOff",
+          "Collection",
+          "LogisticsPoint",
+          "Other"
+        ]
+      },
+      "ProfileDesc": {
+        "type": "string",
+        "description": "The description of the contact profile"
+      },
+      "ProfileName": {
+        "$ref": "./Name.json#/NameProperties",
+        "description": "The name on the contact profile"
+      },
+      "PrimaryAddress": {
+        "$ref": "./Address.json#/AddressProperties",
+        "description": "The address of the contact profile"
+      },
+      "PrimaryEmail": {
+        "$ref": "./Email.json#/EmailProperties",
+        "description": "The email of the contact profile"
+      },
+      "PrimaryPhone": {
+        "$ref": "./Phone.json#/PhoneProperties",
+        "description": "The phone of the contact profile"
+      },
+      "EventId": {
+        "type": "string",
+        "description": "The Xfuze EventId that was the source of this data"
+      },
+      "AsOf": {
+        "type": "string",
+        "format": "date-time",
+        "description": "The timestamp at which the contact profile instance usage was valid 'as of', if known and applicable"
+      }
+    }
+  }
+}

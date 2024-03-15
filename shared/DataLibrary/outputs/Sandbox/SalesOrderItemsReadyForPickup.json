@@ -1,0 +1,355 @@
+[
+  {
+    "EventId": "SalesOrderItemsReadyForPickup_SalesOrder_Hybris_8105970878_2023-01-04T11:13:47Z",
+    "EntityId": "SalesOrderDelivery_Hybris_8105970878",
+    "LineNumber": "1",
+    "NumLines": "1",
+    "ShipmentNumber": null,
+    "DeliveryNumber": null,
+    "OrderNumber": "8105970878",
+    "ReturnOrderNumber": null,
+    "NumReturnOrderNumber": "0",
+    "EntityType": "SalesOrder",
+    "ParentEntityId": "SalesOrder_Hybris_ORDER_8105970878",
+    "EventName": "SalesOrderItemsReadyForPickup",
+    "EventOccurredTimestampUTC": "2023-01-04T11:13:47+00:00",
+    "EventOccurredTimestampLocal": "2023-01-04T12:13:47.000+0100",
+    "EventOccurredTimestampLocalParty": "2023-01-04T12:13:47.000+0100",
+    "EventMetadata": {
+      "EventAtts": {
+        "Xfuze": {
+          "EventId": "SalesOrderItemsReadyForPickup_SalesOrder_Hybris_8105970878_2023-01-04T11:13:47Z",
+          "EventCategory": "Sales",
+          "EventName": "SalesOrderItemsReadyForPickup",
+          "EventValueStream": "Order2Cash",
+          "EventClass": "ProcessedEvent",
+          "EventChangePattern": "BusinessEvent",
+          "ClientCode": "GSR",
+          "Note": "(Any context note like test)",
+          "IsDerivedEvent": "N"
+        },
+        "Origin": {
+          "EventId": "OrderItemsReadyForPickup_ORDER_8105970878_2023-01-04T11:13:47Z",
+          "EventName": "OrderItemsReadyForPickup",
+          "SourceSystem": "Sterling",
+          "SourceSubSystem": "OrderWebhookAPI",
+          "SourceFormatType": "JSON",
+          "CorrelationId": null
+        }
+      },
+      "EntityAtts": {
+        "Xfuze": {
+          "EntityId": "SalesOrderDelivery_Hybris_8105970878",
+          "EntityType": "SalesOrder",
+          "EntitySubType": "Sale",
+          "EntityVariation": "Retail",
+          "EntityDomain": "Sell",
+          "ParentEntityId": null,
+          "ParentEntityType": null,
+          "EntityStatusCode": "SHIPMENT_IN_PROGRESS",
+          "EntityStatusDesc": "ShipmentInProgress",
+          "IsSensitive": "Y"
+        },
+        "Origin": {
+          "EntityId": "8105970878",
+          "ParentEntityId": null
+        }
+      },
+      "TimeAtts": {
+        "Xfuze": {
+          "TimeZones": {
+            "HomeTimeZone": {
+              "TimeZone": "Europe/Amsterdam",
+              "TimeZoneOffset": "TODO - Derive e.g UTC+02:00"
+            },
+            "EventTimeZone": {
+              "TimeZone": "UTC",
+              "TimeZoneOffset": "UTC+00:00"
+            },
+            "PartyTimeZone": {
+              "TimeZone": "DE",
+              "TimeZoneOffset": "TODO - Derive from order locale e.g JP"
+            }
+          },
+          "EventOccurredTimestamp": {
+            "UTC": "2023-01-04T11:13:47+00:00",
+            "Local": "2023-01-04T12:13:47.000+0100",
+            "Millis": "1672830827000"
+          },
+          "EventOccurredType": "TrueTime",
+          "EventSourceSentTimestamp": {
+            "UTC": null,
+            "Local": null,
+            "Millis": null
+          },
+          "EventExternalReceivedTimestamp": {
+            "UTC": null,
+            "Local": null,
+            "Millis": null
+          },
+          "EventReceivedTimestamp": {
+            "UTC": "2023-01-04T11:20:54.703692+00:00",
+            "Local": "2023-01-04T12:20:54.703+0100",
+            "Millis": "1672831254703"
+          },
+          "EventIngestProcessedTimestamp": {
+            "UTC": null,
+            "Local": null,
+            "Millis": null
+          },
+          "EventProcessedTimestamp": {
+            "UTC": "2023-01-04T11:20:55.659667+00:00",
+            "Local": "2023-01-04T12:20:55.659+0100",
+            "Millis": "1672831255659"
+          },
+          "EventPublishedTimestamp": {
+            "UTC": null,
+            "Local": null,
+            "Millis": null
+          },
+          "EventSeq": null
+        },
+        "Origin": {
+          "TimeZone": "UTC",
+          "EventOccurredTimestamp": "2023-01-04T11:13:47Z",
+          "EventSourceSentTimestamp": null
+        }
+      },
+      "PartyAtts": {
+        "Xfuze": {
+          "PartyId": "PARTY_3ed416b9-42ad-4fc1-9ffa-4633774e0210",
+          "PartyType": "Customer::Purchaser",
+          "CustomerId": "PartyRole_Customer_Hybris_6242c47a-011f-4845-a976-85bf618c6bf4",
+          "CustomerKey": "6242c47a-011f-4845-a976-85bf618c6bf4",
+          "CustomerType": "Guest",
+          "InvolvedReasonCode": "Purchaser"
+        },
+        "Origin": {
+          "CustomerId": null,
+          "CustomerKey": "6242c47a-011f-4845-a976-85bf618c6bf4"
+        }
+      },
+      "ProductAtts": {
+        "Xfuze": {
+          "ProductId": null,
+          "ProductKey": null,
+          "ProductIds": [
+            "PRODUCT_B2C_DE_de_DE_D20147-C900-B416-3232"
+          ],
+          "ProductKeys": [
+            "D20147-C900-B416-3232"
+          ],
+          "ProductNames": [
+            "Unisex Pleated Chino Relaxed"
+          ]
+        },
+        "Origin": {
+          "ProductId": null,
+          "ProductKey": null
+        }
+      },
+      "LocationAtts": {
+        "Xfuze": {
+          "ChannelCode": "B2C",
+          "ChannelName": "Consumer Full Price",
+          "LocationId": null,
+          "LocationNumber": null,
+          "LocationType": "Online",
+          "Latitude": "50.936120",
+          "Longitude": "6.949413"
+        },
+        "Origin": {
+          "ChannelCode": "GSSTER",
+          "LocationNumber": null
+        }
+      },
+      "MeasureMetricAtts": {
+        "Latest": {
+          "Value1": "0.0",
+          "Value1Code": "Totals.GrandTotal.BCY.IncTax",
+          "Value2": null,
+          "Value2Code": "Totals.FinalMargin.BCY.Percent",
+          "Value3": "0.0",
+          "Value3Code": "Totals.DiscountsTotal.BCY.IncTax",
+          "Value4": null,
+          "Value4Code": "Totals.RefundedTotal.BCY.IncTax",
+          "Value5": "0.0",
+          "Value5Code": "Totals.DeliveryCharge.BCY.IncTax",
+          "Value6": "1",
+          "Value6Code": "Qtys.QtyNet",
+          "Value7": "1",
+          "Value7Code": "Qtys.QtySold"
+        },
+        "Event": {
+          "Value1": null,
+          "Value1Code": "Totals.GrandTotal.BCY.IncTax",
+          "Value2": null,
+          "Value2Code": "Totals.FinalMargin.BCY.Percent",
+          "Value3": null,
+          "Value3Code": "Totals.DiscountsTotal.BCY.IncTax",
+          "Value4": null,
+          "Value4Code": "Totals.RefundedTotal.BCY.IncTax",
+          "Value5": null,
+          "Value5Code": "Totals.DeliveryCharge.BCY.IncTax",
+          "Value6": "1",
+          "Value6Code": "Qtys.QtyNet",
+          "Value7": "1",
+          "Value7Code": "Qtys.QtySold"
+        }
+      },
+      "ReferenceDataAtts": {
+        "Atts": [
+          {
+            "Code": null,
+            "Value": null,
+            "Type": null
+          }
+        ]
+      },
+      "PrivacyAtts": {
+        "Xfuze": {
+          "IsSensitiveEntity": "Y",
+          "IsEncrypted": "N",
+          "EncryptionKeyURI": null,
+          "EncryptionKeyHost": null,
+          "SensitiveFieldPaths": null
+        },
+        "Origin": {
+          "IsEncrypted": "N"
+        }
+      },
+      "DqTestAtts": {
+        "Atts": [
+          {
+            "TestId": null,
+            "TestName": null,
+            "TestType": null,
+            "TestVersion": null,
+            "ActualResultCode": null,
+            "ActualResultValue": null,
+            "ExpectedResultCode": null,
+            "ExpectedResultValue": null,
+            "Note": null,
+            "SeverityCode": null
+          }
+        ]
+      },
+      "IngestAtts": {
+        "Xfuze": {
+          "File": {
+            "SystemCode": null,
+            "URI": null,
+            "Path": null,
+            "Name": null,
+            "LineNumber": null,
+            "SizeKBs": null,
+            "FormatType": null,
+            "PatternType": null,
+            "ModificationTimestampUTC": null
+          },
+          "Stream": {
+            "SystemCode": "AWS:Kinesis",
+            "ChannelURI": "arn:aws:kinesis:us-east-1:111122223333:stream/SalesOrderPlacedInbound",
+            "ChannelName": "SalesOrderPlacedInbound",
+            "ChannelType": "DataStream",
+            "Partition": "340282366920938463463374607431768211455",
+            "Offset": "8493053",
+            "FormatType": "JSON",
+            "PatternType": null,
+            "ReceiveTimestampUTC": null
+          },
+          "Api": {
+            "SystemCode": null,
+            "ApiURI": null,
+            "ApiName": null,
+            "ApiResource": null,
+            "HttpMethod": null,
+            "QueryString": null,
+            "FormatType": null,
+            "PatternType": null,
+            "InvokeTimestampUTC": null
+          },
+          "Table": {
+            "SystemCode": null,
+            "DatabaseURI": null,
+            "DatabaseName": null,
+            "SchemaName": null,
+            "TableName": null,
+            "RowKey": null,
+            "Method": null,
+            "PatternType": null,
+            "ReceiveTimestampUTC": null
+          }
+        }
+      },
+      "ReplayAtts": {
+        "Xfuze": {
+          "IsReplayed": null,
+          "ReplayStatusCode": null,
+          "ReplayStatusReason": null,
+          "ReplayCount": null,
+          "LastEventId": null,
+          "LastEventOccurredTimestampUTC": null
+        },
+        "Origin": {
+          "IsReplayed": null
+        }
+      },
+      "PayloadAtts": {
+        "Xfuze": {
+          "DataPayloadHash": null,
+          "EventPayloadHash": null,
+          "HashScheme": null
+        },
+        "Origin": {
+          "DataPayloadHash": null,
+          "EventPayloadHash": null,
+          "HashScheme": null
+        }
+      },
+      "ModelAtts": {
+        "Xfuze": {
+          "SchemaURI": null,
+          "SchemaName": null,
+          "SchemaVersion": null,
+          "MetaModellerId": null
+        }
+      },
+      "CustomAtts": {
+        "Atts": [
+          {
+            "Code": null,
+            "Value": null,
+            "Type": null
+          }
+        ]
+      }
+    },
+    "DomainEvent": {
+      "TriggerEntity": {
+        "SalesOrder": {
+          "id": "ORDER_8105970878",
+          "orderNumber": "8105970878",
+          "status": {
+            "statusDesc": "ShipmentAvailableAtPickupLocation",
+            "statusCode": "SHIPMENT_AVAILABLE_AT_PICKUP_LOCATION",
+            "statusChangeDate": "2023-01-04T11:20:55.659673815Z"
+          },
+          "orderLines": [
+            {
+              "id": "ORDERLINE_8105970878_1",
+              "sequence": 1,
+              "status": {
+                "statusDesc": "ShipmentAvailableAtPickupLocation",
+                "statusCode": "SHIPMENT_AVAILABLE_AT_PICKUP_LOCATION",
+                "statusChangeDate": "2023-01-04T11:20:55.659681246Z"
+              }
+            }
+          ],
+          "timestamp": "1672830827",
+          "timeDate": "2023-01-04T11:13:47Z"
+        }
+      }
+    }
+  }
+]

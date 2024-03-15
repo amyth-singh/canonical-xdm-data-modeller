@@ -1,0 +1,61 @@
+[
+    {
+        "SKU": "1212469",
+        "currency": "GBP",
+        "deliveryGroup": "1",
+        "deliveryMethod": "3",
+        "description": "LW RUGBY | OMOE018 | L | INK",
+        "descriptions": [],
+        "excludePromotion": false,
+        "fullfilmentId": "628",
+        "inReturnItem": true,
+        "isChecked": false,
+        "isLastExchanged": false,
+        "itemDiscounts": {
+            "currentRefundPortion": 1.052,
+            "refundPortion": 1.052,
+            "trnDiscountsPortion": 1.052,
+            "trnPromotionsPortion": 0
+        },
+        "itemLineId": 4,
+        "lineOrderDiscounts": [
+            {
+                "cncDiscountAmount": 0,
+                "discountAmount": -1.06,
+                "discountType": "Amount",
+                "inStoreDiscountAmount": -1.06,
+                "itemLineId": 4,
+                "itemLineIds": [
+                    4
+                ],
+                "reasonCode": "Refunded Discount",
+                "scope": "Order",
+                "type": "Discount",
+                "webOrderDiscountAmount": 0
+            }
+        ],
+        "quantity": 1,
+        "refundPromotionalQuantity": 0,
+        "refunded": true,
+        "refundedQuantity": 1,
+        "refundedReason": "600-1",
+        "refundedReasonDescription": "Does not suit",
+        "refundedTotal": -35,
+        "sealed": true,
+        "selectedPrice": 35,
+        "selectedVAT": 20,
+        "selectedVATCode": "H",
+        "taxLines": [
+            {
+                "PreTax": -28.291,
+                "VAT": 20,
+                "VATCode": "H",
+                "itemLineId": 4,
+                "taxLineTotal": -5.657,
+                "taxableAmount": -33.948
+            }
+        ],
+        "total": 35,
+        "totalLinePrice": 35
+    }
+]

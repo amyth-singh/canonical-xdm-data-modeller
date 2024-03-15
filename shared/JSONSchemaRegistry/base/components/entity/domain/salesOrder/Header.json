@@ -1,0 +1,38 @@
+{
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "Header": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "allOf": [
+        {
+          "$ref": "../../common/Entity.json#/EntityHeader"
+        },
+        {
+          "properties": {
+            "HeaderId": {
+              "type": "string"
+            },
+            "SalesOrderNumber": {
+              "type": "string"
+            },
+
+            "Channels": {
+              "type": "object",
+              "unevaluatedProperties": false,
+              "properties": {
+                "SalesChannel" : {
+                  "$ref": "../../common/Channel.json#/ChannelObject"
+                }
+              }
+            },
+            "Prices": {"$ref": "../../common/Price.json#/PriceObject"},
+            "Totals": {"$ref": "../../common/Price.json#/PriceObject"},
+            "Taxes": {"$ref": "../../common/Taxes.json"}
+          }
+        }
+      ]
+    }
+  }
+}

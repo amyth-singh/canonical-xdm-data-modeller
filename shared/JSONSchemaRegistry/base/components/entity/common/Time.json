@@ -1,0 +1,132 @@
+{
+  "TimeObject": {
+        "type": "object" ,
+        "additionalProperties": {
+          "$ref": "#/TimeProperties"
+        }
+  },
+  "TimeProperties": {
+    "type": ["object", "null"],
+    "unevaluatedProperties": false,
+    "anyOf": [
+      {
+        "required": [
+          "DateId",
+          "UTC",
+          "Millis"
+        ]
+      },
+      {
+        "required": [
+          "DateId",
+          "Local",
+          "TimeZone"
+        ]
+      }
+    ],
+    "properties": {
+      "DateId": {
+        "type": "string",
+        "description": "The Xfuze Date dim Id e.g Date_20231001"
+      },
+      "DateKey": {
+        "type": "number",
+        "min-length": 8,
+        "max-length": 8,
+        "description": "The Xfuze Date Key as a number e.g 20231001"
+      },
+      "UTC": {
+        "type": "string",
+        "format": "date-time",
+        "description": "An Xfuze timestamp represented in UTC e.g 2023-11-06T17:12:30.780Z"
+      },
+      "DateTimeKey": {
+        "type": "number",
+        "min-length": 14,
+        "max-length": 14,
+        "description": "An Xfuze timestamp represented in number format e.g 20231109135856000"
+      },
+      "DateUTC": {
+        "type": "string",
+        "format": "date",
+        "description": "An Xfuze timestamp as date represented in UTC e.g 2023-01-12"
+      },
+      "RawValue": {
+        "type": "string",
+        "description": "An input timestamp parsed to Xfuze in raw format e.g 2023-11-06T17:12:30.780Z"
+      },
+      "Local": {
+        "type": "string",
+        "format": "date-time",
+        "description": "An Xfuze timestamp represented in local time e.g 2023-11-06T17:12:30.780Z+00:00"
+      },
+      "DateLocal": {
+        "type": "string",
+        "format": "date",
+        "description": "An Xfuze timestamp as date represented in local timeZone aware (if date is input not a TS is always = DateUTC ) e.g 2023-01-12"
+      },
+      "HourId": {
+        "type": "string",
+        "description": "The Xfuze hour dim Id e.g Hours_2023110617"
+      },
+      "HourKey": {
+        "type": "number",
+        "min-length": 10,
+        "max-length": 10,
+        "description": "The Xfuze hour key in number form e.g 2023110617"
+      },
+      "Millis": {
+        "type": "number",
+        "description": "An Xfuze timestamp represented in unix Millis e.g 1673525621103"
+      },
+      "HourUTC": {
+        "type": "number",
+        "min-length": 2,
+        "max-length": 2,
+        "description": "The Xfuze hour in number form e.g 17"
+      },
+      "HourLocal": {
+        "type": "number",
+        "min-length": 2,
+        "max-length": 2,
+        "description": "The Xfuze hour in number form e.g 17"
+      },
+      "TimeZone": {
+        "type": "string",
+        "description": "The related time zone offset used in local conversions e.g UTC, Europe/London"
+      },
+      "TimeZoneOffset": {
+        "type": "string",
+        "description": "The related time zone offset used in local conversions e.g +00:00"
+      },
+      "YearMonth": {
+        "type": "number",
+        "min-length": 6,
+        "max-length": 6,
+        "description": "The Xfuze YearMonth in number form e.g 202311"
+      },
+      "YearWeek": {
+        "type": "number",
+        "min-length": 6,
+        "max-length": 6,
+        "description": "The Xfuze YearWeek in number form e.g 202344"
+      },
+      "YearIsoWeek": {
+        "type": "number",
+        "min-length": 6,
+        "max-length": 6,
+        "description": "The Xfuze YearIsoWeek in number form e.g 202345"
+      },
+      "YearDay": {
+        "type": "number",
+        "min-length": 7,
+        "max-length": 7,
+        "description": "The YearDay in number form e.g 2023310"
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

@@ -1,0 +1,237 @@
+{
+  "EventId": "SalesOrderLinePublished_SalesOrderLine::Return_Next_6RS34DAK_291692609_2023-10-04T00:00:00.000Z",
+  "EventName": "SalesOrderLinePublished",
+  "EntityId": "SalesOrderLine::Return_Next_6RS34DAK_291692609",
+  "EntityType": "SalesOrderLine",
+  "EntitySubType": "Return",
+  "ParentEntityId": "SalesOrderHeader_Next_6RS34DAK",
+  "ParentEntityType": "SalesOrderHeader",
+  "CompositeEntityId": "SalesOrder_Next_6RS34DAK",
+  "CompositeEntityType": "SalesOrder",
+  "EventOccurredTimestampUTC": "2023-10-04T00:00:00.000Z",
+  "EventOccurredTimestampLocal": "2023-10-04T00:00:00.000Z",
+  "EventMetadata": {
+    "EventAtts": {
+      "Xfuze": {
+        "EventId": "SalesOrderLinePublished_SalesOrderLine::Return_Next_6RS34DAK_291692609_2023-10-04T00:00:00.000Z",
+        "EventCategory": "Sales",
+        "EventName": "SalesOrderLinePublished",
+        "EventClass": "TriggerEvent",
+        "EventChangePattern": "FullSnapshot",
+        "EventValueStream": "Order2Cash",
+        "BizCapabilityL0": "Sell",
+        "BizCapabilityL1": "Sell & Serve",
+        "BizCapabilityL2": "Take Sale",
+        "ClientCode": "Crew",
+        "IsDerivedEvent": "N"
+      },
+      "Origin": {
+        "EventId": "291692609",
+        "SourceSystem": "Next",
+        "SourceSubSystem": "ConcessionCSV",
+        "SourceFormatType": "CSV",
+        "CorrelationId": "291692609"
+      }
+    },
+    "EntityAtts": {
+      "Xfuze": {
+        "EntityId": "SalesOrderLine::Return_Next_6RS34DAK_291692609",
+        "EntityType": "SalesOrderLine",
+        "EntitySubType": "Return",
+        "EntityVariation": "Concession",
+        "EntityDomain": "Sales",
+        "EntityClass": "Composite",
+        "ParentEntityId": "SalesOrderHeader_Next_6RS34DAK",
+        "ParentEntityType": "SalesOrderHeader",
+        "CompositeEntityId": "SalesOrder_Next_6RS34DAK",
+        "CompositeEntityType": "SalesOrder",
+        "IsSensitive": "N"
+      },
+      "Origin": {
+        "EntityId": "6RS34DAK_291692609",
+        "ParentEntityId": "6RS34DAK"
+      }
+    },
+    "TimeAtts": {
+      "Xfuze": {
+        "TimeZones": {
+          "HomeTimeZone": {
+            "TimeZone": "Europe/London"
+          },
+          "EventTimeZone": {
+            "TimeZone": "Europe/London"
+          },
+          "PartyTimeZone": {
+            "TimeZone": "Europe/London"
+          }
+        },
+        "Times": {
+          "EventOccurredTimestamp": {
+            "DateId": "Dates_20231004",
+            "UTC": "2023-10-04T00:00:00.000Z",
+            "Local": "2023-10-04T00:00:00.000Z",
+            "TimeZone": "Europe/London",
+            "Millis": 1696377600000
+          },
+          "EventOccurredType": "TrueTime",
+          "EventExternalReceivedTimestamp": {
+            "DateId": "Dates_20231011",
+            "UTC": "2023-10-11T00:00:00.000Z",
+            "Local": "2023-10-11T00:00:00.000Z",
+            "TimeZone": "Europe/London",
+            "Millis": 1696982400000
+          },
+          "EventReceivedTimestamp": {
+            "DateId": "Dates_20231026",
+            "UTC": "2023-10-26T14:22:22.764Z",
+            "Local": "2023-10-26T14:22:22.764Z",
+            "TimeZone": "UTC",
+            "Millis": 1698330142764
+          },
+          "EventIngestProcessedTimestamp": {
+            "DateId": "Dates_20231026",
+            "UTC": "2023-10-26T14:22:22.764Z",
+            "Local": "2023-10-26T14:22:22.764Z",
+            "TimeZone": "UTC",
+            "Millis": 1698330142764
+          }
+        }
+      },
+      "Origin": {
+        "Times": {
+          "EventOccurredTimestamp": "2023-10-04",
+          "EventExternalReceivedTimestamp": "2023-10-11"
+        }
+      }
+    },
+    "ProductAtts": {
+      "Xfuze": {
+        "ProductIds": [
+          "ProductVariant_Retail247Origin_5059595842972"
+        ],
+        "ProductKeys": [
+          "5059595842972"
+        ],
+        "InvolvedReasonCode": "ReturnedProduct"
+      }
+    },
+    "LocationAtts": {
+      "Xfuze": {
+        "ChannelCode": "Online",
+        "ChannelName": "Online",
+        "LocationId": "Location_Next",
+        "CountryCode2": "GB"
+      }
+    },
+    "MeasuresAtts": {
+      "TriggerEntity": {
+        "Value1": "-1",
+        "Value1Code": "Header.Lines.Qtys.QtyNet",
+        "Value2": "-22",
+        "Value2Code": "Header.Lines.Totals.SubTotal.Current.BCY.IncTax"
+      }
+    },
+    "PrivacyAtts": {
+      "Xfuze": {
+        "IsSensitiveEntity": "N",
+        "IsEncrypted": "N",
+        "SensitiveFieldPaths": []
+      },
+      "Origin": {
+        "IsEncrypted": "N"
+      }
+    },
+    "IngestAtts": {
+      "Xfuze": {
+        "File": {
+          "SystemCode": "(runtime binding)",
+          "URI": "(runtime binding)",
+          "Path": "(runtime binding)",
+          "Name": "(runtime binding)",
+          "BatchId": "(runtime binding)",
+          "BatchNumber": "(runtime binding)",
+          "LineNumber": -1,
+          "TotalBatchLines": -1,
+          "OriginalFileSizeBytes": -1,
+          "OriginalRowSizeBytes": -1,
+          "BytesOffsetInOriginalFile": -1,
+          "FormatType": "CSV",
+          "PatternType": "CloudObjectNotification",
+          "ChangeTimestampUTC": "2023-10-16T09:02:54.530Z",
+          "ObjectNotificationPayload": "(runtime binding)"
+        }
+      }
+    },
+    "PayloadAtts": {
+      "Xfuze": {
+        "DataPayloadHash": "(runtime binding or custom jsonata func)",
+        "EventPayloadHash": "(runtime binding or custom jsonata func)",
+        "HashScheme": "MD5"
+      },
+      "Origin": {
+        "DataPayloadHash": "(runtime binding post processing of output event)",
+        "EventPayloadHash": "(runtime binding post processing of output event)",
+        "HashScheme": "MD5"
+      }
+    }
+  },
+  "DomainEvent": {
+    "TriggerEntity": {
+      "Line": {
+        "EntityId": "SalesOrderLine::Return_Next_6RS34DAK_291692609",
+        "EntityType": "SalesOrderLine",
+        "EntitySubType": "Return",
+        "ParentEntityId": "SalesOrderHeader_Next_6RS34DAK",
+        "ParentEntityType": "SalesOrderHeader",
+        "CompositeEntityId": "SalesOrder_Next_6RS34DAK",
+        "CompositeEntityType": "SalesOrder",
+        "SalesOrderNumber": "6RS34DAK",
+        "SalesOrderLineNumber": "6RS34DAK_291692609",
+        "SalesOrderLineProductNumber": "6RS34DAK_5059595842972",
+        "XRefIds": [
+          {
+            "SystemCode": "Xfuze",
+            "Code": "EntityId"
+          },
+          {
+            "SystemCode": "Xfuze",
+            "Code": "ParentEntityId"
+          },
+          {
+            "Id": "6RS34DAK_291692609",
+            "SystemCode": "Next",
+            "Code": "RawEntityId"
+          },
+          {
+            "Id": "SalesOrderHeader_Next_6RS34DAK",
+            "SystemCode": "Xfuze",
+            "Code": "OrderId"
+          },
+          {
+            "SystemCode": "Xfuze",
+            "Code": "HeaderId"
+          },
+          {
+            "SystemCode": "Xfuze",
+            "Code": "LineId"
+          },
+          {
+            "Id": "291692609",
+            "SystemCode": "Next",
+            "Code": "BIS_Ref_ID"
+          },
+          {
+            "Id": "6RS34DAK_5059595842972",
+            "SystemCode": "Next",
+            "Code": "SalesOrderLineProductNumber"
+          },
+          {
+            "Id": "6RS34DAK",
+            "SystemCode": "Next",
+            "Code": "OrderReferenceNumber"
+          }
+        ]
+      }
+    }
+  }
+}

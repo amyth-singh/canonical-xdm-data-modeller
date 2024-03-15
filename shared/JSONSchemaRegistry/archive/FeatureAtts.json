@@ -1,0 +1,8 @@
+{
+    "$id": "FeatureAtts",
+    "description": "XDM Event (Data) 'Feature' atts definition - key measure and dimesions (aka features) of note, not all",
+    "type": "object",
+    "properties": {
+      "FeatureAtts": [{"$ref": "../../CustomAttribute.json"}]
+    }
+}

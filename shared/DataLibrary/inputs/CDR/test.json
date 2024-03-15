@@ -1,0 +1,466 @@
+[
+  {
+    "AttHeader": {
+      "Id": "ProductPrice_CDRDW_10012001_SuperDiesel_Fuel_ProductPrice_LocationAtts_LocationId",
+      "Code": "Fuel.ProductPrice.LocationAtts.LocationId",
+      "Name": "LocationId",
+      "ValueType": "STRING"
+    },
+    "AttData": {
+      "ValueBefore": {},
+      "ValueAfter": {
+        "Value": "FuelStation_CDRDW_10012001",
+        "RawValue": "FuelStation_CDRDW_10012001"
+      },
+      "ValueChange": {
+        "IsValueChanged": "U",
+        "IsRawValueChanged": "N"
+      }
+    },
+    "AttMetadata": {
+      "RawSourceSystemCode": "CDRDW",
+      "AsOf": "2023-05-24T00:00:00.000Z",
+      "EventId": "ProductPricePublished_ProductPrice_CDRDW_10012001_SuperDiesel_6ac4c2fb-d444-48fe-892a-5ec6cf85aa15",
+      "IsSensitive": "N",
+      "IsEncrypted": "N"
+    }
+  },
+  {
+    "AttHeader": {
+      "Id": "ProductPrice_CDRDW_10012001_SuperDiesel_Fuel_ProductPrice_LocationAtts_RawLocationId",
+      "Code": "Fuel.ProductPrice.LocationAtts.RawLocationId",
+      "Name": "RawLocationId",
+      "ValueType": "STRING"
+    },
+    "AttData": {
+      "ValueBefore": {},
+      "ValueAfter": {
+        "Value": "10012001",
+        "RawValue": "10012001"
+      },
+      "ValueChange": {
+        "IsValueChanged": "U",
+        "IsRawValueChanged": "N"
+      }
+    },
+    "AttMetadata": {
+      "RawSourceSystemCode": "CDRDW",
+      "AsOf": "2023-05-24T00:00:00.000Z",
+      "EventId": "ProductPricePublished_ProductPrice_CDRDW_10012001_SuperDiesel_6506d703-553f-4f3a-a4a5-2ec2dd7157fe",
+      "IsSensitive": "N",
+      "IsEncrypted": "N"
+    }
+  },
+  {
+    "AttHeader": {
+      "Id": "ProductPrice_CDRDW_10012001_SuperDiesel_Fuel_ProductPrice_ProductAtts_ProductCategory_Code",
+      "Code": "Fuel.ProductPrice.ProductAtts.ProductCategory.Code",
+      "Name": "ProductCategory.Code",
+      "ValueType": "STRING"
+    },
+    "AttData": {
+      "ValueBefore": {},
+      "ValueAfter": {
+        "Value": "Fuel",
+        "RawValue": "Fuel"
+      },
+      "ValueChange": {
+        "IsValueChanged": "U",
+        "IsRawValueChanged": "N"
+      }
+    },
+    "AttMetadata": {
+      "RawSourceSystemCode": "CDRDW",
+      "AsOf": "2023-05-24T00:00:00.000Z",
+      "EventId": "ProductPricePublished_ProductPrice_CDRDW_10012001_SuperDiesel_4739f61d-98c2-4cbc-aea0-c7904a4a9a31",
+      "IsSensitive": "N",
+      "IsEncrypted": "N"
+    }
+  },
+  {
+    "AttHeader": {
+      "Id": "ProductPrice_CDRDW_10012001_SuperDiesel_Fuel_ProductPrice_ProductAtts_Product_Code",
+      "Code": "Fuel.ProductPrice.ProductAtts.Product.Code",
+      "Name": "Product.Code",
+      "ValueType": "STRING"
+    },
+    "AttData": {
+      "ValueBefore": {},
+      "ValueAfter": {
+        "Value": "SuperDiesel",
+        "RawValue": "SuperDiesel"
+      },
+      "ValueChange": {
+        "IsValueChanged": "U",
+        "IsRawValueChanged": "N"
+      }
+    },
+    "AttMetadata": {
+      "RawSourceSystemCode": "CDRDW",
+      "AsOf": "2023-05-24T00:00:00.000Z",
+      "EventId": "ProductPricePublished_ProductPrice_CDRDW_10012001_SuperDiesel_a783caf6-fd65-4cad-82d1-ac0cd99bd4f9",
+      "IsSensitive": "N",
+      "IsEncrypted": "N"
+    }
+  },
+  {
+    "AttHeader": {
+      "Id": "ProductPrice_CDRDW_10012001_SuperDiesel_Fuel_ProductPrice_TimeAtts_PriceAsOfDate_UTC",
+      "Code": "Fuel.ProductPrice.TimeAtts.PriceAsOfDate.UTC",
+      "Name": "PriceAsOfDate.UTC",
+      "ValueType": "DATE"
+    },
+    "AttData": {
+      "ValueBefore": {},
+      "ValueAfter": {
+        "RawValue": "24/05/2023"
+      },
+      "ValueChange": {
+        "IsValueChanged": "U",
+        "IsRawValueChanged": "N"
+      }
+    },
+    "AttMetadata": {
+      "RawSourceSystemCode": "CDRDW",
+      "AsOf": "2023-05-24T00:00:00.000Z",
+      "EventId": "ProductPricePublished_ProductPrice_CDRDW_10012001_SuperDiesel_95ce72e5-0616-4553-a9c2-dc501d4feb04",
+      "IsSensitive": "N",
+      "IsEncrypted": "N"
+    }
+  },
+  {
+    "AttHeader": {
+      "Id": "ProductPrice_CDRDW_10012001_SuperDiesel_Fuel_ProductPrice_TimeAtts_PriceAsOfDate_Local",
+      "Code": "Fuel.ProductPrice.TimeAtts.PriceAsOfDate.Local",
+      "Name": "PriceAsOfDate.Local",
+      "ValueType": "DATE"
+    },
+    "AttData": {
+      "ValueBefore": {},
+      "ValueAfter": {
+        "RawValue": "24/05/2023"
+      },
+      "ValueChange": {
+        "IsValueChanged": "U",
+        "IsRawValueChanged": "N"
+      }
+    },
+    "AttMetadata": {
+      "RawSourceSystemCode": "CDRDW",
+      "AsOf": "2023-05-24T00:00:00.000Z",
+      "EventId": "ProductPricePublished_ProductPrice_CDRDW_10012001_SuperDiesel_356740c7-f500-4777-893b-ebca8d677d35",
+      "IsSensitive": "N",
+      "IsEncrypted": "N"
+    }
+  },
+  {
+    "AttHeader": {
+      "Id": "ProductPrice_CDRDW_10012001_SuperDiesel_Fuel_ProductPrice_TimeAtts_PriceAsOfTimestamp_UTC",
+      "Code": "Fuel.ProductPrice.TimeAtts.PriceAsOfTimestamp.UTC",
+      "Name": "PriceAsOfTimestamp.UTC",
+      "ValueType": "TIMESTAMP"
+    },
+    "AttData": {
+      "ValueBefore": {},
+      "ValueAfter": {
+        "RawValue": "24/05/2023"
+      },
+      "ValueChange": {
+        "IsValueChanged": "U",
+        "IsRawValueChanged": "N"
+      }
+    },
+    "AttMetadata": {
+      "RawSourceSystemCode": "CDRDW",
+      "AsOf": "2023-05-24T00:00:00.000Z",
+      "EventId": "ProductPricePublished_ProductPrice_CDRDW_10012001_SuperDiesel_46a36a0e-ea38-4339-8ac1-18603cb8cd4c",
+      "IsSensitive": "N",
+      "IsEncrypted": "N"
+    }
+  },
+  {
+    "AttHeader": {
+      "Id": "ProductPrice_CDRDW_10012001_SuperDiesel_Fuel_ProductPrice_TimeAtts_PriceAsOfTimestamp_Local",
+      "Code": "Fuel.ProductPrice.TimeAtts.PriceAsOfTimestamp.Local",
+      "Name": "PriceAsOfTimestamp.Local",
+      "ValueType": "TIMESTAMP"
+    },
+    "AttData": {
+      "ValueBefore": {},
+      "ValueAfter": {
+        "RawValue": "24/05/2023"
+      },
+      "ValueChange": {
+        "IsValueChanged": "U",
+        "IsRawValueChanged": "N"
+      }
+    },
+    "AttMetadata": {
+      "RawSourceSystemCode": "CDRDW",
+      "AsOf": "2023-05-24T00:00:00.000Z",
+      "EventId": "ProductPricePublished_ProductPrice_CDRDW_10012001_SuperDiesel_785ed114-77b2-40c4-ad66-b63f46928db2",
+      "IsSensitive": "N",
+      "IsEncrypted": "N"
+    }
+  },
+  {
+    "AttHeader": {
+      "Id": "ProductPrice_CDRDW_10012001_SuperDiesel_Fuel_ProductPrice_PriceAtts_PriceType_Code",
+      "Code": "Fuel.ProductPrice.PriceAtts.PriceType.Code",
+      "Name": "PriceType.Code",
+      "ValueType": "STRING"
+    },
+    "AttData": {
+      "ValueBefore": {},
+      "ValueAfter": {
+        "Value": "Sales",
+        "RawValue": "Sales"
+      },
+      "ValueChange": {
+        "IsValueChanged": "U",
+        "IsRawValueChanged": "N"
+      }
+    },
+    "AttMetadata": {
+      "RawSourceSystemCode": "CDRDW",
+      "AsOf": "2023-05-24T00:00:00.000Z",
+      "EventId": "ProductPricePublished_ProductPrice_CDRDW_10012001_SuperDiesel_97c42e35-a5fb-447d-9c6c-11705ccfdde8",
+      "IsSensitive": "N",
+      "IsEncrypted": "N"
+    }
+  },
+  {
+    "AttHeader": {
+      "Id": "ProductPrice_CDRDW_10012001_SuperDiesel_Fuel_ProductPrice_PriceAtts_PriceOwnership_Code",
+      "Code": "Fuel.ProductPrice.PriceAtts.PriceOwnership.Code",
+      "Name": "PriceOwnership.Code",
+      "ValueType": "STRING"
+    },
+    "AttData": {
+      "ValueBefore": {},
+      "ValueAfter": {
+        "Value": "CDR",
+        "RawValue": "CDR"
+      },
+      "ValueChange": {
+        "IsValueChanged": "U",
+        "IsRawValueChanged": "N"
+      }
+    },
+    "AttMetadata": {
+      "RawSourceSystemCode": "CDRDW",
+      "AsOf": "2023-05-24T00:00:00.000Z",
+      "EventId": "ProductPricePublished_ProductPrice_CDRDW_10012001_SuperDiesel_2a13ecaf-3e7b-49c6-82f1-e6cce7871698",
+      "IsSensitive": "N",
+      "IsEncrypted": "N"
+    }
+  },
+  {
+    "AttHeader": {
+      "Id": "ProductPrice_CDRDW_10012001_SuperDiesel_Fuel_ProductPrice_PriceAtts_Price_IncTax_BCY",
+      "Code": "Fuel.ProductPrice.PriceAtts.Price.IncTax.BCY",
+      "Name": "Price.IncTax.BCY",
+      "ValueType": "NUMERIC"
+    },
+    "AttData": {
+      "ValueBefore": {},
+      "ValueAfter": {
+        "ValueNumeric": 163,
+        "RawValue": "162.9"
+      },
+      "ValueChange": {
+        "IsValueChanged": "U",
+        "IsRawValueChanged": "N"
+      }
+    },
+    "AttMetadata": {
+      "RawSourceSystemCode": "CDRDW",
+      "AsOf": "2023-05-24T00:00:00.000Z",
+      "EventId": "ProductPricePublished_ProductPrice_CDRDW_10012001_SuperDiesel_34ccdef9-2b4a-4b6c-9685-d19d757bbf59",
+      "IsSensitive": "N",
+      "IsEncrypted": "N"
+    }
+  },
+  {
+    "AttHeader": {
+      "Id": "ProductPrice_CDRDW_10012001_SuperDiesel_Fuel_ProductPrice_PriceAtts_Price_IncTax_LCY",
+      "Code": "Fuel.ProductPrice.PriceAtts.Price.IncTax.LCY",
+      "Name": "Price.IncTax.LCY",
+      "ValueType": "NUMERIC"
+    },
+    "AttData": {
+      "ValueBefore": {},
+      "ValueAfter": {
+        "ValueNumeric": 163,
+        "RawValue": "162.9"
+      },
+      "ValueChange": {
+        "IsValueChanged": "U",
+        "IsRawValueChanged": "N"
+      }
+    },
+    "AttMetadata": {
+      "RawSourceSystemCode": "CDRDW",
+      "AsOf": "2023-05-24T00:00:00.000Z",
+      "EventId": "ProductPricePublished_ProductPrice_CDRDW_10012001_SuperDiesel_bf462a91-3efe-4452-86c7-f502af18d502",
+      "IsSensitive": "N",
+      "IsEncrypted": "N"
+    }
+  },
+  {
+    "AttHeader": {
+      "Id": "ProductPrice_CDRDW_10012001_SuperDiesel_Fuel_ProductPrice_PriceAtts_Price_Currency_BCY",
+      "Code": "Fuel.ProductPrice.PriceAtts.Price.Currency.BCY",
+      "Name": "Price.Currency.BCY",
+      "ValueType": "STRING"
+    },
+    "AttData": {
+      "ValueBefore": {},
+      "ValueAfter": {
+        "Value": "GBP",
+        "RawValue": "GBP"
+      },
+      "ValueChange": {
+        "IsValueChanged": "U",
+        "IsRawValueChanged": "N"
+      }
+    },
+    "AttMetadata": {
+      "RawSourceSystemCode": "CDRDW",
+      "AsOf": "2023-05-24T00:00:00.000Z",
+      "EventId": "ProductPricePublished_ProductPrice_CDRDW_10012001_SuperDiesel_14dbc9db-ae79-499e-82cd-e51f1f6491ce",
+      "IsSensitive": "N",
+      "IsEncrypted": "N"
+    }
+  },
+  {
+    "AttHeader": {
+      "Id": "ProductPrice_CDRDW_10012001_SuperDiesel_Fuel_ProductPrice_PriceAtts_Price_Currency_LCY",
+      "Code": "Fuel.ProductPrice.PriceAtts.Price.Currency.LCY",
+      "Name": "Price.Currency.LCY",
+      "ValueType": "STRING"
+    },
+    "AttData": {
+      "ValueBefore": {},
+      "ValueAfter": {
+        "Value": "GBP",
+        "RawValue": "GBP"
+      },
+      "ValueChange": {
+        "IsValueChanged": "U",
+        "IsRawValueChanged": "N"
+      }
+    },
+    "AttMetadata": {
+      "RawSourceSystemCode": "CDRDW",
+      "AsOf": "2023-05-24T00:00:00.000Z",
+      "EventId": "ProductPricePublished_ProductPrice_CDRDW_10012001_SuperDiesel_01eb1103-4309-4a30-a4e6-fcc6a690ab78",
+      "IsSensitive": "N",
+      "IsEncrypted": "N"
+    }
+  },
+  {
+    "AttHeader": {
+      "Id": "ProductPrice_CDRDW_10012001_SuperDiesel_Fuel_ProductPrice_PriceAtts_Price_ExchangeRate",
+      "Code": "Fuel.ProductPrice.PriceAtts.Price.ExchangeRate",
+      "Name": "Price.ExchangeRate",
+      "ValueType": "NUMERIC"
+    },
+    "AttData": {
+      "ValueBefore": {},
+      "ValueAfter": {
+        "ValueNumeric": 1,
+        "RawValue": "1.00"
+      },
+      "ValueChange": {
+        "IsValueChanged": "U",
+        "IsRawValueChanged": "N"
+      }
+    },
+    "AttMetadata": {
+      "RawSourceSystemCode": "CDRDW",
+      "AsOf": "2023-05-24T00:00:00.000Z",
+      "EventId": "ProductPricePublished_ProductPrice_CDRDW_10012001_SuperDiesel_59591c01-d299-4725-94b1-f89ea39ad2ea",
+      "IsSensitive": "N",
+      "IsEncrypted": "N"
+    }
+  },
+  {
+    "AttHeader": {
+      "Id": "ProductPrice_CDRDW_10012001_SuperDiesel_Fuel_ProductPrice_PriceAtts_PriceSetScope",
+      "Code": "Fuel.ProductPrice.PriceAtts.PriceSetScope",
+      "Name": "PriceSetScope",
+      "ValueType": "STRING"
+    },
+    "AttData": {
+      "ValueBefore": {},
+      "ValueAfter": {
+        "Value": "MFG",
+        "RawValue": "MFG"
+      },
+      "ValueChange": {
+        "IsValueChanged": "U",
+        "IsRawValueChanged": "N"
+      }
+    },
+    "AttMetadata": {
+      "RawSourceSystemCode": "CDRDW",
+      "AsOf": "2023-05-24T00:00:00.000Z",
+      "EventId": "ProductPricePublished_ProductPrice_CDRDW_10012001_SuperDiesel_29ecbf6b-01d8-412f-8f96-67d4e8240d9b",
+      "IsSensitive": "N",
+      "IsEncrypted": "N"
+    }
+  },
+  {
+    "AttHeader": {
+      "Id": "ProductPrice_CDRDW_10012001_SuperDiesel_Fuel_ProductPrice_ReadingAtts_PriceReadingSourceType_Code",
+      "Code": "Fuel.ProductPrice.ReadingAtts.PriceReadingSourceType.Code",
+      "Name": "PriceReadingSourceType.Code",
+      "ValueType": "STRING"
+    },
+    "AttData": {
+      "ValueBefore": {},
+      "ValueAfter": {
+        "Value": "PriceBook",
+        "RawValue": "PriceBook"
+      },
+      "ValueChange": {
+        "IsValueChanged": "U",
+        "IsRawValueChanged": "N"
+      }
+    },
+    "AttMetadata": {
+      "RawSourceSystemCode": "CDRDW",
+      "AsOf": "2023-05-24T00:00:00.000Z",
+      "EventId": "ProductPricePublished_ProductPrice_CDRDW_10012001_SuperDiesel_ee77aa60-707e-4188-a518-9c62d7884c3b",
+      "IsSensitive": "N",
+      "IsEncrypted": "N"
+    }
+  },
+  {
+    "AttHeader": {
+      "Id": "ProductPrice_CDRDW_10012001_SuperDiesel_Fuel_ProductPrice_ReadingAtts_PriceReadingGranularityType_Code",
+      "Code": "Fuel.ProductPrice.ReadingAtts.PriceReadingGranularityType.Code",
+      "Name": "PriceReadingGranularityType.Code",
+      "ValueType": "STRING"
+    },
+    "AttData": {
+      "ValueBefore": {},
+      "ValueAfter": {
+        "Value": "Daily",
+        "RawValue": "Daily"
+      },
+      "ValueChange": {
+        "IsValueChanged": "U",
+        "IsRawValueChanged": "N"
+      }
+    },
+    "AttMetadata": {
+      "RawSourceSystemCode": "CDRDW",
+      "AsOf": "2023-05-24T00:00:00.000Z",
+      "EventId": "ProductPricePublished_ProductPrice_CDRDW_10012001_SuperDiesel_57e4ed3c-0195-4920-a060-b63e694445ce",
+      "IsSensitive": "N",
+      "IsEncrypted": "N"
+    }
+  }
+]

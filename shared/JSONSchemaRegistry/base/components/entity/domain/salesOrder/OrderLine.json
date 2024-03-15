@@ -1,0 +1,563 @@
+{
+  "type": "object",
+  "unevaluatedProperties": false,
+  "allOf": [
+    {
+      "$ref": "../../common/Entity.json#/EntityHeader"
+    },
+    {
+      "properties": {
+        "LineIds": {
+          "$ref": "./LineIds.json#/LineIdsProperties",
+          "description": "The (required) common set of order line Ids for this order line, not all a required individually, only what can be mapped & derived"
+        },
+        "Channels": {
+          "type": "object",
+          "description": "The collection of channels related to the line.  Typically explicitly defined at header level, however, not always and thus sometimes occurs on this level",
+          "unevaluatedProperties": false,
+          "properties": {
+            "SalesChannel": {
+              "description": "The channel/touchpoint of the original sale/purchase of the line",
+              "$ref": "../../common/Channel.json#/ChannelProperties"
+            },
+            "ReturnChannel": {
+              "description": "The channel/touchpoint of the return/refund of the line",
+              "$ref": "../../common/Channel.json#/ChannelProperties"
+            },
+            "ExchangeChannel": {
+              "description": "The channel/touchpoint of the exchange of the line",
+              "$ref": "../../common/Channel.json#/ChannelProperties"
+            },
+            "FulfilmentChannel": {
+              "description": "The channel/touchpoint of the fulfilment of the line",
+              "$ref": "../../common/Channel.json#/ChannelProperties"
+            }
+          }
+        },
+        "Locations": {
+          "type": "object",
+          "description": "The collection of channels related to this line.  Typically this sits at header level, however, not always and thus lines can support this.",
+          "unevaluatedProperties": false,
+          "properties": {
+            "SalesLocation": {
+              "description": "The location of the original sale/purchase of the line",
+              "$ref": "../../common/Location.json#/LocationProperties"
+            },
+            "ReturnLocation": {
+              "description": "The channel/touchpoint of the return/refund of the line",
+              "$ref": "../../common/Location.json#/LocationProperties"
+            },
+            "ExchangeLocation": {
+              "description": "The channel/touchpoint of the exchange of the order",
+              "$ref": "../../common/Location.json#/LocationProperties"
+            },
+            "DistributionLocation": {
+              "description": "The channel/touchpoint of the distribution of the order",
+              "$ref": "../../common/Location.json#/LocationProperties"
+            }
+          }
+        },
+        "ProductAtts": {
+          "type": "object",
+          "description": "The (required) collection of product attributes, as captured at point of the sale (i.e not at latest/current time).  Often lines are enriched with a full product, one or both of the 'as-was' view and 'latest'",
+          "unevaluatedProperties": false,
+          "properties": {
+            "ProductIds": {
+              "$ref": "../product/ProductIds.json#/ProductIdsProperties",
+              "description": "The collection of core product ids related to identifying the product/variant on this line, as captured at point of the sale.  Sparsely populated depending on what source data is provided"
+            },
+            "ProductName": {
+              "type": "string",
+              "description": "The product name, as captured at point of the sale, of the product  on this line (at the point of sale and as captured/defined at that time)"
+            },
+            "ProductDesc": {
+              "type": "string",
+              "description": "The product description, as captured at point of the sale, of the product on this line (at the point of sale and as captured/defined at that time)"
+            },
+            "ProductCategoryCode": {
+              "type": "string",
+              "description": "The product category code, as captured at point of the sale, of the product on this line (at the point of sale and as captured/defined at that time)"
+            },
+            "ProductCategoryDesc": {
+              "type": "string",
+              "description": "The product category description, as captured at point of the sale, of the product on this line (at the point of sale and as captured/defined at that time)"
+            },
+            "ProductTypeCode": {
+              "type": "string",
+              "description": "The product type code, as captured at point of the sale, of the product on this line e.g "
+            },
+            "ProductTypeDesc": {
+              "type": "string",
+              "description": "The product type description, as captured at point of the sale, of the product on this line e.g "
+            },
+            "ProductSubTypeCode": {
+              "type": "string",
+              "description": "The product sub type code, as captured at point of the sale, of the product on this line e.g "
+            },
+            "ProductSubTypeDesc": {
+              "type": "string",
+              "description": "The product sub type description, as captured at point of the sale, of the product on this line e.g "
+            },
+            "ProductGroupCode": {
+              "type": "string",
+              "description": "The product group code, as captured at point of the sale, of the product on this line e.g "
+            },
+            "ProductGroupDesc": {
+              "type": "string",
+              "description": "The product group description, as captured at point of the sale, of the product on this line e.g "
+            },
+            "ProductSubGroupCode": {
+              "type": "string",
+              "description": "The product sub group code, as captured at point of the sale, of the product on this line e.g "
+            },
+            "ProductSubGroupDesc": {
+              "type": "string",
+              "description": "The product sub group description, as captured at point of the sale, of the product on this line e.g "
+            },
+            "HierarchyNode": {
+              "$ref": "../../common/HierarchyNode.json#/HierarchyNodeProperties",
+              "description": "The product hierarchy level details, as captured at point of the sale, classifying the product/variant on this line"
+            },
+            "Hierarchy": {
+              "$ref": "../../common/HierarchyNodes.json#/HierarchyNodesProperties",
+              "description": "The product hierarchy 'breadcrumb' array details, as captured at point of the sale, with all levels included in array form"
+            },
+            "StyleCode": {
+              "type": "string",
+              "description": "The style code of the product on this line"
+            },
+            "StyleDesc": {
+              "type": "string",
+              "description": "The style description of the product on this line"
+            },
+            "SeasonCode": {
+              "type": "string",
+              "description": "The season code of the product on this line"
+            },
+            "SeasonDesc": {
+              "type": "string",
+              "description": "The season description of the product on this line"
+            },
+            "ItemOptionCode": {
+              "type": "string",
+              "description": "The item option code of the product on this line"
+            },
+            "ItemOptionDesc": {
+              "type": "string",
+              "description": "The item option desc of the product on this line"
+            },
+            "SizeCode": {
+              "type": "string",
+              "description": "The size code, if relevant, of the product on this line"
+            },
+            "SizeDesc": {
+              "type": "string",
+              "description": "The size description, if relevant, of the product on this line"
+            },
+            "SizeMatrixCode": {
+              "type": "string",
+              "description": "The size matrix code, if relevant, of the product on this line"
+            },
+            "SizeMatrixDesc": {
+              "type": "string",
+              "description": "The size matrix description, if relevant, of the product on this line"
+            },
+            "ColourCode": {
+              "type": "string",
+              "description": "The colour code, if relevant, of the product on this line"
+            },
+            "ColourDesc": {
+              "type": "string",
+              "description": "The colour description, if relevant, of the product on this line"
+            },
+            "BrandCode": {
+              "type": "string",
+              "description": "The brand code of the product on this line"
+            },
+            "BrandName": {
+              "type": "string",
+              "description": "The brand description of the product on this line"
+            },
+            "SupplierId": {
+              "type": "string",
+              "description": "The supplierId of the product on this line"
+            },
+            "SupplierCode": {
+              "type": "string",
+              "description": "The supplier code of the product on this line"
+            },
+            "CountryOfOrigin": {
+              "type": "string",
+              "description": "The country of origin of the product on this line"
+            },
+            "ImageURLs": {
+              "type": "array",
+              "description": "An array of urls representing image links",
+              "items": {
+                "type": "string"
+              }
+            },
+            "AttributeCodes": {
+              "type": "array",
+              "description": "An array of 'other atts' in string form",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "Qtys": {
+          "type": "object",
+          "description": "The collection of (possible) quantities, related to various unit level measures, across the lifecycle, of this line.  Actual usage and ability to populate depends on the richness of the sources, so sparsely populated.  Some can be derived, while others are typically provided",
+          "unevaluatedProperties": false,
+          "properties": {
+            "QtyNet": {
+              "description": "The 'net' (current) qty, for the line, of product sold, net AFTER any subsequent retractions and adjustments post sale (e.g cancels, returns etc), at a point in time (e.g event time, latest entity time), ultimately the sellable billable qty in the end.  Can be explicit from source and also derived (e.g multiple lines qith qty 1 agg up to > 1)",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtySold": {
+              "description": "The 'gross' (as sold / original) qty, for the line, of product sold, gross BEFORE any subsequent retractions and adjustments (e.g cancels, returns etc), at a point in time of the sale (immutable thereafter), ultimately the 'as sold'  billable qty.  Always explicit from source but needs to be mapped from the 'first' event or derived equiv",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyPaid": {
+              "description": "The aggregate quantity paid, for the line, at the time at a point in time (e.g event time, latest entity time)",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyCancelled": {
+              "description": "The aggregate quantity cancelled, for the line, at the time at a point in time (e.g event time, latest entity time).  This is a '-' number to support a ledger styled approach to accounting.",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyVoided": {
+              "description": "The aggregate quantity voided, for the line, at the time at a point in time (e.g event time, latest entity time).   This is a '-' number to support a ledger styled approach to accounting.",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyReturned": {
+              "description": "The aggregate quantity returned (but not exchanged), for the line, at the time at a point in time (e.g event time, latest entity time).  This is a '-' number to support a ledger styled approach to accounting.",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyExchanged": {
+              "description": "The aggregate quantity exchanged (but not returned), for the line, at the time at a point in time (e.g event time, latest entity time)",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyRefunded": {
+              "description": "The aggregate quantity refunded (i.e refund payment - note: some returns/cancellation may or may not get refunded so can be different to them), for the line, at the time at a point in time (e.g event time, latest entity time)",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyRefundedPromotional": {
+              "description": "The aggregate quantity refunded when part of promotion, for the line, at the time at a point in time (e.g event time, latest entity time)",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyShipped": {
+              "description": "The aggregate quantity shipped, for the line, at the time at a point in time (e.g event time, latest entity time)",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyFulfilled": {
+              "description": "The aggregate quantity fulfilled, for the line, at the time at a point in time (e.g event time, latest entity time) - context dependant to the fulfilment options (e.g delivered to customer, picked-up) - ultimately with end recipient",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyCompleted": {
+              "description": "The aggregate quantity 'completed' (context dependant), for the line, at the time at a point in time (e.g event time, latest entity time)",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            }
+          }
+        },
+        "Currency": {
+          "type": "object",
+          "description": "The collection of currencies involved in this order",
+          "unevaluatedProperties": false,
+          "properties": {
+            "LCY": {
+              "description": "The local currency native to the order / transaction",
+              "$ref": "../../common/Currency.json#/CurrencyProperties"
+            },
+            "BCY": {
+              "description": "The home / base currency to the client company, aligned to the 'normalised' currency e.g for reporting",
+              "$ref": "../../common/Currency.json#/CurrencyProperties"
+            }
+          }
+        },
+        "ExchangeRates": {
+          "type": "object",
+          "description": "The collection of (possible) exchange rates, across the lifecycle, of this line.  Actual usage and ability to populate depends on the richness of the sources.  Typically sits at the order level, but can also exist at line level",
+          "unevaluatedProperties": false,
+          "properties": {
+            "SaleRate": {
+              "description": "The exchange rate used on this line at the time of sale",
+              "$ref": "../../common/ExchangeRate.json#/ExchangeRateProperties"
+            },
+            "RefundRate": {
+              "description": "The exchange rate used on this line at the time of refund",
+              "$ref": "../../common/ExchangeRate.json#/ExchangeRateProperties"
+            }
+          }
+        },
+        "Prices": {
+          "type": "object",
+          "description": "The collection of possible UNIT prices, both selling and cost related, related to the sale of this line.  Actual usage and ability to populate depends on the richness of the sources.  Some can be derived, while others are typically provided",
+          "unevaluatedProperties": false,
+          "properties": {
+            "SellingPrices": {
+              "type": "object",
+              "description": "The (required) collection of possible SELLING UNIT prices, related to the sale of the product this line.  Actual usage and ability to populate depends on the richness of the sources, only SoldPrice is mandatory.  Some can be derived, while others are typically provided",
+              "unevaluatedProperties": true,
+              "properties": {
+                "SoldUnitPrice": {
+                  "description": "The (required) final 'as sold' unit price of the sale of this lines product, often provided, but sometimes needs to be derived from GrandTotal / QtySold (QtyNet)",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "RRPUnitPrice": {
+                  "description": "The (required) final 'as sold' unit price of the sale of this lines product, often provided, but sometimes needs to be derived from GrandTotal / QtySold (QtyNet)",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "OriginalUnitPrice": {
+                  "description": "The 'original selling price', typically the first release of a unit price for this product, typically has to be explicitly provided and not derivable",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "FromUnitPrice": {
+                  "description": "The 'from' price', typically the , typically the previous price relative to this one",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "ListUnitPrice": {
+                  "description": "The 'from' price', typically the , typically the previous price relative to this one",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                }
+              },
+              "required": [
+                "SoldPrice"
+              ]
+            },
+            "CostPrices": {
+              "type": "object",
+              "description": "The (optional) collection of possible COST UNIT prices (COGS related), related to the sale of the product on this line.  Actual usage and ability to populate depends on the richness of the sources.  Some can be derived, while others are typically provided",
+              "unevaluatedProperties": true,
+              "properties": {
+                "ProductCostPrice": {
+                  "description": "The product 'cost price' - unit cost related to the buying/making of the product on this line (not marketing or logistics related), often provided, but sometimes needs to be derived from ProductCostTotal / QtySold (QtyNet).  Quite often this is derived by joining to core product/price entities, which includes costs, and enriching subsequent",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "LogisticsCostPrice": {
+                  "description": "The logistics 'cost price' - unit cost related to the transport/logistics of the product on this line (not marketing or logistics related), often an apportioned amount.",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                }
+              }
+            },
+            "MarginPrices": {
+              "type": "object",
+              "description": "The (optional) collection of possible Margin UNIT prices (COGS related), related to the profitability of the product on this line.  Actual usage and ability to populate depends on the richness of the sources, having both selling and cost price(s).  Most often needs to be derived",
+              "unevaluatedProperties": false,
+              "properties": {
+                "ProductMarginPrice": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                }
+              }
+            }
+          },
+          "required": [
+            "SellingPrices"
+          ]
+        },
+        "Totals": {
+          "type": "object",
+          "description": "The collection of possible AGGREGATE totals (unit * qty), both selling and cost related, related to the sale of this line.  Actual usage and ability to populate depends on the richness of the sources.  Some can be derived, while others are typically provided",
+          "unevaluatedProperties": false,
+          "properties": {
+            "SaleTotals": {
+              "type": "object",
+              "description": "",
+              "unevaluatedProperties": true,
+              "properties": {
+                "LineTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "SubTotalBeforeDiscounts": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "DiscountsTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "DiscountsApportionedTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "ChargesTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "TaxesTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                }
+              }
+            },
+            "CostTotals": {
+              "type": "object",
+              "description": "",
+              "unevaluatedProperties": true,
+              "properties": {
+                "ProductCostTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "LogisticsCostTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "MarketingCostTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "CommissionTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                }
+              }
+            },
+            "MarginTotals": {
+              "type": "object",
+              "description": "",
+              "unevaluatedProperties": true,
+              "properties": {
+                "ProductMarginTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                }
+              }
+            }
+          },
+          "required": [
+            "SaleTotals"
+          ]
+        },
+        "ExchangeAtts": {
+          "type": "object",
+          "description": "The collection of exchange related options/attributes",
+          "unevaluatedProperties": false,
+          "properties": {
+            "ExchangeId": {
+              "description": "The Id of the exchange transaction",
+              "type": "string"
+            },
+            "ReasonCode": {
+              "description": "The code of the reason for the exchange",
+              "type": "string"
+            },
+            "ReasonDesc": {
+              "description": "The desc of the reason for the exchange",
+              "type": "string"
+            },
+            "IsAnyRefunded": {
+              "description": "Is any qty of this line refunded?",
+              "type": "string",
+              "enum": ["Y","N","U"]
+            },
+            "IsFullRefunded": {
+              "description": "Is all qtys of this line refunded?",
+              "type": "string",
+              "enum": ["Y","N","U"]
+            },
+            "IsInReturnItem": {
+              "description": "Is this item in the return item?",
+              "type": "string",
+              "enum": ["Y","N","U"]
+            },
+            "IsChecked": {
+              "description": "Is this item checked?",
+              "type": "string",
+              "enum": ["Y","N","U"]
+            },
+            "IsLastExchanged": {
+              "description": "Is this the last exchange?",
+              "type": "string",
+              "enum": ["Y","N","U"]
+            },
+            "IsSealed": {
+              "description": "Is this exchange still sealed?",
+              "type": "string",
+              "enum": ["Y","N","U"]
+            },
+            "NewItems": {
+              "type": "array",
+              "description": "The collection (array) of new items as a result of the exchange",
+              "items": {
+                "$ref": "../../common/QuantityItems.json#/QuantityItemsProperties"
+              }
+            },
+            "ExtAtts": {
+              "type": "array",
+              "description": "The collection (array) of extra extension fulfillment options/attributes.",
+              "items": {
+                "$ref": "../../common/CustomAtt.json#/CustomAttProperties"
+              }
+            }
+          }
+        },
+        "MarketingAtts": {
+          "type": "object",
+          "description": "The collection of marketing options/attributes",
+          "unevaluatedProperties": false,
+          "properties": {
+            "IsExcludedFromDiscPromo": {
+              "description": "Is this line excluded from discount/promo",
+              "type": "string",
+              "enum": ["Y","N","U"]
+            },
+            "SourceCode": {
+              "description": "The code of the source that was attributed to this order",
+              "type": "string"
+            },
+            "ExtAtts": {
+              "type": "array",
+              "description": "The collection (array) of extra extension fulfillment options/attributes.",
+              "items": {
+                "$ref": "../../common/CustomAtt.json#/CustomAttProperties"
+              }
+            }
+          }
+        },
+        "DiscountAtts": {
+          "type": "array",
+          "description": "The collection (array) of discount attributes for this line",
+          "items": {
+            "$ref" : "../../common/CustomAtt.json#/CustomAttProperties"
+          }
+        },
+        "FulfillmentAtts": {
+          "type": "array",
+          "description": "The collection (array) of fulfillment attributes/options (fulfillment options e.g delivery method, not the fulfillment's e.g delivery themselves), controlling fulfillment of the line.  Typically sits at the header level, but sometimes also a line level",
+          "items": {
+            "$ref" : "../../common/CustomAtt.json#/CustomAttProperties"
+          }
+        },
+        "PaymentAtts": {
+          "type": "array",
+          "description": "The collection (array) of payment attributes/options (payment options from customer e.g method, not the payment transactions themselves), controlling payment processing for the product purchased.  Typically sits at the header level, but sometimes also a line level",
+          "items": {
+            "$ref" : "../../common/CustomAtt.json#/CustomAttProperties"
+          }
+        },
+        "FinanceAtts": {
+          "type": "array",
+          "description": "The collection of finance (e.g tax, commission) attributes, of the product purchased",
+          "items": {
+            "$ref" : "../../common/CustomAtt.json#/CustomAttProperties"
+          }
+        },
+        "Lineage": {
+          "$ref": "../../common/EventLineage.json#/EventLineageProperties",
+          "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+        }
+      },
+      "required": [
+        "SalesOrderNumber",
+        "SalesOrderLineNumber",
+        "ProductAtts",
+        "Qtys",
+        "Totals"
+      ]
+    }
+  ]
+}

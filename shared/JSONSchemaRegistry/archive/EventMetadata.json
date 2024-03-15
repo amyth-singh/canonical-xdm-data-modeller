@@ -1,0 +1,24 @@
+{
+    "$id": "EventMetadata",
+    "description": "XDM Event 'EventMetadata' definition (TODO add Location)",
+    "type": "object",
+    "properties": {
+      "EventAtts": {"$ref": "./EventAtts.json"},
+      "EntityAtts": {"$ref": "./EntityAtts.json"},
+      "TimeAtts": {"$ref": "./TimeAtts.json"},
+      "PartyAtts": {"$ref": "./PartyAtts.json"},
+      "LocationAtts": {"$ref": "./LocationAtts.json"},
+      "DeltaFieldAtts": {"$ref": "./DeltaFieldAtts.json"},
+      "FeatureAtts": {"$ref": "./FeatureAtts.json"},
+      "SensitiveFieldsAtts": {"$ref": "./SensitiveFieldsAtts.json"},
+      "IngestAtts": {"$ref": "./IngestAtts.json"},
+      "DeliveryAtts": {"$ref": "./DeliveryAtts.json"}
+    },
+    "required": [
+      "EventId",
+      "EntityId",
+      "EventOccurredTimestamp",
+      "EventAtts",
+      "TimeAtts"
+    ]
+}

@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "EntityId": {"type": "string"},
+    "EntityType": {"type": "string"},
+    "ReferenceData": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "allOf": [
+        {"$ref": "../../components/entity/common/Entity.json#/EntityHeader"},
+        {"properties": {        
+          "ReferenceAtts": {"$ref": "../../components/entity/domain/referenceData/ReferenceAtts.json"}
+        },
+        "required": ["ReferenceAtts"]
+      }
+    ]
+  }
+}
+}

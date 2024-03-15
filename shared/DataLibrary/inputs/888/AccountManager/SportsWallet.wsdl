@@ -1,0 +1,582 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions name="SportWallet" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://tempuri.org/"
+                  xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl">
+    <wsdl:types>
+        <xs:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="GetAccountBalance">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="request" nillable="true" type="q1:GetAccountBalanceRequest"
+                                    xmlns:q1="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetAccountBalanceResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="GetAccountBalanceResult" nillable="true"
+                                    type="q2:GetAccountBalanceResponse"
+                                    xmlns:q2="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="Withdraw">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="request" nillable="true" type="q3:WithdrawRequest"
+                                    xmlns:q3="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="WithdrawResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="WithdrawResult" nillable="true" type="q4:WithdrawResponse"
+                                    xmlns:q4="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="Refund">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="request" nillable="true" type="q5:RefundRequest"
+                                    xmlns:q5="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="RefundResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="RefundResult" nillable="true" type="q6:RefundResponse"
+                                    xmlns:q6="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="CancelWithdraw">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="request" nillable="true" type="q7:CancelWithdrawRequest"
+                                    xmlns:q7="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="CancelWithdrawResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="CancelWithdrawResult" nillable="true"
+                                    type="q8:CancelWithdrawResponse"
+                                    xmlns:q8="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="CloseBetSlip">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="request" nillable="true" type="q9:CloseBetSlipRequest"
+                                    xmlns:q9="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="CloseBetSlipResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="CloseBetSlipResult" nillable="true"
+                                    type="q10:CloseBetSlipResponse"
+                                    xmlns:q10="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="MigrateOpenBets">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="request" nillable="true" type="q11:MigrateOpenBetsRequest"
+                                    xmlns:q11="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="MigrateOpenBetsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="MigrateOpenBetsResult" nillable="true"
+                                    type="q12:MigrateOpenBetsResponse"
+                                    xmlns:q12="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="IsAlive">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="IsAliveResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="IsAliveResult" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified"
+                   targetNamespace="http://schemas.microsoft.com/2003/10/Serialization/"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   xmlns:tns="http://schemas.microsoft.com/2003/10/Serialization/">
+            <xs:element name="anyType" nillable="true" type="xs:anyType"/>
+            <xs:element name="anyURI" nillable="true" type="xs:anyURI"/>
+            <xs:element name="base64Binary" nillable="true" type="xs:base64Binary"/>
+            <xs:element name="boolean" nillable="true" type="xs:boolean"/>
+            <xs:element name="byte" nillable="true" type="xs:byte"/>
+            <xs:element name="dateTime" nillable="true" type="xs:dateTime"/>
+            <xs:element name="decimal" nillable="true" type="xs:decimal"/>
+            <xs:element name="double" nillable="true" type="xs:double"/>
+            <xs:element name="float" nillable="true" type="xs:float"/>
+            <xs:element name="int" nillable="true" type="xs:int"/>
+            <xs:element name="long" nillable="true" type="xs:long"/>
+            <xs:element name="QName" nillable="true" type="xs:QName"/>
+            <xs:element name="short" nillable="true" type="xs:short"/>
+            <xs:element name="string" nillable="true" type="xs:string"/>
+            <xs:element name="unsignedByte" nillable="true" type="xs:unsignedByte"/>
+            <xs:element name="unsignedInt" nillable="true" type="xs:unsignedInt"/>
+            <xs:element name="unsignedLong" nillable="true" type="xs:unsignedLong"/>
+            <xs:element name="unsignedShort" nillable="true" type="xs:unsignedShort"/>
+            <xs:element name="char" nillable="true" type="tns:char"/>
+            <xs:simpleType name="char">
+                <xs:restriction base="xs:int"/>
+            </xs:simpleType>
+            <xs:element name="duration" nillable="true" type="tns:duration"/>
+            <xs:simpleType name="duration">
+                <xs:restriction base="xs:duration">
+                    <xs:pattern value="\-?P(\d*D)?(T(\d*H)?(\d*M)?(\d*(\.\d*)?S)?)?"/>
+                    <xs:minInclusive value="-P10675199DT2H48M5.4775808S"/>
+                    <xs:maxInclusive value="P10675199DT2H48M5.4775807S"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="guid" nillable="true" type="tns:guid"/>
+            <xs:simpleType name="guid">
+                <xs:restriction base="xs:string">
+                    <xs:pattern value="[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:attribute name="FactoryType" type="xs:QName"/>
+            <xs:attribute name="Id" type="xs:ID"/>
+            <xs:attribute name="Ref" type="xs:IDREF"/>
+        </xs:schema>
+        <xs:schema elementFormDefault="qualified"
+                   targetNamespace="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   xmlns:tns="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.DataContracts">
+            <xs:complexType name="GetAccountBalanceRequest">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="CurrencyCode" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="Date" type="xs:dateTime"/>
+                    <xs:element minOccurs="0" name="PlayerID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="ServerID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="SubBrand" nillable="true" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="GetAccountBalanceRequest" nillable="true" type="tns:GetAccountBalanceRequest"/>
+            <xs:complexType name="GetAccountBalanceResponse">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q1:BaseResponse"
+                                  xmlns:q1="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="AvailableBalance" nillable="true" type="xs:long"/>
+                            <xs:element minOccurs="0" name="ExchangeRateToUSD" type="xs:double"/>
+                            <xs:element minOccurs="0" name="TotalBalance" type="xs:long"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="GetAccountBalanceResponse" nillable="true" type="tns:GetAccountBalanceResponse"/>
+            <xs:complexType name="WithdrawRequest">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="BetSlipID" type="xs:long"/>
+                    <xs:element minOccurs="0" name="BetsList" nillable="true" type="q2:ArrayOfBetDetails"
+                                xmlns:q2="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.CommonTypes"/>
+                    <xs:element minOccurs="0" name="CurrencyCode" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="Date" type="xs:dateTime"/>
+                    <xs:element minOccurs="0" name="LiveBettingDetails" nillable="true"
+                                type="tns:ArrayOfLiveBettingEvent"/>
+                    <xs:element minOccurs="0" name="PlayerID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="PlayerSessionID" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="ReasonID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="RequestGuid" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="RequestIDItem" nillable="true" type="q3:CombinedRequestID"
+                                xmlns:q3="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.CommonTypes"/>
+                    <xs:element minOccurs="0" name="ServerID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="WithdrawAmount" type="xs:long"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="WithdrawRequest" nillable="true" type="tns:WithdrawRequest"/>
+            <xs:complexType name="ArrayOfLiveBettingEvent">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="LiveBettingEvent" nillable="true"
+                                type="tns:LiveBettingEvent"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ArrayOfLiveBettingEvent" nillable="true" type="tns:ArrayOfLiveBettingEvent"/>
+            <xs:complexType name="LiveBettingEvent">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="EventID" type="xs:long"/>
+                    <xs:element minOccurs="0" name="SpendingAmount" type="xs:long"/>
+                    <xs:element minOccurs="0" name="StartDate" type="xs:dateTime"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="LiveBettingEvent" nillable="true" type="tns:LiveBettingEvent"/>
+            <xs:complexType name="WithdrawResponse">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q4:BaseResponse"
+                                  xmlns:q4="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="AvailableBalance" type="xs:long"/>
+                            <xs:element minOccurs="0" name="ExceededLiveBettingAmount" type="xs:long">
+                                <xs:annotation>
+                                    <xs:appinfo>
+                                        <DefaultValue EmitDefaultValue="false"
+                                                      xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+                                    </xs:appinfo>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" name="ExceedingLiveBettingLimitEventID" type="xs:long">
+                                <xs:annotation>
+                                    <xs:appinfo>
+                                        <DefaultValue EmitDefaultValue="false"
+                                                      xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+                                    </xs:appinfo>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" name="LimitLeftover" nillable="true" type="xs:int">
+                                <xs:annotation>
+                                    <xs:appinfo>
+                                        <DefaultValue EmitDefaultValue="false"
+                                                      xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+                                    </xs:appinfo>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" name="Receipt" type="xs:long"/>
+                            <xs:element minOccurs="0" name="WithdrawnRealAmount" nillable="true" type="xs:long">
+                                <xs:annotation>
+                                    <xs:appinfo>
+                                        <DefaultValue EmitDefaultValue="false"
+                                                      xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+                                    </xs:appinfo>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" name="WithdrawnRestrictedAmount" nillable="true" type="xs:long">
+                                <xs:annotation>
+                                    <xs:appinfo>
+                                        <DefaultValue EmitDefaultValue="false"
+                                                      xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+                                    </xs:appinfo>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="WithdrawResponse" nillable="true" type="tns:WithdrawResponse"/>
+            <xs:complexType name="RefundRequest">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="BetSlipID" type="xs:long"/>
+                    <xs:element minOccurs="0" name="BetsList" nillable="true" type="q5:ArrayOfBetDetails"
+                                xmlns:q5="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.CommonTypes"/>
+                    <xs:element minOccurs="0" name="CurrencyCode" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="Date" type="xs:dateTime"/>
+                    <xs:element minOccurs="0" name="PlayerID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="ReasonID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="RefundAmount" type="xs:long"/>
+                    <xs:element minOccurs="0" name="RequestGuid" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="RequestIDItem" nillable="true" type="q6:CombinedRequestID"
+                                xmlns:q6="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.CommonTypes"/>
+                    <xs:element minOccurs="0" name="ServerID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="SettlementType" nillable="true" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="RefundRequest" nillable="true" type="tns:RefundRequest"/>
+            <xs:complexType name="RefundResponse">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q7:BaseResponse"
+                                  xmlns:q7="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="Receipt" type="xs:long"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="RefundResponse" nillable="true" type="tns:RefundResponse"/>
+            <xs:complexType name="CancelWithdrawRequest">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="Date" type="xs:dateTime"/>
+                    <xs:element minOccurs="0" name="PlayerID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="RequestGuid" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="RequestIDItem" nillable="true" type="q8:CombinedRequestID"
+                                xmlns:q8="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.CommonTypes"/>
+                    <xs:element minOccurs="0" name="ServerID" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="CancelWithdrawRequest" nillable="true" type="tns:CancelWithdrawRequest"/>
+            <xs:complexType name="CancelWithdrawResponse">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q9:BaseResponse"
+                                  xmlns:q9="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="Receipt" type="xs:long"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="CancelWithdrawResponse" nillable="true" type="tns:CancelWithdrawResponse"/>
+            <xs:complexType name="CloseBetSlipRequest">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="BetSlipID" type="xs:long"/>
+                    <xs:element minOccurs="0" name="Date" type="xs:dateTime"/>
+                    <xs:element minOccurs="0" name="PlayerID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="RequestGuid" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="RequestIDItem" nillable="true" type="q10:CombinedRequestID"
+                                xmlns:q10="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.CommonTypes"/>
+                    <xs:element minOccurs="0" name="ServerID" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="CloseBetSlipRequest" nillable="true" type="tns:CloseBetSlipRequest"/>
+            <xs:complexType name="CloseBetSlipResponse">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q11:BaseResponse"
+                                  xmlns:q11="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes">
+                        <xs:sequence/>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="CloseBetSlipResponse" nillable="true" type="tns:CloseBetSlipResponse"/>
+            <xs:complexType name="MigrateOpenBetsRequest">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="BetSlipID" type="xs:long"/>
+                    <xs:element minOccurs="0" name="BetsList" nillable="true" type="q12:ArrayOfBetDetails"
+                                xmlns:q12="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.CommonTypes"/>
+                    <xs:element minOccurs="0" name="Brand" type="xs:int"/>
+                    <xs:element minOccurs="0" name="ClientPlatform" type="xs:int"/>
+                    <xs:element minOccurs="0" name="CurrencyCode" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="Date" type="xs:dateTime"/>
+                    <xs:element minOccurs="0" name="PlayerID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="PlayerSessionID" type="xs:long"/>
+                    <xs:element minOccurs="0" name="ProductPackage" type="xs:int"/>
+                    <xs:element minOccurs="0" name="ReasonID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="RegulationType" type="xs:int"/>
+                    <xs:element minOccurs="0" name="RequestGuid" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="RequestIDItem" nillable="true" type="q13:CombinedRequestID"
+                                xmlns:q13="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.CommonTypes"/>
+                    <xs:element minOccurs="0" name="ServerID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="SubBrand" type="xs:int"/>
+                    <xs:element minOccurs="0" name="WithdrawAmount" type="xs:long"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="MigrateOpenBetsRequest" nillable="true" type="tns:MigrateOpenBetsRequest"/>
+            <xs:complexType name="MigrateOpenBetsResponse">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q14:BaseResponse"
+                                  xmlns:q14="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes">
+                        <xs:sequence/>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="MigrateOpenBetsResponse" nillable="true" type="tns:MigrateOpenBetsResponse"/>
+        </xs:schema>
+        <xs:schema elementFormDefault="qualified"
+                   targetNamespace="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   xmlns:tns="http://schemas.datacontract.org/2004/07/RL.Common.CommonTypes">
+            <xs:complexType name="BaseResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="ErrorCode" type="xs:int"/>
+                    <xs:element minOccurs="0" name="ErrorDescription" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="BaseResponse" nillable="true" type="tns:BaseResponse"/>
+        </xs:schema>
+        <xs:schema elementFormDefault="qualified"
+                   targetNamespace="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.CommonTypes"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   xmlns:tns="http://schemas.datacontract.org/2004/07/RL.IntegrationPlatform.Financial.CommonTypes">
+            <xs:complexType name="ArrayOfBetDetails">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="BetDetails" nillable="true"
+                                type="tns:BetDetails"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ArrayOfBetDetails" nillable="true" type="tns:ArrayOfBetDetails"/>
+            <xs:complexType name="BetDetails">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="Amount" type="xs:long"/>
+                    <xs:element minOccurs="0" name="BetID" type="xs:long"/>
+                    <xs:element minOccurs="0" name="IsFromFB" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="Odds" type="xs:double"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="BetDetails" nillable="true" type="tns:BetDetails"/>
+            <xs:complexType name="CombinedRequestID">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="RequestID" type="xs:long"/>
+                    <xs:element minOccurs="0" name="RequestIDPrefix" type="xs:long"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="CombinedRequestID" nillable="true" type="tns:CombinedRequestID"/>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="IFinancialService_GetAccountBalance_InputMessage">
+        <wsdl:part name="parameters" element="tns:GetAccountBalance"/>
+    </wsdl:message>
+    <wsdl:message name="IFinancialService_GetAccountBalance_OutputMessage">
+        <wsdl:part name="parameters" element="tns:GetAccountBalanceResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IFinancialService_Withdraw_InputMessage">
+        <wsdl:part name="parameters" element="tns:Withdraw"/>
+    </wsdl:message>
+    <wsdl:message name="IFinancialService_Withdraw_OutputMessage">
+        <wsdl:part name="parameters" element="tns:WithdrawResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IFinancialService_Refund_InputMessage">
+        <wsdl:part name="parameters" element="tns:Refund"/>
+    </wsdl:message>
+    <wsdl:message name="IFinancialService_Refund_OutputMessage">
+        <wsdl:part name="parameters" element="tns:RefundResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IFinancialService_CancelWithdraw_InputMessage">
+        <wsdl:part name="parameters" element="tns:CancelWithdraw"/>
+    </wsdl:message>
+    <wsdl:message name="IFinancialService_CancelWithdraw_OutputMessage">
+        <wsdl:part name="parameters" element="tns:CancelWithdrawResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IFinancialService_CloseBetSlip_InputMessage">
+        <wsdl:part name="parameters" element="tns:CloseBetSlip"/>
+    </wsdl:message>
+    <wsdl:message name="IFinancialService_CloseBetSlip_OutputMessage">
+        <wsdl:part name="parameters" element="tns:CloseBetSlipResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IFinancialService_MigrateOpenBets_InputMessage">
+        <wsdl:part name="parameters" element="tns:MigrateOpenBets"/>
+    </wsdl:message>
+    <wsdl:message name="IFinancialService_MigrateOpenBets_OutputMessage">
+        <wsdl:part name="parameters" element="tns:MigrateOpenBetsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IFinancialService_IsAlive_InputMessage">
+        <wsdl:part name="parameters" element="tns:IsAlive"/>
+    </wsdl:message>
+    <wsdl:message name="IFinancialService_IsAlive_OutputMessage">
+        <wsdl:part name="parameters" element="tns:IsAliveResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="IFinancialService">
+        <wsdl:operation name="GetAccountBalance">
+            <wsdl:input wsaw:Action="http://tempuri.org/IFinancialService/GetAccountBalance"
+                        message="tns:IFinancialService_GetAccountBalance_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IFinancialService/GetAccountBalanceResponse"
+                         message="tns:IFinancialService_GetAccountBalance_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="Withdraw">
+            <wsdl:input wsaw:Action="http://tempuri.org/IFinancialService/Withdraw"
+                        message="tns:IFinancialService_Withdraw_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IFinancialService/WithdrawResponse"
+                         message="tns:IFinancialService_Withdraw_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="Refund">
+            <wsdl:input wsaw:Action="http://tempuri.org/IFinancialService/Refund"
+                        message="tns:IFinancialService_Refund_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IFinancialService/RefundResponse"
+                         message="tns:IFinancialService_Refund_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="CancelWithdraw">
+            <wsdl:input wsaw:Action="http://tempuri.org/IFinancialService/CancelWithdraw"
+                        message="tns:IFinancialService_CancelWithdraw_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IFinancialService/CancelWithdrawResponse"
+                         message="tns:IFinancialService_CancelWithdraw_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="CloseBetSlip">
+            <wsdl:input wsaw:Action="http://tempuri.org/IFinancialService/CloseBetSlip"
+                        message="tns:IFinancialService_CloseBetSlip_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IFinancialService/CloseBetSlipResponse"
+                         message="tns:IFinancialService_CloseBetSlip_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="MigrateOpenBets">
+            <wsdl:input wsaw:Action="http://tempuri.org/IFinancialService/MigrateOpenBets"
+                        message="tns:IFinancialService_MigrateOpenBets_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IFinancialService/MigrateOpenBetsResponse"
+                         message="tns:IFinancialService_MigrateOpenBets_OutputMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="IsAlive">
+            <wsdl:input wsaw:Action="http://tempuri.org/IFinancialService/IsAlive"
+                        message="tns:IFinancialService_IsAlive_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IFinancialService/IsAliveResponse"
+                         message="tns:IFinancialService_IsAlive_OutputMessage"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="BasicHttpBinding_IFinancialService" type="tns:IFinancialService">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="GetAccountBalance">
+            <soap:operation soapAction="http://tempuri.org/IFinancialService/GetAccountBalance" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Withdraw">
+            <soap:operation soapAction="http://tempuri.org/IFinancialService/Withdraw" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Refund">
+            <soap:operation soapAction="http://tempuri.org/IFinancialService/Refund" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="CancelWithdraw">
+            <soap:operation soapAction="http://tempuri.org/IFinancialService/CancelWithdraw" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="CloseBetSlip">
+            <soap:operation soapAction="http://tempuri.org/IFinancialService/CloseBetSlip" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="MigrateOpenBets">
+            <soap:operation soapAction="http://tempuri.org/IFinancialService/MigrateOpenBets" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="IsAlive">
+            <soap:operation soapAction="http://tempuri.org/IFinancialService/IsAlive" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="SportWallet">
+        <wsdl:port name="BasicHttpBinding_IFinancialService" binding="tns:BasicHttpBinding_IFinancialService">
+            <soap:address location="http://mrg-real-financialsport.production-qa.com/SportWallet.svc"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

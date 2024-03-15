@@ -1,0 +1,33 @@
+{
+  "$id": "https://xfuze.io/xdm/schema/components/event/common/EventMetadata",
+  "title": "EventMetadata",
+  "description": "XDM Schema for the common event component 'EventMetadata'",
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "EventAtts": {"$ref": "./EventMetadata/EventAtts.json"},
+    "EntityAtts": {"$ref": "./EventMetadata/EntityAtts.json"},
+    "TimeAtts": {"$ref": "./EventMetadata/TimeAtts.json"},
+    "PartyAtts": {"$ref": "./EventMetadata/PartyAtts.json"},
+    "ProductAtts": {"$ref": "./EventMetadata/ProductAtts.json"},
+    "LocationAtts": {"$ref": "./EventMetadata/LocationAtts.json"},
+    "MeasuresAtts": {"$ref": "./EventMetadata/MeasuresAtts.json"},
+    "ReferenceAtts": {"$ref": "./EventMetadata/ReferenceAtts.json"},
+    "PrivacyAtts": {"$ref": "./EventMetadata/PrivacyAtts.json"},
+    "IngestAtts": {"$ref": "./EventMetadata/IngestAtts.json"},
+    "PayloadAtts": {"$ref": "./EventMetadata/PayloadAtts.json"},
+    "LabelAtts": {"$ref": "./EventMetadata/LabelAtts.json"},
+    "DqTestAtts": {"$ref": "./EventMetadata/DqTestAtts.json"},
+    "ReplayAtts": {"$ref": "./EventMetadata/ReplayAtts.json"},
+    "ErrorAtts": {"$ref": "./EventMetadata/ErrorAtts.json"},
+    "ExtensionAtts": {"$ref": "./EventMetadata/ExtensionAtts.json"}
+  },
+  "required": [
+    "EventAtts",
+    "EntityAtts",
+    "TimeAtts",
+    "IngestAtts",
+    "PrivacyAtts",
+    "PayloadAtts"
+  ]
+}

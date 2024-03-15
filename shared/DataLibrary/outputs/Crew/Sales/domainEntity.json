@@ -1,0 +1,2048 @@
+{
+  "DomainEvent": {
+    "TriggerEntity": {
+      "SalesOrder": {
+        "DiscountLines": [
+          {
+            "AppliedToLineIds": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "DiscountDesc": "Variable TD",
+            "DiscountIds": {
+              "DiscountId": "SalesOrderDiscount_PMC_A0001331_9901",
+              "DiscountKey": "9901",
+              "HeaderIds": {
+                "OrderId": "581ee053-fd24-44e2-9d31-80bd1e83f61c",
+                "OrderKey": "A0001331",
+                "OrderReferenceNumber": "H6jdoJ6282023-11-06T16:52:51.725Z71c5",
+                "OrderType": "SALE",
+                "OrigOrderId": "581ee053-fd24-44e2-9d31-80bd1e83f61c",
+                "OrigOrderKey": "A0001331",
+                "OrigOrderReferenceNumber": null,
+                "OrigOrderType": "SALE",
+                "OrigReceiptNumber": null,
+                "ReceiptNumber": null
+              }
+            },
+            "DiscountLevel": "Order",
+            "DiscountMethod": "Store",
+            "DiscountName": "",
+            "DiscountStatus": {
+              "StatusClass": "Discount",
+              "StatusCode": "FullyApplied"
+            },
+            "DiscountType": {
+              "TypeClass": "Discount",
+              "TypeCode": "OrderDiscount"
+            },
+            "Overrides": [
+              {
+                "IsAutomaticApproval": "Y",
+                "OriginalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                "UserId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+              }
+            ],
+            "ReasonCode": "9901",
+            "ReasonDesc": "Variable TD",
+            "Times": {
+              "AppliedOn": {
+                "TimeZone": "UTC",
+                "TimeZoneOffset": "+00:00",
+                "YearMonth": 202311,
+                "YearWeek": 202344,
+                "YearIsoWeek": 202345,
+                "YearDay": 2023310,
+                "DateId": "Dates_20231106",
+                "DateKey": 20231106,
+                "DateTimeKey": 20231106170939000,
+                "HourId": "Hours_2023110617",
+                "HourKey": 2023110617,
+                "Millis": 1699290579844,
+                "RawValue": "2023-11-06T17:09:39.844Z",
+                "UTC": "2023-11-06T17:09:39.844Z",
+                "DateUTC": "2023-11-06",
+                "HourUTC": 17,
+                "Local": "2023-11-06T17:09:39.844+00:00",
+                "DateLocal": "2023-11-06",
+                "HourLocal": 17
+              }
+            },
+            "Totals": {
+              "DiscountTotal": {
+                "Current": {
+                  "BCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "IncTax": 10
+                  },
+                  "LCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "IncTax": 10
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "Header": {
+          "Channels": {
+            "SalesChannel": {
+              "BusinessModelTypeCode": "B2C",
+              "ChannelCode": "RetailStore",
+              "ChannelPurpose": "Sales",
+              "ChannelType": "Retail",
+              "TouchPoint": {
+                "Device": {
+                  "DeviceId": "429785ecd794e35d"
+                },
+                "TerminalId": "62862",
+                "TouchPointSystem": "eBasket"
+              }
+            }
+          },
+          "EntityIds": {
+            "CompositeEntityId": "SalesOrder_Sale_A0001331",
+            "CompositeEntityType": "SalesOrder",
+            "EntityId": "SalesOrderHeader_Sale_A0001331_A0001331",
+            "EntityType": "SalesOrderHeader",
+            "ParentEntityId": "SalesOrder_Sale_A0001331",
+            "ParentEntityType": "SalesOrder",
+            "RawEntityId": "A0001331"
+          },
+          "HeaderIds": {
+            "OrderId": "581ee053-fd24-44e2-9d31-80bd1e83f61c",
+            "OrderKey": "A0001331",
+            "OrderReferenceNumber": "H6jdoJ6282023-11-06T16:52:51.725Z71c5",
+            "OrderType": "SALE",
+            "OrigOrderId": "581ee053-fd24-44e2-9d31-80bd1e83f61c",
+            "OrigOrderKey": "A0001331",
+            "OrigOrderReferenceNumber": null,
+            "OrigOrderType": "SALE",
+            "OrigReceiptNumber": null,
+            "ReceiptNumber": null
+          },
+          "Locations": {
+            "SalesLocations": {
+              "Hierarchy": [
+                {
+                  "NodeClass": "Store",
+                  "NodeName": "Berkhamsted Test",
+                  "NodeStatus": "Active",
+                  "NodeType": "STORE",
+                  "StoreId": "628"
+                },
+                {
+                  "NodeClass": "Store",
+                  "NodeName": "South East \u0026 Central",
+                  "NodeStatus": "Active",
+                  "NodeType": "STORE_GROUP"
+                },
+                {
+                  "NodeClass": "Store",
+                  "NodeName": "UK",
+                  "NodeStatus": "Active",
+                  "NodeType": "TRADING_REGION"
+                },
+                {
+                  "NodeClass": "Store",
+                  "NodeName": "Crew Clothing",
+                  "NodeStatus": "Active",
+                  "NodeType": "COMPANY"
+                },
+                {
+                  "NodeClass": "Store",
+                  "NodeName": "Crew Clothing",
+                  "NodeStatus": "Active",
+                  "NodeType": "ORGANIZATION"
+                }
+              ],
+              "HierarchyNode": {
+                "L1Name": "Crew Clothing",
+                "L1Type": "ORGANIZATION",
+                "L2Name": "Crew Clothing",
+                "L2Type": "COMPANY",
+                "L3Name": "UK",
+                "L3Type": "TRADING_REGION",
+                "L4Name": "South East \u0026 Central",
+                "L4Type": "STORE_GROUP",
+                "L5Name": "Berkhamsted Test",
+                "L5Type": "STORE"
+              },
+              "LocationId": "Location_PMC_628",
+              "LocationKey": "628",
+              "LocationName": "Berkhamsted Test",
+              "LocationNodeId": "Location_PMC_628",
+              "LocationShortName": "Berkhamsted Test",
+              "LocationType": "STORE"
+            }
+          },
+          "OrderLineage": {
+            "ExternalNodeKey": "A0001331",
+            "ExternalNodeType": "SALE",
+            "ExternalParentNodeKey": "NA",
+            "IsGiftRefund": "N",
+            "NodeId": "581ee053-fd24-44e2-9d31-80bd1e83f61c",
+            "NodeKey": "SalesOrder_PMC_A0001331",
+            "ParentNodeKey": "SalesOrder_PMC_NA",
+            "StoreId": "628"
+          },
+          "Qtys": {
+            "QtyAllDiscounts": {
+              "Amount": 7
+            },
+            "QtyAllDiscountsApplied": {
+              "Amount": 12
+            },
+            "QtyExchanged": {
+              "Amount": 0
+            },
+            "QtyExchangedNew": {
+              "Amount": 0
+            },
+            "QtyLines": {
+              "Amount": 6
+            },
+            "QtyNet": {
+              "Amount": 8
+            },
+            "QtyPayments": {
+              "Amount": 1
+            },
+            "QtyRefunded": {
+              "Amount": 0
+            },
+            "QtyRefundedPromotional": {
+              "Amount": 0
+            },
+            "QtySold": {
+              "Amount": 8
+            }
+          },
+          "Status": {
+            "FulfilmentStatus": {
+              "StatusClass": "Fulfilment",
+              "StatusCode": "Fulfilled"
+            },
+            "OrderStatus": {
+              "StatusClass": "Order",
+              "StatusCode": "Completed"
+            },
+            "PaymentStatus": {
+              "StatusClass": "Payment",
+              "StatusCode": "FullyPaid"
+            }
+          },
+          "Totals": {
+            "SalesTotals": {
+              "DiscountsTotal": {
+                "Current": {
+                  "BCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "IncTax": 79.449
+                  },
+                  "LCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "IncTax": 79.449
+                  }
+                }
+              },
+              "OrderTotal": {
+                "Current": {
+                  "BCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "ExTax": 268.793,
+                    "IncTax": 322.55,
+                    "Tax": 53.757
+                  },
+                  "LCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "ExTax": 268.793,
+                    "IncTax": 322.55,
+                    "Tax": 53.757
+                  }
+                }
+              },
+              "OrderTotalBeforeDiscounts": {
+                "Current": {
+                  "BCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "IncTax": 402
+                  },
+                  "LCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "IncTax": 402
+                  }
+                }
+              },
+              "PaymentsTotal": {
+                "Current": {
+                  "BCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "IncTax": 322.55
+                  },
+                  "LCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "IncTax": 322.55
+                  }
+                }
+              },
+              "RefundsTotal": {
+                "Current": {
+                  "BCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "IncTax": 0
+                  },
+                  "LCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "IncTax": 0
+                  }
+                }
+              },
+              "ShippingTotal": {
+                "Current": {
+                  "BCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "IncTax": 0
+                  },
+                  "LCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "IncTax": 0
+                  }
+                }
+              },
+              "TaxableAmount": {
+                "Current": {
+                  "BCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "Tax": 322.552
+                  },
+                  "LCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "ExTax": 322.552
+                  }
+                }
+              }
+            }
+          },
+          "Type": {
+            "TypeClass": "B2C",
+            "TypeCode": "Retail",
+            "TypeDesc": "Sale"
+          }
+        },
+        "Lines": [
+          {
+            "FulfilmentAtts": {
+              "DeliveryGroup": "1",
+              "DeliveryMethodCode": "InStore",
+              "ExternalDeliveryMethodCode": "3",
+              "FulfilledFromLocationId": "Location_628",
+              "FulfilledFromLocationKey": "628",
+              "OriginFulfilledFromLocationId": "Location_N/A",
+              "OriginFulfilledFromLocationKey": "N/A"
+            },
+            "LineIds": {
+              "HeaderIds": {
+                "OrderId": "581ee053-fd24-44e2-9d31-80bd1e83f61c",
+                "OrderKey": "A0001331",
+                "OrderReferenceNumber": "H6jdoJ6282023-11-06T16:52:51.725Z71c5",
+                "OrderType": "SALE",
+                "OrigOrderId": "581ee053-fd24-44e2-9d31-80bd1e83f61c",
+                "OrigOrderKey": "A0001331",
+                "OrigOrderReferenceNumber": null,
+                "OrigOrderType": "SALE",
+                "OrigReceiptNumber": null,
+                "ReceiptNumber": null
+              },
+              "LineId": "581ee053-fd24-44e2-9d31-80bd1e83f61c_1",
+              "LineKey": "A0001331_1",
+              "LineProductKey": "1200677",
+              "LineProductKeyType": "SKU",
+              "LineSeq": 1,
+              "OrigLineId": "581ee053-fd24-44e2-9d31-80bd1e83f61c_1",
+              "OrigLineSeq": 1
+            },
+            "Prices": {
+              "SalesPrices": {
+                "LineUnitPrice": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 110
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 110
+                    }
+                  }
+                },
+                "LineUnitPriceAfterDiscounts": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 104.5
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 104.5
+                    }
+                  }
+                }
+              }
+            },
+            "ProductAtts": {
+              "ProductDesc": "RIVERTON BLAZER | MNA053 | 44 | IVY",
+              "ProductIds": {
+                "EntityId": "ProductVariant_Retail247Origin_1200677",
+                "EntityType": "ProductVariant",
+                "ProductVariantKey": "1200677",
+                "ProductVariantKeyType": "SKU",
+                "SKU": "1200677"
+              },
+              "ProductName": "RIVERTON BLAZER"
+            },
+            "Qtys": {
+              "QtyAllDiscountsApplied": {
+                "Amount": 4
+              },
+              "QtyChanged": {
+                "Amount": 0
+              },
+              "QtyDiscounts": {
+                "Amount": 1
+              },
+              "QtyExchanged": {
+                "Amount": 0
+              },
+              "QtyExchangedNew": {
+                "Amount": 0
+              },
+              "QtyNet": {
+                "Amount": 1
+              },
+              "QtyOrderDiscounts": {
+                "Amount": 1
+              },
+              "QtyOrderPromotions": {
+                "Amount": 1
+              },
+              "QtyPromotions": {
+                "Amount": 1
+              },
+              "QtyRefunded": {
+                "Amount": 0
+              },
+              "QtyRefundedPromotional": {
+                "Amount": 0
+              },
+              "QtySold": {
+                "Amount": 1
+              }
+            },
+            "ReturnExchangeAtts": {
+              "IsExchanged": "N",
+              "IsFullyRefunded": "N",
+              "IsLastExchanged": "N",
+              "IsRefunded": "N"
+            },
+            "Status": {
+              "DiscountStatus": {
+                "StatusClass": "Discount",
+                "StatusCode": "Discounted",
+                "StatusDesc": "PartiallyDiscounted"
+              },
+              "FulfilmentStatus": {
+                "StatusClass": "Fulfilment",
+                "StatusCode": "Fulfilled",
+                "StatusDesc": "InStore"
+              },
+              "LineStatus": {
+                "StatusClass": "Line",
+                "StatusCode": "Sold"
+              }
+            },
+            "Times": {
+              "CompletedOn": {
+                "TimeZone": "UTC",
+                "TimeZoneOffset": "+00:00",
+                "YearMonth": 202311,
+                "YearWeek": 202344,
+                "YearIsoWeek": 202345,
+                "YearDay": 2023310,
+                "DateId": "Dates_20231106",
+                "DateKey": 20231106,
+                "DateTimeKey": 20231106170939000,
+                "HourId": "Hours_2023110617",
+                "HourKey": 2023110617,
+                "Millis": 1699290579844,
+                "RawValue": "2023-11-06T17:09:39.844Z",
+                "UTC": "2023-11-06T17:09:39.844Z",
+                "DateUTC": "2023-11-06",
+                "HourUTC": 17,
+                "Local": "2023-11-06T17:09:39.844+00:00",
+                "DateLocal": "2023-11-06",
+                "HourLocal": 17
+              }
+            },
+            "Totals": {
+              "SalesTotals": {
+                "LineRefundsTotal": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 0
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 0
+                    }
+                  }
+                },
+                "LineTotal": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "ExTax": 76.019,
+                      "IncTax": 91.222,
+                      "Tax": 15.203
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "ExTax": 76.019,
+                      "IncTax": 91.222,
+                      "Tax": 15.203
+                    }
+                  }
+                },
+                "LineTotalBeforeDiscounts": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 110
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 110
+                    }
+                  }
+                },
+                "LineTotalDiscounts": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 18.778
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 18.778
+                    }
+                  }
+                }
+              }
+            },
+            "Type": {
+              "TypeClass": "B2C"
+            },
+            "UniqueMeasures": {
+              "UniqueLineDiscountIds": [
+                "LD Wrong Price"
+              ],
+              "UniqueLineDiscountIdsFlat": "LD Wrong Price",
+              "UniqueLinePromotionIds": [
+                "10percentline"
+              ],
+              "UniqueLinePromotionIdsFlat": "10percentline",
+              "UniqueOrderDiscountIds": [
+                "9901"
+              ],
+              "UniqueOrderDiscountIdsFlat": "9901",
+              "UniqueOrderPromotionIds": [
+                "TP £10 off"
+              ],
+              "UniqueOrderPromotionIdsFlat": "TP £10 off"
+            }
+          },
+          {
+            "FulfilmentAtts": {
+              "DeliveryGroup": "1",
+              "DeliveryMethodCode": "InStore",
+              "ExternalDeliveryMethodCode": "3",
+              "FulfilledFromLocationId": "Location_628",
+              "FulfilledFromLocationKey": "628",
+              "OriginFulfilledFromLocationId": "Location_N/A",
+              "OriginFulfilledFromLocationKey": "N/A"
+            },
+            "LineIds": {
+              "HeaderIds": {
+                "OrderId": "581ee053-fd24-44e2-9d31-80bd1e83f61c",
+                "OrderKey": "A0001331",
+                "OrderReferenceNumber": "H6jdoJ6282023-11-06T16:52:51.725Z71c5",
+                "OrderType": "SALE",
+                "OrigOrderId": "581ee053-fd24-44e2-9d31-80bd1e83f61c",
+                "OrigOrderKey": "A0001331",
+                "OrigOrderReferenceNumber": null,
+                "OrigOrderType": "SALE",
+                "OrigReceiptNumber": null,
+                "ReceiptNumber": null
+              },
+              "LineId": "581ee053-fd24-44e2-9d31-80bd1e83f61c_2",
+              "LineKey": "A0001331_2",
+              "LineProductKey": "1184873",
+              "LineProductKeyType": "SKU",
+              "LineSeq": 2,
+              "OrigLineId": "581ee053-fd24-44e2-9d31-80bd1e83f61c_2",
+              "OrigLineSeq": 2
+            },
+            "Prices": {
+              "SalesPrices": {
+                "LineUnitPrice": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 67
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 67
+                    }
+                  }
+                },
+                "LineUnitPriceAfterDiscounts": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 50
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 50
+                    }
+                  }
+                }
+              }
+            },
+            "ProductAtts": {
+              "ProductDesc": "STRIPE KNITTED RUGBY | MMC030 | XS | BRCBLTNVY",
+              "ProductIds": {
+                "EntityId": "ProductVariant_Retail247Origin_1184873",
+                "EntityType": "ProductVariant",
+                "ProductVariantKey": "1184873",
+                "ProductVariantKeyType": "SKU",
+                "SKU": "1184873"
+              },
+              "ProductName": "STRIPE KNITTED RUGBY"
+            },
+            "Qtys": {
+              "QtyAllDiscountsApplied": {
+                "Amount": 2
+              },
+              "QtyChanged": {
+                "Amount": 0
+              },
+              "QtyDiscounts": {
+                "Amount": 1
+              },
+              "QtyExchanged": {
+                "Amount": 0
+              },
+              "QtyExchangedNew": {
+                "Amount": 0
+              },
+              "QtyNet": {
+                "Amount": 1
+              },
+              "QtyOrderDiscounts": {
+                "Amount": 1
+              },
+              "QtyOrderPromotions": {
+                "Amount": 0
+              },
+              "QtyPromotions": {
+                "Amount": 0
+              },
+              "QtyRefunded": {
+                "Amount": 0
+              },
+              "QtyRefundedPromotional": {
+                "Amount": 0
+              },
+              "QtySold": {
+                "Amount": 1
+              }
+            },
+            "ReturnExchangeAtts": {
+              "IsExchanged": "N",
+              "IsFullyRefunded": "N",
+              "IsLastExchanged": "N",
+              "IsRefunded": "N"
+            },
+            "Status": {
+              "DiscountStatus": {
+                "StatusClass": "Discount",
+                "StatusCode": "Discounted",
+                "StatusDesc": "PartiallyDiscounted"
+              },
+              "FulfilmentStatus": {
+                "StatusClass": "Fulfilment",
+                "StatusCode": "Fulfilled",
+                "StatusDesc": "InStore"
+              },
+              "LineStatus": {
+                "StatusClass": "Line",
+                "StatusCode": "Sold"
+              }
+            },
+            "Times": {
+              "CompletedOn": {
+                "TimeZone": "UTC",
+                "TimeZoneOffset": "+00:00",
+                "YearMonth": 202311,
+                "YearWeek": 202344,
+                "YearIsoWeek": 202345,
+                "YearDay": 2023310,
+                "DateId": "Dates_20231106",
+                "DateKey": 20231106,
+                "DateTimeKey": 20231106170939000,
+                "HourId": "Hours_2023110617",
+                "HourKey": 2023110617,
+                "Millis": 1699290579844,
+                "RawValue": "2023-11-06T17:09:39.844Z",
+                "UTC": "2023-11-06T17:09:39.844Z",
+                "DateUTC": "2023-11-06",
+                "HourUTC": 17,
+                "Local": "2023-11-06T17:09:39.844+00:00",
+                "DateLocal": "2023-11-06",
+                "HourLocal": 17
+              }
+            },
+            "Totals": {
+              "SalesTotals": {
+                "LineRefundsTotal": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 0
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 0
+                    }
+                  }
+                },
+                "LineTotal": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "ExTax": 40.415,
+                      "IncTax": 48.497,
+                      "Tax": 8.082
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "ExTax": 40.415,
+                      "IncTax": 48.497,
+                      "Tax": 8.082
+                    }
+                  }
+                },
+                "LineTotalBeforeDiscounts": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 67
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 67
+                    }
+                  }
+                },
+                "LineTotalDiscounts": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 18.503
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 18.503
+                    }
+                  }
+                }
+              }
+            },
+            "Type": {
+              "TypeClass": "B2C"
+            },
+            "UniqueMeasures": {
+              "UniqueLineDiscountIds": [
+                "Price override - wrong price"
+              ],
+              "UniqueLineDiscountIdsFlat": "Price override - wrong price",
+              "UniqueOrderDiscountIds": [
+                "9901"
+              ],
+              "UniqueOrderDiscountIdsFlat": "9901"
+            }
+          },
+          {
+            "FulfilmentAtts": {
+              "DeliveryGroup": "1",
+              "DeliveryMethodCode": "InStore",
+              "ExternalDeliveryMethodCode": "3",
+              "FulfilledFromLocationId": "Location_628",
+              "FulfilledFromLocationKey": "628",
+              "OriginFulfilledFromLocationId": "Location_N/A",
+              "OriginFulfilledFromLocationKey": "N/A"
+            },
+            "LineIds": {
+              "HeaderIds": {
+                "OrderId": "581ee053-fd24-44e2-9d31-80bd1e83f61c",
+                "OrderKey": "A0001331",
+                "OrderReferenceNumber": "H6jdoJ6282023-11-06T16:52:51.725Z71c5",
+                "OrderType": "SALE",
+                "OrigOrderId": "581ee053-fd24-44e2-9d31-80bd1e83f61c",
+                "OrigOrderKey": "A0001331",
+                "OrigOrderReferenceNumber": null,
+                "OrigOrderType": "SALE",
+                "OrigReceiptNumber": null,
+                "ReceiptNumber": null
+              },
+              "LineId": "581ee053-fd24-44e2-9d31-80bd1e83f61c_3",
+              "LineKey": "A0001331_3",
+              "LineProductKey": "1212479",
+              "LineProductKeyType": "SKU",
+              "LineSeq": 3,
+              "OrigLineId": "581ee053-fd24-44e2-9d31-80bd1e83f61c_3",
+              "OrigLineSeq": 3
+            },
+            "Prices": {
+              "SalesPrices": {
+                "LineUnitPrice": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 35
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 35
+                    }
+                  }
+                },
+                "LineUnitPriceAfterDiscounts": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      }
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "ProductAtts": {
+              "ProductDesc": "LW RUGBY | OMOE018 | XXL | INK",
+              "ProductIds": {
+                "EntityId": "ProductVariant_Retail247Origin_1212479",
+                "EntityType": "ProductVariant",
+                "ProductVariantKey": "1212479",
+                "ProductVariantKeyType": "SKU",
+                "SKU": "1212479"
+              },
+              "ProductName": "LW RUGBY"
+            },
+            "Qtys": {
+              "QtyAllDiscountsApplied": {
+                "Amount": 1
+              },
+              "QtyChanged": {
+                "Amount": 0
+              },
+              "QtyDiscounts": {
+                "Amount": 0
+              },
+              "QtyExchanged": {
+                "Amount": 0
+              },
+              "QtyExchangedNew": {
+                "Amount": 0
+              },
+              "QtyNet": {
+                "Amount": 1
+              },
+              "QtyOrderDiscounts": {
+                "Amount": 1
+              },
+              "QtyOrderPromotions": {
+                "Amount": 0
+              },
+              "QtyPromotions": {
+                "Amount": 0
+              },
+              "QtyRefunded": {
+                "Amount": 0
+              },
+              "QtyRefundedPromotional": {
+                "Amount": 0
+              },
+              "QtySold": {
+                "Amount": 1
+              }
+            },
+            "ReturnExchangeAtts": {
+              "IsExchanged": "N",
+              "IsFullyRefunded": "N",
+              "IsLastExchanged": "N",
+              "IsRefunded": "N"
+            },
+            "Status": {
+              "DiscountStatus": {
+                "StatusClass": "Discount",
+                "StatusCode": "Discounted",
+                "StatusDesc": "PartiallyDiscounted"
+              },
+              "FulfilmentStatus": {
+                "StatusClass": "Fulfilment",
+                "StatusCode": "Fulfilled",
+                "StatusDesc": "InStore"
+              },
+              "LineStatus": {
+                "StatusClass": "Line",
+                "StatusCode": "Sold"
+              }
+            },
+            "Times": {
+              "CompletedOn": {
+                "TimeZone": "UTC",
+                "TimeZoneOffset": "+00:00",
+                "YearMonth": 202311,
+                "YearWeek": 202344,
+                "YearIsoWeek": 202345,
+                "YearDay": 2023310,
+                "DateId": "Dates_20231106",
+                "DateKey": 20231106,
+                "DateTimeKey": 20231106170939000,
+                "HourId": "Hours_2023110617",
+                "HourKey": 2023110617,
+                "Millis": 1699290579844,
+                "RawValue": "2023-11-06T17:09:39.844Z",
+                "UTC": "2023-11-06T17:09:39.844Z",
+                "DateUTC": "2023-11-06",
+                "HourUTC": 17,
+                "Local": "2023-11-06T17:09:39.844+00:00",
+                "DateLocal": "2023-11-06",
+                "HourLocal": 17
+              }
+            },
+            "Totals": {
+              "SalesTotals": {
+                "LineRefundsTotal": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 0
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 0
+                    }
+                  }
+                },
+                "LineTotal": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "ExTax": 28.29,
+                      "IncTax": 33.948,
+                      "Tax": 5.658
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "ExTax": 28.29,
+                      "IncTax": 33.948,
+                      "Tax": 5.658
+                    }
+                  }
+                },
+                "LineTotalBeforeDiscounts": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 35
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 35
+                    }
+                  }
+                },
+                "LineTotalDiscounts": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 1.052
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 1.052
+                    }
+                  }
+                }
+              }
+            },
+            "Type": {
+              "TypeClass": "B2C"
+            },
+            "UniqueMeasures": {
+              "UniqueOrderDiscountIds": [
+                "9901"
+              ],
+              "UniqueOrderDiscountIdsFlat": "9901"
+            }
+          },
+          {
+            "FulfilmentAtts": {
+              "DeliveryGroup": "1",
+              "DeliveryMethodCode": "InStore",
+              "ExternalDeliveryMethodCode": "3",
+              "FulfilledFromLocationId": "Location_628",
+              "FulfilledFromLocationKey": "628",
+              "OriginFulfilledFromLocationId": "Location_N/A",
+              "OriginFulfilledFromLocationKey": "N/A"
+            },
+            "LineIds": {
+              "HeaderIds": {
+                "OrderId": "581ee053-fd24-44e2-9d31-80bd1e83f61c",
+                "OrderKey": "A0001331",
+                "OrderReferenceNumber": "H6jdoJ6282023-11-06T16:52:51.725Z71c5",
+                "OrderType": "SALE",
+                "OrigOrderId": "581ee053-fd24-44e2-9d31-80bd1e83f61c",
+                "OrigOrderKey": "A0001331",
+                "OrigOrderReferenceNumber": null,
+                "OrigOrderType": "SALE",
+                "OrigReceiptNumber": null,
+                "ReceiptNumber": null
+              },
+              "LineId": "581ee053-fd24-44e2-9d31-80bd1e83f61c_4",
+              "LineKey": "A0001331_4",
+              "LineProductKey": "1212469",
+              "LineProductKeyType": "SKU",
+              "LineSeq": 4,
+              "OrigLineId": "581ee053-fd24-44e2-9d31-80bd1e83f61c_4",
+              "OrigLineSeq": 4
+            },
+            "Prices": {
+              "SalesPrices": {
+                "LineUnitPrice": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 35
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 35
+                    }
+                  }
+                },
+                "LineUnitPriceAfterDiscounts": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      }
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "ProductAtts": {
+              "ProductDesc": "LW RUGBY | OMOE018 | L | INK",
+              "ProductIds": {
+                "EntityId": "ProductVariant_Retail247Origin_1212469",
+                "EntityType": "ProductVariant",
+                "ProductVariantKey": "1212469",
+                "ProductVariantKeyType": "SKU",
+                "SKU": "1212469"
+              },
+              "ProductName": "LW RUGBY"
+            },
+            "Qtys": {
+              "QtyAllDiscountsApplied": {
+                "Amount": 1
+              },
+              "QtyChanged": {
+                "Amount": 0
+              },
+              "QtyDiscounts": {
+                "Amount": 0
+              },
+              "QtyExchanged": {
+                "Amount": 0
+              },
+              "QtyExchangedNew": {
+                "Amount": 0
+              },
+              "QtyNet": {
+                "Amount": 1
+              },
+              "QtyOrderDiscounts": {
+                "Amount": 1
+              },
+              "QtyOrderPromotions": {
+                "Amount": 0
+              },
+              "QtyPromotions": {
+                "Amount": 0
+              },
+              "QtyRefunded": {
+                "Amount": 0
+              },
+              "QtyRefundedPromotional": {
+                "Amount": 0
+              },
+              "QtySold": {
+                "Amount": 1
+              }
+            },
+            "ReturnExchangeAtts": {
+              "IsExchanged": "N",
+              "IsFullyRefunded": "N",
+              "IsLastExchanged": "N",
+              "IsRefunded": "N"
+            },
+            "Status": {
+              "DiscountStatus": {
+                "StatusClass": "Discount",
+                "StatusCode": "Discounted",
+                "StatusDesc": "PartiallyDiscounted"
+              },
+              "FulfilmentStatus": {
+                "StatusClass": "Fulfilment",
+                "StatusCode": "Fulfilled",
+                "StatusDesc": "InStore"
+              },
+              "LineStatus": {
+                "StatusClass": "Line",
+                "StatusCode": "Sold"
+              }
+            },
+            "Times": {
+              "CompletedOn": {
+                "TimeZone": "UTC",
+                "TimeZoneOffset": "+00:00",
+                "YearMonth": 202311,
+                "YearWeek": 202344,
+                "YearIsoWeek": 202345,
+                "YearDay": 2023310,
+                "DateId": "Dates_20231106",
+                "DateKey": 20231106,
+                "DateTimeKey": 20231106170939000,
+                "HourId": "Hours_2023110617",
+                "HourKey": 2023110617,
+                "Millis": 1699290579844,
+                "RawValue": "2023-11-06T17:09:39.844Z",
+                "UTC": "2023-11-06T17:09:39.844Z",
+                "DateUTC": "2023-11-06",
+                "HourUTC": 17,
+                "Local": "2023-11-06T17:09:39.844+00:00",
+                "DateLocal": "2023-11-06",
+                "HourLocal": 17
+              }
+            },
+            "Totals": {
+              "SalesTotals": {
+                "LineRefundsTotal": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 0
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 0
+                    }
+                  }
+                },
+                "LineTotal": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "ExTax": 28.29,
+                      "IncTax": 33.948,
+                      "Tax": 5.658
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "ExTax": 28.29,
+                      "IncTax": 33.948,
+                      "Tax": 5.658
+                    }
+                  }
+                },
+                "LineTotalBeforeDiscounts": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 35
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 35
+                    }
+                  }
+                },
+                "LineTotalDiscounts": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 1.052
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 1.052
+                    }
+                  }
+                }
+              }
+            },
+            "Type": {
+              "TypeClass": "B2C"
+            },
+            "UniqueMeasures": {
+              "UniqueOrderDiscountIds": [
+                "9901"
+              ],
+              "UniqueOrderDiscountIdsFlat": "9901"
+            }
+          },
+          {
+            "FulfilmentAtts": {
+              "DeliveryGroup": "1",
+              "DeliveryMethodCode": "InStore",
+              "ExternalDeliveryMethodCode": "3",
+              "FulfilledFromLocationId": "Location_628",
+              "FulfilledFromLocationKey": "628",
+              "OriginFulfilledFromLocationId": "Location_N/A",
+              "OriginFulfilledFromLocationKey": "N/A"
+            },
+            "LineIds": {
+              "HeaderIds": {
+                "OrderId": "581ee053-fd24-44e2-9d31-80bd1e83f61c",
+                "OrderKey": "A0001331",
+                "OrderReferenceNumber": "H6jdoJ6282023-11-06T16:52:51.725Z71c5",
+                "OrderType": "SALE",
+                "OrigOrderId": "581ee053-fd24-44e2-9d31-80bd1e83f61c",
+                "OrigOrderKey": "A0001331",
+                "OrigOrderReferenceNumber": null,
+                "OrigOrderType": "SALE",
+                "OrigReceiptNumber": null,
+                "ReceiptNumber": null
+              },
+              "LineId": "581ee053-fd24-44e2-9d31-80bd1e83f61c_5",
+              "LineKey": "A0001331_5",
+              "LineProductKey": "1189147",
+              "LineProductKeyType": "SKU",
+              "LineSeq": 5,
+              "OrigLineId": "581ee053-fd24-44e2-9d31-80bd1e83f61c_5",
+              "OrigLineSeq": 5
+            },
+            "Prices": {
+              "SalesPrices": {
+                "LineUnitPrice": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 65
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 65
+                    }
+                  }
+                },
+                "LineUnitPriceAfterDiscounts": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      }
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "ProductAtts": {
+              "ProductDesc": "LOZENGE LS CLASSIC PRINT | MMB081 | M | BLUWHT",
+              "ProductIds": {
+                "EntityId": "ProductVariant_Retail247Origin_1189147",
+                "EntityType": "ProductVariant",
+                "ProductVariantKey": "1189147",
+                "ProductVariantKeyType": "SKU",
+                "SKU": "1189147"
+              },
+              "ProductName": "LOZENGE LS CLASSIC PRINT"
+            },
+            "Qtys": {
+              "QtyAllDiscountsApplied": {
+                "Amount": 2
+              },
+              "QtyChanged": {
+                "Amount": 0
+              },
+              "QtyDiscounts": {
+                "Amount": 0
+              },
+              "QtyExchanged": {
+                "Amount": 0
+              },
+              "QtyExchangedNew": {
+                "Amount": 0
+              },
+              "QtyNet": {
+                "Amount": 1
+              },
+              "QtyOrderDiscounts": {
+                "Amount": 1
+              },
+              "QtyOrderPromotions": {
+                "Amount": 0
+              },
+              "QtyPromotions": {
+                "Amount": 1
+              },
+              "QtyRefunded": {
+                "Amount": 0
+              },
+              "QtyRefundedPromotional": {
+                "Amount": 0
+              },
+              "QtySold": {
+                "Amount": 1
+              }
+            },
+            "ReturnExchangeAtts": {
+              "IsExchanged": "N",
+              "IsFullyRefunded": "N",
+              "IsLastExchanged": "N",
+              "IsRefunded": "N"
+            },
+            "Status": {
+              "DiscountStatus": {
+                "StatusClass": "Discount",
+                "StatusCode": "Discounted",
+                "StatusDesc": "PartiallyDiscounted"
+              },
+              "FulfilmentStatus": {
+                "StatusClass": "Fulfilment",
+                "StatusCode": "Fulfilled",
+                "StatusDesc": "InStore"
+              },
+              "LineStatus": {
+                "StatusClass": "Line",
+                "StatusCode": "Sold"
+              }
+            },
+            "Times": {
+              "CompletedOn": {
+                "TimeZone": "UTC",
+                "TimeZoneOffset": "+00:00",
+                "YearMonth": 202311,
+                "YearWeek": 202344,
+                "YearIsoWeek": 202345,
+                "YearDay": 2023310,
+                "DateId": "Dates_20231106",
+                "DateKey": 20231106,
+                "DateTimeKey": 20231106170939000,
+                "HourId": "Hours_2023110617",
+                "HourKey": 2023110617,
+                "Millis": 1699290579844,
+                "RawValue": "2023-11-06T17:09:39.844Z",
+                "UTC": "2023-11-06T17:09:39.844Z",
+                "DateUTC": "2023-11-06",
+                "HourUTC": 17,
+                "Local": "2023-11-06T17:09:39.844+00:00",
+                "DateLocal": "2023-11-06",
+                "HourLocal": 17
+              }
+            },
+            "Totals": {
+              "SalesTotals": {
+                "LineRefundsTotal": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 0
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 0
+                    }
+                  }
+                },
+                "LineTotal": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "ExTax": 47.284,
+                      "IncTax": 56.741,
+                      "Tax": 9.457
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "ExTax": 47.284,
+                      "IncTax": 56.741,
+                      "Tax": 9.457
+                    }
+                  }
+                },
+                "LineTotalBeforeDiscounts": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 65
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 65
+                    }
+                  }
+                },
+                "LineTotalDiscounts": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 8.259
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 8.259
+                    }
+                  }
+                }
+              }
+            },
+            "Type": {
+              "TypeClass": "B2C"
+            },
+            "UniqueMeasures": {
+              "UniqueLinePromotionIds": [
+                "10percentline"
+              ],
+              "UniqueLinePromotionIdsFlat": "10percentline",
+              "UniqueOrderDiscountIds": [
+                "9901"
+              ],
+              "UniqueOrderDiscountIdsFlat": "9901"
+            }
+          },
+          {
+            "FulfilmentAtts": {
+              "DeliveryGroup": "1",
+              "DeliveryMethodCode": "InStore",
+              "ExternalDeliveryMethodCode": "3",
+              "FulfilledFromLocationId": "Location_628",
+              "FulfilledFromLocationKey": "628",
+              "OriginFulfilledFromLocationId": "Location_N/A",
+              "OriginFulfilledFromLocationKey": "N/A"
+            },
+            "LineIds": {
+              "HeaderIds": {
+                "OrderId": "581ee053-fd24-44e2-9d31-80bd1e83f61c",
+                "OrderKey": "A0001331",
+                "OrderReferenceNumber": "H6jdoJ6282023-11-06T16:52:51.725Z71c5",
+                "OrderType": "SALE",
+                "OrigOrderId": "581ee053-fd24-44e2-9d31-80bd1e83f61c",
+                "OrigOrderKey": "A0001331",
+                "OrigOrderReferenceNumber": null,
+                "OrigOrderType": "SALE",
+                "OrigReceiptNumber": null,
+                "ReceiptNumber": null
+              },
+              "LineId": "581ee053-fd24-44e2-9d31-80bd1e83f61c_6",
+              "LineKey": "A0001331_6",
+              "LineProductKey": "1201761",
+              "LineProductKeyType": "SKU",
+              "LineSeq": 6,
+              "OrigLineId": "581ee053-fd24-44e2-9d31-80bd1e83f61c_6",
+              "OrigLineSeq": 6
+            },
+            "Prices": {
+              "SalesPrices": {
+                "LineUnitPrice": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 30
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 30
+                    }
+                  }
+                },
+                "LineUnitPriceAfterDiscounts": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      }
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "ProductAtts": {
+              "ProductDesc": "OXFORD SHIRT DRESS | OWNJ001 | 12 | NAVY",
+              "ProductIds": {
+                "EntityId": "ProductVariant_Retail247Origin_1201761",
+                "EntityType": "ProductVariant",
+                "ProductVariantKey": "1201761",
+                "ProductVariantKeyType": "SKU",
+                "SKU": "1201761"
+              },
+              "ProductName": "OXFORD SHIRT DRESS"
+            },
+            "Qtys": {
+              "QtyAllDiscountsApplied": {
+                "Amount": 2
+              },
+              "QtyChanged": {
+                "Amount": 0
+              },
+              "QtyDiscounts": {
+                "Amount": 0
+              },
+              "QtyExchanged": {
+                "Amount": 0
+              },
+              "QtyExchangedNew": {
+                "Amount": 0
+              },
+              "QtyNet": {
+                "Amount": 3
+              },
+              "QtyOrderDiscounts": {
+                "Amount": 1
+              },
+              "QtyOrderPromotions": {
+                "Amount": 0
+              },
+              "QtyPromotions": {
+                "Amount": 1
+              },
+              "QtyRefunded": {
+                "Amount": 0
+              },
+              "QtyRefundedPromotional": {
+                "Amount": 0
+              },
+              "QtySold": {
+                "Amount": 3
+              }
+            },
+            "ReturnExchangeAtts": {
+              "IsExchanged": "N",
+              "IsFullyRefunded": "N",
+              "IsLastExchanged": "N",
+              "IsRefunded": "N"
+            },
+            "Status": {
+              "DiscountStatus": {
+                "StatusClass": "Discount",
+                "StatusCode": "Discounted",
+                "StatusDesc": "PartiallyDiscounted"
+              },
+              "FulfilmentStatus": {
+                "StatusClass": "Fulfilment",
+                "StatusCode": "Fulfilled",
+                "StatusDesc": "InStore"
+              },
+              "LineStatus": {
+                "StatusClass": "Line",
+                "StatusCode": "Sold"
+              }
+            },
+            "Times": {
+              "CompletedOn": {
+                "TimeZone": "UTC",
+                "TimeZoneOffset": "+00:00",
+                "YearMonth": 202311,
+                "YearWeek": 202344,
+                "YearIsoWeek": 202345,
+                "YearDay": 2023310,
+                "DateId": "Dates_20231106",
+                "DateKey": 20231106,
+                "DateTimeKey": 20231106170939000,
+                "HourId": "Hours_2023110617",
+                "HourKey": 2023110617,
+                "Millis": 1699290579844,
+                "RawValue": "2023-11-06T17:09:39.844Z",
+                "UTC": "2023-11-06T17:09:39.844Z",
+                "DateUTC": "2023-11-06",
+                "HourUTC": 17,
+                "Local": "2023-11-06T17:09:39.844+00:00",
+                "DateLocal": "2023-11-06",
+                "HourLocal": 17
+              }
+            },
+            "Totals": {
+              "SalesTotals": {
+                "LineRefundsTotal": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 0
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 0
+                    }
+                  }
+                },
+                "LineTotal": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "ExTax": 48.497,
+                      "IncTax": 58.196,
+                      "Tax": 9.699
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "ExTax": 48.497,
+                      "IncTax": 58.196,
+                      "Tax": 9.699
+                    }
+                  }
+                },
+                "LineTotalBeforeDiscounts": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 90
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 90
+                    }
+                  }
+                },
+                "LineTotalDiscounts": {
+                  "Current": {
+                    "BCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 31.804
+                    },
+                    "LCY": {
+                      "Currency": {
+                        "ISO3": "GBP"
+                      },
+                      "IncTax": 31.804
+                    }
+                  }
+                }
+              }
+            },
+            "Type": {
+              "TypeClass": "B2C"
+            },
+            "UniqueMeasures": {
+              "UniqueLinePromotionIds": [
+                "MT3for2new"
+              ],
+              "UniqueLinePromotionIdsFlat": "MT3for2new",
+              "UniqueOrderDiscountIds": [
+                "9901"
+              ],
+              "UniqueOrderDiscountIdsFlat": "9901"
+            }
+          }
+        ],
+        "PaymentLines": [
+          {
+            "PaymentIds": {
+              "ExternalProviderId": "NA",
+              "HeaderIds": {
+                "OrderId": "581ee053-fd24-44e2-9d31-80bd1e83f61c",
+                "OrderKey": "A0001331",
+                "OrderReferenceNumber": "H6jdoJ6282023-11-06T16:52:51.725Z71c5",
+                "OrderType": "SALE",
+                "OrigOrderId": "581ee053-fd24-44e2-9d31-80bd1e83f61c",
+                "OrigOrderKey": "A0001331",
+                "OrigOrderReferenceNumber": null,
+                "OrigOrderType": "SALE",
+                "OrigReceiptNumber": null,
+                "ReceiptNumber": null
+              },
+              "PaymentId": "SalesOrderPayment_PMC_A0001331_H6jdoJ6282023-11-06T16:52:51.725Z71c5",
+              "PaymentKey": "H6jdoJ6282023-11-06T16:52:51.725Z71c5"
+            },
+            "PaymentMethod": {},
+            "PaymentStatus": {
+              "StatusClass": "Payment",
+              "StatusCode": "FullyPaid"
+            },
+            "PaymentType": {
+              "ExternalSubCode": "PDQ",
+              "TypeClass": "Payment",
+              "TypeCode": "Sale",
+              "TypeDesc": "PDQ"
+            },
+            "ResultType": {
+              "ExternalCode": "AUTHORISED",
+              "SubTypeCode": "NA",
+              "TypeClass": "Payment",
+              "TypeCode": "Authorised"
+            },
+            "Times": {
+              "PaidOn": {
+                "TimeZone": "UTC",
+                "TimeZoneOffset": "+00:00",
+                "YearMonth": 202311,
+                "YearWeek": 202344,
+                "YearIsoWeek": 202345,
+                "YearDay": 2023310,
+                "DateId": "Dates_20231106",
+                "DateKey": 20231106,
+                "DateTimeKey": 20231106165251000,
+                "HourId": "Hours_2023110616",
+                "HourKey": 2023110616,
+                "Millis": 1699289571726,
+                "RawValue": "2023-11-06T16:52:51.726Z",
+                "UTC": "2023-11-06T16:52:51.726Z",
+                "DateUTC": "2023-11-06",
+                "HourUTC": 16,
+                "Local": "2023-11-06T16:52:51.726+00:00",
+                "DateLocal": "2023-11-06",
+                "HourLocal": 16
+              }
+            },
+            "Totals": {
+              "PaidTotal": {
+                "Current": {
+                  "BCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "IncTax": 322.55
+                  },
+                  "LCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "IncTax": 322.55
+                  }
+                }
+              }
+            },
+            "TransactionType": {
+              "ExternalCode": "SALE",
+              "TypeClass": "Payment",
+              "TypeCode": "Sale"
+            }
+          }
+        ],
+        "PomotionLines": [
+          {
+            "AppliedToLineIds": [
+              1
+            ],
+            "DiscountDesc": "TP £10 off",
+            "DiscountIds": {
+              "DiscountId": "SalesOrderPromotion_PMC_A0001331_a37e838e-694c-4069-9972-cddbd00abf43",
+              "DiscountKey": "a37e838e-694c-4069-9972-cddbd00abf43",
+              "HeaderIds": {
+                "OrderId": "581ee053-fd24-44e2-9d31-80bd1e83f61c",
+                "OrderKey": "A0001331",
+                "OrderReferenceNumber": "H6jdoJ6282023-11-06T16:52:51.725Z71c5",
+                "OrderType": "SALE",
+                "OrigOrderId": "581ee053-fd24-44e2-9d31-80bd1e83f61c",
+                "OrigOrderKey": "A0001331",
+                "OrigOrderReferenceNumber": null,
+                "OrigOrderType": "SALE",
+                "OrigReceiptNumber": null,
+                "ReceiptNumber": null
+              }
+            },
+            "DiscountLevel": "Order",
+            "DiscountMethod": "Store",
+            "DiscountName": "TP £10 off",
+            "DiscountStatus": {
+              "StatusClass": "Promotion",
+              "StatusCode": "FullyApplied"
+            },
+            "DiscountType": {
+              "TypeClass": "Promotion",
+              "TypeCode": "OrderPromotion"
+            },
+            "Overrides": [
+              {
+                "IsAutomaticApproval": ""
+              }
+            ],
+            "ReasonDesc": "TP £10 off",
+            "Times": {
+              "AppliedOn": {
+                "TimeZone": "UTC",
+                "TimeZoneOffset": "+00:00",
+                "YearMonth": 202311,
+                "YearWeek": 202344,
+                "YearIsoWeek": 202345,
+                "YearDay": 2023310,
+                "DateId": "Dates_20231106",
+                "DateKey": 20231106,
+                "DateTimeKey": 20231106170939000,
+                "HourId": "Hours_2023110617",
+                "HourKey": 2023110617,
+                "Millis": 1699290579844,
+                "RawValue": "2023-11-06T17:09:39.844Z",
+                "UTC": "2023-11-06T17:09:39.844Z",
+                "DateUTC": "2023-11-06",
+                "HourUTC": 17,
+                "Local": "2023-11-06T17:09:39.844+00:00",
+                "DateLocal": "2023-11-06",
+                "HourLocal": 17
+              }
+            },
+            "Totals": {
+              "DiscountTotal": {
+                "Current": {
+                  "BCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "IncTax": 5
+                  },
+                  "LCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "IncTax": 5
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "TaxSummaryLines": [
+          {
+            "Tax": {
+              "IsTaxExempt": "N",
+              "TaxCode": "H",
+              "TaxLineLevel": "Order",
+              "TaxLineType": "SummaryByTaxCode",
+              "TaxRate": 20,
+              "TaxSchemeCode": "VAT"
+            },
+            "Totals": {
+              "TaxableAmountTotal": {
+                "Current": {
+                  "BCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "ExTax": 268.792,
+                    "IncTax": 322.54900000000004,
+                    "Tax": 53.757
+                  },
+                  "LCY": {
+                    "Currency": {
+                      "ISO3": "GBP"
+                    },
+                    "ExTax": 268.792,
+                    "IncTax": 322.54900000000004,
+                    "Tax": 53.757
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

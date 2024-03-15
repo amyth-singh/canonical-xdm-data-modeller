@@ -1,0 +1,21 @@
+{
+    "$id": "LocationAtts",
+    "description": "XDM EventMetadata 'Location' definition (primary location + others in CustomAtts)",
+    "type": "object",
+    "properties": {
+      "LocationId": {"type": "string"} ,
+      "LocationType": {"type": "string"} ,
+      "RawLocationId": {"type": "string"} ,
+      "InvolvedReasonCode": {"type": "string"} ,
+      "GeoJSON": {"type": "string"} ,
+      "Latitude": {"type": "string"} ,
+      "Longitude": {"type": "string"} ,
+      "CustomAtts": [{"$ref": "../../CustomAttribute.json"}]
+    },
+    "required": [
+      "EventOccurredTimestamp",
+      "EventOccurredDateDim",
+      "EventReceivedTimestamp",
+      "EventReceivedDateDim"
+    ]
+}

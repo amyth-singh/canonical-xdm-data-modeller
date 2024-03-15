@@ -1,0 +1,15 @@
+{
+    "$id": "Availability",
+    "description": "CDM Availability definition",
+    "type": "object",
+    "properties": {
+      "AttHeader": {"$ref": "./Definitions.json#/properties/AttHeader"},
+      "DateDim": {"$ref": "./Definitions.json#/properties/DateDimension"},
+      "AttMetadata": {"$ref": "./Definitions.json#/properties/AttMetadata"}
+    },
+    "required": [
+      "AttHeader",
+      "DateDim",
+      "AttMetadata"
+    ]
+}

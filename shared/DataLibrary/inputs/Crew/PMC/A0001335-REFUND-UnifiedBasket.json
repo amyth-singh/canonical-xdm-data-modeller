@@ -1,0 +1,113 @@
+[
+    {
+        "SKU": "1184873",
+        "deliveryGroup": "1",
+        "deliveryMethod": "3",
+        "description": "STRIPE KNITTED RUGBY | MMC030 | XS | BRCBLTNVY",
+        "descriptions": [],
+        "excludePromotion": false,
+        "fullfilmentId": "628",
+        "itemDiscounts": {
+            "refundPortion": 0,
+            "trnDiscountsPortion": 1.503,
+            "trnPromotionsPortion": 0
+        },
+        "itemLineId": "2",
+        "lineDiscounts": [
+            {
+                "discountAmount": 17,
+                "discountType": "AMOUNT",
+                "discountedLinePrice": 50,
+                "itemLineId": "2",
+                "name": "Price override - wrong price",
+                "percentageDiscountManagerOverride": {
+                    "automaticApprove": "false",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                },
+                "priceManagerOverride": {
+                    "automaticApprove": "true",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                },
+                "priceOverrideAmount": 50,
+                "priceOverrideReasonCode": "100",
+                "priceOverrideReasonName": "Price override - wrong price",
+                "unitPrice": 50
+            }
+        ],
+        "originFullfillmentId": "N/A",
+        "price": 67,
+        "quantity": 1,
+        "refunded": true,
+        "refundedPromotionalQuantity": 0,
+        "refundedQuantity": 1,
+        "refundedReason": "600-1",
+        "refundedReasonDescription": "Does not suit",
+        "refundedTotal": -50,
+        "taxLines": [
+            {
+                "PreTax": 40.414,
+                "VAT": 20,
+                "VATCode": "H",
+                "itemLineId": 2,
+                "taxLineTotal": 8.082,
+                "taxableAmount": 48.497
+            }
+        ],
+        "totalLinePrice": 67
+    },
+    {
+        "SKU": "1201761",
+        "deliveryGroup": "1",
+        "deliveryMethod": "3",
+        "description": "OXFORD SHIRT DRESS | OWNJ001 | 12 | NAVY",
+        "descriptions": [],
+        "excludePromotion": false,
+        "fullfilmentId": "628",
+        "itemDiscounts": {
+            "refundPortion": 0,
+            "trnDiscountsPortion": 1.804,
+            "trnPromotionsPortion": 0
+        },
+        "itemLineId": "6",
+        "linePromotions": [
+            {
+                "displayText": "MT3for2new",
+                "itemLineId": "6",
+                "name": "MT3for2new",
+                "promotionAmount": 30,
+                "promotionId": "c9098744-3daa-4836-bfe2-07e95a21a4c1",
+                "promotionInfo": "undefined",
+                "promotionLinePrice": 60,
+                "promotionType": "MULTY_BUY",
+                "trigger": [
+                    {
+                        "itemLineId": "6",
+                        "quantity": 3
+                    }
+                ]
+            }
+        ],
+        "originFullfillmentId": "N/A",
+        "price": 30,
+        "quantity": 3,
+        "refunded": true,
+        "refundedPromotionalQuantity": 0,
+        "refundedQuantity": 3,
+        "refundedReason": "600-1",
+        "refundedReasonDescription": "Does not suit",
+        "refundedTotal": -60,
+        "taxLines": [
+            {
+                "PreTax": 48.496,
+                "VAT": 20,
+                "VATCode": "H",
+                "itemLineId": 6,
+                "taxLineTotal": 9.699,
+                "taxableAmount": 58.196
+            }
+        ],
+        "totalLinePrice": 90
+    }
+]

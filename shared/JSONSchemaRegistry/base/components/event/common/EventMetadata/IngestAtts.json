@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xfuze.io/xdm/schema/components/event/common/EventHeader/IngestAtts",
+  "description": "XDM Schema for the common event component 'EventHeader/IngestAtts'",
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "Xfuze": {
+      "type": "object",
+      "title": "Xfuze IngestAtts",
+      "description": "The (required) Xfuze derived / enriched attributes that define the context of the external trigger system and full ingest path for lineage and auditability",
+      "unevaluatedProperties": false,
+      "oneOf": [
+        {
+        "required": ["File"]
+        },
+        {
+        "required": ["Stream"]
+        },
+        {
+        "required": ["Api"]
+        },
+        {
+        "required": ["Table"]
+        }
+      ],
+      "properties": {
+        "File": {
+          "type": "object",
+          "properties": {
+            "SystemCode": {
+              "type": ["string","null"],
+              "description": "The (required) system code of the provider of the file e.g GCS"
+            },
+            "URI": {
+              "type": ["string","null"],
+              "description": "The (optional) URI of the file if a cloud file being processed that this event was derived from e.g gcs://xfuze-file-ingest/clientA/prod/dt=20230810/SalesDaily.csv"
+            },
+            "Path": {
+              "type": ["string","null"],
+              "description": "The (required) URI of the file if a cloud file being processed that this event was derived from e.g xfuze-file-ingest/clientA/prod/dt=20230810"
+            },
+            "Name": {
+              "type": ["string","null"],
+              "description": "The (required) name of the file if a cloud file being processed that this event was derived from e.g SalesDaily.csv"
+            },
+            "BatchId": {
+              "type": ["string","null"],
+              "description": "The (optional) batch ID if processing is being batched e.g BT1001"
+            },
+            "BatchNumber": {
+              "type": ["string","null"],
+              "description": "The (optional) batch Number if processing is being batched e.g BT1001-004"
+            },
+            "LineNumber": {
+              "type": "number",
+              "description": "The (optional) line number within a batch, as a key way to track lineage of event to source row e.g 234"
+            },
+            "TotalBatchLines": {
+              "type": "number",
+              "description": "The (optional) total number of lines within the batch, as a tracker of batch completion e.g 500 "
+            },
+            "OriginalFileSizeBytes": {
+              "type": "number",
+              "description": "The (required) original file size in bytes, key to reconciliation in chunked/streaming mode e.g 25000 "
+            },
+            "OriginalRowSizeBytes": {
+              "type": "number",
+              "description": "The (optional) original file size in bytes, key to reconciliation in chunked/streaming mode e.g 500 "
+            },
+            "BytesOffsetInOriginalFile": {
+              "type": "number",
+              "description": "The (optional) original file size in bytes, key to reconciliation in chunked/streaming mode e.g 500 "
+            },
+            "FormatType": {
+              "type": ["string","null"],
+              "description": "The (required) source format type",
+              "enum": [
+                "CSV",
+                "TCSV",
+                "INI",
+                "TXT",
+                "JSON",
+                "BSON",
+                "XML",
+                "YAML",
+                "Protobuf",
+                "Binary",
+                "MessagePack",
+                "Avro",
+                "Thrift",
+                "Parquet",
+                "Arrow",
+                "Other"
+              ]
+            },
+            "PatternType": {
+              "type": ["string","null"],
+              "description": "The (optional) type of File ingest pattern e.g Cloud Object Notification",
+              "enum": [
+                "CloudObjectNotification",
+                "SFTP",
+                "FTP",
+                "CloudObjectScan",
+                "Other"
+              ]
+            },
+            "ChangeTimestampUTC": {
+              "type": ["string","null"],
+              "format": "date-time",
+              "description": "The  (optional) time at which the file object changed state and triggered a notification, often in cloud metadata e.g GCS metadata"
+            },
+            "ObjectNotificationPayload": {
+              "type": ["string","null"],
+              "description": "The (optional) raw JSON string of the cloud object notification payload e.g GCS file notification"
+            }
+          }
+        },
+        "Stream": {
+          "type": "object",
+          "unevaluatedProperties": false,
+          "properties": {
+            "SystemCode": {
+              "type": "string"
+            },
+            "ChannelURI": {
+              "type": "string"
+            },
+            "ChannelName": {
+              "type": "string"
+            },
+            "ChannelType": {
+              "type": "string"
+            },
+            "Partition": {
+              "type": "string"
+            },
+            "Offset": {
+              "type": "number"
+            },
+            "ExternalMessageId": {
+              "type": "string"
+            },
+            "FormatType": {
+              "type": "string"
+            },
+            "PatternType": {
+              "type": "string"
+            },
+            "PublishTimestampUTC": {
+              "type": ["string","null"],
+              "format": "date-time"
+            }
+          }
+        },
+        "Api": {
+          "type": "object",
+          "unevaluatedProperties": false,
+          "properties": {
+            "SystemCode": {
+              "type": "string"
+            },
+            "URI": {
+              "type": "string"
+            },
+            "Name": {
+              "type": "string"
+            },
+            "Resource": {
+              "type": "string"
+            },
+            "HttpMethod": {
+              "type": "string"
+            },
+            "QueryString": {
+              "type": "string"
+            },
+            "FormatType": {
+              "type": "string"
+            },
+            "PatternType": {
+              "type": "string"
+            },
+            "InvokeTimestampUTC": {
+              "type": "string"
+            }
+          }
+        },
+        "Table": {
+          "type": "object",
+          "unevaluatedProperties": false,
+          "properties": {
+            "SystemCode": {
+              "type": "string"
+            },
+            "DatabaseURI": {
+              "type": "string"
+            },
+            "DatabaseName": {
+              "type": "string"
+            },
+            "SchemaName": {
+              "type": "string"
+            },
+            "TableName": {
+              "type": "string"
+            },
+            "RowKey": {
+              "type": "string"
+            },
+            "Method": {
+              "type": "string"
+            },
+            "PatternType": {
+              "type": "string"
+            },
+            "ReceiveTimestampUTC": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "Xfuze"
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "CardObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/CardProperties"
+    }
+  },
+  "CardProperties": {
+    "type": "object",
+    "required": [
+      "CardNumber"
+    ],
+    "unevaluatedProperties": false,
+    "properties": {
+      "CardId": {
+        "type": "string",
+        "description": "The canonical (synthetic) Xfuze Card id for the Card if identifiable and has some unique key e.g Card_D365_987654"
+      },
+      "CardNumber": {
+        "type": "string",
+        "description": "The native Card number of the Card master if identifiable and has some unique key e.g 987654"
+      },
+      "CardSerial": {
+        "type": "string",
+        "description": "The native card serial number e.g 9123445567787654"
+      },
+      "SourceBatchNumber": {
+        "type": "string",
+        "description": "The batch number from the source that this card was released  e.g 9123445567787654"
+      },
+      "CardType": {
+        "type": "string",
+        "description": "The type of the Card e.g Gift, Payment, Membership etc"
+      },
+      "CardPurpose": {
+        "type": "string",
+        "description": "The purpose of the usage of the Card e.g GiftPayments, Subscription etc"
+      },
+      "CardValidFrom": {
+        "type": "string",
+        "description": "The valid from / effective date of the  Card"
+      },
+      "CardValidTo": {
+        "type": "string",
+        "description": "The valid to / expiry date of the  Card"
+      },
+      "IsPrimary": {
+        "type": "string",
+        "description": "Is this Card a primary one? e.g Y",
+        "enum": [
+          "Y","N","U"
+        ]
+      },
+      "IsVerified": {
+        "type": "string",
+        "description": "Is this Card verified by an official Card lookup / validator? e.g Y",
+        "enum": [
+          "Y","N","U"
+        ]
+      },
+      "IsEncrypted": {
+        "type": "string",
+        "description": "Is this Card encrypted? e.g Y",
+        "enum": [
+          "Y","N","U"
+        ]
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

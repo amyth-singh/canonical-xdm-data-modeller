@@ -1,0 +1,101 @@
+{
+  "DeviceObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/DeviceProperties"
+    }
+  },
+  "DeviceProperties": {
+    "type": "object",
+    "required": [
+      "DeviceType"
+    ],
+    "unevaluatedProperties": false,
+    "properties": {
+      "DeviceId": {
+        "type": "string",
+        "description": "The canonical (synthetic) Xfuze device id, if the touch point is identifiable, format Device_[sourceSystem]_[DeviceNumber] e.g Device_D365_012"
+      },
+      "DeviceNumber": {
+        "type": "string",
+        "description": "The native device number from source, if identifiable e.g 012"
+      },
+      "DeviceClass": {
+        "type": "string",
+        "description": "The class of the device e.g ConsumerDigital",
+        "enum": [
+          "ConsumerDigital",
+          "RetailerDigital",
+          "RetailerPhysical",
+          "Other"
+        ]
+      },
+      "DeviceType": {
+        "type": "string",
+        "description": "The type of the device e.g Tablet",
+        "enum": [
+          "Tablet",
+          "Mobile",
+          "Kiosk",
+          "POS",
+          "mPOS",
+          "VendingMachine",
+          "Wearable",
+          "QRCodeReader",
+          "TV",
+          "Scanner",
+          "PaymentDevice",
+          "Other"
+        ]
+      },
+      "ExternalDeviceId": {
+        "type": "string",
+        "description": "The external device id if the device is identifiable"
+      },
+      "OS": {
+        "type": "string",
+        "description": "The operating system of the device"
+      },
+      "OSVersion": {
+        "type": "string",
+        "description": "The operating system version of the device"
+      },
+      "Model": {
+        "type": "string",
+        "description": "The model of the device"
+      },
+      "Brand": {
+        "type": "string",
+        "description": "The brand of the device"
+      },
+      "UserAgent": {
+        "type": "string",
+        "description": "The user agent of the device"
+      },
+      "Browser": {
+        "type": "string",
+        "description": "The browser of the device"
+      },
+      "BrowserType": {
+        "type": "string",
+        "description": "The browser type of the device"
+      },
+      "BrowserVersion": {
+        "type": "string",
+        "description": "The browser version of the device"
+      },
+      "BrowserWidth": {
+        "type": "string",
+        "description": "The browser screen width of the device"
+      },
+      "BrowserHeight": {
+        "type": "string",
+        "description": "The browser screen height of the device"
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

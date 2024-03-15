@@ -1,0 +1,24 @@
+{
+    "$id": "TimeAtts",
+    "description": "XDM EventMetadata 'Time' definition",
+    "type": "object",
+    "properties": {
+      "EventOccurredTimestamp": {"type": "string"} ,
+      "EventOccurredDateDim": {"$ref": "../../Definitions.json#/properties/DateDimension"},
+      "EventOccurredType": {"type": "string"} ,
+      "EventOccurredLocalTimeZone": {"type": "string"} ,      
+      "EventReceivedTimestamp": {"type": "string"} ,
+      "EventReceivedDateDim": {"$ref": "../../Definitions.json#/properties/DateDimension"},
+      "ExternalEventReceivedTimestamp": {"type": "string"} ,
+      "ExternalEventReceivedDateDim": {"$ref": "../../Definitions.json#/properties/DateDimension"},              
+      "EventProcessedTimestamp": {"type": "string"} ,
+      "EventProcessedDateDim": {"$ref": "../../Definitions.json#/properties/DateDimension"},
+      "CustomTimeAtts": [{"$ref": "../../Time.json"}]
+    },
+    "required": [
+      "EventOccurredTimestamp",
+      "EventOccurredDateDim",
+      "EventReceivedTimestamp",
+      "EventReceivedDateDim"
+    ]
+}

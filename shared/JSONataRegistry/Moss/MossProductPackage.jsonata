@@ -1,0 +1,583 @@
+(
+  $upperTrim := $string ~> $trim ~> $uppercase;
+  $cleanStr := $string ~> $trim;
+  $cleanNum := function($num){$type($num) = "number" ? $num : $type($num) = "string" ? $contains($num,/^-?\d+(\.\d+)?$/) ? $number($num) : null};
+  $dateTimeRegexMap := {"[Y0001]-[M01]-[D01] [H01]:[m01]:[s01] [P]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]) (AM|PM)$/,
+                        "[M01]/[D01]/[Y0001]":/^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/[1-9][0-9]{3}$/,
+                        "ISO8601":/^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d)(\.\d+)?([+-]([01]\d|2[0-3]):([0-5]\d)|Z)$/
+                       };
+  $dateTimeFormatValidator := function($datetime,$dateTimeFormat){$exists($dateTimeFormat) ? $contains($datetime,$lookup($dateTimeRegexMap,$dateTimeFormat)): $contains($datetime,$lookup($dateTimeRegexMap,"ISO8601"))};
+  $stringBoolMap := {"Y":"Y","1":"Y","TRUE":"Y","N":"N","0":"N","FALSE":"Y"};
+  $stringBool := function($value){$exists($value)?$lookup($stringBoolMap, $upperTrim($value)):""};
+  $reverseBool := function($value){$value = "Y" ? "N" : $value = "N" ? "Y" : "U"};
+  $reverseStringBool := $stringBool ~> $reverseBool;
+  $buildEntityID := function($entityCode,$system,$rawEntityId){$replace($entityCode,".","_") & "_" & $system & "_" & $rawEntityId};
+  $buildAttributeID := function($entityID,$AttributeCode,$AttributeId){$entityID & "_" & $replace($AttributeCode,".","_") & ($exists($AttributeId) ? "_" & $AttributeId : "")};
+  $buildEventID := function($entityType,$eventVerb,$entityId,$eventOccurredTimestamp){$entityType & "_" & $eventVerb & "_" & $entityId & "_" & $eventOccurredTimestamp};
+
+  $getDateDimFn := function($dt,$isUTC,$tz,$format) {$exists($dt) ? $dateTimeFormatValidator($dt,$format) ?
+    { 
+          "DateId": $fromMillis($toMillis($dt,$format),"[Y0001][M01][D01]"),
+          "TimestampUTC": (isUTC ? $dt : NULL),
+          "DateUTC": (isUTC ? $dt : NULL), /* TODO convert to date */
+          "TimeZone": ($tz != null ? $tz : $rawSourceTimeZone),
+          "DateTimeLocal": $fromMillis($toMillis($dt,$format)),
+          "DateLocal": $fromMillis($toMillis($dt,$format),"[Y0001]-[M01]-[D01]"),
+          "HourId": $fromMillis($toMillis($dt,$format),"[H01]"),
+          "Millis": $toMillis($dt,$format)
+    } 
+    : NULL
+  };
+
+ $eventOccurredTimestamp := $now();
+ $ProductId := $buildEntityID("Product","Dolfin",$cleanStr(PackageCode));
+ $AvailabilityId := $buildEntityID("Product_Availability","Dolfin",PackageCode);
+ $ProductGroupItemId := $buildEntityID("Product_Group_Item","Dolfin",?);
+ $EventId := $buildEventID("Product","Published",$ProductId,$eventOccurredTimestamp);
+ $AsOf := $eventOccurredTimestamp;
+{
+  "ProductId": $ProductId,
+  "Header": {
+    "ProductId": $ProductId,
+    "ProductIds": [
+      {
+        "AttHeader": {
+          "Id": $ProductId,
+          "RawId": $cleanStr(PackageCode),
+          "Class": "Product",
+          "Code": "Header.Product.ID.PackageCode",
+          "Name": "PackageCode",
+          "Desc": "Dolfin Product Code"
+        },
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "PackageCode",
+              "RawSourceVal": $string(PackageCode)
+            }
+          ]
+        }
+      }
+    ],
+    "PartyIds": NULL,
+    "Times": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Time.PackageEndOfLifeDate",""),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Header.Time.PackageEndOfLifeDate",
+          "Name": "EOLDate",
+          "Desc": "Date package goes end of life"
+        },
+        "DateDim": $getDateDimFn(EOLDate,FALSE,'Europe/London'),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "EOLDate",
+              "RawSourceVal": $string(EOLDate)
+            }
+          ]
+        }
+      }
+    ],
+    "Type": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Type.Package",""),
+          "RawId": NULL,
+          "Class": "Type",
+          "Code": "Header.Type.Package",
+          "Name": "Package",
+          "Desc": "Product hire package"
+        },
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": NULL
+        }
+      }
+    ],
+    "Status": NULL,
+    "PrimaryAtts": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Primary.Title",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Primary.Title",
+          "Name": "Title",
+          "Desc": NULL
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(Title),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "Title",
+              "RawSourceVal": $string(Title)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Primary.Descriptions",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Primary.Descriptions",
+          "Name": "Descriptions",
+          "Desc": "All attributes that describe product features"
+        },
+        "IsArray": "Y",
+        "AttType": NULL,
+        "AttValue": NULL,
+        "AttValues": [
+          {
+            "AttType": "STRING",
+            "AttKey": "Description",
+            "AttValue": $cleanStr(Description)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "ShortDescription",
+            "AttValue": $cleanStr(ShortDescription)
+          }
+
+        ],
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "Description",
+            "RawSourceVal": $string(Description)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "ShortDescription",
+            "RawSourceVal": $string(ShortDescription)
+          }
+          ]
+        }
+      }
+    ],
+    "Classifications": NULL,
+    "SellingAtts": NULL,
+    "WebMerchAtts": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.WebMerch.IsWebEnabled",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.WebMerch.IsWebEnabled",
+          "Name": "IsWebEnabled",
+          "Desc": "Is product enabled to display on website"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(WebEnabled),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "WebEnabled",
+              "RawSourceVal": $string(WebEnabled)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.WebMerch.WebProductName",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.WebMerch.WebProductName",
+          "Name": "WebProductName",
+          "Desc": "Name of product displayed on website"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(WebTitle),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "WebTitle",
+              "RawSourceVal": $string(WebTitle)
+            }
+          ]
+        }
+      }
+    ],
+    "SupplierBuyerAtts": NULL,
+    "StyleAtts": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Header.Style.Occasions",""),
+          "RawId": NULL,
+          "Class": "Product",
+          "Code": "Header.Style.Occasions",
+          "Name": "Occasions",
+          "Desc": "Occasion product has been designed for"
+        },
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(OccasionDesc),
+        "AttValues": Occasions.Occasion.
+          {
+            "AttType": "STRING",
+            "RawId": $cleanStr(OccasionCode),
+            "AttKey": "Occasion",
+            "AttValue": $cleanStr(OccasionDesc)
+          }
+        ,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "OccasionCode",
+              "RawSourceVal": $string(Occasions.Occasion.OccasionCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "OccasionDesc",
+              "RawSourceVal": $string(Occasions.Occasion.OccasionDesc)
+            }
+          ]
+        }
+      }
+    ],
+    "SizeAtts": NULL,
+    "ColourAtts": NULL,
+    "HireAtts": NULL,
+    "Qtys": NULL,
+    "Totals": NULL
+  },
+  "Variants": NULL,
+  "Prices": [
+    {
+      "ProductId": $ProductId,
+      "PriceId": $buildEntityID("Product_Prices","Dolfin", "CostPrices_" & ProductCode),
+      "PriceIds": NULL,
+      "Times": NULL,
+      "Location": NULL,
+      "Price": PriceList.Price.
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Prices.Price.HirePrice",$cleanStr(Type)),
+          "RawId": $cleanStr(Type),
+          "Class": "Sale",
+          "Code": "Prices.Price.HirePrice",
+          "Name": "HirePrice",
+          "Desc": ""
+        },
+        "PriceLocalisation": NULL,
+        "IsRecurring": NULL,
+        "RecurranceFrequency": NULL,
+        "PriceIncTax": $cleanNum(Price),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": $cleanStr(Type),
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "IsExchangeRateEstimated": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "EntityLinks": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "Price",
+              "RawSourceVal": $string(Price)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "Type",
+              "RawSourceVal": $string(Type)
+            }
+            ]
+          }
+        }
+    }
+  ],
+  "Suppliers": NULL,
+  "Availability": [
+    {
+      "ProductId": $ProductId,
+      "VariantId": NULL,
+      "AvailabilityId": $AvailabilityId,
+      "AvailabilityIds": [
+        {
+          "AttHeader": {
+            "Id": $AvailabilityId,
+            "RawId": PackageCode,
+            "Class": "ID",
+            "Code": "Availability.ID.PackageCode",
+            "Name": "PackageCode",
+            "Desc": NULL
+          },
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "PackageCode",
+                "RawSourceVal": $string(PackageCode)
+              }
+            ]
+          }
+        }
+      ],
+      "Times": [
+        {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Availability.Time.FromDate"),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Availability.Time.FromDate",
+          "Name": "FromDate",
+          "Desc": "Date package not available from"
+        },
+        "DateDim": $getDateDimFn(PackageStopDates.PackageStopDate.FromStopDate,FALSE,'Europe/London'),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "PackageStopDates.PackageStopDate.FromStopDate",
+              "RawSourceVal": $string(PackageStopDates.PackageStopDate.FromStopDate)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Availability.Time.ToDate"),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Availability.Time.ToDate",
+          "Name": "ToDate",
+          "Desc": "Date package not available to"
+        },
+        "DateDim": $getDateDimFn(PackageStopDates.PackageStopDate.ToStopDate,FALSE,'Europe/London'),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "PackageStopDates.PackageStopDate.ToStopDate",
+              "RawSourceVal": $string(PackageStopDates.PackageStopDate.ToStopDate)
+            }
+          ]
+        }
+      }
+      ]
+    }
+  ],
+  "Features": NULL,
+  "ProductGroupItems": PackageItems.Product.
+    {
+      "ProductId": $ProductId,
+      "ProductGroupItemId": $ProductGroupItemId(Product & "_" & LineNumber & "_" & SequenceNo),
+      "ProductGroupItemIds": [
+        {
+          "AttHeader": {
+            "Id": $ProductGroupItemId(Product & "_" & LineNumber & "_" & SequenceNo),
+            "RawId": Product & "_" & LineNumber & "_" & SequenceNo,
+            "Class": "ID",
+            "Code": "ProductGroupItem.ID.AvailabilityId",
+            "Name": "AvailabilityId",
+            "Desc": NULL
+          },
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "PackageItems.Product.Product",
+                "RawSourceVal": $string(Product)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "PackageItems.Product.LineNumber",
+                "RawSourceVal": $string(LineNumber)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "PackageItems.Product.SequenceNo",
+                "RawSourceVal": $string(SequenceNo)
+              }
+            ]
+          }
+        }
+      ],
+      "Times": [
+        {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"ProductGroupItem.Time.EndOfLifeDate"),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "ProductGroupItem.Time.EndOfLifeDate",
+          "Name": "EndOfLifeDate",
+          "Desc": NULL
+        },
+        "DateDim": $getDateDimFn(EndOfLifeDate,FALSE,'Europe/London'),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "PackageItems.Product.EndOfLifeDate",
+              "RawSourceVal": $string(EndOfLifeDate)
+            }
+          ]
+        }
+      }
+      ],
+      "Price": [
+        {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"ProductGroupItem.Price.AdditionalCost"),
+          "RawId": NULL,
+          "Class": "Sale",
+          "Code": "ProductGroupItem.Price.AdditionalCost",
+          "Name": "AdditionalCost",
+          "Desc": ""
+        },
+        "PriceLocalisation": "BCY",
+        "IsRecurring": NULL,
+        "RecurranceFrequency": NULL,
+        "PriceIncTax": $cleanNum(AdditionalCost),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": "GBP",
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "IsExchangeRateEstimated": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "EntityLinks": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "PackageItems.Product.AdditionalCost",
+              "RawSourceVal": $string(AdditionalCost)
+            }
+            ]
+          }
+        }
+      ],
+      "ProductLinks": [
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($ProductId,"ProductGroupItem.ProductLink.PackageItem",Product),
+            "RawId": NULL,
+            "Class": "Product",
+            "Code": "ProductGroupItem.ProductLink.PackageItem",
+            "Name": "PackageItem",
+            "Desc": ""
+          },
+          "FromEntityId": $ProductId,
+          "ToEntityId": $buildEntityID("Product","Dolfin",$cleanStr(Product)),
+          "LinkStatus": NULL,
+          "LinkName": "PackageItem",
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "PackageItems.Product.Product",
+                "RawSourceVal": $string(Product)
+              }
+              ]
+          }
+        }
+      ]
+    }
+}
+)

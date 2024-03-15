@@ -1,0 +1,44 @@
+{
+    "$id": "Price",
+    "description": "CDM Price definition",
+    "type": "object",
+    "properties": {
+      "AttHeader": {"$ref": "./Definitions.json#/properties/AttHeader"},
+      "PriceLocalisation": {"type": "string"},
+      "IsRecurring": {"$ref": "./Definitions.json#/properties/StringBool"},
+      "RecurranceFrequency": {"type": "string"},
+      "PriceIncTax": {"type": "number"},
+      "PriceExTax": {"type": "number"},
+      "PriceTax": {"type": "number"},
+      "CurrencyCode": {"type": "string"},
+      "TaxRate": {"type": "number"},
+      "IsTaxRateEstimated": {"$ref": "./Definitions.json#/properties/StringBool"},
+      "TaxRateCode": {"type": "string"},
+      "AccountingMethodType": {"type": "string"},
+      "ExchangeRate": {"type": "number"},
+      "IsExchangeRateEstimated": {"$ref": "./Definitions.json#/properties/StringBool"},
+      "ExchangeRateHistoryId": {"type": "string"},
+      "EntityLinks": [{"$ref": "./Link.json"}],
+      "AttMetadata": {"$ref": "./Definitions.json#/properties/AttMetadata"}
+    },
+    "required": [
+      "AttHeader",
+      "PriceLocalisation",
+      "IsRecurring",
+      "RecurranceFrequency",
+      "PriceIncTax",
+      "PriceExTax",
+      "PriceTax",
+      "CurrencyCode",
+      "TaxRate",
+      "IsTaxRateEstimated",
+      "TaxRateCode",
+      "AccountingMethodType",
+      "ExchangeRate",
+      "IsExchangeRateEstimated",
+      "ExchangeRateHistoryId",
+      "EntityLinks",
+      "AttMetadata"
+    ]
+}
+

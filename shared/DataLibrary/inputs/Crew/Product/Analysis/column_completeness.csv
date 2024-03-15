@@ -1,0 +1,81 @@
+Column Name,Completeness (Absolute),Completeness (%),Top 5 Frequent Values
+Description,229227,100.0,"['CLASSIC PIQUE POLO', 'ROUND NECK TEE', 'MELBURY POLO SOLID', 'CREW CLASSIC TEE', 'OXFORD SLIM FIT']"
+Range,229227,100.0,['Range test']
+Eco Friendly,229227,100.0,['Eco Friendly Test']
+Colour Group,229227,100.0,['Colour Group Test']
+Web Exclusive,229227,100.0,['Web Exclusive Test']
+Style ID,229227,100.0,"['500_6945', '500_12536', '600_10040', '500_13890', '500_18439']"
+Supplier ID,229227,100.0,"['HART BROTHERS INTERNATIONAL LTD', 'ORANGE SOURCING', 'High Hope Aglory Limited', 'RISING GROUP', 'NOVATEKS']"
+Style Code,229227,100.0,"['TMJL001', 'MQG005', 'WBD002', 'TMKE001', 'MSE002']"
+SKU,229227,100.0,"[492522, 492546, 492478, 492485, 492492]"
+Crew Type,229227,100.0,"['5200: LS Shirt', '6402: Jersey Top', '5501: Polo', '6201: Jumper', '5502: T-Shirt']"
+Product Group,229227,100.0,"['500: Menswear', '600: Womenswear', '300: Girls', '400: Boys', '800: Sponsorship']"
+EAN,229227,100.0,"[5052123108120, 5052123079864, 5052123079857, 5052123079895, 5052123079888]"
+Last Updated,229227,100.0,"['11/09/2023 15:20:44', '11/09/2023 14:28:26', '11/09/2023 15:18:09', '11/09/2023 15:22:58', '11/09/2023 15:42:39']"
+Design Colour,229223,99.99825500486418,"['NAVY', 'WHITE', 'PINK', 'BLUE', 'BLACK']"
+Size,229223,99.99825500486418,"['M', 'S', 'L', 'XL', 'XXL']"
+Vat Code,228861,99.84033294507192,"['H', 'Z', 'E']"
+Season,226253,98.70259611651333,"['Outlet manufactured styles', 'DO NOT USE PRODUCTS', 'AUTUMN WINTER 2023', 'SPRING SUMMER 2023', 'SPRING SUMMER 2022']"
+Phase,202679,88.41846728352245,"['CARRYOVER', 'CONTINUITY', 'AUTUMN 1', 'SPRING 1', 'March']"
+Country of Origin,152054,66.33337259572389,"['BGD', 'CHN', 'IND', 'TUR', 'HKG']"
+Commodity Code,143350,62.53626318016639,"['6109100010', 6109100010.0, '6110209100', '6110209900', 6110209100.0]"
+Discontinued,88338,38.5373450771506,"[True, False]"
+Product Code,67067,29.25789719361157,"['MQG005_STONE', 'MQG005_DRKNAVY', 'MQG005_TAN', 'WJH002_BLACK', 'WZH004_VINTAGMID']"
+Cost Price,62380,27.21319914320739,"[9.37, 8.07, 5.32, 7.6, 5.34]"
+Gender,46221,20.163855043254067,"['Womens', 'Mens', 'Girls', 'Boys', 'Unisex']"
+Product Type,46221,20.163855043254067,"['Tops', 'Knitwear', 'Sweatshirts and Hoodies', 'Trousers', 'Dresses']"
+Product Area,46215,20.16123755055033,"['Clothing', 'Footwear', 'Accessories']"
+Style,46197,20.15338507243911,"['Jumper', 'T-shirt', 'Shirt', 'Sweatshirt', 'Polo Shirt']"
+Packing Format,45740,19.954019378170983,"['Flat', 'Boxed', 'Hanging']"
+Short Web Description,44644,19.475890710954644,"['Classic Pique Polo', 'Crew Classic T-Shirt', 'Straight Fit Chino', 'Classic Half Zip Knit', 'Classic Pique Polo Shirt']"
+Main/Upper Comp,44592,19.453205774188902,"['100% Cotton', '100% cotton', '100% COTTON', '100% Viscose', '100% COTTON\n']"
+Washing Instructions,44577,19.44666204242956,"['Delicate Machine Wash at 30°C', 'Machine Washable at 40°C', 'Delicate Machine Wash at 40°C', 'Machine Washable', 'Machine Washable at 30°C']"
+Fit,43694,19.061454366195953,"['Classic', 'Casual', 'Regular', 'Relaxed', 'Fitted']"
+Fabric Type,42487,18.534902083960443,"['Cotton', 'Viscose', 'Polyester', 'Nylon', 'Leather']"
+Colour,40382,17.616598393731977,"['Navy Blue', 'White', 'Multi Blue', 'Mid Blue', 'Light Blue']"
+Pattern,40382,17.616598393731977,"['Plain', 'Stripe', 'Floral', 'Check', 'Textured']"
+SKU ID,40372,17.612235905892412,"['500_12323_010_033_XL', '600_12377_138_014_18', '600_12381_097_011_8', '600_12381_097_011_10', '600_12379_138_039_16']"
+Option ID,40372,17.612235905892412,"['500_12536_034_033', '500_12536_019_033', '500_12536_082_033', '600_10513_000_033', '600_11981_016_033']"
+Drying Instructions,36684,16.003350390660785,"['Do not tumble dry', 'Cool tumble dry', 'Tumble dry at low temperature', 'Dry flat', 'Flat Dry']"
+Ironing Instructions,36610,15.971067980648005,"['Cool iron on reverse', 'Warm iron on reverse', 'Do not iron', 'Cool iron', 'Warm Iron']"
+Long Web Description,35720,15.582806562926708,"['A skinny fit pair of jeans for a woman who wants a close cut. Made to stretch and retain their shape. Because everything works with jeans.', 'Let us present the perfect crew neck slub t-shirt. With roll cuffs and side split seam detail, this takes the classic tee and makes it interesting. It’ll be a seriously useful addition to your casual ensembles.', 'Our vintage chinos come washed for a lived-in look. Tailored from 100% cotton in a straight fit. Old favourites from new.', 'Our classic half zip is the perfect final layer. Supersoft with a fitted shape that goes just as well with your smarter chinos as it does with your jeans. For the week and the weekend.\n\n• Body: 82% Cotton 18% Polyester \n• Neck: 91% Cotton 9% Polyester \n• Rib:57%  Cotton 40%\n• Branded zip pull\n• Crossed oars embroidered on the chest\n• Machine wash', 'A regular fit pair of jeans for a woman who wants a relaxed cut. Slim on the leg and loose around the ankle. Because everything works with jeans..']"
+Sleeve Length,35437,15.459348157067012,"['Long', 'Short', 'Sleeveless', '3/4 Sleeve', 'Bracelet Length']"
+Neckline/Collar,35324,15.410052044479928,"['Classic Collar', 'Crew Neck', 'Round Neck', 'V Neck', 'Button Neck']"
+Length (cm),31412,13.703446801642041,"[72.0, 70.0, 64.0, 73.0, 65.0]"
+End Use,29594,12.910346512409095,"['Casual', 'Day', 'Smart', 'Summer', 'Holiday']"
+Live Date,24709,10.779271202781523,"['02/16/2023 00:00:00', '09/17/2023 23:00:00', '05/07/2023 23:00:00', '01/01/2024 00:00:00', '10/22/2023 23:00:00']"
+Fastening,17245,7.523110279330096,"['Button', 'Pullover', 'Zip', 'Button and zip', 'Slip on']"
+Markdown,17004,7.417974322396577,"[True, False]"
+Washcare Label,12821,5.593145659106475,"['Delicate Machine Wash at 30°C', 'Delicate Machine Wash at 40°C', 'Machine Washable', 'Delicate Machine Wash at 30 degrees', '\n']"
+Product Created,11234,4.900818838967487,"['08/09/2023 21:36:55', '05/18/2023 21:34:44', '10/02/2023 21:44:31', '08/09/2023 21:36:54', '07/31/2023 21:35:38']"
+Lining Comp,6555,2.8596107788349543,"['100% Polyester', '100% cotton', 'Lining/sock Leather', 'LINING: 100% POLYESTER', '100% polyester']"
+Model Height,6422,2.8015896905687376,"['5ft 9in', '5ft 8in', '5ft 10in', '6ft 1in', '5ft 9.5in']"
+Length,5059,2.206982598036008,"['Mid', 'Long', 'Knee Length', 'Below the Knee', 'Short']"
+John Lewis Product Code,4438,1.9360721031990122,"[77300367.0, 52060569.0, 52060550.0, 52060554.0, 52060551.0]"
+Waistband Position,2411,1.051795818119157,"['Standard rise', 'Mid rise', 'High rise', 'Low rise']"
+Height (cm),1546,0.6744406199967717,"[2.0, 2.5, 1.0, 3.5, 3.0]"
+Sole Comp,1391,0.606822058483512,"['Outsole: Synthetic', 'Outsole Synthetic', 'Outsole; Synthetic\n', 'Outsole; Synthetic', 'Outsole; synthetic']"
+Heel Height,817,0.3564152564924725,"['Flat', 'Low', 'Mid', 'High']"
+Heel Type,409,0.1784257526382145,"['Flat', 'Flatform', 'Block heel', 'Wedge']"
+Toe Style,391,0.17057327452699728,"['Rounded', 'Almond', 'Peep toe', 'Pointed', 'Square Toe']"
+High Value,280,0.12214965950782414,"[False, True]"
+Water Resistance,107,0.046678619883347074,"['Showerproof', 'Water Resistant']"
+Wiring,105,0.045806122315434045,"['Not wired', 'Wired']"
+Padding,105,0.045806122315434045,"['Not padded', 'Lightly padded']"
+Width (cm),91,0.03969863934004284,"[20.0, 70.0, 57.0, 21.0, 58.0]"
+Depth (cm),66,0.02879241974112997,"[6.0, 7.0, 10.0, 23.0, 1.0]"
+Model Wears,28,0.01221496595078241,"['\n\n', '\n']"
+Web Length (cm),10,0.004362487839565147,[4.5]
+Product Segment,0,0.0,[]
+Outfit 1,0,0.0,[]
+Age of Intake,0,0.0,[]
+Product Template,0,0.0,[]
+Weight (kg),0,0.0,[]
+Dangerous Goods,0,0.0,[]
+Price Level,0,0.0,[]
+Non-Returnable,0,0.0,[]
+Outfit 4,0,0.0,[]
+Outfit 3,0,0.0,[]
+Exclusive,0,0.0,[]
+Outfit 2,0,0.0,[]
+Volume (ml),0,0.0,[]

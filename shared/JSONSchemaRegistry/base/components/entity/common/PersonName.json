@@ -1,0 +1,126 @@
+{
+  "NameObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/NameProperties"
+    }
+  },
+  "NameProperties": {
+    "type": "object",
+    "required": [
+      "FullName","NameType"
+    ],
+    "unevaluatedProperties": false,
+    "properties": {
+      "NameId": {
+        "type": "string",
+        "description": "The canonical (synthetic) Xfuze name id for the name if identifiable and has some unique key e.g Name_D365_55555"
+      },
+      "NameKey": {
+        "type": "string",
+        "description": "The native name key / number of the name master, if identifiable and thus has some unique key e.g 55555"
+      },
+      "NameType": {
+        "type": "string",
+        "description": "The type of the name",
+        "enum": [
+          "Person",
+          "Organisation",
+          "Group"
+        ]
+      },
+      "Honorific": {
+        "type": "string",
+        "description": "The canonical Honorific of the name",
+        "enum": [
+          "Mr",
+          "Mrs",
+          "Miss",
+          "Ms",
+          "Dr",
+          "Professor",
+          "The Rt Revd Dr",
+          "The Most Revd",
+          "The Rt Revd",
+          "The Revd Canon",
+          "The Revd",
+          "The Rt Revd Professor",
+          "The Ven",
+          "The Most Revd Dr",
+          "Rabbi",
+          "Canon",
+          "Dame",
+          "Chief",
+          "Sister",
+          "Father",
+          "Reverend",
+          "Major",
+          "Other",
+          "Cllr",
+          "Sir",
+          "Rt Hon Lord",
+          "Rt Hon",
+          "The Lord ",
+          "Viscount",
+          "Viscountess",
+          "Baroness",
+          "Captain",
+          "Master",
+          "Very Revd",
+          "Lady",
+          "MP",
+          "Mx (gender-netural)",
+          "His Holiness",
+          "Her Holiness"
+        ]
+      },
+      "FirstName": {
+        "type": "string",
+        "description": "The first name"
+      },
+      "LastName": {
+        "type": "string",
+        "description": "The last name"
+      },
+      "MiddleNames": {
+        "type": "string",
+        "description": "The middle names"
+      },
+      "MaidenName": {
+        "type": "string",
+        "description": "The maiden name"
+      },
+      "FullName": {
+        "type": "string",
+        "description": "The full name"
+      },
+      "NickName": {
+        "type": "string",
+        "description": "The nick name"
+      },
+      "PreferredName": {
+        "type": "string",
+        "description": "The preferred name the person wishes to be called"
+      },
+      "Initials": {
+        "type": "string",
+        "description": "The initials of the name"
+      },
+      "Suffix": {
+        "type": "string",
+        "description": "The suffix of the name"
+      },
+      "IsEncrypted": {
+        "type": "string",
+        "description": "Is this name encrypted? e.g Y",
+        "enum": [
+          "Y","N","U"
+        ]
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

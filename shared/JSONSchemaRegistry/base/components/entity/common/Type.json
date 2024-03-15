@@ -1,0 +1,41 @@
+{
+  "TypeObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/TypeProperties"
+    }
+  },
+  "TypeProperties": {
+    "type": "object",
+    "required": [
+      "TypeCode"
+    ],
+    "unevaluatedProperties": false,
+    "properties": {
+      "TypeClass": {
+        "type": "string",
+        "description": "The class of the type e.g Concession, Hire"
+      },
+      "TypeCode": {
+        "type": "string",
+        "description": "The canonical code of the type e.g Sale"
+      },
+      "TypeDesc": {
+        "type": "string",
+        "description": "The description of the type e.g Sale Order Line"
+      },
+      "SubTypeCode": {
+        "type": "string",
+        "description": "The canonical code of the sub type e.g Sale"
+      },
+      "SubTypeDesc": {
+        "type": "string",
+        "description": "The description of the sub type e.g Sale Order Line"
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

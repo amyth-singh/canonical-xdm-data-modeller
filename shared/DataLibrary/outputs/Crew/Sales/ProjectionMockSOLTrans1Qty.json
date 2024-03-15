@@ -1,0 +1,314 @@
+{
+  "Events": [
+    {
+      "EventId": "SalesOrderLineCreated_SalesOrderLine::Sale_Next_6R5C62P4_959071255_2023-07-29T06:59:00.000Z",
+      "EventName": "SalesOrderLineCreated",
+      "EntityId": "SalesOrderLine::Sale_Next_6R5C62P4_959071255",
+      "EntityType": "SalesOrderLine",
+      "EventOccurredTimestampUTC": "2023-07-29T06:59:00.000Z",
+      "EventOccurredTimestampLocal": "2023-07-29T07:59:00.000+01:00",
+      "EventReceivedTimestampUTC": "2023-07-29T07:01:30.000Z",
+      "DataPayloadHash": "111111111",
+      "Note": "1st event in EOT order, 1st in ERT, sale of qty 5, for product 959071255",
+      "DomainEvent": {
+        "TriggerEntity": {
+          "SalesOrder": {
+            "OrderKey": "6R5C62P4",
+            "Lines": [
+              {
+                "Status": "Sold",
+                "ProductNumber": "959071255",
+                "Qtys": {
+                  "QtySold": {
+                    "Amount": 5
+                  },
+                  "QtyReturned": {
+                    "Amount": 0
+                  }
+                },
+                "Totals": {
+                  "SaleTotals": {
+                    "LineTotal": {
+                      "Transacted": {
+                        "LCY": {
+                          "CurrencyCode": "GBP",
+                          "IncTax": 60,
+                          "ExTax": 50,
+                          "Tax": 10
+                        },
+                        "BCY": {
+                          "IncTax": 60,
+                          "ExTax": 50,
+                          "Tax": 10
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "EventId": "SalesOrderLineCreated_SalesOrderLine::Sale_Next_6R5C62P4_259071255_2023-07-29T06:59:00.000Z",
+      "EventName": "SalesOrderLineCreated",
+      "EntityId": "SalesOrderLine::Sale_Next_6R5C62P4_259071255",
+      "EntityType": "SalesOrderLine",
+      "EventOccurredTimestampUTC": "2023-07-29T06:59:00.000Z",
+      "EventOccurredTimestampLocal": "2023-07-29T07:59:00.000+01:00",
+      "EventReceivedTimestampUTC": "2023-07-29T07:01:32.000Z",
+      "DataPayloadHash": "222222222",
+      "Note": "Equally 1st in EOT order (from same order), 2nd in ERT (just behind 1), sale of qty 1, for product 259071255",
+      "DomainEvent": {
+        "TriggerEntity": {
+          "SalesOrder": {
+            "OrderKey": "6R5C62P4",
+            "Lines": [
+              {
+                "Status": "Sold",
+                "ProductNumber": "259071255",
+                "Qtys": {
+                  "QtySold": {
+                    "Amount": 2
+                  },
+                  "QtyReturned": {
+                    "Amount": 0
+                  }
+                },
+                "Totals": {
+                  "SaleTotals": {
+                    "LineTotal": {
+                      "Transacted": {
+                        "LCY": {
+                          "CurrencyCode": "GBP",
+                          "IncTax": 36,
+                          "ExTax": 30,
+                          "Tax": 6
+                        },
+                        "BCY": {
+                          "IncTax": 36,
+                          "ExTax": 30,
+                          "Tax": 6
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "EventId": "SalesOrderLineUpdated_SalesOrderLine::Sale_Next_6R5C62P4_959071255_2023-07-29T09:05:30.000Z",
+      "EventName": "SalesOrderLineUpdated",
+      "EntityId": "SalesOrderLine::Sale_Next_6R5C62P4_959071255",
+      "EntityType": "SalesOrderLine",
+      "EventOccurredTimestampUTC": "2023-07-29T09:05:30.000Z",
+      "EventOccurredTimestampLocal": "2023-07-29T10:05:30.000+01:00",
+      "EventReceivedTimestampUTC": "2023-07-29T09:06:30.000Z",
+      "DataPayloadHash": "3333333333",
+      "Note": "2nd event in EOT order, 3rd in ERT, exchanged / return of qty -2, of product 959071255, 3 for product 559071255",
+      "DomainEvent": {
+        "TriggerEntity": {
+          "SalesOrder": {
+            "OrderKey": "6R5C62P4",
+            "Lines": [
+              {
+                "Status": "PartialExchanged",
+                "ProductNumber": "959071255",
+                "Qtys": {
+                  "QtySold": {
+                    "Amount": 0
+                  },
+                  "QtyReturned": {
+                    "Amount": -2
+                  }
+                },
+                "Totals": {
+                  "SaleTotals": {
+                    "LineTotal": {
+                      "Transacted": {
+                        "LCY": {
+                          "CurrencyCode": "GBP",
+                          "IncTax": -24,
+                          "ExTax": -20,
+                          "Tax": -4
+                        },
+                        "BCY": {
+                          "IncTax": 60,
+                          "ExTax": 50,
+                          "Tax": 10
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "EventId": "SalesOrderLineCreated_SalesOrderLine::Sale_Next_6R5C62P4_559071255_2023-07-29T09:05:30.000Z",
+      "EventName": "SalesOrderLineCreated",
+      "EntityId": "SalesOrderLine::Sale_Next_6R5C62P4_559071255",
+      "EntityType": "SalesOrderLine",
+      "EventOccurredTimestampUTC": "2023-07-29T09:05:30.000Z",
+      "EventOccurredTimestampLocal": "2023-07-29T10:05:30.000+01:00",
+      "EventReceivedTimestampUTC": "2023-07-29T09:06:30.000Z",
+      "DataPayloadHash": "4444444444",
+      "Note": "Equally 2nd event in EOT order (from same order), 4th in ERT (just behind 3rd),  exchanged / return of qty -2, of product 959071255, 3 for product 559071255",
+      "DomainEvent": {
+        "TriggerEntity": {
+          "SalesOrder": {
+            "OrderKey": "6R5C62P4",
+            "Lines": [
+              {
+                "Status": "PartialExchanged",
+                "ProductNumber": "559071255",
+                "Qtys": {
+                  "QtySold": {
+                    "Amount": 3
+                  },
+                  "QtyReturned": {
+                    "Amount": 0
+                  }
+                },
+                "Totals": {
+                  "SaleTotals": {
+                    "LineTotal": {
+                      "Transacted": {
+                        "LCY": {
+                          "CurrencyCode": "GBP",
+                          "IncTax": 72,
+                          "ExTax": 60,
+                          "Tax": 12
+                        },
+                        "BCY": {
+                          "CurrencyCode": "GBP",
+                          "IncTax": 72,
+                          "ExTax": 60,
+                          "Tax": 12
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "EventId": "SalesOrderLineCreated_SalesOrderLine::Sale_Next_6R5C62P4_559071255_2023-07-29T09:05:30.000Z",
+      "EventName": "SalesOrderLineCreated",
+      "EntityId": "SalesOrderLine::Sale_Next_6R5C62P4_559071255",
+      "EntityType": "SalesOrderLine",
+      "EventOccurredTimestampUTC": "2023-07-29T09:05:30.000Z",
+      "EventOccurredTimestampLocal": "2023-07-29T10:05:30.000+01:00",
+      "EventReceivedTimestampUTC": "2023-07-29T09:06:30.000Z",
+      "DataPayloadHash": "4444444444",
+      "Note": "Duplicate of SalesOrderLineCreated_SalesOrderLine::Sale_Next_6R5C62P4_559071255_2023-07-29T09:05:30.000Z",
+      "DomainEvent": {
+        "TriggerEntity": {
+          "SalesOrder": {
+            "OrderKey": "6R5C62P4",
+            "Lines": [
+              {
+                "Status": "PartialExchanged",
+                "ProductNumber": "559071255",
+                "Qtys": {
+                  "QtySold": {
+                    "Amount": 3
+                  },
+                  "QtyReturned": {
+                    "Amount": 0
+                  }
+                },
+                "Totals": {
+                  "SaleTotals": {
+                    "LineTotal": {
+                      "Transacted": {
+                        "LCY": {
+                          "CurrencyCode": "GBP",
+                          "IncTax": 72,
+                          "ExTax": 60,
+                          "Tax": 12
+                        },
+                        "BCY": {
+                          "CurrencyCode": "GBP",
+                          "IncTax": 72,
+                          "ExTax": 60,
+                          "Tax": 12
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "EventId": "SalesOrderLineCreated_SalesOrderLine::Sale_Next_6R5C62P4_459071255_2023-07-29T08:59:00.000Z",
+      "EventName": "SalesOrderLineCreated",
+      "EntityId": "SalesOrderLine::Sale_Next_6R5C62P4_459071255",
+      "EntityType": "SalesOrderLine",
+      "EventOccurredTimestampUTC": "2023-07-29T08:59:00.000Z",
+      "EventOccurredTimestampLocal": "2023-07-29T09:59:00.000+01:00",
+      "EventReceivedTimestampUTC": "2023-07-29T10:01:30.000Z",
+      "DataPayloadHash": "0000000000",
+      "Note": "Out-of-order, 3rd event in EOT order, LAST in ERT, sale of qty 1, for product 459071255",
+      "DomainEvent": {
+        "TriggerEntity": {
+          "SalesOrder": {
+            "OrderKey": "6R5C62P4",
+            "Lines": [
+              {
+                "Status": "Sold",
+                "ProductNumber": "459071255",
+                "Qtys": {
+                  "QtySold": {
+                    "Amount": 1
+                  },
+                  "QtyReturned": {
+                    "Amount": 0
+                  }
+                },
+                "Totals": {
+                  "SaleTotals": {
+                    "LineTotal": {
+                      "Transacted": {
+                        "LCY": {
+                          "CurrencyCode": "GBP",
+                          "IncTax": 6,
+                          "ExTax": 5,
+                          "Tax": 1
+                        },
+                        "BCY": {
+                          "IncTax": 6,
+                          "ExTax": 5,
+                          "Tax": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "Entity": null,
+  "TriggerEntityID": "SalesOrderLineCreated_SalesOrderLine::Sale_Next_6R5C62P4_959071255_2023-07-29T08:59:00.000Z"
+}

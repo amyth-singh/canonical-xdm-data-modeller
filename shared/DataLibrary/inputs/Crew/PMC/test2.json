@@ -1,0 +1,284 @@
+[
+  {
+    "HeaderId": "A0001331",
+    "Totals": {
+      "Sold": {
+        "BCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 268.793,
+          "IncTax": 322.55,
+          "Tax": 53.757
+        },
+        "LCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 268.793,
+          "IncTax": 322.55,
+          "Tax": 53.757
+        }
+      },
+      "Current": {
+        "BCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 268.793,
+          "IncTax": 322.55,
+          "Tax": 53.757
+        },
+        "LCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 268.793,
+          "IncTax": 322.55,
+          "Tax": 53.757
+        }
+      }
+    },
+    "Type": "SALE"
+  },
+  {
+    "HeaderId": "A0001332",
+    "Totals": {
+      "Sold": {
+        "BCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 268.793,
+          "IncTax": 322.55,
+          "Tax": 53.757
+        },
+        "LCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 268.793,
+          "IncTax": 322.55,
+          "Tax": 53.757
+        }
+      },
+      "Change": {
+        "BCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": -28.283,
+          "IncTax": -33.94,
+          "Tax": -5.657
+        },
+        "LCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": -28.283,
+          "IncTax": -33.94,
+          "Tax": -5.657
+        }
+      },
+      "Current": {
+        "BCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 0,
+          "IncTax": 288.61,
+          "Tax": 0
+        },
+        "LCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 0,
+          "IncTax": 288.61,
+          "Tax": 0
+        }
+      }
+    },
+    "Type": "SALE_REFUND"
+  },
+  {
+    "HeaderId": "A0001333",
+    "Totals": {
+      "Sold": {
+        "BCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 268.793,
+          "IncTax": 322.55,
+          "Tax": 53.757
+        },
+        "LCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 268.793,
+          "IncTax": 322.55,
+          "Tax": 53.757
+        }
+      },
+      "Change": {
+        "BCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 17.55,
+          "IncTax": 21.06,
+          "Tax": 3.51
+        },
+        "LCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 17.55,
+          "IncTax": 21.06,
+          "Tax": 3.51
+        }
+      },
+      "Current": {
+        "BCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 0,
+          "IncTax": 309.67,
+          "Tax": 0
+        },
+        "LCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 0,
+          "IncTax": 309.67,
+          "Tax": 0
+        }
+      }
+    },
+    "Type": "SALE_EXCHANGE"
+  },
+  {
+    "HeaderId": "A0001334",
+    "Totals": {
+      "Sold": {
+        "BCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 268.793,
+          "IncTax": 322.55,
+          "Tax": 53.757
+        },
+        "LCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 268.793,
+          "IncTax": 322.55,
+          "Tax": 53.757
+        }
+      },
+      "Change": {
+        "BCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": -169.134,
+          "IncTax": -202.96,
+          "Tax": -33.826
+        },
+        "LCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": -169.134,
+          "IncTax": -202.96,
+          "Tax": -33.826
+        }
+      },
+      "Current": {
+        "BCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 0,
+          "IncTax": 106.71,
+          "Tax": 0
+        },
+        "LCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 0,
+          "IncTax": 106.71,
+          "Tax": 0
+        }
+      }
+    },
+    "Type": "SALE_REFUND"
+  },
+  {
+    "HeaderId": "A0001335",
+    "Totals": {
+      "Sold": {
+        "BCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 268.793,
+          "IncTax": 322.55,
+          "Tax": 53.757
+        },
+        "LCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 268.793,
+          "IncTax": 322.55,
+          "Tax": 53.757
+        }
+      },
+      "Change": {
+        "BCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": -126.721,
+          "IncTax": -108.94,
+          "Tax": 17.781
+        },
+        "LCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": -126.721,
+          "IncTax": -108.94,
+          "Tax": 17.781
+        }
+      },
+      "Current": {
+        "BCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 0,
+          "IncTax": -2.23,
+          "Tax": 0
+        },
+        "LCY": {
+          "Currency": {
+            "ISO3": "GBP"
+          },
+          "ExTax": 0,
+          "IncTax": -2.23,
+          "Tax": 0
+        }
+      }
+    },
+    "Type": "REFUND"
+  }
+]

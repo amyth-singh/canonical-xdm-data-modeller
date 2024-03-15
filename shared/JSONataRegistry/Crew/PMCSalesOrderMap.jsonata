@@ -1,0 +1,3659 @@
+(
+$formatValue := function($value, $dType, $format){(
+    $formatString := $string ~> $trim;
+    $formatArray := function($array){$type($array) = "array" ? $array : [$array]};
+    $formatNumber := function($num){$type($num) = "number" ? $num : $type($num) = "string" ? $contains($num,/^-?\d+(\.\d+)?$/) ? $number($num) : $format = "ZERO" ? 0 : null : $format = "ZERO" ? 0 : null};
+    $formatStringBool := function($value,$format){(
+        $stringBoolMap := {"Y":"Y","1":"Y","TRUE":"Y","N":"N","0":"N","FALSE":"N","false":"N","true":"Y","F":"N","T":"Y"};
+        $upperTrim := $string ~> $trim ~> $uppercase;
+        $stringBool := function($v){$exists($value)?$lookup($stringBoolMap, $upperTrim($value)):""};
+        $reverseBool := function($v){$v = "Y" ? "N" : $v = "N" ? "Y" : "U"};
+        $type($format)="null" ? $value ~> $stringBool : $format="reverse" ? $value ~> $stringBool ~> $reverseBool : null
+    )};
+
+
+    $dType = "STRINGBOOL" ? $formatStringBool($value,$format) :
+    $dType = "NUMERIC"    ? $formatNumber($value) :
+    $dType = "STRING"     ? $formatString($value) :
+    $dType = "ARRAY"      ? $formatArray($value) :
+    null;
+)};
+
+$attributeSplitter := function($v,$sep,$pos){$split($v, $sep) ~> function($v){$trim($v[$pos])}};
+$TimestampToDateId := function($date,$prefix){$join([$prefix,$replace($formatValue($substringBefore($date, "T"),"STRING"),"-","")],"_")};
+
+$buildCustomAttribute := function(
+    $rawEntityId       /* Unique code describing the associated event (e.g., Sale, Return, Deposit) */
+    ,$attributeId      /* ID for distinct attributes (e.g., unique line ID for sales lines) */
+    ,$canonicalCode    /* Hierarchical code in dot notation, indicating position in hierarchy */
+    ,$value            /* Value of the attribute */
+    ,$dType            /* Type of data (options: TIMESTAMP, STRINGBOOL, NUMERIC, STRING) */
+    ,$dFormat          /* Format details e.g. input time format or bool direction */
+    ,$includeMetadata  /* Boolean: Whether to include metadata in the hierarchical output */
+    )
+{(
+    /* Build attribute unique id by concatenating entity code, canonical code and attribute id */
+    $buildAttributeID := function($rawEntityId,$canonicalCode,$attributeId){$rawEntityId & "_" & $replace($canonicalCode,".","_") & ($type($attributeId) = "null" ? "" : "_" & $attributeId)};
+
+
+    {"Id":$buildAttributeID($rawEntityId,$canonicalCode,$attributeId),
+     "Desc":$desc,
+     "Code":$canonicalCode,
+     "Value":$formatValue($value,$dType,$dFormat),
+     "Type":$dType,
+     "IncludeMetadata":$includeMetadata
+     }
+)};
+
+/* ############ PREPROCESS RAW DATA: Build a unified SV of Raw Lines as a starter as data is spread out in payload ############ */
+/*
+/* Preprocessing to shape the raw data concisely pivoted around the lines and header. */
+/* Complex source data, highly nested, lots of data quality issue e.g ids being both strings and ints, sometimes a field means one thing, other times another, depenging on trans type etc
+/* Key is that multiple line level relationships are scattered into different array structures, linked via ID to the core line */
+/* There is also a key concept of *basket level* (basket.* - 'all' lines at the poiont of that trans) lines versus *changed lines* (currentTransactionDetails.*)  */
+/* Former is for a rough basket state of all lines, the other is for changed lines only within a given trans */
+/* Lines can *disappear* between transactions too (exchanges / refunds) so the complete state between linked trans is not properly preserved, and requires deriving */
+
+	/* Desc: Key raw types of transactions explained */
+
+    /* SALE: The (ORIGINAL) initial Sale */
+    /* SALE_EXCHANGE: The (PARTIAL) exchange will have the main section show the full transaction and current status of what is left on the transaction + what has been refunded or added. */
+    /*                The currentTransactionDetails section shows exactly what has been completed in this transaction specifically, so what has been refunded and added but what is not from the original transaction.*/
+    /* SALE_REFUND: The (PARTIAL) refund - The partial refund will have the main section show the full transaction and current status of what is left on the transaction + what has been refunded. */
+    /*.             The currentTransactionDetails section shows exactly what has been completed in this transaction specifically, so what has been refunded.  */
+    /* REFUND: The FULL refund - but referenceable - the same as Sales but Negative numbers. */
+    /* UNREFERENCED_REFUND: The FULL refund - but unreferenceable - the same as Sales but Negative numbers. */
+
+
+    /* ### START: PREPROCESS CREATE REUSABLE CLEANED RAW & DERIVED XDM FIELDS USED THROUGHOUT SURFACED AT TOP LEVEL ### */
+
+  $timeNow := $now();
+
+  $xdmEvents := Events.(
+  	$originEvent := $;
+    $originId := $formatValue(id,"STRING");
+    $originTransactionId := $formatValue(transactionId,"STRING");
+    $originOriginalTransId := $formatValue(originalTransId,"STRING");
+    $originTransType := $formatValue(`type`,"STRING");
+    $originTransCompletedAt := $formatValue(transCompletedAt,"STRING");
+    $originOperationStatus := $formatValue(operationStatus,"STRING");
+    $originStoreId := storeId;
+    $originLocalCurrencyLCY := baseCurrency;
+    $localCurrencyLCY := baseCurrency;
+    $homeCurrencyBCY := "GBP";
+
+    $entityClass := "Retail";
+    $entityDomain := "Sales";
+    $entityType := "SalesOrder";
+    $entitySubType := function($inRaw) {
+        [
+          {"systemCode": "SALE",                "xfuzeCode": "Sale"},
+          {"systemCode": "SALE_EXCHANGE",       "xfuzeCode": "Exchange"},
+          {"systemCode": "SALE_REFUND",         "xfuzeCode": "Return"},
+          {"systemCode": "REFUND",              "xfuzeCode": "Return"},
+          {"systemCode": "UNREFERENCED_REFUND", "xfuzeCode": "Return"}
+        ][systemCode = $string($inRaw)].xfuzeCode
+      }($originTransType);
+
+    /* TRANS CHANGE INDICATOR: boolean used to determine whether to use *currentTransactionDetail* to source line changes from or not.  Mixed pattern, e.g REFUND doesnt even though they are changed */
+    /* The currentTransactionDetails section shows exactly what has been completed in this transaction specifically, so what has been refunded and added but what is not from the original transaction. */
+    $useChangeObj := function($inRaw) {
+        [
+          {"systemCode": "SALE",                "xfuzeCode": false},
+          {"systemCode": "SALE_EXCHANGE",       "xfuzeCode": true},
+          {"systemCode": "SALE_REFUND",         "xfuzeCode": true},
+          {"systemCode": "REFUND",              "xfuzeCode": false},
+          {"systemCode": "UNREFERENCED_REFUND", "xfuzeCode": false}
+        ][systemCode = $string($inRaw)].xfuzeCode
+      }($originTransType);
+
+
+    /* ### START: PREPROCESS RAW DATA INTO REFINED FEATURES ### */
+
+
+	/* ### PREPROCESS: 1st Step - UNIFY ALL (RAW) BASKET LINES - CORE LINE LEVEL STRUCTURE - unify the lines by brining all the seperate line related arrays (linked via itemLineId) all into ONE MASTER LINE for ease of processing */
+
+	/* JOIN: Unifiy a single line by joining the core product line to all the other array lines, resulting in a single line enirched with linked data e.g right taxLines for that line from the array */
+    $allRawBasketLines := $oneToManyJoin(basket.products,basket.taxBreakdown.taxLines,"itemLineId","itemLineId","taxLines","left");
+      $count(basket.lineDiscount) > 0 ? $allRawBasketLines := $oneToManyJoin([$allRawBasketLines],basket.lineDiscount,"itemLineId","itemLineId","lineDiscounts","left");
+      $count(basket.linePromotion) > 0 ? $allRawBasketLines := $oneToManyJoin([$allRawBasketLines],basket.linePromotion,"itemLineId","itemLineId","linePromotions","left");
+      $exists(basket.exchange.quantity) ? $allRawBasketLines := $oneToManyJoin([$allRawBasketLines],basket.exchange,"itemLineId","lineItemId","exchangeLines","left");
+
+
+
+	/* ### START: RAW BASKET ORDER DISCOUNTS - special case as itemLineIds is an array of ids*/
+
+    /* DESC: basket.transactionDiscount: Array of top level scoped discounts, applied to 1 or more lines. This expands into a per line record where itemLineIds has 1 or more lines (i.e unnest) */
+    /* All order level promos get apportioned to lines for accounting, and a single one of these can reference 1..* lines, so we want to unpack and link each to those lines in the final onetoMany join */
+
+
+    /* MAP: Unnest out a row for each line that is specified, per disc, so each line has its own record linked to an appplied top level discount */
+	$allLineOrdDiscs := $map(basket.transactionDiscount,function($x) {
+        $map($x.itemLineIds, function($lineId) {
+          $merge([$x,{"itemLineId":$lineId,"type":"Discount", "scope":"Order"}])
+        })
+    });
+
+
+    /* MAP: Flatten the array of arrays now so is a single array of all the combos of disc for line */
+    $allLineOrdDiscs := $reduce($allLineOrdDiscs, $append);
+
+
+    /* JOIN: Now, if there are any, also join in this to the unified baseket lines for the right matching master lines */
+    $count($allLineOrdDiscs) > 0 ? $allRawBasketLines := $oneToManyJoin([$allRawBasketLines],[$allLineOrdDiscs],"itemLineId","itemLineId","lineOrderDiscounts","left");
+
+
+
+
+    /* ### START: RAW BASKET ORDER PROMOTIONS  - special case as itemLineIds is an array of ids */
+
+    /* DESC: basket.transactionPromotion: As above, but for promotions not discounts, physically seperated by source */
+
+
+    /* MAP: Similar to above but for promos: Unnest out a row for each line that is specified, per disc, so each line has its own record linked to an appplied top level discount */
+    $allLineOrdPromos := $map(basket.transactionPromotion,function($x) {
+        $map($x.itemLineIds, function($lineId) {
+          $merge([$x,{"itemLineId":$lineId,"type":"Promotion", "scope":"Order"}])
+        })
+    });
+
+
+    /* MAP: Flatten the array of arrays now */
+    $allLineOrdPromos := $reduce($allLineOrdPromos, $append);
+
+
+    /* JOIN: Now, if there are any, also join in this to the unified baseket lines for the right matching master lines */
+    $count($allLineOrdPromos) > 0 ? $allRawBasketLines := $oneToManyJoin([$allRawBasketLines],[$allLineOrdPromos],"itemLineId","itemLineId","lineOrderPromotions","left");
+
+
+
+	/* ### PREPROCESS: 2nd Step - UNIFY ALL *CHANGED* BASKET LINES - CORE LINE LEVEL STRUCTURE - unify the lines by brining all the seperate line related arrays (linked via itemLineId) all into ONE MASTER LINE for ease of processing */
+
+    /* DESC: currentTransactionDetails.transactionDiscount: Array of top level scoped discounts, applied to 1 or more lines. This expands into a per line record where itemLineIds has 1 or more lines (i.e unnest) */
+    /* All order level promos get apportioned to lines for accounting, and a single one of these can reference 1..* lines, so we want to unpack and link each to those lines in the final onetoMany join */
+
+
+
+    /* JOIN: Unfiy a single line by joining the core changed product line (currentTransactionDetails.products) to all the other change array lines, resulting in a single line enirched with linked data e.g right taxLines for that line from the array */
+    $allRawBasketChangeLines := $oneToManyJoin(currentTransactionDetails.products,currentTransactionDetails.taxBreakdown.taxLines,"itemLineId","itemLineId","taxLines","left");
+        $count(currentTransactionDetails.lineDiscount) > 0 ? $allRawBasketChangeLines := $oneToManyJoin([$allRawBasketChangeLines],currentTransactionDetails.lineDiscount,"itemLineId","itemLineId","lineDiscounts","left");
+        $count(currentTransactionDetails.linePromotion) > 0 ? $allRawBasketChangeLines := $oneToManyJoin([$allRawBasketChangeLines],currentTransactionDetails.linePromotion,"itemLineId","itemLineId","linePromotions","left");
+        $exists(currentTransactionDetails.exchange.quantity) ? $allRawBasketChangeLines := $oneToManyJoin([$allRawBasketChangeLines],currentTransactionDetails.exchange,"itemLineId","lineItemId","exchangeLines","left");
+
+
+    /* ### START: RAW BASKET ORDER DISCOUNTS *CHANGED* IN TRANS - special case as itemLineIds is an array of ids*/
+
+    /* DESC: currentTransactionDetails.transactionDiscount: Array of top level scoped discounts related to the changes items WRT event (type - e.g those exchanged or refunded). This expands into a per line record where itemLineIds has 1 or more lines (i.e unnest) */
+	/* THis is analogous to the basket.transactionDiscount but only related to those lines that have changed on this transaction */
+
+
+    /* MAP: Unnest out a row for each line that is specified, per changed disc, so each line has its own record linked to an appplied top level discount */
+	$allLineOrdDiscChanges := $map(currentTransactionDetails.transactionDiscount,function($x) {
+        $map($x.itemLineIds, function($lineId) {
+          $merge([$x,{"itemLineId":$lineId,"type":"Discount", "scope":"Order"}])
+        })
+    });
+
+
+	/* MAP: Flatten the array of arrays now */
+    $allLineOrdDiscChanges := $reduce($allLineOrdDiscChanges, $append);
+
+
+    /* JOIN: Now, if there are any, also join in this to the unified baseket lines for the right matching master lines */
+    $count($allLineOrdDiscChanges) > 0 ? $allRawBasketChangeLines := $oneToManyJoin([$allRawBasketChangeLines],[$allLineOrdDiscChanges],"itemLineId","itemLineId","lineOrderDiscounts","left");
+
+
+	/* ### START: RAW BASKET ORDER DISCOUNTS CHANGED - special case as itemLineIds is an array of ids*/
+
+    /* MAP: Similar to above but for promos: Unnest out a row for each line that is specified, per disc, so each line has its own record linked to an appplied top level discount */
+    $allLineOrdPromoChanges := $map(currentTransactionDetails.transactionPromotion,function($x) {
+        $map($x.itemLineIds, function($lineId) {
+          $merge([$x,{"itemLineId":$lineId,"type":"Promotion", "scope":"Order"}])
+        })
+    });
+
+
+    /* MAP: Flatten the array of arrays now */
+    $allLineOrdPromoChanges := $reduce($allLineOrdPromoChanges, $append);
+
+
+    /* JOIN: Now, if there are any, also join in this to the unified baseket lines for the right matching master lines */
+    $count($allLineOrdPromoChanges) > 0 ? $allRawBasketChangeLines := $oneToManyJoin([$allRawBasketChangeLines],[$allLineOrdPromoChanges],"itemLineId","itemLineId","lineOrderPromotions","left");
+
+
+
+	/* ### ALL (RAW) BASKET CHANGE LINES UNIFIED - Unify the (Change) Lines by brining all the seperate line related arrays all into ONE MASTER LINE for ease of processing*/
+	/* NOTE: if a new line is added, it wont be in the basket.products, need the right join */
+
+   $allRawBasketLines := $count([$allRawBasketChangeLines]) > 0 ? $oneToManyJoin([$allRawBasketLines],[$allRawBasketChangeLines],"itemLineId","itemLineId","changedLine","left") : $allRawBasketLines;
+
+
+	/* ### PREPROCESS: 3rd Step - DERIVE LINE MEASURES */
+
+    /* ###: MAP: Line measures based on above, where the 'original' sale data sits (pre any changes) OR should be used for REFUND - currrentTransactionDetails isnt populated for these types */
+    $derivedAllLineFeatures := $allRawBasketLines.(
+      {
+      	"transactionId": 											$originTransactionId,
+      	"itemLineId": 												$formatValue(itemLineId,"NUMERIC",null),
+        "parentItemLineId": 										$formatValue(parentItemLineId,"NUMERIC",null),
+        "SKU":														SKU,
+        "Description": 												$length(description) > 0 ? description : descriptions[0],
+        "Source": 													"basket",
+        "Type":														$entitySubType,
+        "RawType": 													$originEvent.type,
+        "IsRefunded":												$formatValue($exists(refunded) ? refunded : false,"STRINGBOOL",null),
+        "IsExchangeSaleLine": 										$exists(isnewProduct) and isnewProduct ? "Y" : "N", /* no exchange possible in SALE or REFUND so should be 'N'*/
+        "IsExchangeReturnLine": 									$exists(exchange) ? "Y" : "N",
+        "IsReturnLine": 											$exists(exchange) = false and $exists(refundedQuantity) ? "Y" : "N",
+        "Qtys" : {
+          "QtySoldUnits" : 											$entitySubType = "Sale" ? quantity :  0,
+          "QtyRefundedUnits" : 										($exists(refundedQuantity) ? $formatValue(refundedQuantity,"NUMERIC","ZERO") : 0),
+          "QtyReturnRefundedUnits" : 								($exists(exchange) = false and $exists(refundedQuantity) ? $formatValue(refundedQuantity,"NUMERIC","ZERO") : 0),
+          "QtyReturnRefundedPromotionalUnits" : 					($exists(refundedPromotionalQuantity) ? $formatValue(refundedPromotionalQuantity,"NUMERIC","ZERO") : 0),
+          "QtyExchangedRefundedUnits" : 							($exists(exchange.quantity) ? $formatValue(exchange.quantity, "NUMERIC","ZERO") : 0),
+          "QtyExchangedSaleUnits" :       							($exists(exchange.newItems) ? $formatValue($sum(exchange.newItems.Quantity), "NUMERIC","ZERO") : 0),
+          "QtyDiscountLines" :       								$count([lineDiscounts]),
+          "QtyPromotionLines" :       								$count([linePromotions]),
+          "QtyOrderDiscountLines" :       							$count([lineOrderDiscounts]),
+          "QtyOrderPromotionLines" :       							$count([lineOrderPromotions]),
+          "QtySaleLines" : 											$exists(exchange) = false and $exists(refundedQuantity) = false ? 1 : 0,
+          "QtyExchangeLines" : 										$exists(exchange) ? 1 : 0, 											/* only 0 */
+          "QtyReturnLines" : 										$exists(exchange) = false and $exists(refundedQuantity) ? 1 : 0,
+          "IsRefunded":												$formatValue($exists(refunded) ? refunded : false,"STRINGBOOL")
+        },
+        "UnitPrices" : {
+          "LineUnitPriceIncTax" : 									$formatValue(price,"NUMERIC","ZERO"),
+          "LineUnitPriceAfterDiscountsIncTax" : 					($count([lineDiscounts]) > 0 ? $formatValue(lineDiscounts[0].unitPrice,"NUMERIC","ZERO") : null), /* assume will only be max length of 1 */
+          "IsRefunded":												$formatValue($exists(refunded) ? refunded : false,"STRINGBOOL")
+        },
+        "Totals" : {
+          "LineTotalBeforeDiscountsIncTax" : 						(refunded ? -1.0 * totalLinePrice : totalLinePrice),
+          "LineTotalTax" : 											$sum(taxLines.taxLineTotal),
+          "LineTotalTaxableAmount" : 								$sum(taxLines.taxableAmount),
+          "LineDiscountsTotalIncTax" : 								($count([lineDiscounts]) > 0 ? $sum($formatValue(lineDiscounts.discountAmount,"NUMERIC","ZERO")) : 0.00),
+          "LinePromotionsTotalIncTax" : 							($count([linePromotions]) > 0 ? $sum($formatValue(linePromotions.promotionAmount,"NUMERIC","ZERO")) : 0.00),
+          "LineRefundsTotalIncTax" : 							    $formatValue(refundedTotal,"NUMERIC","ZERO"),
+          "LineDiscountRefundsTotalIncTax" : 						-1.0 * $formatValue(itemDiscounts.refundPortion,"NUMERIC","ZERO"), /* TBD */
+          "LineOrderDiscountsApportionedTotalIncTax" : 				$formatValue(itemDiscounts.trnDiscountsPortion,"NUMERIC","ZERO"),
+          "LineOrderPromotionsApportionedTotalIncTax" : 			$formatValue(itemDiscounts.trnPromotionsPortion,"NUMERIC","ZERO"),
+          "LineOrderDiscountspportionedTotalIncTax2" : 				($count([lineOrderDiscounts]) > 0 and $count(lineOrderDiscounts.itemLineIds) = 1 ? $sum($formatValue(lineOrderDiscounts.discountAmount,"NUMERIC","ZERO")) : 0.00),
+          "LineOrderPromotionsApportionedTotalIncTax2" : 			($count([lineOrderPromotions]) > 0 and $count(lineOrderPromotions.itemLineIds) = 1 ? $sum($formatValue(lineOrderPromotions.promotionAmount,"NUMERIC","ZERO")) : 0.00),
+          "IsRefunded":												$formatValue($exists(refunded) ? refunded : false,"STRINGBOOL",null)
+        },
+        "Flags" : {
+          "IsChangedLineFromUpdate" : 								$formatValue($exists(changedLine),"STRINGBOOL",null),
+          "IsAddedInBasketFromUpdate" : 							$formatValue($exists(addedInBasket) ? addedInBasket : "N","STRINGBOOL",null),
+          "IsNewProductFromUpdate" : 								$formatValue($exists(isnewProduct) ? isnewProduct : "N","STRINGBOOL",null),
+          "IsExcludePromotion" : 									$formatValue($exists(excludePromotion) ? excludePromotion : "N" ,"STRINGBOOL",null),
+          "IsSealedOnReturn" : 										$formatValue($exists(sealed) ? sealed : "N" ,"STRINGBOOL",null)
+        },
+        "FulfilmentAtts" : {
+		  "ExternalDeliveryMethodCode" : 							deliveryMethod,
+          "DeliveryGroup" : 										deliveryGroup,
+          "FulfilledFromLocationId" :								"Location_" & fullfilmentId,
+          "FulfilledFromLocationKey" :								fullfilmentId,
+          "OriginFulfilledFromLocationId" :							"Location_" & originFullfillmentId,
+          "OriginFulfilledFromLocationKey" :						originFullfillmentId,
+          "LeadTimeType" : 											leadTime.type,
+          "LeadTimeValue" : 										leadTime.value
+        },
+        "ReturnExchangeAtts" : {
+		  "IsRefunded" : 											$formatValue($exists(refunded) ? "Y" : "N","STRINGBOOL",null),
+		  "IsExchanged" : 											$formatValue($exists(exchange) ? "Y" : "N","STRINGBOOL",null),
+		  "IsFullyRefunded" : 										(quantity - ($exists(refundedQuantity) ? $formatValue(refundedQuantity,"NUMERIC","ZERO") : 0) = 0 ? "Y" : "N"),
+          "IsLastExchanged" : 										$formatValue($exists(isLastExchanged) ? isLastExchanged : "N","STRINGBOOL",null),
+          "RefundedReasonCode" : 									$formatValue(refundedReason,"STRING",null),
+          "RefundedReasonDesc" : 									$formatValue(refundedReasonDescription,"STRING",null)
+        },
+       	"UniqueMeasures" : {
+          "UniqueOrderDiscountIds" : 								$count(lineOrderDiscounts) > 0 ? $formatValue($distinct([lineOrderDiscounts.(reasonCode)]),"ARRAY",null),
+          "UniqueOrderDiscountIdsFlat" : 							$count(lineOrderDiscounts) > 0 ? $join($distinct([lineOrderDiscounts.(reasonCode)]),","),
+          "UniqueOrderPromotionIds" : 								$count(lineOrderPromotions) > 0 ? $formatValue($distinct([lineOrderPromotions.(name)]),"ARRAY",null),
+          "UniqueOrderPromotionIdsFlat" : 							$count(lineOrderPromotions) > 0 ? $join($distinct([lineOrderPromotions.(name)]),","),
+          "UniqueLineDiscountIds" : 								$count(lineDiscounts) > 0 ? $formatValue($distinct([lineDiscounts.(name)]),"ARRAY",null),
+          "UniqueLineDiscountIdsFlat" : 							$count(lineDiscounts) > 0 ? $join($distinct([lineDiscounts.(name)]),","),
+          "UniqueLinePromotionIds" : 								$count(linePromotions) > 0 ? $formatValue($distinct([linePromotions.(name)]),"ARRAY",null),
+          "UniqueLinePromotionIdsFlat" : 							$count(linePromotions) > 0 ? $join($distinct([linePromotions.(name)]),","),
+          "UniqueExchangeNewItemLineIds" : 							$count(exchange.newItems) > 0 ? $formatValue($distinct([exchange.newItems.(lineItemId)]),"ARRAY",null),
+          "UniqueExchangeNewItemLineIdssFlat" : 					$count(exchange.newItems) > 0 ? $join($string($distinct([exchange.newItems.(lineItemId)])),",")
+      	},
+        "ImageURLs" : 												imageUrls,
+        "AttributeCodes" :											attributes,
+        "DiscountLines": 											lineDiscounts,
+        "PromotionLines": 											linePromotions,
+        "OrderDiscountLines" : 										lineOrderDiscounts,
+        "OrderPromotionLines": 										lineOrderPromotions,
+        "TaxLines":													taxLines
+    });
+
+    /* ###: MAP: Derive LineTotalTax */
+    $derivedAllLineFeatures := $derivedAllLineFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LineTotalTax":
+            	$originEvent.type = "REFUND" or $originEvent.type = "UNREFERENCED_REFUND" ? -1.0 * $.LineTotalTax : $.LineTotalTax } |
+        ])
+    );
+
+    /* ###: MAP: Derive LineTotalTax */
+    $derivedAllLineFeatures := $derivedAllLineFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LineTotalTaxableAmount":
+            	$originEvent.type = "REFUND" or $originEvent.type = "UNREFERENCED_REFUND" ? -1.0 * $.LineTotalTaxableAmount : $.LineTotalTaxableAmount } |
+        ])
+    );
+
+    /* ###: MAP: Derive LineDiscountsTotalIncTax */
+    $derivedAllLineFeatures := $derivedAllLineFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LineDiscountsTotalIncTax":
+            	$originEvent.type = "REFUND" or $originEvent.type = "UNREFERENCED_REFUND" ? -1.0 * $.LineDiscountsTotalIncTax : $.LineDiscountsTotalIncTax } |
+        ])
+    );
+
+    /* ###: MAP: Derive LinePromotionsTotalIncTax */
+    $derivedAllLineFeatures := $derivedAllLineFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LinePromotionsTotalIncTax":
+            	$originEvent.type = "REFUND" or $originEvent.type = "UNREFERENCED_REFUND" ? -1.0 * $.LinePromotionsTotalIncTax : $.LinePromotionsTotalIncTax } |
+        ])
+    );
+
+    /* ###: MAP: Derive LineOrderDiscountsApportionedTotalIncTax */
+    $derivedAllLineFeatures := $derivedAllLineFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LineOrderDiscountsApportionedTotalIncTax":
+            	$.LineOrderDiscountsApportionedTotalIncTax != 0 ? $.LineOrderDiscountsApportionedTotalIncTax : $.LineOrderDiscountsApportionedTotalIncTax } |
+        ])
+    );
+
+     /* ###: MAP: Derive LineOrderDiscountsApportionedTotalIncTax */
+    $derivedAllLineFeatures := $derivedAllLineFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LineOrderDiscountsApportionedTotalIncTax":
+            	$originEvent.type = "REFUND" or $originEvent.type = "UNREFERENCED_REFUND" ? -1.0 * $.LineOrderDiscountsApportionedTotalIncTax : $.LineOrderDiscountsApportionedTotalIncTax } |
+        ])
+    );
+
+     /* ###: MAP: Derive LineOrderPromotionsApportionedTotalIncTax */
+    $derivedAllLineFeatures := $derivedAllLineFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LineOrderPromotionsApportionedTotalIncTax":
+            	$.LineOrderPromotionsApportionedTotalIncTax2 != 0 ? $.LineOrderPromotionsApportionedTotalIncTax2 : $.LineOrderPromotionsApportionedTotalIncTax } |
+        ])
+    );
+
+     /* ###: MAP: Derive LineOrderPromotionsApportionedTotalIncTax */
+    $derivedAllLineFeatures := $derivedAllLineFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LineOrderPromotionsApportionedTotalIncTax":
+            	$originEvent.type = "REFUND" or $originEvent.type = "UNREFERENCED_REFUND" ? -1.0 * $.LineOrderPromotionsApportionedTotalIncTax : $.LineOrderPromotionsApportionedTotalIncTax } |
+        ])
+    );
+
+     /* ###: MAP: Line measures based on above, where the 'original' sale data sits (pre any changes) OR should be used for REFUND - currrentTransactionDetails isnt populated for these types */
+    $derivedAllLineFeatures := $derivedAllLineFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LineAllDiscountsTotalIncTax":
+            	$.LineDiscountsTotalIncTax + $.LinePromotionsTotalIncTax + $.LineOrderDiscountsApportionedTotalIncTax + $.LineOrderPromotionsApportionedTotalIncTax } |
+        ])
+    );
+
+    /* ###: MAP: Derive LineTotalAfterDiscountsIncTax */
+    $derivedAllLineFeatures := $derivedAllLineFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LineTotalAfterDiscountsIncTax":
+            	$.LineTotalBeforeDiscountsIncTax - $.LineAllDiscountsTotalIncTax } |
+        ])
+    );
+
+    /* ###: MAP: Derive LineTotalIncTax */
+    $derivedAllLineFeatures := $derivedAllLineFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LineTotalIncTax":
+            	$.LineTotalTaxableAmount } |
+        ])
+    );
+
+    $derivedAllLineFeatures := $derivedAllLineFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LineTotalExTax":
+            	$.LineTotalIncTax - $.LineTotalTax } |
+        ])
+    );
+
+    /* ###: MAP: Derive QtyAllDiscounts */
+    $derivedAllLineFeatures := $derivedAllLineFeatures.(
+    	$merge([$,
+            $ ~> |Qtys|{"QtyAllDiscountLinesApplied":
+            	$.QtyDiscountLines + $.QtyPromotionLines + $.QtyOrderPromotionLines + $.QtyOrderDiscountLines} |
+        ])
+    );
+
+    /* ###: MAP: Derive QtyNetUnits */
+    $derivedAllLineFeatures := $derivedAllLineFeatures.(
+    	$merge([$,
+            $ ~> |Qtys|{"QtyNetUnits":
+            	$.QtySoldUnits - $.QtyRefundedUnits} |
+        ])
+    );
+
+
+    /* ###: MAP: DERIVED LINE *CHANGE* FEATURES: */
+    /* ###: MAP: Line measures for currentTransactionDetails.products[] which have been shaped into an unified line in allRawBasketChangeLines */
+    $derivedAllLineChangeFeatures := $allRawBasketChangeLines.(
+      {
+      	"TransactionId": 											$originTransactionId,
+      	"itemLineId": 												$formatValue(itemLineId,"NUMERIC",null),
+        "parentItemLineId": 										$formatValue(parentItemLineId,"NUMERIC",null),
+        "SKU":														SKU,
+        "Description": 												$length(description) > 0 ? description : descriptions[0],
+        "Source": 													"currrentTransactionDetails",
+        "Type":														$entitySubType,
+        "RawType": 													$originEvent.type,
+        "IsRefunded":												$formatValue($exists(refunded) ? refunded : false,"STRINGBOOL",null),
+        "IsExchangeSaleLine": 										$exists(isnewProduct) and isnewProduct ? "Y" : "N",
+        "IsExchangeReturnLine": 									$exists(exchange) ? "Y" : "N",
+        "IsReturnLine": 											$exists(exchange) = false and $exists(refundedQuantity) ? "Y" : "N",
+        "Qtys" : {
+          "QtySoldUnits" : 											$exists(isnewProduct) and isnewProduct ? quantity : 0,
+          "QtyRefundedUnits" : 										($exists(refundedQuantity) ? $formatValue(refundedQuantity,"NUMERIC","ZERO") : 0),
+          "QtyReturnRefundedUnits" : 								($exists(exchange) = false and $exists(refundedQuantity) ? $formatValue(refundedQuantity,"NUMERIC","ZERO") : 0),
+          "QtyReturnRefundedPromotionalUnits" : 					($exists(refundedPromotionalQuantity) ? $formatValue(refundedPromotionalQuantity,"NUMERIC","ZERO") : 0),
+          "QtyExchangedRefundedUnits" : 							($exists(exchange.quantity) ? $formatValue(exchange.quantity, "NUMERIC","ZERO") : 0),
+          "QtyExchangedSaleUnits" :       							$exists(isnewProduct) and isnewProduct ? quantity : 0, /* TODO: ($exists(exchange.newItems) ? $formatValue($sum(exchange.newItems.Quantity), "NUMERIC","ZERO") : 0),*/
+          "QtyDiscountLines" :       								$count([lineDiscounts]),
+          "QtyPromotionLines" :       								$count([linePromotions]),
+          "QtyOrderDiscountLines" :       							$count([lineOrderDiscounts]),
+          "QtyOrderPromotionLines" :       							$count([lineOrderPromotions]),
+          "QtySaleLines" : 											$exists(isnewProduct) and isnewProduct ? 1 : 0,
+          "QtyExchangeLines" : 										$exists(exchange) ? 1 : 0,
+          "QtyReturnLines" : 										$exists(exchange) = false and $exists(refundedQuantity) ? 1 : 0,
+          "IsRefunded":												$formatValue($exists(refunded) ? refunded : false,"STRINGBOOL")
+
+        },
+        "UnitPrices" : {
+          "LineUnitPriceIncTax" : 									$formatValue(price,"NUMERIC","ZERO"),
+          "LineUnitPriceAfterDiscountsIncTax" : 					($count([lineDiscounts]) > 0 ? $formatValue(lineDiscounts[0].unitPrice,"NUMERIC","ZERO") : null) /* assume will only be max length of 1 */,
+          "IsRefunded":												$formatValue($exists(refunded) ? refunded : false,"STRINGBOOL")
+        },
+        "Totals" : {
+          "LineTotalBeforeDiscountsIncTax" : 						(refunded ? refundedTotal : totalLinePrice),
+          "LineTotalTax" : 											$sum(taxLines.taxLineTotal),
+          "LineTotalTaxableAmount" : 								$sum(taxLines.taxableAmount),
+          "LineDiscountsTotalIncTax" : 								($count([lineDiscounts]) > 0 ? $sum($formatValue(lineDiscounts.discountAmount,"NUMERIC","ZERO")) : 0.00),
+          "LinePromotionsTotalIncTax" : 							($count([linePromotions]) > 0 ? $sum($formatValue(linePromotions.promotionAmount,"NUMERIC","ZERO")) : 0.00),
+          "LineRefundsTotalIncTax" : 							    $formatValue(refundedTotal,"NUMERIC","ZERO"),
+          "LineDiscountRefundsTotalIncTax" : 						-1.0 * $formatValue(itemDiscounts.currentRefundPortion,"NUMERIC","ZERO"),
+          "LineOrderDiscountsApportionedTotalIncTax" : 				$formatValue(itemDiscounts.trnDiscountsPortion,"NUMERIC","ZERO"),
+          "LineOrderPromotionsApportionedTotalIncTax" : 			$formatValue(itemDiscounts.trnPromotionsPortion,"NUMERIC","ZERO"),
+          "LineOrderDiscountspportionedTotalIncTax2" : 				($count([lineOrderDiscounts]) > 0 and $count(lineOrderDiscounts.itemLineIds) = 1 ? $sum($formatValue(lineOrderDiscounts.discountAmount,"NUMERIC","ZERO")) : 0.00),
+          "LineOrderPromotionsApportionedTotalIncTax2" : 			($count([lineOrderPromotions]) > 0 and $count(lineOrderPromotions.itemLineIds) = 1 ? $sum($formatValue(lineOrderPromotions.promotionAmount,"NUMERIC","ZERO")) : 0.00),
+          "IsRefunded":												$formatValue($exists(refunded) ? refunded : false,"STRINGBOOL",null)
+        },
+        "Flags" : {
+          "IsChangedLineFromUpdate" : 								$formatValue($exists(changedLine),"STRINGBOOL",null),
+          "IsAddedInBasketFromUpdate" : 							$formatValue($exists(addedInBasket) ? addedInBasket : "N","STRINGBOOL",null),
+          "IsNewProductFromUpdate" : 								$formatValue($exists(isnewProduct) ? isnewProduct : "N","STRINGBOOL",null),
+          "IsExcludePromotion" : 									$formatValue($exists(excludePromotion) ? excludePromotion : "N" ,"STRINGBOOL",null),
+          "IsSealedOnReturn" : 										$formatValue($exists(sealed) ? sealed : "N" ,"STRINGBOOL",null)
+        },
+        "FulfilmentAtts" : {
+		  "ExternalDeliveryMethodCode" : 							deliveryMethod,
+          "DeliveryGroup" : 										deliveryGroup,
+          "FulfilledFromLocationId" :								"Location_" & fullfilmentId,
+          "FulfilledFromLocationKey" :								fullfilmentId,
+          "OriginFulfilledFromLocationId" :							"Location_" & originFullfillmentId,
+          "OriginFulfilledFromLocationKey" :						originFullfillmentId,
+          "LeadTimeType" : 											leadTime.type,
+          "LeadTimeValue" : 										leadTime.value
+        },
+        "ReturnExchangeAtts" : {
+		  "IsRefunded" : 											$formatValue($exists(refunded) ? "Y" : "N","STRINGBOOL",null),
+		  "IsExchanged" : 											$formatValue($exists(exchange) ? "Y" : "N","STRINGBOOL",null),
+		  "IsFullyRefunded" : 										(quantity - ($exists(refundedQuantity) ? $formatValue(refundedQuantity,"NUMERIC","ZERO") : 0) = 0 ? "Y" : "N"),
+          "IsLastExchanged" : 										$formatValue($exists(isLastExchanged) and isLastExchanged ? "Y" : "N","STRINGBOOL",null),
+          "RefundedReasonCode" : 									$formatValue(refundedReason,"STRING",null),
+          "RefundedReasonDesc" : 									$formatValue(refundedReasonDescription,"STRING",null)
+        },
+       	"UniqueMeasures" : {
+          "UniqueOrderDiscountIds" : 								$count(lineOrderDiscounts) > 0 ? $formatValue($distinct([lineOrderDiscounts.(reasonCode)]),"ARRAY",null),
+          "UniqueOrderDiscountIdsFlat" : 							$count(lineOrderDiscounts) > 0 ? $join($distinct([lineOrderDiscounts.(reasonCode)]),","),
+          "UniqueOrderPromotionIds" : 								$count(lineOrderPromotions) > 0 ? $formatValue($distinct([lineOrderPromotions.(name)]),"ARRAY",null),
+          "UniqueOrderPromotionIdsFlat" : 							$count(lineOrderPromotions) > 0 ? $join($distinct([lineOrderPromotions.(name)]),","),
+          "UniqueLineDiscountIds" : 								$count(lineDiscounts) > 0 ? $formatValue($distinct([lineDiscounts.(name)]),"ARRAY",null),
+          "UniqueLineDiscountIdsFlat" : 							$count(lineDiscounts) > 0 ? $join($distinct([lineDiscounts.(name)]),","),
+          "UniqueLinePromotionIds" : 								$count(linePromotions) > 0 ? $formatValue($distinct([linePromotions.(name)]),"ARRAY",null),
+          "UniqueLinePromotionIdsFlat" : 							$count(linePromotions) > 0 ? $join($distinct([linePromotions.(name)]),","),
+          "UniqueExchangeNewItemLineIds" : 							$count(exchange.newItems) > 0 ? $formatValue($distinct([exchange.newItems.(lineItemId)]),"ARRAY",null),
+          "UniqueExchangeNewItemLineIdssFlat" : 					$count(exchange.newItems) > 0 ? $join($string($distinct([exchange.newItems.(lineItemId)])),",")
+      	},
+        "ImageURLs" : 												imageUrls,
+        "AttributeCodes" :											attributes,
+        "DiscountLines": 											lineDiscounts,
+        "PromotionLines": 											linePromotions,
+        "OrderDiscountLines" : 										lineOrderDiscounts,
+        "OrderPromotionLines": 										lineOrderPromotions,
+        "TaxLines":													taxLines
+    });
+
+    /* ###: MAP: Derive LineDiscountsTotalIncTax */
+    $derivedAllLineChangeFeatures := $derivedAllLineChangeFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LineDiscountsTotalIncTax":
+            	$.IsReturn = "Y" and $.LineDiscountsTotalIncTax > 0 ? -1.0 * $.LineDiscountsTotalIncTax : $.LineDiscountsTotalIncTax } |
+        ])
+    );
+
+    /* ###: MAP: Derive LinePromotionsTotalIncTax */
+    $derivedAllLineChangeFeatures := $derivedAllLineChangeFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LinePromotionsTotalIncTax":
+            	$.IsReturn = "Y" and $.LinePromotionsTotalIncTax > 0 ? -1.0 * $.LinePromotionsTotalIncTax : $.LinePromotionsTotalIncTax } |
+        ])
+    );
+
+    /* ###: MAP: Derive LineOrderDiscountsApportionedTotalIncTax */
+    $derivedAllLineChangeFeatures := $derivedAllLineChangeFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LineOrderDiscountsApportionedTotalIncTax":
+            	$.LineOrderDiscountsApportionedTotalIncTax != 0 ? $.LineOrderDiscountsApportionedTotalIncTax : $.LineOrderDiscountsApportionedTotalIncTax } |
+        ])
+    );
+
+     /* ###: MAP: Derive LineOrderDiscountsApportionedTotalIncTax */
+    $derivedAllLineChangeFeatures := $derivedAllLineChangeFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LineOrderDiscountsApportionedTotalIncTax":
+            	$.IsReturn = "Y" and $.LineOrderDiscountsApportionedTotalIncTax > 0 ? -1.0 * $.LineOrderDiscountsApportionedTotalIncTax : $.LineOrderDiscountsApportionedTotalIncTax } |
+        ])
+    );
+
+     /* ###: MAP: Derive LineOrderPromotionsApportionedTotalIncTax */
+    $derivedAllLineChangeFeatures := $derivedAllLineChangeFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LineOrderPromotionsApportionedTotalIncTax":
+            	$.LineOrderPromotionsApportionedTotalIncTax2 != 0 ? $.LineOrderPromotionsApportionedTotalIncTax2 : $.LineOrderPromotionsApportionedTotalIncTax } |
+        ])
+    );
+
+     /* ###: MAP: Derive LineOrderPromotionsApportionedTotalIncTax */
+    $derivedAllLineChangeFeatures := $derivedAllLineChangeFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LineOrderPromotionsApportionedTotalIncTax":
+            	$.IsReturn = "Y" and $.LineOrderPromotionsApportionedTotalIncTax > 0 ? -1.0 * $.LineOrderPromotionsApportionedTotalIncTax : $.LineOrderPromotionsApportionedTotalIncTax } |
+        ])
+    );
+
+     /* ###: MAP: Derive LineAllDiscountsTotalIncTax */
+    $derivedAllLineChangeFeatures := $derivedAllLineChangeFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LineAllDiscountsTotalIncTax":
+            	$.LineDiscountsTotalIncTax + $.LinePromotionsTotalIncTax + ($.IsRefunded = "N" ? ($.LineOrderDiscountsApportionedTotalIncTax + $.LineOrderPromotionsApportionedTotalIncTax) : $.LineDiscountRefundsTotalIncTax) } |
+        ])
+    );
+
+    /* ###: MAP: Derive LineTotalAfterDiscountsIncTax */
+    $derivedAllLineChangeFeatures := $derivedAllLineChangeFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LineTotalAfterDiscountsIncTax":
+            	$.LineTotalBeforeDiscountsIncTax - $.LineAllDiscountsTotalIncTax } |
+        ])
+    );
+
+    /* ###: MAP: Derive LineTotalIncTax */
+    $derivedAllLineChangeFeatures := $derivedAllLineChangeFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LineTotalIncTax":
+            	$.LineTotalTaxableAmount } |
+        ])
+    );
+
+   /* ###: MAP: Derive LineTotalExTax */
+    $derivedAllLineChangeFeatures := $derivedAllLineChangeFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"LineTotalExTax":
+            	$.LineTotalIncTax - $.LineTotalTax } |
+        ])
+    );
+
+    /* ###: MAP: Derive QtyAllDiscounts */
+    $derivedAllLineChangeFeatures := $derivedAllLineChangeFeatures.(
+    	$merge([$,
+            $ ~> |Qtys|{"QtyAllDiscountLinesApplied":
+            	$.QtyDiscountLines + $.QtyPromotionLines + $.QtyOrderPromotionLines + $.QtyOrderDiscountLines} |
+        ])
+    );
+
+    /* ###: MAP: Derive QtyNetUnits */
+    $derivedAllLineChangeFeatures := $derivedAllLineChangeFeatures.(
+    	$merge([$,
+            $ ~> |Qtys|{"QtyNetUnits":
+            	$.QtySoldUnits - $.QtyRefundedUnits} |
+        ])
+    );
+
+
+	/* ### PREPROCESS: 4th Step - DERIVE ORDER MEASURES */
+
+    /* ###: MAP: For the core basket, map top level order measures */
+	$derivedOrderFeatures := {
+      "TransactionId": 									$originTransactionId,
+      "Type":											$entitySubType,
+      "RawType": 										$originEvent.type,
+      "Source": 										"basket",
+      "RawTopLevelSaleTotal" : 							$formatValue(saleTotal,"NUMERIC","ZERO"),
+      "TransactionRef": 								transactionRef,
+      "ExternalProviderResponse":						externalProviderResponse,
+      "Qtys" : {
+        "QtySoldUnits" : 								$originEvent.type = "SALE" ? $formatValue(basketSummary.totalItems,"NUMERIC","ZERO") : 0,
+        "QtyRefundedUnits": 							$sum($derivedAllLineFeatures.Qtys.QtyRefundedUnits),
+        "QtyPaymentLines" : 							$formatValue($count(paymentDetails),"NUMERIC","ZERO"),
+        "QtyOrderLines" : 								$formatValue($count(basket.products),"NUMERIC","ZERO"),
+        "QtyOrderDiscountLines" : 						$formatValue($count(basket.transactionDiscount),"NUMERIC","ZERO"),
+        "QtyOrderPromotionLines" : 						$formatValue($count(basket.transactionPromotion),"NUMERIC","ZERO"),
+        "QtyLineDiscountLines" : 						$formatValue($count(basket.lineDiscount),"NUMERIC","ZERO"),
+        "QtyLinePromotionLines" : 						$formatValue($count(basket.linePromotion),"NUMERIC","ZERO"),
+        "QtyTaxLines" : 								$formatValue($count(basket.taxBreakdown.taxLines),"NUMERIC","ZERO"),
+        "QtyLifetimeTransToDate" : 						$formatValue($count(transactionStructure),"NUMERIC","ZERO")
+
+      },
+      "QtysByLineAgg": {
+      	"QtySoldUnits": 								$sum($derivedAllLineFeatures.Qtys.QtySoldUnits),
+      	"QtyRefundedUnits": 							$sum($derivedAllLineFeatures.Qtys.QtyRefundedUnits),
+      	"QtyReturnRefundedUnits": 						$sum($derivedAllLineFeatures.Qtys.QtyReturnRefundedUnits),
+        "QtyReturnRefundedPromotionalUnits": 			$sum($derivedAllLineFeatures.Qtys.QtyReturnRefundedPromotionalUnits),
+        "QtyExchangedRefundedUnits": 					$sum($derivedAllLineFeatures.Qtys.QtyExchangedRefundedUnits),
+        "QtyExchangedSaleUnits": 						$sum($derivedAllLineFeatures.Qtys.QtyExchangedSaleUnits),
+        "QtyAllDiscountLinesApplied": 					$sum($derivedAllLineFeatures.Qtys.QtyAllDiscountLinesApplied),
+        "QtySaleLines": 								$sum($derivedAllLineFeatures.Qtys.QtySaleLines),
+        "QtyExchangeLines": 							$sum($derivedAllLineFeatures.Qtys.QtyExchangeLines),
+        "QtyReturnLines": 								$sum($derivedAllLineFeatures.Qtys.QtyReturnLines)
+
+      },
+      "Totals" : {
+        "OrderTotalIncTax" : 							$formatValue(basketSummary.basketTotal,"NUMERIC","ZERO"),
+        "OrderTotalExTax" : 							$formatValue(basketSummary.basketTotal,"NUMERIC","ZERO") - $formatValue(basketSummary.VATTotal,"NUMERIC","ZERO"),
+        "OrderTotalTax" : 								$formatValue(basketSummary.VATTotal,"NUMERIC","ZERO"),
+        "OrderTotalBeforeDiscountsIncTax" : 			$formatValue(basketSummary.saleTotal,"NUMERIC","ZERO"), /* Check */
+        "RefundsTotalIncTax" : 							$formatValue(basketSummary.refundTotal,"NUMERIC","ZERO"),
+        "DiscountsTotalIncTax" : 						$formatValue(basketSummary.discountTotal,"NUMERIC","ZERO"),
+        "OrderDiscountsTotalIncTax" : 					$formatValue($sum(basket.transactionDiscount.discountAmount), "NUMERIC","ZERO"),
+        "LineDiscountsTotalIncTax" : 					$formatValue($sum(basket.lineDiscount.discountAmount), "NUMERIC","ZERO"),
+        "OrderPromotionsTotalIncTax" : 					$formatValue($sum(basket.transactionPromotion.promotionAmount), "NUMERIC","ZERO"),
+        "LinePromotionsTotalIncTax" : 					$formatValue($sum(basket.linePromotion.promotionAmount), "NUMERIC","ZERO"),
+        "PaymentsTotalIncTax" : 						$formatValue($sum($formatValue(paymentDetails.amount,"NUMERIC","ZERO")), "NUMERIC","ZERO"),
+        "TaxableAmountTotalTax" : 						$formatValue(basket.taxBreakdown.totalTaxableAmount,"NUMERIC","ZERO"),
+        "TaxTotalTax" : 								$formatValue($round($sum(basket.totalTaxSummary.TaxSum),3), "NUMERIC","ZERO"),
+        "TaxTotalExTax" : 								$formatValue($sum(basket.totalTaxSummary.PreTaxSum), "NUMERIC","ZERO"),
+        "TaxTotalIncTax" : 								$formatValue($round($sum(basket.totalTaxSummary.TXrateSum),3), "NUMERIC","ZERO"),
+        "FulfilmentsTotalIncTax" : 						$formatValue($sum($formatValue(paymentDetails.shippingAmount,"NUMERIC","ZERO")), "NUMERIC","ZERO")
+
+      },
+      "TotalsByLineAgg": {
+      	"LineTotalIncTax": 								$sum($derivedAllLineFeatures.Totals.LineTotalIncTax),
+      	"LineTotalExTax": 								$sum($derivedAllLineFeatures.Totals.LineTotalExTax),
+      	"LineTotalTax": 								$sum($derivedAllLineFeatures.Totals.LineTotalTax),
+      	"LineAllDiscountsTotalIncTax": 					$sum($derivedAllLineFeatures.Totals.LineAllDiscountsTotalIncTax),
+      	"LineDiscountsTotalIncTax": 					$sum($derivedAllLineFeatures.Totals.LineDiscountsTotalIncTax),
+      	"LineDiscountRefundsTotalIncTax": 				$sum($derivedAllLineFeatures.Totals.LineDiscountRefundsTotalIncTax)
+      },
+      "OrderLineage" : {
+      	  "CurrTransId" : $originTransactionId,
+      	  "CurrTransStoreId" : $originStoreId,
+          "CurrTrans" : transactionStructure[transactionId = $originTransactionId],
+    	  "OrigSaleTransId" : transactionStructure[type = "SALE"].id,
+    	  "OrigSaleTransStoreId" : transactionStructure[type = "SALE"].storeId,
+    	  "OrigSaleTrans" : transactionStructure[type = "SALE"],
+          "ParentTransId" : transactionStructure[transactionId = $originTransactionId].parentId,
+          "AllTransactionStructure" : transactionStructure
+      },
+      "UniqueFeatures" : {
+        "UniqueProductIds" : 							$formatValue($distinct([basket.products.(SKU)]),"ARRAY",null),
+        "UniqueProductIdsFlat" : 						$join($distinct([basket.products.(SKU)]),","),
+        "UniqueStoreIds" : 								$count(transactionStructure) > 0 ? $formatValue($distinct([transactionStructure.(storeId)]),"ARRAY",null),
+        "UniqueStoreIdsFlat" : 							$count(transactionStructure) > 0 ? $join($distinct([transactionStructure.(storeId)]),","),
+        "UniqueStoreIdTransTypes" : 					$count(transactionStructure) > 0 ? $formatValue($distinct([transactionStructure.({"storeId":storeId,"tranType":type})]),"ARRAY",null),
+        "UniqueStoreIdTransTypesFlat" : 				$count(transactionStructure) > 0 ? $join($distinct([transactionStructure.("storeId:"& storeId & ",tranType:" & type)]),","),
+        "UniquePaymentTypeIds" : 						$count(paymentDetails) > 0 ? $formatValue($distinct([paymentDetails.(paymentType)]),"ARRAY",null),
+        "UniquePaymentTypeIdsFlat" : 					$count(paymentDetails) > 0 ? $join($distinct([paymentDetails.(paymentType)]),","),
+        "UniqueOrderDiscountIds" : 						$count(basket.transactionDiscount) > 0 ? $formatValue($distinct([basket.transactionDiscount.(reasonCode)]),"ARRAY",null),
+        "UniqueOrderDiscountIdsFlat" : 					$count(basket.transactionDiscount) > 0 ? $join($distinct([basket.transactionDiscount.(reasonCode)]),","),
+        "UniqueOrderPromotionIds" : 					$count(basket.transactionPromotion) > 0 ? $formatValue($distinct([basket.transactionPromotion.(name)]),"ARRAY",null),
+        "UniqueOrderPromotionIdsFlat" : 				$count(basket.transactionPromotion) > 0 ? $join($distinct([basket.transactionPromotion.(name)]),","),
+        "UniqueLineDiscountIds" : 						$count(basket.lineDiscount) > 0 ? $formatValue($distinct([basket.lineDiscount.(name)]),"ARRAY",null),
+        "UniqueLineDiscountIdsFlat" : 					$count(basket.lineDiscount) > 0 ? $join($distinct([basket.lineDiscount.(name)]),","),
+        "UniqueLinePromotionIds" : 						$count(basket.linePromotion) > 0 ? $formatValue($distinct([basket.linePromotion.(name)]),"ARRAY",null),
+        "UniqueLinePromotionIdsFlat" : 					$count(basket.linePromotion) > 0 ? $join($distinct([basket.linePromotion.(name)]),","),
+        "UniquePaymentResultIds" : 						$count(paymentDetails) > 0 ? $formatValue($distinct(paymentDetails.(result)),"ARRAY",null),
+        "UniqueDeliveryMethodIds" : 					$formatValue($distinct([basket.products.(deliveryMethod)]),"ARRAY",null),
+        "UniqueDeliveryMethodIdsFlat" : 				$join($distinct([basket.products.(deliveryMethod)]),","),
+        "UniqueTaxCodes" : 								$formatValue($distinct([totalTaxSummary.(VATCode)]),"ARRAY",null),
+        "UniqueTaxCodesFlat" : 							$join($distinct([totalTaxSummary.(VATCode)]),",")
+      }
+
+    };
+
+    /* ###: MAP: Derive TaxableAmountTotalTax */
+    $derivedOrderFeatures := $derivedOrderFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"TaxableAmountTotalTax":
+            	$originEvent.type = "REFUND" or $originEvent.type = "UNREFERENCED_REFUND" ? -1.0 * $.TaxableAmountTotalTax : $.TaxableAmountTotalTax} |
+        ])
+    );
+
+    /* ###: MAP: Derive TaxTotalTax */
+    $derivedOrderFeatures := $derivedOrderFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"TaxTotalTax":
+            	$originEvent.type = "REFUND" or $originEvent.type = "UNREFERENCED_REFUND" ? -1.0 * $.TaxTotalTax : $.TaxTotalTax} |
+        ])
+    );
+
+    /* ###: MAP: Derive TaxTotalIncTax */
+    $derivedOrderFeatures := $derivedOrderFeatures.(
+    	$merge([$,
+            $ ~> |Totals|{"TaxTotalIncTax":
+            	$originEvent.type = "REFUND" or $originEvent.type = "UNREFERENCED_REFUND" ? -1.0 * $.TaxTotalIncTax : $.TaxTotalIncTax} |
+        ])
+    );
+
+    /* ###: MAP: Derive QtyNetUnits */
+    $derivedOrderFeatures := $derivedOrderFeatures.(
+    	$merge([$,
+            $ ~> |Qtys|{"QtyNetUnits":
+            	$.QtySoldUnits - $.QtyRefundedUnits} |
+        ])
+    );
+
+    /* ###: MAP: Derive QtyAllDiscounts */
+    $derivedOrderFeatures := $derivedOrderFeatures.(
+    	$merge([$,
+            $ ~> |Qtys|{"QtyAllDiscountLines":
+            	$.QtyOrderDiscountLines + $.QtyOrderPromotionLines + $.QtyLinePromotionLines + $.QtyLineDiscountLines} |
+        ])
+    );
+
+    /* ###: MAP: Derive ParentTrans */
+    $derivedOrderFeatures := $derivedOrderFeatures.(
+    	$merge([$,
+            $ ~> |OrderLineage|{"ParentTrans":
+            		$.AllTransactionStructure[transactionId = $.ParentTransId]  } |
+        ])
+    );
+
+        /* ###: MAP: Derive ParentTransStoreId */
+    $derivedOrderFeatures := $derivedOrderFeatures.(
+    	$merge([$,
+            $ ~> |OrderLineage|{"ParentTransStoreId":
+            		$.ParentTrans.storeId  } |
+        ])
+    );
+
+    /* ###: MAP: For the changed basket (currentTransactionDetails), map top level order measures */
+	$derivedOrderChangeFeatures := {
+      "TransactionId": 									$originTransactionId,
+      "Type":											$entitySubType,
+      "RawType": 										$originEvent.type,
+      "Source": 										"currentTransactionDetails",
+      "RawTopLevelSaleTotal" : 							$formatValue(saleTotal,"NUMERIC","ZERO"),
+      "TransactionRef": 								transactionRef,
+      "ExternalProviderResponse":						externalProviderResponse,
+      "Qtys" : {
+        "QtySoldUnits" : 								$sum($derivedAllLineChangeFeatures.Qtys.QtySoldUnits),
+        "QtyRefundedUnits": 							$sum($formatValue($count(currentTransactionDetails.products.refundedQuantity),"NUMERIC","ZERO")),
+        "QtyPaymentLines" : 							$formatValue($count(paymentDetails),"NUMERIC","ZERO"),
+        "QtyOrderLines" : 								$formatValue($count(currentTransactionDetails.products),"NUMERIC","ZERO"),
+        "QtyOrderDiscountLines" : 						$formatValue($count(currentTransactionDetails.transactionDiscount),"NUMERIC","ZERO"),
+        "QtyOrderPromotionLines" : 						$formatValue($count(currentTransactionDetails.transactionPromotion),"NUMERIC","ZERO"),
+        "QtyLineDiscountLines" : 						$formatValue($count(currentTransactionDetails.lineDiscount),"NUMERIC","ZERO"),
+        "QtyLinePromotionLines" : 						$formatValue($count(currentTransactionDetails.linePromotion),"NUMERIC","ZERO"),
+        "QtyTaxLines" : 								$formatValue($count(currentTransactionDetails.taxBreakdown.taxLines),"NUMERIC","ZERO"),
+        "QtyLifetimeTransToDate" : 						$formatValue($count(transactionStructure),"NUMERIC","ZERO")
+      },
+      "QtysByLineAgg": {
+      	"QtySoldUnits": 								$sum($derivedAllLineChangeFeatures.Qtys.QtySoldUnits),
+		"QtyRefundedUnits": 							$sum($derivedAllLineChangeFeatures.Qtys.QtyRefundedUnits),
+      	"QtyReturnRefundedUnits": 						$sum($derivedAllLineChangeFeatures.Qtys.QtyReturnRefundedUnits),
+        "QtyReturnRefundedPromotionalUnits": 			$sum($derivedAllLineChangeFeatures.Qtys.QtyReturnRefundedPromotionalUnits),
+        "QtyExchangedRefundedUnits": 					$sum($derivedAllLineChangeFeatures.Qtys.QtyExchangedRefundedUnits),
+        "QtyExchangedSaleUnits": 						$sum($derivedAllLineChangeFeatures.Qtys.QtyExchangedSaleUnits),
+        "QtyAllDiscountLinesApplied": 					$sum($derivedAllLineChangeFeatures.Qtys.QtyAllDiscountLinesApplied),
+        "QtySaleLines": 								$sum($derivedAllLineChangeFeatures.Qtys.QtySaleLines),
+        "QtyExchangeLines": 							$sum($derivedAllLineChangeFeatures.Qtys.QtyExchangeLines),
+        "QtyReturnLines": 								$sum($derivedAllLineChangeFeatures.Qtys.QtyReturnLines)
+      },
+      "Totals" : {
+        "OrderTotalIncTax" : 							$formatValue(currentTransactionDetails.basketSummary.basketTotal,"NUMERIC","ZERO"),
+        "OrderTotalExTax" : 							$formatValue(currentTransactionDetails.basketSummary.basketTotal,"NUMERIC","ZERO") - $formatValue(currentTransactionDetails.basketSummary.VATTotal,"NUMERIC","ZERO"),
+        "OrderTotalTax" : 								$formatValue(currentTransactionDetails.basketSummary.VATTotal,"NUMERIC","ZERO"),
+        "OrderTotalBeforeDiscountsIncTax" : 			$formatValue(currentTransactionDetails.basketSummary.saleTotal,"NUMERIC","ZERO"), /* Check */
+        "RefundsTotalIncTax" : 							$formatValue(currentTransactionDetails.basketSummary.refundTotal,"NUMERIC","ZERO"),
+        "DiscountsTotalIncTax" : 						$formatValue(currentTransactionDetails.basketSummary.discountTotal,"NUMERIC","ZERO"),
+        "OrderDiscountsTotalIncTax" : 					$formatValue($sum(currentTransactionDetails.transactionDiscount.discountAmount), "NUMERIC","ZERO"),
+        "LineDiscountsTotalIncTax" : 					$formatValue($sum(currentTransactionDetails.lineDiscount.discountAmount), "NUMERIC","ZERO"),
+        "OrderPromotionsTotalIncTax" : 					$formatValue($sum(currentTransactionDetails.transactionPromotion.promotionAmount), "NUMERIC","ZERO"),
+        "LinePromotionsTotalIncTax" : 					$formatValue($sum(currentTransactionDetails.linePromotion.promotionAmount), "NUMERIC","ZERO"),
+        "PaymentsTotalIncTax" : 						$formatValue($sum($formatValue(paymentDetails.amount,"NUMERIC","ZERO")), "NUMERIC","ZERO"),
+        "TaxableAmountTotalTax" : 						$formatValue(currentTransactionDetails.taxBreakdown.totalTaxableAmount,"NUMERIC","ZERO"),
+        "TaxTotalTax" : 								$formatValue($round($sum(currentTransactionDetails.totalTaxSummary.TaxSum),3), "NUMERIC","ZERO"),
+        "TaxTotalExTax" : 								$formatValue($sum(currentTransactionDetails.totalTaxSummary.PreTaxSum), "NUMERIC","ZERO"),
+        "TaxTotalIncTax" : 								$formatValue($round($sum(currentTransactionDetails.totalTaxSummary.TXrateSum),3), "NUMERIC","ZERO"),
+      	"FulfilmentsTotalIncTax" : 						$formatValue($sum($formatValue(paymentDetails.shippingAmount,"NUMERIC","ZERO")), "NUMERIC","ZERO")
+      },
+      "TotalsByLineAgg": {
+      	"LineTotalIncTax": 								$sum($derivedAllLineChangeFeatures.Totals.LineTotalIncTax),
+      	"LineTotalExTax": 								$sum($derivedAllLineChangeFeatures.Totals.LineTotalExTax),
+      	"LineTotalTaxTax": 								$sum($derivedAllLineChangeFeatures.Totals.LineTotalTax),
+        "LineAllDiscountsTotalIncTax": 					$sum($derivedAllLineChangeFeatures.Totals.LineAllDiscountsTotalIncTax),
+      	"LineDiscountsTotalIncTax": 					$sum($derivedAllLineChangeFeatures.Totals.LineDiscountsTotalIncTax),
+      	"LineDiscountRefundsTotalIncTax": 				$sum($derivedAllLineChangeFeatures.Totals.LineDiscountRefundsTotalIncTax)
+      },
+      "OrderLineage" : {
+      	  "CurrTransId" : $originTransactionId,
+      	  "CurrTransStoreId" : $originStoreId,
+          "CurrTrans" : transactionStructure[transactionId = $originTransactionId],
+    	  "OrigSaleTransId" : transactionStructure[type = "SALE"].id,
+    	  "OrigSaleTransStoreId" : transactionStructure[type = "SALE"].storeId,
+    	  "OrigSaleTrans" : transactionStructure[type = "SALE"],
+          "ParentTransId" : transactionStructure[transactionId = $originTransactionId].parentId,
+          "AllTransactionStructure" : transactionStructure
+      },
+      "UniqueFeatures" : {
+        "UniqueProductIds" : 							$formatValue($distinct([currentTransactionDetails.products.(SKU)]),"ARRAY",null),
+        "UniqueProductIdsFlat" : 						$join($distinct([currentTransactionDetails.products.(SKU)]),","),
+        "UniqueStoreIds" : 								$count(transactionStructure) > 0 ? $formatValue($distinct([transactionStructure.(storeId)]),"ARRAY",null),
+        "UniqueStoreIdsFlat" : 							$count(transactionStructure) > 0 ? $join($distinct([transactionStructure.(storeId)]),","),
+        "UniqueStoreIdTransTypes" : 					$count(transactionStructure) > 0 ? $formatValue($distinct([transactionStructure.({"storeId":storeId,"tranType":type})]),"ARRAY",null),
+        "UniqueStoreIdTransTypesFlat" : 				$count(transactionStructure) > 0 ? $join($distinct([transactionStructure.("storeId:"& storeId & ",tranType:" & type)]),","),
+        "UniquePaymentTypeIds" : 						$count(paymentDetails) > 0 ? $formatValue($distinct(paymentDetails.(paymentType)),"ARRAY",null),
+        "UniquePaymentTypeIdsFlat" : 					$count(paymentDetails) > 0 ? $join($distinct([paymentDetails.(paymentType)]),","),
+        "UniqueOrderDiscountIds" : 						$count(paymentcurrentTransactionDetails.transactionDiscountDetails) > 0 ? $formatValue($distinct([currentTransactionDetails.transactionDiscount.(reasonCode)]),"ARRAY",null),
+        "UniqueOrderDiscountIdsFlat" : 					$count(currentTransactionDetails.transactionDiscount) > 0 ? $join($distinct([currentTransactionDetails.transactionDiscount.(reasonCode)]),","),
+        "UniqueOrderPromotionIds" : 					$count(currentTransactionDetails.transactionPromotion) > 0 ? $formatValue($distinct([currentTransactionDetails.transactionPromotion.(name)]),"ARRAY",null),
+        "UniqueOrderPromotionIdsFlat" : 				$count(currentTransactionDetails.transactionPromotion) > 0 ? $join($distinct([currentTransactionDetails.transactionPromotion.(name)]),","),
+        "UniqueLineDiscountIds" : 						$count(currentTransactionDetails.lineDiscount) > 0 ? $formatValue($distinct([currentTransactionDetails.lineDiscount.(name)]),"ARRAY",null),
+        "UniqueLineDiscountIdsFlat" : 					$count(currentTransactionDetails.lineDiscount) > 0 ? $join($distinct([currentTransactionDetails.lineDiscount.(name)]),","),
+        "UniqueLinePromotionIds" : 						$count(currentTransactionDetails.linePromotion) > 0 ? $formatValue($distinct([currentTransactionDetails.linePromotion.(name)]),"ARRAY",null),
+        "UniqueLinePromotionIdsFlat" : 					$count(currentTransactionDetails.linePromotion) > 0 ? $join($distinct([currentTransactionDetails.linePromotion.(name)]),","),
+        "UniquePaymentResultIds" : 						$count(paymentDetails) > 0 ? $count(paymentDetails) > 0 ? $formatValue($distinct(paymentDetails.(result)),"ARRAY",null),
+        "UniquePaymentResultIdsFlat" : 					$count(paymentDetails) > 0 ? $join($distinct([paymentDetails.(result)]),","),
+        "UniqueDeliveryMethodIds" : 					$formatValue($distinct([currentTransactionDetails.products.(deliveryMethod)]),"ARRAY",null),
+        "UniqueDeliveryMethodIdsFlat" : 				$join($distinct([currentTransactionDetails.products.(deliveryMethod)]),","),
+        "UniqueTaxCodes" : 								$formatValue($distinct([totalTaxSummary.(VATCode)]),"ARRAY",null),
+        "UniqueTaxCodesFlat" : 							$join($distinct([totalTaxSummary.(VATCode)]),",")
+      }
+
+    };
+
+    /* ###: MAP: Derive QtyNet */
+    $derivedOrderChangeFeatures := $derivedOrderChangeFeatures.(
+    	$merge([$,
+            $ ~> |Qtys|{"QtyNetUnits":
+            	$.QtySoldUnits - $.QtyRefundedUnits} |
+        ])
+    );
+
+    /* ###: MAP: Derive QtyAllDiscounts */
+    $derivedOrderChangeFeatures := $derivedOrderChangeFeatures.(
+    	$merge([$,
+            $ ~> |Qtys|{"QtyAllDiscountLines":
+            	$.QtyOrderDiscountLines + $.QtyOrderPromotionLines + $.QtyLinePromotionLines + $.QtyLineDiscountLines} |
+        ])
+    );
+
+        /* ###: MAP: Derive ParentTrans */
+    $derivedOrderChangeFeatures := $derivedOrderChangeFeatures.(
+    	$merge([$,
+            $ ~> |OrderLineage|{"ParentTrans":
+            		$.AllTransactionStructure[transactionId = $.ParentTransId]  } |
+        ])
+    );
+
+    /* ###: MAP: Derive ParentTransStoreId */
+    $derivedOrderChangeFeatures := $derivedOrderChangeFeatures.(
+    	$merge([$,
+            $ ~> |OrderLineage|{"ParentTransStoreId":
+            		$.AllTransactionStructure[transactionId = $.ParentTransId].storeId  } |
+        ])
+    );
+
+	/* MAP: If there is  aftual change part to merge - i.e currentTransactionDetails exists and is used - merge it in */
+	$derivedOrderMeasures := $useChangeObj ? $merge([$derivedOrderMeasures,{"changedOrder" : $derivedOrderChangeMeasures}]) : $derivedOrderMeasures;
+
+$derivedOrderChangeFeatures;
+$derivedOrderFeatures;
+$derivedAllLineChangeFeatures;
+$derivedAllLineFeatures;
+
+/* ############ PROCESS XDM EVENT: Build Xfuze XDM Event ############ */
+/*
+/* Using Preprocessed data and original raw, build out the XDM trigger event*/
+
+
+
+/* ### START: XDM EVENT HEADER SCHEMA & OBJECTS */
+
+
+$buildBaseMetadata := function(
+    $originEntityId,            /* Identifier for the entity */
+    $originParentEntityId,      /* Identifier for the parent entity */
+    $originCompositeEntityId,
+    $orginEntityStatusCode,
+
+    $originCorrelationId,      /* Correlation ID for tracing related events across systems */
+    $originEventId,            /* Unique identifier for the event */
+    $originEventName,          /* Descriptive name for the event */
+    $originEnvCode,            /* NEW: Code for the sources environment that was the source of the raw event*/
+
+    $originSourceFormatType,   /* Format type of the source data (e.g., JSON, XML) */
+    $originSourceSystem,       /* Name of the source subsystem generating the event */
+    $originSourceSubSystem,    /* Name of the source system generating the event */
+
+    $originEventOccurredTimestamp,      /* Timestamp of when the event occurred in Origin */
+
+    $entityClass,         /* Classification of the entity (e.g., Composite, Primitive) */
+    $entityDomain,        /* Domain or category to which the entity belongs */
+    $entityType,          /* Specific type of the entity */
+    $entitySubType,       /* Specific sub-type of the entity */
+    $entityVariation,     /* Variation or version of the entity */
+    $isSensitive,         /* Flag indicating if the entity contains sensitive data ("Y" or "N") */
+    $parentEntityType,    /* Type of the parent entity */
+    $compositeEntityType, /* Type of the composite entity */
+    $entityStatusCode,    /* Entity status code */
+    $entityStatusDesc,    /* Entity status description */
+
+
+    $bizCapL0,           /* Top-level business capability category */
+    $bizCapL1,           /* Second-level business capability category */
+    $bizCapL2,           /* Third-level business capability category */
+
+    $clientCode,         /* Code representing the client or user group */
+    $envCode,         	 /* NEW: Code representing the Xfuze environment this events was generated in */
+
+    $eventCategory,      /* General category of the event (e.g., Sales, Inventory) */
+    $eventChangePattern, /* Pattern or type of event change (e.g., FullSnapshot, Delta) */
+
+    $eventClass,         /* Classification of the event (e.g., TriggerEvent, StateEvent) */
+    $eventVerb,          /* Descriptive name for the event within the Xfuze system */
+
+    $eventValueStream,   /* Stream or flow to which the event belongs */
+
+    $isDerivedEvent,     /* Flag indicating if the event is derived from other events ("Y" or "N") */
+    $note,               /* Any context note or comments related to the event */
+
+
+    $homeTimeZone,                 	/* Home time zone for Xfuze (e.g., "Europe/London") */
+    $homeTimeZoneOffset,           	/* Offset of the home time zone for Xfuze (e.g., "UTC +1") */
+    $eventOccurredTimeDim,         	/* Event occurred time dim */
+    $eventOccurredType,            	/* Type of event occurred in Xfuze */
+    $eventReceivedTimeDim,  		/* */
+    $eventExternalReceivedTimeDim,  /* */
+    $eventSourceSentTimeDim,     	/* */
+    $eventExternalLandingZoneType,  /* */
+    $eventIngestProcessedTimeDim,   /* */
+    $eventProcessedTimeDim,     	/* */
+    $eventPublishedTimeDim,     	/* */
+    $eventSeq     					/* */
+) {
+    (
+    $xfuzeEntityId := $join([$entityType,$originEntityId],"_");
+    $xfuzeParentEntityId := $join([$parentEntityType,$originParentEntityId],"_");
+    $xfuzeCompositeEntityId := $join([$compositeEntityType,$originCompositeEntityId],"_");
+
+    $xfuzeEventName := $join([$entityType,$eventVerb],""); 										/* KM: Removed subtype */
+    $xfuzeEventId := $join([$xfuzeEventName,$xfuzeEntityId,$string($eventOccurredTimeDim.DateTimeKey)],"_");
+
+    [{"EntityAtts": {
+                    "Origin": {
+                        "EntityId": $originEntityId,
+                        "ParentEntityId": $originParentEntityId,
+                        "EntityStatusCode": $orginEntityStatusCode
+                    },
+                    "Xfuze": {
+
+
+                        "EntityId": $xfuzeEntityId,
+                        "EntityType": $entityType,
+                        "EntitySubType": $entitySubType,
+                        "EntityVariation": $entityVariation,
+                        "EntityDomain": $entityDomain,
+                        "EntityClass": $entityClass,
+                        "ParentEntityId": $xfuzeParentEntityId,
+                        "ParentEntityType": $parentEntityType,
+                        "CompositeEntityId": $xfuzeCompositeEntityId,
+                        "CompositeEntityType": $compositeEntityType,
+                        "EntityStatusCode" : $entityStatusCode,
+                        "EntityStatusDesc" : $entityStatusDesc,
+                        "IsSensitive": $isSensitive
+                        }
+                    }
+      },
+     {"EventAtts": {"Origin": {
+                      "CorrelationId": $originCorrelationId,
+                      "EventId": $originEventId,
+                      "EventName": $originEventName,
+                      "SourceFormatType": $originSourceFormatType,
+                      "SourceSystem": $originSourceSystem,
+                      "SourceSubSystem": $originSourceSubSystem,
+                      "EnvCode": $originEnvCode},
+                  "Xfuze": {
+                      "BizCapabilityL0": $bizCapL0,
+                      "BizCapabilityL1": $bizCapL1,
+                      "BizCapabilityL2": $bizCapL2,
+                      "ClientCode": $clientCode,
+                      "EnvCode": $envCode,
+                      "EventCategory": $eventCategory,
+                      "EventChangePattern": $eventChangePattern,
+                      "EventClass": $eventClass,
+                      "EventId": $xfuzeEventId,
+                      "EventName": $xfuzeEventName,
+                      "EventValueStream": $eventValueStream,
+                      "IsDerivedEvent": $isDerivedEvent,
+                      "Note": $note}
+                  }
+     },
+     {"TimeAtts": {
+        "Origin": {
+            "Times": {
+                "EventOccurredTimestamp": $originEventOccurredTimestamp
+            }
+        },
+        "Xfuze": {
+            "TimeZones": {
+                "EventTimeZone": {
+                    "TimeZone"			: $eventOccurredTimeDim.TimeZone,
+                    "TimeZoneOffset"	: $eventOccurredTimeDim.TimeZoneOffset
+                },
+                "HomeTimeZone": {
+                    "TimeZone"			: $homeTimeZone,
+                    "TimeZoneOffset"	: $homeTimeZoneOffset
+                }
+            },
+
+            "Times": {
+                "EventOccurredTimestamp"			: $eventOccurredTimeDim,
+                "EventOccurredType"					: $eventOccurredType,
+                "EventSourceSentTimestamp" 			: $eventSourceSentTimeDim,
+                "EventExternalReceivedTimestamp"	: $eventExternalReceivedTimeDim,
+                "EventExternalLandingZoneType"		: $eventExternalLandingZoneType,
+                "EventReceivedTimestamp"			: $eventReceivedTimeDim,
+                "EventIngestProcessedTimestamp"		: $eventIngestProcessedTimestamp,
+                "EventProcessedTimestamp"			: $eventProcessedTimestamp,
+                "EventPublishedTimestamp"			: $eventPublishedTimestamp,
+                "EventSeq"							: $eventSeq
+
+            }
+        }
+       }
+     },
+     {
+      "EventId": $xfuzeEventId,
+      "EntityId": $xfuzeEntityId,
+      "EventName": $xfuzeEventName,
+      "EntityType": $entityType,
+      "EntitySubType": $entitySubType,
+      "ParentEntityId": $xfuzeParentEntityId,
+      "ParentEntityType": $parentEntityType,
+      "CompositeEntityId": $xfuzeCompositeEntityId,
+      "CompositeEntityType": $compositeEntityType,
+      "EventOccurredTimestampUTC": $eventOccurredTimeDim.UTC,
+      "EventOccurredTimestampLocal": $eventOccurredTimeDim.Local,
+      "EventOccurredDateUTC": $eventOccurredTimeDim.DateUTC,
+      "EventOccurredDateLocal": $eventOccurredTimeDim.DateLocal,
+      "EventReceivedTimestampUTC" : $eventReceivedTimeDim.UTC
+    }
+    ]
+  )
+};
+
+
+
+$buildIngestAtts := function(
+    $apiName,           /* API Name */
+    $patternType,       /* API Pattern Type (e.g., "Scheduled Poll", "Event Driven", etc.) */
+    $apiResource,       /* Specific API resource path */
+    $apiURI             /* The full URI of the API */
+) {
+    {"IngestAtts": {
+        "Xfuze": {
+            "API": {
+                "Name": $apiName,
+                "PatternType": $patternType,
+                "Resource": $apiResource,
+                "URI": $apiURI
+                   }
+                 }
+                   }
+    }
+};
+
+$buildPayloadAtts := function(
+    $originDataPayloadHash,     /* Data Payload Hash for Origin */
+    $originEventPayloadHash,    /* Event Payload Hash for Origin */
+    $originHashScheme,          /* Hash Scheme for Origin (e.g., "MD5") */
+    $xfuzeDataPayloadHash,      /* Data Payload Hash for Xfuze */
+    $xfuzeEventPayloadHash,     /* Event Payload Hash for Xfuze */
+    $xfuzeHashScheme            /* Hash Scheme for Xfuze (e.g., "MD5") */
+) {
+    {"PayloadAtts": {
+        "Origin": {
+            "DataPayloadHash": $originDataPayloadHash,
+            "EventPayloadHash": $originEventPayloadHash,
+            "HashScheme": $originHashScheme
+        },
+        "Xfuze": {
+            "DataPayloadHash": $xfuzeDataPayloadHash,
+            "EventPayloadHash": $xfuzeEventPayloadHash,
+            "HashScheme": $xfuzeHashScheme
+        }
+    }
+    }
+};
+
+
+$buildIngestFileAtts := function(
+    $SystemCode,
+    $URI,
+    $Path,
+    $Name,
+    $BatchId,
+    $BatchNumber,
+    $LineNumber,
+    $TotalBatchLines,
+    $OriginalFileSizeBytes,
+    $OriginalRowSizeBytes,
+    $BytesOffsetInOriginalFile,
+    $FormatType,
+    $PatternType,
+    $ChangeTimestampUTC,
+    $ObjectNotificationPayload
+) {
+    {"IngestAtts": {
+        "Xfuze": {
+            "File": {
+                "SystemCode": $SystemCode,
+                "URI": $URI,
+                "Path": $Path,
+                "Name": $Name,
+                "BatchId": $BatchId,
+                "BatchNumber": $BatchNumber,
+                "LineNumber": $LineNumber,
+                "TotalBatchLines": $TotalBatchLines,
+                "OriginalFileSizeBytes": $OriginalFileSizeBytes,
+                "OriginalRowSizeBytes": $OriginalRowSizeBytes,
+                "BytesOffsetInOriginalFile": $BytesOffsetInOriginalFile,
+                "FormatType": $FormatType,
+                "PatternType": $PatternType,
+                "ChangeTimestampUTC": $ChangeTimestampUTC,
+                "ObjectNotificationPayload": $ObjectNotificationPayload
+                }}}
+     }
+};
+
+$buildIngestStreamAtts := function(
+    $SystemCode,
+    $ChannelURI,
+    $ChannelName,
+    $ChannelType,
+    $Partition,
+    $Offset,
+    $ExternalMessageId,
+    $FormatType,
+    $PatternType,
+    $PublishTimestampUTC
+) {
+    {"IngestAtts": {
+        "Xfuze": {
+            "Stream": {
+                "SystemCode": $SystemCode,
+                "ChannelURI": $ChannelURI,
+                "ChannelName": $ChannelName,
+                "ChannelType": $ChannelType,
+                "Partition": $Partition,
+                "Offset": $Offset,
+                "ExternalMessageId": $ExternalMessageId,
+                "FormatType": $FormatType,
+                "PatternType": $PatternType,
+                "PublishTimestampUTC": $PublishTimestampUTC
+            }
+        }
+    }}
+};
+
+$buildIngestApiAtts := function(
+    $SystemCode,
+    $URI,
+    $Name,
+    $Resource,
+    $HttpMethod,
+    $QueryString,
+    $FormatType,
+    $PatternType,
+    $InvokeTimestampUTC
+) {
+    {"IngestAtts": {
+        "Xfuze": {
+            "API": {
+                "SystemCode": $SystemCode,
+                "URI": $URI,
+                "Name": $Name,
+                "Resource": $Resource,
+                "HttpMethod": $HttpMethod,
+                "QueryString": $QueryString,
+                "FormatType": $FormatType,
+                "PatternType": $PatternType,
+                "InvokeTimestampUTC": $InvokeTimestampUTC
+            }
+        }
+    }}
+};
+
+$buildIngestTableAtts := function(
+    $SystemCode,
+    $DatabaseURI,
+    $DatabaseName,
+    $SchemaName,
+    $TableName,
+    $RowKey,
+    $Method,
+    $PatternType,
+    $ReceiveTimestampUTC
+) {
+    {"IngestAtts": {
+        "Xfuze": {
+            "Table": {
+                "SystemCode": $SystemCode,
+                "DatabaseURI": $DatabaseURI,
+                "DatabaseName": $DatabaseName,
+                "SchemaName": $SchemaName,
+                "TableName": $TableName,
+                "RowKey": $RowKey,
+                "Method": $Method,
+                "PatternType": $PatternType,
+                "ReceiveTimestampUTC": $ReceiveTimestampUTC
+            }
+        }
+    }}
+};
+
+$buildPrivacyAtts := function(
+    $isSensitiveEntity,       /* Is this a sensitive entity? Values: "Y", "N", "U" */
+    $isEncrypted,             /* Is the entity's sensitive fields encrypted by Xfuze? Values: "Y", "N", "U" */
+    $encryptionKeyId,         /* ID of the key used for encryption (optional) */
+    $encryptionKeyURI,        /* URI of the key used for encryption (optional) */
+    $encryptionKeyName,       /* Name of the encryption key (optional) */
+    $encryptionKeyHost,       /* Host provider of the encryption key (optional) */
+    $sensitiveFieldPaths,     /* Array of canonical codes of sensitive fields (optional) */
+    $originIsEncrypted        /* Raw form indicating if the origin source is encrypted (required) */
+) {
+    {"PrivacyAtts": {
+    "Xfuze": {
+        "IsSensitiveEntity": $isSensitiveEntity,
+        "IsEncrypted": $isEncrypted,
+        "EncryptionKeyId": $encryptionKeyId,
+        "EncryptionKeyURI": $encryptionKeyURI,
+        "EncryptionKeyName": $encryptionKeyName,
+        "EncryptionKeyHost": $encryptionKeyHost,
+        "SensitiveFieldPaths": $sensitiveFieldPaths
+    },
+    "Origin": {
+        "IsEncrypted": $originIsEncrypted
+    }
+    }}
+};
+
+
+
+$buildEventMetadata := function($EventMetadataAtts){{"EventMetadata":$merge($EventMetadataAtts)}};
+
+/* ### START: PROCESS EVENT METADATA INSTANCE */
+
+
+/* START: Key Reusable Cleaned Raws */
+
+$BaseMetadata := $buildBaseMetadata(
+    $originEntityId := $originTransactionId,
+    $originParentEntityId := $originTransactionId,
+    $originCompositeEntityId := $originTransactionId,
+    $orginEntityStatusCode,
+    $originCorrelationId,
+    $originEventId := $join([$originTransactionId,$originTransCompletedAt],"_"),
+    $originEventName := $originTransType,
+    $originEnvCode := "(dev)",
+    $originSourceFormatType := "JSON",
+    $originSourceSystem := "PMC",
+    $originSourceSubSystem := "Graphene",
+    $originEventOccurredTimestamp := transCompletedAt,
+
+    $entityClass := "Retail",
+    $entityDomain := "Sales",
+    $entityType := "SalesOrder",
+    $entitySubType := function($inRaw) {
+        [
+          {"systemCode": "SALE",                "xfuzeCode": "Sale"},
+          {"systemCode": "SALE_EXCHANGE",       "xfuzeCode": "Exchange"},
+          {"systemCode": "SALE_REFUND",         "xfuzeCode": "Return"},
+          {"systemCode": "REFUND",              "xfuzeCode": "Return"},
+          {"systemCode": "UNREFERENCED_REFUND", "xfuzeCode": "Return"}
+        ][systemCode = $string($inRaw)].xfuzeCode
+      }($originTransType),
+    $entityVariation,
+    $isSensitive := "Y",
+    $parentEntityType := "SalesOrder",
+    $compositeEntityType := "SalesOrder",
+    $entityStatusCode,
+    $entityStatusDesc,
+
+    $bizCapL0 			:= "Sell",
+    $bizCapL1 			:= "Sell and Serve",
+    $bizCapL2			:= "Take Sale",
+    $clientCode         := "Crew",
+    $envCode         	:= "(dev)",           		/* TODO: from bindings */
+    $eventCategory      := "Sales",
+    $eventChangePattern := "BusinessEvent",
+    $eventClass         := "TriggerEvent",
+    $eventVerb          := function($inRaw) {
+        [
+          {"systemCode": "SALE",                "xfuzeCode": "Completed"},
+          {"systemCode": "SALE_EXCHANGE",       "xfuzeCode": "Exchanged"},
+          {"systemCode": "SALE_REFUND",         "xfuzeCode": "PartiallyReturned"},
+          {"systemCode": "REFUND",              "xfuzeCode": "Returned"},
+          {"systemCode": "UNREFERENCED_REFUND", "xfuzeCode": "Returned"}
+        ][systemCode = $string($inRaw)].xfuzeCode
+      }($originTransType),
+    $eventValueStream	:= "Order2Cash",
+    $isDerivedEvent,
+    $note,
+
+    /* TODO: dependant on runtime bindings for external stuff */
+    $homeTimeZone := "Europe/London",
+    $homeTimeZoneOffset,
+    $eventOccurredTimeDim := $dateTimeDim($originTransCompletedAt,"2006-01-02T15:04:05.000Z","UTC","UTC"),
+    $eventOccurredType := "TrueTime",
+    $eventReceivedTimeDim :=  $dateTimeDimLite($timeNow,"2006-01-02T15:04:05.000Z","UTC","UTC"),
+    $eventExternalReceivedTimeDim :=  $dateTimeDimLite($timeNow,"2006-01-02T15:04:05.000Z","UTC","UTC"),
+    $eventSourceSentTimeDim :=  null,
+    $eventExternalLandingZoneType :=  "GCS",
+    $eventIngestProcessedTimeDim :=  null,
+    $eventProcessedTimeDim :=  null,
+    $eventPublishedTimeDim :=  null,
+    $eventSeq := null
+);
+
+$IngestAtts := $buildIngestApiAtts(
+    $SystemCode := "Xfuze CSV Connector",
+    $URI := null,
+    $Name := null,
+    $Resource := null,
+    $HttpMethod := "POST",
+    $QueryString := null,
+    $FormatType := null,
+    $PatternType := 0,
+    $InvokeTimestampUTC := null
+);
+
+$PrivacyAtts := $buildPrivacyAtts(
+    $isSensitiveEntity := "Y",
+    $isEncrypted := "N",
+    $encryptionKeyId,
+    $encryptionKeyURI,
+    $encryptionKeyName,
+    $encryptionKeyHost,
+    $sensitiveFieldPaths,
+    $originIsEncrypted := "N"
+);
+
+$EventHeader := $BaseMetadata[-2];
+$EntityIds := $BaseMetadata[-1];
+
+/* ### END: PROCESS EVENT METADATA INSTANCE */
+
+  /* ### START: SET COMMON ENTITY ATTS FROM EVENT METADATA*/
+
+  $eventId 						:= $BaseMetadata.EventAtts.Xfuze.EventId;
+  $entityId 					:= $BaseMetadata.EntityAtts.Xfuze.EntityId;
+  $entityType 					:= $BaseMetadata.EntityAtts.Xfuze.EntityType;
+  $entitySubType 				:= $BaseMetadata.EntityAtts.Xfuze.EntitySubType;
+  $parentEntityId 				:= $BaseMetadata.EntityAtts.Xfuze.ParentEntityId;         /* TODO: CHECK */
+  $compositeEntityId 			:= $BaseMetadata.EntityAtts.Xfuze.CompositeEntityId;
+  $originEntityId 				:= $BaseMetadata.EntityAtts.Origin.EntityId;
+  $eventOccurredTimestampUTC 	:= $BaseMetadata.TimeAtts.Xfuze.Times.EventOccurredTimestamp.UTC;
+  $sourceSystem 				:= $BaseMetadata.EventAtts.Origin.SourceSystem;
+  $sourceSubSystem 				:= $BaseMetadata.EventAtts.Origin.SourceSubSystem;
+
+  /* ### START: SET COMMON CORE ENTITY COMPONENT SCHEMA OBJECTS */
+
+  $IdSetObj := function($RawEntityId,$EntityId,$EntityType,$ParentEntityId,$ParentEntityType,$CompositeEntityId,$CompositeEntityType,$SourceSystem){
+        {
+            "RawEntityId" 			: $RawEntityId,
+            "EntityId" 				: $EntityId,
+            "EntityType" 			: $EntityType,
+            "ParentEntityId" 		: $ParentEntityId,
+            "ParentEntityType" 		: $ParentEntityType,
+            "CompositeEntityId" 	: $CompositeEntityId,
+            "CompositeEntityType" 	: $CompositeEntityType,
+            "SourceSystem"			: $SourceSystem
+
+        }
+  };
+
+
+  $XrefIdsSetObj := function($Id,$SystemCode,$Code,$EntityId,$ParentEntityId,$CompositeEntityId,$Lineage){
+        {
+            "Id" 					: $Id,
+            "SystemCode" 			: $SystemCode,
+            "Code" 					: $Code,
+            "EntityId" 				: $EntityId,
+            "ParentEntityId" 		: $ParentEntityId,
+            "CompositeEntityId" 	: $CompositeEntityId,
+            "Lineage"				: $Lineage
+
+        }
+  };
+
+
+  $CusAttObj := function($Code,$CodeShort,$Name,$Value,$Desc,$SourceSystem,$ExtId,$ExtCode,$Lineage){
+        {
+            "Id" 			: $Id,
+            "Code" 			: $Code,
+            "CodeShort" 	: $CodeShort,
+            "Name" 			: $Name,
+            "Value" 		: $Value,
+            "Desc" 			: $Desc,
+            "SourceSystem" 	: $SourceSystem,
+            "ExtId" 		: $ExtId,
+            "ExtCode" 		: $ExtCode,
+            "Lineage" 		: $Lineage
+        }
+  };
+
+
+  $LineageObj := function($EventId,$EntityId,$AsOf,$SourceSystem){
+        {
+            "EventId" 		: $EventId,
+            "EntityId" 		: $EntityId,
+            "AsOf" 			: $AsOf,
+            "SourceSystem" 	: $SourceSystem
+        }
+  };
+
+
+  $TypeObj := function($TypeClass,$TypeCode,$TypeDesc,$SubTypeCode,$SubTypeDesc,$ExternalCode,$ExternalSubCode){
+        {
+            "TypeClass" 		: $TypeClass,
+            "TypeCode" 			: $TypeCode,
+            "TypeDesc" 			: $TypeDesc,
+            "SubTypeCode" 		: $SubTypeCode,
+            "SubTypeDesc" 		: $SubTypeDesc,
+            "ExternalCode"  	: $ExternalCode,
+            "ExternalSubCode"  	: $ExternalSubCode
+        }
+  };
+
+  /* $TimeObj is AutoGenerated from go-jsonata func */
+
+  $StatusObj := function($StatusClass,$StatusCode,$StatusDesc,$SubStatusCode,$SubStatusDesc,$SeqNo,$ReasonCode,$ReasonDesc,$ExtStatusCode,$ExtSubStatusCode,$Lineage){
+        {
+            "StatusClass" 			: $StatusClass,
+            "StatusCode" 			: $StatusCode,
+            "StatusDesc" 			: $StatusDesc,
+            "SubStatusCode" 		: $SubStatusCode,
+            "SubStatusDesc" 		: $SubStatusDesc,
+            "SeqNo" 				: $SeqNo,
+            "ReasonCode" 			: $ReasonCode,
+            "ReasonDesc" 			: $ReasonDesc,
+            "ExtStatusCode"  		: $ExtStatusCode,
+            "ExtSubStatusCode"  	: $ExtSubStatusCode,
+            "Lineage" 				: $Lineage
+        }
+  };
+
+  $CurrencyObj := function($ISO3,$ISO2,$Lineage){
+        {
+            "ISO3" 		: $ISO3,
+            "ISO2" 		: $ISO2,
+            "Lineage" 	: $Lineage
+        }
+  };
+
+  $PriceObj := function($Currency,$IncTax,$ExTax,$Tax,$Localisation,$Type,$Lineage){
+        {
+            "Currency" 		: $Currency,
+            "IncTax" 		: $IncTax,
+            "ExTax" 		: $ExTax,
+            "Tax" 			: $Tax,
+            "Localisation" 	: $Localisation,
+            "Type"			: $Type
+        }
+  };
+
+  $PriceLocaleObj := function($PriceLCY,$PriceBCY,$IsChanged,$Lineage){
+        {
+            "IsChanged" : $IsChanged,
+            "LCY" 		: $PriceLCY,
+            "BCY" 		: $PriceBCY,
+            "Lineage" 	: $Lineage
+        }
+  };
+
+  $PriceSetObj := function($Change,$Sold,$Current){
+		{
+      		"Change"		: $Change,
+            "Sold"			: $Sold,
+            "Current"		: $Current
+        }
+  };
+
+  $QtyObj := function($Amount,$Code,$Desc,$Lineage){
+        {
+            "Code" 		: $Code,
+            "Desc" 		: $Desc,
+            "Amount" 	: $Amount,
+            "Lineage" 	: $Lineage
+        }
+  };
+
+  $QtyItemsObj := function($Qty,$ProductIds,$LineIds,$Lineage){
+        {
+            "Qty" 			: $Qty,
+            "ProductIds" 	: $ProductIds,
+            "LineIds" 		: $LineIds,
+            "Lineage" 		: $Lineage
+        }
+  };
+
+  $ChannelObj := function($ChannelId,$ChannelClass,$ChannelType,$ChannelCode,$BusinessModelTypeCode,$ChannelInstanceNumber,$ChannelInstanceType,$ChannelPurpose,$ChannelName,$ChannelDesc,$Country,$TouchPoint,$ReasonCode,$ReasonDesc,$ExtChannelCode,$ExtChannelId,$Lineage){
+        {
+            "ChannelId" 				: $ChannelId,
+            "ChannelClass" 				: $ChannelClass,
+            "ChannelType" 				: $ChannelType,
+            "ChannelCode" 				: $ChannelCode,
+            "BusinessModelTypeCode" 	: $BusinessModelTypeCode,
+            "ChannelInstanceNumber" 	: $ChannelNumber,
+            "ChannelInstanceType" 		: $ChannelNumberType,
+            "ChannelPurpose" 			: $ChannelPurpose,
+            "ChannelName" 				: $ChannelName,
+            "ChannelDesc" 				: $ChannelDesc,
+            "Country" 					: $Country,
+            "TouchPoint" 				: $TouchPoint,
+            "ReasonCode" 				: $ReasonCode,
+            "ReasonDesc" 				: $ReasonDesc,
+            "ExtChannelId"  			: $ExtChannelId,
+            "ExtChannelCode"  			: $ExtChannelCode,
+            "Lineage" 					: $Lineage
+        }
+    };
+
+  $TouchPointObj := function($TouchPointId,$TouchPointNumber,$TouchPointClass,$TouchPointDeviceType,$TouchPointSystem,$TerminalId,$ExternalTerminalId,$Device,$IPAddress,$Lineage){
+        {
+            "TouchPointId" 			: $TouchPointId,
+            "TouchPointNumber" 		: $TouchPointNumber,
+            "TouchPointClass" 		: $TouchPointClass,
+            "TouchPointDeviceType" 	: $TouchPointDeviceType,
+            "TouchPointSystem" 		: $TouchPointSystem,
+            "TerminalId" 			: $TerminalId,
+            "ExternalTerminalId" 	: $ExternalTerminalId,
+            "Device" 				: $Device,
+            "IPAddress" 			: $IPAddress,
+            "Lineage" 				: $Lineage
+        }
+    };
+
+  $DeviceObj := function($DeviceId,$ExternalTerminalId){
+        {
+            "DeviceId" 				: $DeviceId,
+            "ExternalTerminalId" 	: $ExternalTerminalId
+        }
+  };
+
+  $LocationObj := function($LocationId,$LocationNodeId,$LocationKey,$LocationType,$LocationShortName,$LocationName,$SubsidiaryId,$HierarchyNode,$Hierarchy,$LocationAddress,$LocationAtts,$Lineage){
+        {
+            "LocationId" 			: $LocationId,
+            "LocationNodeId" 		: $LocationNodeId,
+            "LocationKey" 			: $LocationKey,
+            "LocationType" 			: $LocationType,
+            "LocationShortName" 	: $LocationShortName,
+            "LocationName" 			: $LocationName,
+            "SubsidiaryId" 			: $SubsidiaryId,
+            "HierarchyNode" 		: $HierarchyNode,
+            "Hierarchy" 			: $Hierarchy,
+            "LocationAddress" 		: $LocationAddress,
+            "LocationAtts" 			: $LocationAtts,
+            "Lineage" 				: $Lineage
+        }
+  };
+
+  $HierNodeObj := function($NodeId,$NodeKey,$NodeType,$L1,$L1Name,$L1Type,$L2,$L2Name,$L2Type,$L3,$L3Name,$L3Type,$L4,$L4Name,$L4Type,$L5,$L5Name,$L5Type,$ParentNodeId,$ParentNodeKey,$ParentNodeCode,$NodeStatus,$NodeName,$NodeClass,$NodeDesc,$NodeLevel,$Lineage){
+        {
+            "NodeId" 			: $NodeId,
+            "NodeKey" 			: $NodeKey,
+            "NodeType" 			: $NodeType,
+            "LevelExpanded"		: {
+                "L1" 				: $L1,
+                "L1Name" 			: $L1Name,
+                "L1Type" 			: $L1Type,
+                "L2" 				: $L2,
+                "L2Name" 			: $L2Name,
+                "L2Type" 			: $L2Type,
+                "L3" 				: $L3,
+                "L3Name" 			: $L3Name,
+                "L3Type" 			: $L3Type,
+                "L4" 				: $L4,
+                "L4Name" 			: $L4Name,
+                "L4Type" 			: $L4Type,
+                "L5" 				: $L5,
+                "L5Name" 			: $L5Name,
+                "L5Type" 			: $L5Type
+            },
+            "ParentNodeId" 		: $ParentNodeId,
+            "ParentNodeKey" 	: $ParentNodeKey,
+            "ParentNodeCode" 	: $ParentNodeCode,
+            "NodeStatus" 		: $NodeStatus,
+            "NodeName" 			: $NodeName,
+            "NodeClass" 		: $NodeClass,
+            "NodeDesc" 			: $NodeDesc,
+            "NodeLevel" 		: $NodeLevel,
+            "IsOverride " 		: $IsOverride,
+            "IsChecked " 		: $IsChecked,
+            "Lang " 			: $Lang,
+            "Locale " 			: $Locale,
+            "Keywords " 		: $Keywords,
+            "Country " 			: $Country,
+            "Lineage " 			: $Lineage
+        }
+  };
+
+  $HierNodeLevelObj := function($L1,$L1Name,$L1Type,$L2,$L2Name,$L2Type,$L3,$L3Name,$L3Type,$L4,$L4Name,$L4Type,$L5,$L5Name,$L5Type){
+        {
+
+           "L1" 				: $L1,
+           "L1Name" 			: $L1Name,
+           "L1Type" 			: $L1Type,
+           "L2" 				: $L2,
+           "L2Name" 			: $L2Name,
+           "L2Type" 			: $L2Type,
+           "L3" 				: $L3,
+           "L3Name" 			: $L3Name,
+           "L3Type" 			: $L3Type,
+           "L4" 				: $L4,
+           "L4Name" 			: $L4Name,
+           "L4Type" 			: $L4Type,
+           "L5" 				: $L5,
+           "L5Name" 			: $L5Name,
+           "L5Type" 			: $L5Type
+        }
+  };
+
+  $OverrideObj := function($OverrideId,$OverrideKey,$UserId,$OriginalUserId,$IsAutomaticApproval,$OverrideType,$OverrideTarget,$OverrideReasonCode,$OverrideReasonDesc,$OriginalValue,$Value,$Lineage){
+        {
+            "OverrideId" 					: $OverrideId,
+            "OverrideKey" 					: $OverrideKey,
+            "UserId" 						: $UserId,
+            "OriginalUserId" 				: $OriginalUserId,
+            "IsAutomaticApproval" 			: $IsAutomaticApproval,
+            "OverrideType" 					: $OverrideType,
+            "OverrideTarget" 				: $OverrideTarget,
+            "OverrideReasonCode" 			: $OverrideReasonCode,
+            "OverrideReasonDesc" 			: $OverrideReasonDesc,
+            "OriginalValue" 				: $OriginalValue,
+            "Value" 						: $Value,
+            "Lineage"						: $Lineage
+        }
+   };
+
+  /* ### END: SET COMMON CORE ENTITY COMPONENT SCHEMA OBJECTS */
+
+  /* ### START: SET SALES ORDER DOMAIN ENTITY COMPONENT SCHEMA OBJECTS */
+
+  /* SCHEMA: SalesOrderHeader */
+
+  /* SCHEMA FUNC: Header.EntityIds */
+  $HeaderEntityIdsObj := function($rawId,$SourceSystem) {
+	{"EntityIds" :
+    	$IdSetObj(
+          $formatValue($rawId,"STRING"),
+          $join(["SalesOrderHeader",$SourceSystem,$rawId],"_"),
+          "SalesOrderHeader",
+          $compositeEntityId,
+          "SalesOrder",
+          $compositeEntityId,
+          "SalesOrder",
+          $SourceSystem
+        )
+      }
+  };
+
+
+
+  /* SCHEMA FUNC: Header.HeaderIds */
+  $HeaderIdsObj := function($OrderId,$OrderKey,$ExtOrderKey,$OrderType,$OrigOrderId,$OrigOrderKey,$OrigOrderType,$ParentOrderId,$ParentOrderKey,$ParentOrderType,$OrderReferenceNumber,$OrigOrderReferenceNumber,$ReceiptNumber,$OrigReceiptNumber){
+        {
+            "OrderId" 						: $OrderId,
+            "OrderKey" 						: $OrderKey,
+            "ExtOrderKey" 					: $ExtOrderKey,
+            "OrderType" 					: $OrderType,
+            "OrigOrderId" 					: $OrigOrderId,
+            "OrigOrderKey" 					: $OrigOrderKey,
+            "OrigOrderType" 				: $OrigOrderType,
+            "ParentOrderId" 				: $ParentOrderId,
+            "ParentOrderKey" 				: $ParentOrderKey,
+            "ParentOrderType" 				: $ParentOrderType,
+            "OrderReferenceNumber" 			: $OrderReferenceNumber,
+            "OrigOrderReferenceNumber" 		: $OrigOrderReferenceNumber,
+            "ReceiptNumber" 				: $ReceiptNumber,
+            "OrigReceiptNumber" 			: $OrigReceiptNumber
+
+        }
+  };
+
+  /* SCHEMA: SalesOrderDiscount */
+
+  /* SCHEMA FUNC: Discount.DiscountIdsObj */
+  $DiscountIdsObj := function($HeaderIds,$DiscountId,$DiscountKey,$DiscountCode,$CouponCode,$VoucherCode,$ExternalProviderId){
+        {
+            "DiscountId" 					: $DiscountId,
+            "DiscountKey" 					: $DiscountKey,
+            "DiscountCode" 					: $DiscountCode,
+            "PromoCode" 					: $PromoCode,
+            "CouponCode" 					: $CouponCode,
+            "VoucherCode" 					: $VoucherCode,
+            "HeaderIds"						: $HeaderIds
+        }
+  };
+
+  /* SCHEMA FUNC: Discount.DiscountLine */
+  $DiscountLine := function($DiscountIds,$DiscountType,$DiscountName,$DiscountDesc,$DiscountStatus,$DiscountLevel,$DiscountMethod,$DiscountPct,$Trigger,$ReasonCode,$ReasonDesc,$Times,$Prices,$Totals,$AppliedToLineIds,$Overrides,$DisplayAtts,$FinanceAtts,$ExtReasonCode,$Lineage){
+        {
+            "DiscountIds" 				: $DiscountIds,
+            "DiscountType" 				: $DiscountType,
+            "DiscountName" 				: $DiscountName,
+            "DiscountDesc" 				: $DiscountDesc,
+            "DiscountStatus" 			: $DiscountStatus,
+            "DiscountLevel" 			: $DiscountLevel,
+            "DiscountMethod" 			: $DiscountMethod,
+            "DiscountPct" 				: $DiscountPct,
+            "Trigger"					: $Trigger,
+            "ReasonCode" 				: $ReasonCode,
+            "ReasonDesc" 				: $ReasonDesc,
+            "Times"						: $Times,
+            "Prices"					: $Prices,
+            "Totals"					: $Totals,
+            "AppliedToLineIds"			: $AppliedToLineIds,
+            "Overrides"					: $Overrides,
+            "DisplayAtts"				: $DisplayAtts,
+            "FinanceAtts"				: $FinanceAtts,
+            "ExtReasonCode" 			: $ExtReasonCode,
+            "Lineage" 					: $Lineage
+        }
+  };
+
+
+  /* SCHEMA: SalesOrderLine */
+  /* SCHEMA FUNC: Line.EntityIds */
+  $LineEntityIdsObj := function($rawHeaderId,$rawId,$SourceSystem) {
+	{"EntityIds" :
+    	$IdSetObj(
+          $join([$rawHeaderId,$rawId][$type($) != "null"],"_"),
+          $join(["SalesOrderLine" ,$SourceSystem,$join([$rawHeaderId,$rawId][$type($) != "null"],"_")][$type($) != "null"],"_"),
+          "SalesOrderLine",
+          $HeaderEntityIdsObj($rawHeaderId,$SourceSystem).EntityIds.EntityId,
+          "SalesOrderHeader",
+          $compositeEntityId,
+          "SalesOrder",
+          $SourceSystem
+        )
+     }
+  };
+
+  /* SCHEMA FUNC: Line.LineIds */
+  $LineIdsObj := function($LineId,$LineKey,$LineSeq,$LineProductId,$LineProductKey,$LineProductKeyType,$ParentLineId,$ParentLineKey,$ParentLineSeq,$HeaderIds){
+    {"LineIds" :
+        {
+            "LineId" 					: $LineId,
+            "LineKey" 					: $LineKey,
+            "LineSeq" 					: $LineSeq,
+            "LineProductId" 			: $LineProductId,
+            "LineProductKey" 			: $LineProductKey,
+            "LineProductKeyType" 		: $LineProductKeyType,
+            "ParentLineId" 				: $ParentLineId,
+            "ParentLineKey" 				: $ParentLineNumberKey,
+            "ParentLineSeq" 				: $ParentLineSeq,
+            "HeaderIds"					: $HeaderIds
+
+        }
+       }
+  };
+
+  /* SCHEMA FUNC: SalesOrder.Lines.ProductAtts.ProductIds */
+  $LinePrdIdsObj := function($EntityId,$EntityType,$ProductId,$ProductKey,$ProductVariantId,$ProductVariantKey,$ProductVariantKeyType,$SKU,$EAN,$UPC,$Barcode,$Barcodes,$ItemOptionNumber,$Lineage){
+        {
+            "EntityId" 					: $EntityId,
+            "EntityType" 				: $EntityType,
+            "ProductId" 				: $ProductId,
+            "ProductKey" 				: $ProductKey,
+            "ProductVariantId" 			: $ProductVariantId,
+            "ProductVariantKey" 		: $ProductVariantKey,
+            "ProductVariantKeyType" 	: $ProductVariantKeyType,
+            "SKU" 						: $SKU,
+            "EAN" 						: $EAN,
+            "UPC" 						: $UPC,
+            "Barcode" 					: $Barcode,
+            "Barcodes" 					: $Barcodes,
+            "ItemOptionNumber" 			: $ItemOptionNumber,
+            "Lineage" 					: $Lineage
+        }
+  };
+
+  /* MAP FUNC: SalesOrder.Lines.ProductAtts */
+  $LinePrdAttsObj := function($ProductIds,$ProductName,$ProductDesc,$ProductCategory,$ProductType,$ProductGroup,$ProductDepartment,$HierarchyNode,$Hierarchy,$Style,$Colour,$Size,$SizeMatrix,
+								$Season,$Brand,$SupplierId,$SupplierCode,$CountryOfOrigin,$ImageURLs,$AttributeCodes,$Lineage){
+        {
+            "ProductIds" 				: $ProductIds,
+            "ProductName" 				: $ProductName,
+            "ProductDesc" 				: $ProductDesc,
+            "ProductCategory" 			: $ProductCategory,
+            "ProductType" 				: $ProductType,
+            "ProductGroup" 				: $ProductGroup,
+            "ProductDepartment" 		: $ProductDepartment,
+            "HierarchyNode" 			: $HierarchyNode,
+            "Hierarchy" 				: $Hierarchy,
+            "Style" 					: $Style,
+            "Colour" 					: $Colour,
+            "Size" 						: $Size,
+            "SizeMatrix" 				: $SizeMatrix,
+            "Season" 					: $Season,
+            "Brand" 					: $Brand,
+            "SupplierId" 				: $SupplierId,
+            "SupplierCode" 				: $SupplierCode,
+            "CountryOfOrigin" 			: $CountryOfOrigin,
+            "ImageURLs" 				: $ImageURLs,
+            "AttributeCodes" 			: $AttributeCodes,
+            "Lineage" 					: $Lineage
+        }
+  };
+
+  /* SCHEMA FUNC: SalesOrder.Lines.ProductAtts.Barcodes */
+  $LineBarcodeObj := function($Barcode,$BarcodeType,$BarcodeSource,$Lineage){
+        {
+            "Barcode" 					: $Barcode,
+            "BarcodeType" 				: $BarcodeType,
+            "BarcodeSource" 			: $BarcodeSource,
+            "Lineage" 					: $Lineage
+        }
+  };
+
+  /* SCHEMA: SalesOrderPayment */
+  /* SCHEMA FUNC: Payment.Ids */
+  $PaymentIdsObj := function($HeaderIds,$PaymentId,$PaymentKey,$PaymentSeq,$PaymentReference,$PaymentReceipt,$ExternalProviderId){
+     {
+         "PaymentId" 					: $PaymentId,
+         "PaymentKey" 					: $PaymentKey,
+         "PaymentSeq" 					: $PaymentSeq,
+         "PaymentReference" 				: $PaymentReference,
+         "PaymentReceipt" 				: $PaymentReceipt,
+         "ExternalProviderId"			: $ExternalProviderId,
+         "HeaderIds"						: $HeaderIds
+
+     }
+  };
+
+  /* SCHEMA FUNC: Payment */
+  $PaymentLine := function($PaymentIds,$PaymentType,$PaymentStatus,$TransactionType,$PaymentMethod,$ResultType,
+ 							$Times,$Totals,$ProviderAtts,$DeviceAtts,$FinanceAtts,$Lineage){
+     {
+         "PaymentIds" 				: $PaymentIds,
+         "PaymentType" 				: $PaymentType,
+         "PaymentStatus" 			: $PaymentStatus,
+         "TransactionType" 			: $TransactionType,
+         "Times"						: $Times,
+         "Totals"					: $Totals,
+         "PaymentMethod" 			: $PaymentMethod,
+         "ResultType" 				: $ResultType,
+         "ProviderAtts"				: $ProviderAtts,
+         "DeviceAtts"				: $DeviceAtts,
+         "FinanceAtts"				: $FinanceAtts,
+         "Lineage" 					: $Lineage
+      }
+  };
+
+  /* SCHEMA FUNC: TaxLine */
+  $TaxSummaryLine := function($TaxLineType,$TaxLineLevel,$TaxCode,$TaxSchemeCode,$IsTaxExempt,$TaxRate,$TaxGroupType,$TaxGroup,$TaxableAmountTotal,$Lineage){
+      {
+         "Tax" : {
+           "TaxLineType" 			: $TaxLineType,
+           "TaxLineLevel" 			: $TaxLineLevel,
+           "TaxCode" 				: $TaxCode,
+           "TaxSchemeCode" 			: $TaxSchemeCode,
+           "IsTaxExempt" 			: $IsTaxExempt,
+           "TaxRate" 				: $TaxRate,
+           "TaxGroupType" 			: $TaxGroupType,
+           "TaxGroup" 				: $TaxGroup
+         },
+         "Totals":{
+              "TaxableAmountTotal"	: $TaxableAmountTotal
+          },
+          "Lineage" 					: $Lineage
+      }
+  };
+
+
+  /* ### END: SET SALES ORDER DOMAIN ENTITY COMPONENT SCHEMA OBJECTS */
+
+  /* --------------------------------------------------------------- */
+
+
+  /* ### START: PROCESS XDM TRIGGER ENTITY */
+
+  /* ------------------------------------- */
+
+
+  /* ### START: COMMON ENTITY OBJECT INSTANCES */
+
+  $Lineage := $LineageObj($eventId,$entityId,$eventOccurredTimestampUTC,$sourceSystem);
+
+  $BCY := $CurrencyObj($homeCurrencyBCY);
+  $LCY := $CurrencyObj($localCurrencyLCY);
+
+  /* ### END: COMMON ENTITY OBJECT INSTANCES */
+
+
+
+  /* ### START: PREPROCESS - SELECT CORRECT *BASKET* OBJECT TO USE WHICH DEPENDS ON THE TRANS TYPE  */
+
+  $ordFeatures := $useChangeObj ? $derivedOrderChangeFeatures : $derivedOrderFeatures;
+  $linesFeatures := $useChangeObj ? $derivedAllLineChangeFeatures : $derivedAllLineFeatures;
+
+
+  /* ### START: PROCESS SalesOrder.Header */
+  /* ------------------------------------- */
+
+  $HeaderEntityIds := $HeaderEntityIdsObj(transactionId,$sourceSystem);
+
+  $HeaderIds := {
+	"HeaderIds" : $HeaderIdsObj(
+					$OrderId := $originId,
+                    $OrderKey := $originTransactionId,
+                    $ExtOrderKey := NULL,
+                    $OrderType := $originTransType,
+                    $OrigOrderId := $ordFeatures.OrderLineage.OrigSaleTrans.id,
+                    $OrigOrderKey := $ordFeatures.OrderLineage.OrigSaleTrans.transactionId,
+                    $OrigOrderType := $ordFeatures.OrderLineage.OrigSaleTrans.type,
+                    $ParentOrderId := NULL,
+                    $ParentOrderKey := $exists($ordFeatures.OrderLineage.ParentTransId) and $ordFeatures.OrderLineage.ParentTransId != "NA" ? $ordFeatures.OrderLineage.ParentTransId :  NULL,
+                    $ParentOrderType := $ordFeatures.OrderLineage.ParentTrans.type,
+                    $OrderReferenceNumber := transactionRef,
+                    $OrigOrderReferenceNumber := null,
+                    $ReceiptNumber := null,
+                    $OrigReceiptNumber := null
+                  )
+  };
+
+  $Header_XRefIds := {"XRefIds":[
+  	$XrefIdsSetObj($originTransactionId,$HeaderEntityIds.EntityIds.SourceSystem,"transactionId",$HeaderEntityIds.EntityIds.EntityId,$HeaderEntityIds.EntityIds.ParentEntityId,$HeaderEntityIds.EntityIds.CompositeEntityId),
+  	$XrefIdsSetObj($originId,$HeaderEntityIds.EntityIds.SourceSystem,"id",$HeaderEntityIds.EntityIds.EntityId,$HeaderEntityIds.EntityIds.ParentEntityId,$HeaderEntityIds.EntityIds.CompositeEntityId),
+  	$exists($ordFeatures.ExternalProviderResponse) ? $XrefIdsSetObj($ordFeatures.ExternalProviderResponse,"Ecom","externalProviderResponse",$HeaderEntityIds.EntityIds.EntityId,$HeaderEntityIds.EntityIds.ParentEntityId,$HeaderEntityIds.EntityIds.CompositeEntityId),
+    $XrefIdsSetObj($ordFeatures.TransactionRef,$HeaderEntityIds.EntityIds.SourceSystem,"transactionRef",$HeaderEntityIds.EntityIds.EntityId,$HeaderEntityIds.EntityIds.ParentEntityId,$HeaderEntityIds.EntityIds.CompositeEntityId),
+    $exists($ordFeatures.OrderLineage.ParentTransId) and $ordFeatures.OrderLineage.ParentTransId != "NA" ? $XrefIdsSetObj($ordFeatures.OrderLineage.ParentTransId,$HeaderEntityIds.EntityIds.SourceSystem,"parentTransId",$HeaderEntityIds.EntityIds.EntityId,$HeaderEntityIds.EntityIds.ParentEntityId,$HeaderEntityIds.EntityIds.CompositeEntityId) : NULL
+
+  ]};
+
+  $headerClassCode := function($inRaw) {
+  	"B2C"
+  }();
+
+  $headerTypeCode := function($inRaw) {
+  	"Retail"
+  }();
+
+  /* MAP FUNC: Header.Type.SubTypeCode */
+  $headerSubTypeCode := function($inRaw) {
+    [
+    	{"systemCode": "SALE",                "xfuzeCode": "Sale"},
+       	{"systemCode": "SALE_EXCHANGE",       "xfuzeCode": "Exchange"},
+      	{"systemCode": "SALE_REFUND",         "xfuzeCode": "Return"},
+      	{"systemCode": "REFUND",              "xfuzeCode": "Return"},
+       	{"systemCode": "UNREFERENCED_REFUND", "xfuzeCode": "Return"}
+    ][systemCode = $string($inRaw)].xfuzeCode
+  }($originTransType);
+
+ /* MAP FUNC: Header.Type.SubTypeCode */
+ $Header_Type := {
+	"Type": $TypeObj(
+            	$TypeClass 		:= $headerClassCode,
+               	$TypeCode 		:= $headerTypeCode,
+                $SubTypeCode 	:= $headerSubTypeCode)
+  };
+
+
+  /* MAP FUNC: Header.Status */
+  /* MAP FUNC: Header.Status.OrderStatus.StatusCode */
+  $headerOrderStatusCode := function($inRaw) {
+    $length($inRaw) > 0 ? "Completed" : "NotCompleted"
+  }($originTransCompletedAt);
+
+  /* MAP: Header.Status.OrderStatus */
+  $Header_Status_OrderStatus := {
+	"OrderStatus": 	$StatusObj(
+						$StatusClass 	:= "Order",
+                        $StatusCode 	:= $headerOrderStatusCode)};
+
+
+  /* MAP FUNC: Header.Status.PaymentStatus.StatusCode */
+  $headerPaymentStatusCode := function($inRaw) {
+    $inRaw = "PAY_SUCCESS" ? "FullyPaid" : "NotPaid"
+  }($originOperationStatus);
+
+  /* MAP: Header.Status.PaymentStatus */
+  $Header_Status_PaymentStatus := {
+	"PaymentStatus": $StatusObj(
+                      	$StatusClass 	:= "Payment",
+                      	$StatusCode 	:= $headerPaymentStatusCode)
+  };
+
+  /* MAP FUNC: Header.Status.FulfilmentStatus.StatusCode */
+  $headerFulfilmentStatusCode := function($inRaw) {
+    $length($inRaw) > 0 ? "Fulfilled" : "NotFulfilled"
+  }($originTransCompletedAt);
+
+  /* MAP: Header.Status.FulfilmentStatus */
+  $Header_Status_FulfilmentStatus := {
+	"FulfilmentStatus": $StatusObj(
+							$StatusClass 	:= "Fulfilment",
+                        	$StatusCode 	:= $headerFulfilmentStatusCode)
+  };
+
+  /* MAP: Header.Status - Final Merge*/
+  $Header_Status := {
+	"Status": $merge([$Header_Status_OrderStatus,$Header_Status_PaymentStatus,$Header_Status_FulfilmentStatus])
+  };
+
+
+  /* MAP: Header.Times */
+  $Header_Times := {
+	"Times": {
+    	"CompletedOn": 				$dateTimeDim(transCompletedAt,"2006-01-02T15:04:05.000Z","UTC","UTC"),
+		"ParentCompletedOn": 		$dateTimeDim(originalTime,"2006-01-02T15:04:05.000Z","UTC","UTC")
+    }
+  };
+
+
+  /* MAP: Header.Channels */
+  /* MAP: Header.Channels.SalesChannel */
+  $Header_Channels_SalesChannel := {
+	"SalesChannel": $ChannelObj(NULL,NULL,"Retail","RetailStore","B2C",$originStoreId,"Store","Sales",NULL,NULL,NULL,
+    					$TouchPointObj(NULL,NULL,NULL,NULL,initiatingModule,terminalId,externalTerminalId,
+                        $DeviceObj(deviceId,externalDeviceId),NULL,NULL),NULL,NULL,NULL
+    )
+  };
+
+  /* MAP: Header.Channels - Final Merge*/
+  $Header_Channels := {
+	"Channels": $merge([$Header_Channels_SalesChannel])
+  };
+
+
+  /* MAP: Header.Locations */
+  /* MAP: Header.Locations.SalesLocation.HierarchyNode */
+  $Header_Locations_SalesLocation_HierarchyNode := $HierNodeObj(
+		$NodeId := $exists(storeNodeStructure[0].nodeId) ? "StoreNode_Crew" & storeNodeStructure[0].nodeId,
+		$NodeKey := $exists(storeNodeStructure[0].nodeId) ? storeNodeStructure[0].nodeId,
+		$NodeCode := NULL,
+    	$L1 := storeNodeStructure[4].nodeId,
+    	$L1Name := storeNodeStructure[4].name,
+    	$L1Type := storeNodeStructure[4].nodeType,
+    	$L2 := storeNodeStructure[3].nodeId,
+    	$L2Name := storeNodeStructure[3].name,
+    	$L2Type := storeNodeStructure[3].nodeType,
+        $L3 := storeNodeStructure[2].nodeId,
+    	$L3Name := storeNodeStructure[2].name,
+    	$L3Type := storeNodeStructure[2].nodeType,
+        $L4 := storeNodeStructure[1].nodeId,
+    	$L4Name := storeNodeStructure[1].name,
+    	$L4Type := storeNodeStructure[1].nodeType,
+        $L5 := storeNodeStructure[0].nodeId,
+    	$L5Name := storeNodeStructure[0].name,
+    	$L5Type := storeNodeStructure[0].nodeType,
+        $Lineage := NULL
+    );
+
+  /* MAP: Header.Locations.SalesLocation */
+  $Header_Locations_SalesLocation := {
+	"SalesLocation": $LocationObj("Location_PMC_" & $originStoreId,"Location_PMC_" & $originStoreId,$originStoreId,storeNodeStructure[0].nodeType,storeNodeStructure[0].name,storeNodeStructure[0].name,subsidiaryId,
+    					$Header_Locations_SalesLocation_HierarchyNode,
+                        storeNodeStructure.(
+                        	{
+                            	"NodeId": nodeId,
+                                "NodeKey": nodeId,
+                                "NodeType": nodeType,
+                                "StoreId": ( nodeType = "STORE" ? $originEvent.storeId : NULL ),
+                                "ParentNodeId": parentId,
+                                "ParentNodeKey": parentId,
+                                "NodeName" : name,
+                                "NodeClass" : "Store",
+                                "NodeStatus" : status = false ? "NotActive" : "Active"
+                            }
+                        ),
+                        NULL,NULL,NULL)
+  };
+
+  /* MAP: Header.Locations Final Merge*/
+  $Header_Locations := {
+	"Locations": $merge([$Header_Locations_SalesLocation])
+  };
+
+  /* MAP: Header.Qtys - Order level unit/qty totals as an agg across lines */
+  /* MAP: Both total units and line level counts are captured here */
+  $Header_Qtys_Amounts := {
+        	"QtySoldUnits":								$QtyObj($ordFeatures.Qtys.QtySoldUnits),
+			"QtyNetUnits":								$QtyObj($ordFeatures.Qtys.QtyNetUnits),
+            "QtyRefundedUnits":							$QtyObj($ordFeatures.Qtys.QtyRefundedUnits),
+			"QtyPaymentLines":							$QtyObj($ordFeatures.Qtys.QtyPaymentLines),
+   			"QtyOrderLines": 							$QtyObj($ordFeatures.Qtys.QtyOrderLines),
+   			"QtyTaxLines": 								$QtyObj($ordFeatures.Qtys.QtyTaxLines),
+   			"QtyLifetimeTransToDate": 					$QtyObj($ordFeatures.Qtys.QtyLifetimeTransToDate),
+        	"QtyAllDiscountLines":						$QtyObj($ordFeatures.Qtys.QtyAllDiscountLines),
+   			"QtyReturnRefundedUnits":					$QtyObj($ordFeatures.QtysByLineAgg.QtyReturnRefundedUnits),
+   			"QtyReturnRefundedPromotionalUnits":		$QtyObj($ordFeatures.QtysByLineAgg.QtyReturnRefundedPromotionalUnits),
+   			"QtyExchangedRefundedUnits":				$QtyObj($ordFeatures.QtysByLineAgg.QtyExchangedRefundedUnits),
+   			"QtyExchangedSaleUnits":					$QtyObj($ordFeatures.QtysByLineAgg.QtyExchangedSaleUnits),
+   			"QtySaleLines": 							$QtyObj($ordFeatures.QtysByLineAgg.QtySaleLines),
+   			"QtyExchangeLines": 						$QtyObj($ordFeatures.QtysByLineAgg.QtyExchangeLines),
+   			"QtyReturnLines": 							$QtyObj($ordFeatures.QtysByLineAgg.QtyReturnLines),
+            "QtyAllDiscountsLinesApplied":				$QtyObj($ordFeatures.QtysByLineAgg.QtyAllDiscountLinesApplied) /* TODO: chck A0001334 */
+
+  };
+
+  $Header_Qtys := {
+	"Qtys" : {
+   		"Sold"		: $ordFeatures.Type = "Sale" ? $Header_Qtys_Amounts : NULL,     /* 'Sold' - Original 'as sold' qty */
+        "Changed" 	: $ordFeatures.Type != "Sale" ? $Header_Qtys_Amounts : NULL,    /* 'Delta' - The changed qty for this event / change as a delta */
+        "Current"	: NULL 															/* 'Net' at Point in time - nothing in data to map this or derive */
+     }
+  };
+
+
+  /* MAP: Header.Totals.SalesTotals */
+  /* MAP: Header.Totals.SalesTotals.OrderTotal */
+  $OrderTotal := $PriceLocaleObj(
+                  			$PriceObj($LCY,$ordFeatures.Totals.OrderTotalIncTax,$ordFeatures.Totals.OrderTotalExTax,$ordFeatures.Totals.OrderTotalTax), 												/* LCY */
+                  				  $localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$ordFeatures.Totals.OrderTotalIncTax,$ordFeatures.Totals.OrderTotalExTax,$ordFeatures.Totals.OrderTotalTax)  	/* BCY */
+  );
+
+  $Header_Totals_SalesTotals_OrderTotal := {
+	"OrderTotal": $ordFeatures.Type = "Sale" ? $PriceSetObj(NULL,$OrderTotal,NULL) : $PriceSetObj($OrderTotal,NULL,NULL)
+  };
+
+
+  /* MAP: Header.Totals.SalesTotals.OrderTotalBeforeDiscounts */
+  $OrderTotalBeforeDiscounts := $PriceLocaleObj(
+                                          $PriceObj($LCY,$ordFeatures.Totals.OrderTotalBeforeDiscountsIncTax), 													/* LCY */
+                                                $localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$ordFeatures.Totals.OrderTotalBeforeDiscountsIncTax)  	/* BCY */
+  );
+
+  $Header_Totals_SalesTotals_OrderTotalBeforeDiscounts := {
+	"OrderTotalBeforeDiscounts": $ordFeatures.Type = "Sale" ? $PriceSetObj(NULL,$OrderTotalBeforeDiscounts,NULL) : $PriceSetObj($OrderTotalBeforeDiscounts,NULL,NULL)
+  };
+
+
+  /* MAP: Header.Totals.SalesTotals.DiscountsTotal */
+  $DiscountsTotal := $PriceLocaleObj(
+                          $PriceObj($LCY,-1.00 * $ordFeatures.Totals.DiscountsTotalIncTax), 													/* LCY */
+                              $localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,-1.00 * $ordFeatures.Totals.DiscountsTotalIncTax)  			/* BCY */
+  );
+
+  $Header_Totals_SalesTotals_DiscountsTotal := {
+	"DiscountsTotal": $ordFeatures.Type = "Sale" ? $PriceSetObj(NULL,$DiscountsTotal,NULL) : $PriceSetObj($DiscountsTotal,NULL,NULL)
+  };
+
+
+  /* MAP: Header.Totals.SalesTotals.FulfilmentsTotal */
+  $FulfilmentsTotal := $PriceLocaleObj(
+                          $PriceObj($LCY,$ordFeatures.Totals.FulfilmentsTotalIncTax), 													/* LCY */
+                              $localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$ordFeatures.Totals.FulfilmentsTotalIncTax)  		/* BCY */
+  );
+
+  $Header_Totals_SalesTotals_FulfilmentsTotal := {
+	"FulfilmentsTotal": $ordFeatures.Type = "Sale" ? $PriceSetObj(NULL,$FulfilmentsTotal,NULL) : $PriceSetObj($FulfilmentsTotal,NULL,NULL)
+  };
+
+  /* MAP: Header.Totals.SalesTotals.FulfilmentsTotalBeforeDiscounts */
+  /* TODO: Confirm */
+  $FulfilmentsTotalBeforeDiscounts := $PriceLocaleObj(
+                          $PriceObj($LCY,$ordFeatures.Totals.FulfilmentsTotalIncTax), 													/* LCY */
+                              $localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$ordFeatures.Totals.FulfilmentsTotalIncTax)  		/* BCY */
+  );
+
+  $Header_Totals_SalesTotals_FulfilmentsTotalBeforeDiscounts := {
+	"FulfilmentsTotalBeforeDiscounts": $ordFeatures.Type = "Sale" ? $PriceSetObj(NULL,$FulfilmentsTotalBeforeDiscounts,NULL) : $PriceSetObj($FulfilmentsTotalBeforeDiscounts,NULL,NULL)
+  };
+
+
+
+  /* MAP: Header.Totals.SalesTotals.RefundsTotal */
+  $RefundsTotal := $PriceLocaleObj(
+                          $PriceObj($LCY,$ordFeatures.Totals.RefundsTotalIncTax), 													/* LCY */
+                              $localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$ordFeatures.Totals.RefundsTotalIncTax)  		/* BCY */
+  );
+
+  $Header_Totals_SalesTotals_RefundsTotal := {
+	"RefundsTotal": $ordFeatures.Type = "Sale" ? $PriceSetObj(NULL,$RefundsTotal,NULL) : $PriceSetObj($RefundsTotal,NULL,NULL)
+  };
+
+
+  /* MAP: Header.Totals.SalesTotals.PaymentsTotal */
+
+  $PaymentsTotal := $PriceLocaleObj(
+                          $PriceObj($LCY,$ordFeatures.Totals.PaymentsTotalIncTax), 													/* LCY */
+                              $localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$ordFeatures.Totals.PaymentsTotalIncTax)  		/* BCY */
+  );
+
+  $Header_Totals_SalesTotals_PaymentsTotal := {
+	"PaymentsTotal": $ordFeatures.Type = "Sale" ? $PriceSetObj(NULL,$PaymentsTotal,NULL) : $PriceSetObj($PaymentsTotal,NULL,NULL)
+  };
+
+
+  /* MAP: Header.Totals.SalesTotals.TaxableAmountTotal */
+  $TaxableAmountTotal := $PriceLocaleObj(
+                          $PriceObj($LCY,$ordFeatures.Totals.TaxableAmountTotalTax), 													/* LCY */
+                              $localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$ordFeatures.Totals.TaxableAmountTotalTax)  		/* BCY */
+  );
+
+  $Header_Totals_SalesTotals_TaxableAmountTotal := {
+	"TaxableAmount": $ordFeatures.Type = "Sale" ? $PriceSetObj(NULL,$TaxableAmountTotal,NULL) : $PriceSetObj($TaxableAmountTotal,NULL,NULL)
+  };
+
+  $Header_Totals_SalesTotals := {
+	"SalesTotals": $merge([
+    	$Header_Totals_SalesTotals_OrderTotal,
+        $Header_Totals_SalesTotals_OrderTotalBeforeDiscounts,
+        $Header_Totals_SalesTotals_DiscountsTotal,
+        $Header_Totals_SalesTotals_FulfilmentsTotal,
+        $Header_Totals_SalesTotals_FulfilmentsTotalBeforeDiscounts, /* TODO: Verify */
+        $Header_Totals_SalesTotals_RefundsTotal,
+        $Header_Totals_SalesTotals_PaymentsTotal,
+        $Header_Totals_SalesTotals_TaxableAmountTotal
+        ])
+  };
+
+  $Header_Totals_CostTotals := NULL; /* None in source */
+
+  $Header_Totals_MarginTotals := NULL; /* None in source or derivable */
+
+  $Header_Totals := {
+	"Totals": $merge([$Header_Totals_SalesTotals,$Header_Totals_CostTotals,$Header_Totals_MarginTotals])
+  };
+
+  /* MAP: Header.Locations.OrderLineage */
+  $Header_OrderLineage := [{
+	"OrderLineage": transactionStructure.(
+                      {
+                        "NodeId": id,
+                        "NodeKey": "SalesOrder_PMC_" & transactionId,
+                        "ExternalNodeKey": transactionId,
+                        "NodeType": $subType,
+                        "ExternalNodeType": type,
+                        "StoreId": storeId,
+                        "ParentNodeId": NULL,
+                        "ParentNodeKey": $exists(parentId) and parentId != "NA" ? "SalesOrder_PMC_" & parentId : NULL,
+                        "ExternalParentNodeKey": $exists(parentId) and parentId != "NA" ? parentId : NULL,
+                        "IsGiftRefund": $exists(isGiftRefund) and isGiftRefund ? "Y" : "N"
+                       }
+                    )
+  }];
+
+  /* MAP: Header: Bring together all the sub entity parts */
+  $Header := {
+	"Header": $merge([$HeaderEntityIds,$HeaderIds,$Header_XRefIds,$Header_Type,$Header_Status,$Header_Times,$Header_Channels,$Header_Locations,$Header_Qtys,$Header_Totals,$Header_OrderLineage])
+  };
+
+  /* ### END: PROCESS SalesOrder.HEADER */
+  /* ----------------------------------- */
+
+
+
+  /* ### START: PROCESS SalesOrder.Lines */
+  /* ----------------------------------- */
+
+
+  /* MAP FUNC: SalesOrder.Lines[].Type.SubTypeCode */
+  $LineSubTypeCode := function($isExchangeReturnLine,$isReturnLine) {
+       $isReturnLine = "Y" ? "ReturnLine" : ($isExchangeReturnLine = "Y" ? "ExchangeLine" : "SaleLine")
+  };
+
+
+  /* MAP FUNC: SalesOrder.Lines[].FulfilmentAtts.DeliveryMethod */
+  $LineDeliveryMethodCode := function($inRaw) {
+    [
+    	{"systemCode": "1",       "xfuzeCode": "WebOrder"},
+       	{"systemCode": "2",       "xfuzeCode": "Click&Collect"},
+      	{"systemCode": "3",       "xfuzeCode": "InStore"},
+      	{"systemCode": "4",       "xfuzeCode": "ShiptoStore"}
+    ][systemCode = $string($inRaw)].xfuzeCode
+  };
+
+
+  /* MAP: SalesOrder.Lines[] CORE MAPPINGS OVER PREPROCESSED LINE FEATURES*/
+  $Lines := [
+    $linesFeatures.(
+
+    $RawOrderType := $.RawType;
+    $OrderType := $.Type; /* NOTE: No parent '&' supported in go so need a variable in the context of this line array expansion */
+	$IsReturn := $.IsReturn;
+  	$LineEntityIds := $LineEntityIdsObj($originTransactionId,$formatValue(itemLineId,"STRING",null),$sourceSystem);
+
+    $LineIds := $LineIdsObj(
+        	$LineId := $HeaderIds.HeaderIds.OrderId & "_" & itemLineId,
+            $LineKey := $HeaderIds.HeaderIds.OrderKey & "_" & itemLineId,
+            $LineSeq := $formatValue(itemLineId,"NUMERIC",null),
+            $LineProductId := $HeaderIds.HeaderIds.OrderId & "_" & SKU,
+            $LineProductKey := $HeaderIds.HeaderIds.OrderKey & "_" & SKU,
+            $LineProductKeyType := "SKU",
+            $exists(parentItemLineId) and parentItemLineId != null ? $ParentLineId := $HeaderIds.HeaderIds.OrderKey & "_" & parentItemLineId,
+            $exists(parentItemLineId) and parentItemLineId != null ? $ParentLineKey := $HeaderIds.HeaderIds.OrderKey & "_" & parentItemLineId,
+            $exists(parentItemLineId) and parentItemLineId != null ? $ParentLineSeq := $formatValue(parentItemLineId,"NUMERIC",null),
+            $HeaderIds := $HeaderIds.HeaderIds
+    );
+
+    $Line_XRefIds := {"XRefIds":[
+      $XrefIdsSetObj($LineIds.LineIds.LineKey,$LineEntityIds.EntityIds.SourceSystem,"transactionId_itemLineId",$LineEntityIds.EntityIds.EntityId,$LineEntityIds.EntityIds.ParentEntityId,$LineEntityIds.EntityIds.CompositeEntityId),
+      $XrefIdsSetObj($LineIds.LineIds.LineProductKey,$LineEntityIds.EntityIds.SourceSystem,"transactionId_SKU",$LineEntityIds.EntityIds.EntityId,$LineEntityIds.EntityIds.ParentEntityId,$LineEntityIds.EntityIds.CompositeEntityId)
+    ]};
+
+    $Line_Type := {
+		"Type": $TypeObj(
+                  $TypeClass 		:= Type,
+                  $TypeCode 		:= "OrderLine",
+                  $TypeDesc 		:= NULL,
+                  $SubTypeCode 		:= $LineSubTypeCode(IsExchangeReturnLine,IsReturnLine))
+
+	};
+
+    $Line_Status_LineStatus := {
+		"LineStatus": 	$StatusObj(
+                          $StatusClass 	:= "Line",
+                          $StatusCode 	:= "Completed",
+                          $StatusDesc 	:= NULL,
+                          $SubStatusCode  := $LineDeliveryMethodCode(FulfilmentAtts.ExternalDeliveryMethodCode))
+    };
+
+    $Line_Status_FulfilmentStatus := {
+        "FulfilmentStatus": $StatusObj(
+                                $StatusClass 	:= "Fulfilment",
+                                $StatusCode 	:= "Fulfilled", /* TODO: delivery specific */
+                                $StatusDesc 	:= NULL,
+                                $SubStatusCode  := $LineDeliveryMethodCode(FulfilmentAtts.ExternalDeliveryMethodCode))
+    };
+
+    $Line_Status_DiscountStatus := {
+        "DiscountStatus": $StatusObj(
+                                $StatusClass 	:= "Discount",
+                                $StatusCode 	:= (Qtys.QtyAllDiscountLinesApplied > 0 ? "Discounted" : "NotDiscounted"),
+                                $StatusDesc 	:= NULL,
+                                $SubStatusCode  := ((Qtys.QtyAllDiscountLinesApplied > 0 ? "Discounted" : "NotDiscounted") = "Discounted")
+                                						? ($round(Totals.LineTotalBeforeDiscountsIncTax - Totals.LineAllDiscountsTotalIncTax,2) = 0 ? "FullyDiscounted" : "PartiallyDiscounted")
+                                                        : ("NotDiscounted")
+                          )
+    };
+
+    $Line_Status_ReturnExchangeStatus := {
+        "ReturnExchangeStatus": $StatusObj(
+                                	$StatusClass 	:= "Return",
+                                	$StatusCode 	:= (IsRefunded = "Y" ? "Returned" : (IsExchangeReturnLine = "Y" or IsExchangeSaleLine = "Y" ? "Exchanged" : "NotReturned")),
+                                	$StatusDesc 	:= NULL,
+                                	$SubStatusCode  := (IsReturnLine = "Y" ? "Returned" : (IsExchangeReturnLine = "Y" ? "Exchanged" : "Sold"))
+                          )
+    };
+
+    $Line_Status := {
+        "Status": $merge([$Line_Status_LineStatus,$Line_Status_FulfilmentStatus,$Line_Status_DiscountStatus,$Line_Status_ReturnExchangeStatus])
+    };
+
+
+    $Line_Times := {
+      "Times": {
+          "CompletedOn": 				$dateTimeDim($originTransCompletedAt,"2006-01-02T15:04:05.000Z","UTC","UTC"),
+          "PreviousCompletedOn": 		$dateTimeDim($originEvent.originalTime,"2006-01-02T15:04:05.000Z","UTC","UTC"),
+          "UpdatedOn" : 				$dateTimeDim(updateDate,"2006-01-02T15:04:05.000Z","UTC","UTC")
+      }
+	};
+
+    $Line_ProductIds := $LinePrdIdsObj(
+        	$EntityId := "ProductVariant_Retail247Origin_" & $formatValue(SKU,"STRING",null),
+            $EntityType := "ProductVariant",
+            $ProductId := NULL,
+            $ProductKey := NULL,
+            $ProductVariantId := NULL,
+            $ProductVariantKey := $formatValue(SKU,"STRING",null),
+            $ProductVariantKeyType := "SKU",
+            $SKU := $formatValue(SKU,"STRING",null),
+            $EAN := NULL,
+            $UPC := NULL,
+            $Barcode := $length(barCode) > 0 ? barCode : barcodes[0],
+            $Barcodes := barcodes, /* TODO */
+            $ItemOptionNumber := NULL
+    );
+
+    $Line_ProductAtts := {
+  		"ProductAtts" : $LinePrdAttsObj(
+        	$ProductIds := $Line_ProductIds,
+            $ProductName := $trim($split(Description, '|')[0]),
+            $ProductDesc := Description,
+            $ProductType := NULL,
+            $ProductCategory := NULL,
+            $ProductGroup := NULL,
+            $ProductDepartment := NULL,
+            $HierarchyNode := NULL,
+            $Hierarchy := NULL,
+            $Style := NULL,
+            $Colour := NULL,
+            $Size := NULL,
+            $SizeMatrix := NULL,
+            $Season := NULL,
+            $SupplierId := NULL,
+            $SupplierCode := NULL,
+            $CountryOfOrigin := NULL,
+            $ImageURLs := ImageURLs,
+            $AttributeCodes := AttributeCodes,
+            $Lineage := NULL
+
+        )
+  	};
+
+    /* MAP: Lines[].Prices.SalesPrices */
+	/* MAP: Lines[].Prices.SalesPrices.LineUnitPrice */
+	$Line_Prices_SalesPrices_LineUnitPrice := {
+		"LineUnitPrice": 	$PriceSetObj(
+								$PriceLocaleObj(
+                  					$PriceObj($LCY,$.UnitPrices.LineUnitPriceIncTax), 												/* LCY */
+                  				  		$localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$.UnitPrices.LineUnitPriceIncTax)  	/* BCY */
+                	))
+	};
+
+	$Line_Prices_SalesPrices_LineUnitPriceAfterDiscounts := {
+		"LineUnitPriceAfterDiscounts": 	$PriceSetObj(
+								$PriceLocaleObj(
+                  					$PriceObj($LCY,$.UnitPrices.LineUnitPriceAfterDiscountsIncTax), 												/* LCY */
+                  				  		$localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$.UnitPrices.LineUnitPriceAfterDiscountsIncTax)  	/* BCY */
+                	))
+	};
+
+    $Line_Prices_SalesPrices := {
+		"SalesPrices": $merge([$Line_Prices_SalesPrices_LineUnitPrice,$Line_Prices_SalesPrices_LineUnitPriceAfterDiscounts])
+    };
+
+    $Line_Prices_CostPrices := NULL; /* None to map from source */
+
+    $Line_Prices_MarginPrices := NULL; /* None to map from source or derive */
+
+    $Line_Prices := {
+		"Prices": $merge([$Line_Prices_SalesPrices,$Line_Prices_CostPrices,$Line_Prices_MarginPrices])
+	};
+
+
+    /* MAP: Line.Qtys */
+	$Line_Qtys_Amounts := {
+		"Qtys" : {
+            "QtySoldUnits":							$QtyObj(Qtys.QtySoldUnits),
+            "QtyNetUnits":							$QtyObj(Qtys.QtyNetUnits),
+            "QtyRefundedUnits":						$QtyObj(Qtys.QtyRefundedUnits),
+            "QtyReturnRefundedUnits":				$QtyObj(Qtys.QtyReturnRefundedUnits),
+            "QtyReturnRefundedPromotionalUnits":	$QtyObj(Qtys.QtyReturnRefundedPromotionalUnits),
+            "QtyExchangedRefundedUnits":			$QtyObj(Qtys.QtyExchangedRefundedUnits),
+            "QtyExchangedSaleUnits":				$QtyObj(Qtys.QtyExchangedSaleUnits),
+            "QtyDiscountLines":						$QtyObj(Qtys.QtyDiscountLines),
+            "QtyAllDiscountLinesApplied":			$QtyObj(Qtys.QtyAllDiscountLinesApplied),
+            "QtyPromotionLines":					$QtyObj(Qtys.QtyPromotionLines),
+            "QtyOrderDiscountLines":				$QtyObj(Qtys.QtyOrderDiscountLines),
+            "QtyOrderPromotionLines":				$QtyObj(Qtys.QtyOrderPromotionLines)
+         }
+	};
+
+    $Line_Qtys := {
+      "Qtys" : {
+          "Sold"		: $OrderType = "Sale" ? $Line_Qtys_Amounts : NULL,     /* 'Sold' - Original 'as sold' qty */
+          "Changed" 	: $OrderType != "Sale" ? $Line_Qtys_Amounts : NULL,    /* 'Delta' - The changed qty for this event / change as a delta */
+          "Current"	: NULL 														  /* 'Net' at Point in time - nothing in data to map this or derive */
+       }
+    };
+
+
+    /* MAP: Lines[].Totals.SalesTotals */
+	/* MAP: Lines[].Totals.SalesTotals.LineTotal */
+    $LineTotal := $PriceLocaleObj(
+                  	$PriceObj($LCY,$.Totals.LineTotalIncTax,$.Totals.LineTotalExTax,$.Totals.LineTotalTax,NULL,"LineTotal"), 												/* LCY */
+                    	$localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$.Totals.LineTotalIncTax,$.Totals.LineTotalExTax,$.Totals.LineTotalTax,NULL,"LineTotal")  	/* BCY */
+                  );
+
+	$Line_Totals_SalesTotals_LineTotal := {
+		"LineTotal": $OrderType = "Sale" ? $PriceSetObj(NULL,$LineTotal,NULL) : $PriceSetObj($LineTotal,NULL,NULL)
+	};
+
+
+    /* MAP: Lines[].Totals.SalesTotals.LineTotalDiscounts */
+	$LineTotalDiscounts := $PriceLocaleObj(
+                  					$PriceObj($LCY,$.Totals.LineAllDiscountsTotalIncTax,NULL,NULL,NULL,"LineTotalDiscounts"), 													/* LCY */
+                  				  		$localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$.Totals.LineAllDiscountsTotalIncTax,NULL,NULL,NULL,"LineTotalDiscounts")  		/* BCY */
+                		  );
+
+    $Line_Totals_SalesTotals_LineTotalDiscounts := {
+		"LineTotalDiscounts": $OrderType = "Sale" ? $PriceSetObj(NULL,$LineTotalDiscounts,NULL) : $PriceSetObj($LineTotalDiscounts,NULL,NULL)
+	};
+
+	/* MAP: Lines[].Totals.SalesTotals.LineTotalBeforeDiscounts */
+    $LineTotalBeforeDiscounts := $PriceLocaleObj(
+                  							$PriceObj($LCY,$.Totals.LineTotalBeforeDiscountsIncTax,NULL,NULL,NULL,"LineTotalBeforeDiscounts"), 													/* LCY */
+                  				  				$localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$.Totals.LineTotalBeforeDiscountsIncTax,NULL,NULL,NULL,"LineTotalBeforeDiscounts")  		/* BCY */
+                				);
+
+	$Line_Totals_SalesTotals_LineTotalBeforeDiscounts := {
+		"LineTotalBeforeDiscounts": $OrderType = "Sale" ? $PriceSetObj(NULL,$LineTotalBeforeDiscounts,NULL) : $PriceSetObj($LineTotalBeforeDiscounts,NULL,NULL)
+	};
+
+	/* MAP: Lines[].Totals.SalesTotals.LineTotalAfterDiscounts */
+    $LineTotalAfterDiscounts := $PriceLocaleObj(
+                  							$PriceObj($LCY,$.Totals.LineTotalAfterDiscountsIncTax,NULL,NULL,NULL,"LineTotalAfterDiscounts"), 													/* LCY */
+                  				  				$localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$.Totals.LineTotalAfterDiscountsIncTax,NULL,NULL,NULL,"LineTotalAfterDiscounts")  		/* BCY */
+                				);
+
+	$Line_Totals_SalesTotals_LineTotalAfterDiscounts := {
+		"LineTotalAfterDiscounts": $OrderType = "Sale" ? $PriceSetObj(NULL,$LineTotalAfterDiscounts,NULL) : $PriceSetObj($LineTotalAfterDiscounts,NULL,NULL)
+	};
+
+    /* MAP: Lines[].Totals.SalesTotals.LineTotalTax */
+    $LineTotalTax := $PriceLocaleObj(
+                  						$PriceObj($LCY,$.Totals.LineTotalTax,NULL,NULL,NULL,"LineTotalTax"), 														/* LCY */
+                  				  				$localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$.Totals.LineTotalTax,NULL,NULL,NULL,"LineTotalTax")  		/* BCY */
+                					);
+
+	$Line_Totals_SalesTotals_LineTotalTax := {
+		"LineTotalTax": $OrderType = "Sale" ? $PriceSetObj(NULL,$LineTotalTax,NULL) : $PriceSetObj($LineTotalTax,NULL,NULL)
+	};
+
+       /* MAP: Lines[].Totals.SalesTotals.LineTotalTax */
+    $LineTaxableAmountTotal := $PriceLocaleObj(
+                  						$PriceObj($LCY,$.Totals.LineTotalTaxableAmount,NULL,NULL,NULL,"LineTaxableAmountTotal"), 														/* LCY */
+                  				  				$localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$.Totals.LineTotalTaxableAmount,NULL,NULL,NULL,"LineTaxableAmountTotal")  		/* BCY */
+                					);
+
+	$Line_Totals_SalesTotals_LineTaxableAmountTotal := {
+		"LineTaxableAmountTotal": $OrderType = "Sale" ? $PriceSetObj(NULL,$LineTaxableAmountTotal,NULL) : $PriceSetObj($LineTaxableAmountTotal,NULL,NULL)
+	};
+
+
+
+	/* MAP: Line.Totals.SalesTotals.LineRefundsTotal */
+    $LineRefundsTotal := $PriceLocaleObj(
+                  					$PriceObj($LCY,$.Totals.LineRefundsTotalIncTax,NULL,NULL,NULL,"LineRefundsTotal"), 													/* LCY */
+                  				  		$localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$.Totals.LineRefundsTotalIncTax,NULL,NULL,NULL,"LineRefundsTotal")  		/* BCY */
+                		 );
+
+    $Line_Totals_SalesTotals_LineRefundsTotal := {
+		"LineRefundsTotal": $OrderType = "Sale" ? $PriceSetObj(NULL,$LineRefundsTotal,NULL) : $PriceSetObj($LineRefundsTotal,NULL,NULL)
+	};
+
+    /* MAP: Line.Totals.SalesTotals - Merge all individual totals into the final group for sales totals (costTotals need to come from enrichment from product) */
+    $Line_Totals_SalesTotals := {
+		"SalesTotals": $merge([
+        	$Line_Totals_SalesTotals_LineTotal,
+            $Line_Totals_SalesTotals_LineTotalBeforeDiscounts,
+            $Line_Totals_SalesTotals_LineTotalAfterDiscounts,
+            $Line_Totals_SalesTotals_LineTotalDiscounts,
+            $Line_Totals_SalesTotals_LineRefundsTotal,
+            $Line_Totals_SalesTotals_LineTotalTax,
+            $Line_Totals_SalesTotals_LineTaxableAmountTotal])
+    };
+
+    /* MAP: Line.Totals.CostTotals - Not mappable in trigger mapping, needs to come from enrichment from product */
+    $Line_Totals_CostTotals := {
+		"CostTotals": NULL
+    };
+
+    /* MAP: Line.Totals.CostTotals - Not mappable in trigger mapping, needs to come from enrichment from product */
+    $Line_Totals_MarginTotals := {
+		"MarginTotals": NULL
+    };
+
+    /* MAP: Line.Totals - Merge all the sales, cost and margin totals together */
+    $Line_Totals := {
+		"Totals": $merge([$Line_Totals_SalesTotals,$Line_Totals_CostTotals,$Line_Totals_MarginTotals])
+	};
+
+    /* MAP: Line.FulfilmentAtts */
+    $Line_FulfilmentAtts := {
+		"FulfilmentAtts": $.FulfilmentAtts
+	};
+
+    /* MAP: Line.FulfilmentAtts - Enrich raw DeliveryMethod*/
+    $Line_FulfilmentAtts :=
+    	$merge([$Line_FulfilmentAtts,
+            $Line_FulfilmentAtts ~> |FulfilmentAtts|{"DeliveryMethodCode": $LineDeliveryMethodCode($.ExternalDeliveryMethodCode)} |
+        ]);
+
+    /* MAP: Line.ReturnExchangeAtts */
+    $Line_ReturnExchangeAtts := {
+		"ReturnExchangeAtts": $.ReturnExchangeAtts
+	};
+
+    /* MAP: Line.Flags */
+    $Line_Flags := {
+		"Flags": $.Flags
+	};
+
+    /* MAP: Line.UniqueMeasures */
+    $Line_UniqueMeasures := {
+		"UniqueMeasures": $.UniqueMeasures
+	};
+
+    /* MAP Line.TaxLines[] */
+  	$Line_TaxLines := [
+      TaxLines.(
+      	  $LineTaxableAmount := $PriceLocaleObj(
+                  					$PriceObj($LCY,
+                                    			$RawOrderType = "REFUND" or $RawOrderType = "UNREFERENCED_REFUND" ? -1.0 * $.taxableAmount : $.taxableAmount,
+                                                $RawOrderType = "REFUND" or $RawOrderType = "UNREFERENCED_REFUND" ? -1.0 * $.PreTax :  $.PreTax,
+                                                $RawOrderType = "REFUND" or $RawOrderType = "UNREFERENCED_REFUND" ? -1.0 * $.taxLineTotal : $.taxLineTotal,NULL,"TaxableAmount"), 													/* LCY */
+                                	$localCurrencyLCY = $homeCurrencyBCY ?
+                                    $PriceObj($BCY,
+                                    			$RawOrderType = "REFUND" or $RawOrderType = "UNREFERENCED_REFUND" ? -1.0 * $.taxableAmount : $.taxableAmount,
+                                                $RawOrderType = "REFUND" or $RawOrderType = "UNREFERENCED_REFUND" ? -1.0 * $.PreTax :  $.PreTax,
+                                                $RawOrderType = "REFUND" or $RawOrderType = "UNREFERENCED_REFUND" ? -1.0 * $.taxLineTotal : $.taxLineTotal,NULL,"TaxableAmount")
+                             	);
+
+          $Line_TaxLines_TaxableAmount := $OrderType = "Sale" ? $PriceSetObj(NULL,$LineTaxableAmount,NULL) : $PriceSetObj($LineTaxableAmount,NULL,NULL);
+
+      	  $TaxSummaryLine("LineTaxDetail","Line",$.VATCode,"VAT",$formatValue($.VAT = 0,"STRINGBOOL",null),$formatValue($.VAT,"NUMERIC","ZERO"),NULL,NULL,$Line_TaxLines_TaxableAmount);
+
+  	)];
+
+  	$Line_TaxLines := {"TaxLines":$Line_TaxLines};
+
+
+
+    /* MAP Line.DiscountLines[] */
+    $Line_DiscountLines := [
+      	DiscountLines.(
+
+        	$DiscountReasonCode := $exists(percentageDiscountReasonCode) ? percentageDiscountReasonCode : reasonCode;
+
+            $DiscountReasonDesc:= $exists(percentageDiscountReasonName) ? percentageDiscountReasonName : reasonDisplayText;
+
+            /* MAP: Line.DiscountLine.DiscountIds */
+            $DiscountIds := $DiscountIdsObj($LineIds.LineIds.HeaderIds,"SalesOrderDiscount_PMC_" & $LineIds.LineIds.HeaderIds.OrderKey & "_" & percentageDiscountReasonCode,percentageDiscountReasonCode,NULL,NULL,NULL,percentageDiscountReasonCode);
+
+            /* MAP: Line.DiscountLine.DiscountTotalIncTax */
+            $DiscountTotalIncTax := $formatValue(discountAmount,"NUMERIC","ZERO");
+
+            $DiscountName := name;
+
+            $DiscountDesc := reasonDisplayText;
+
+            /* MAP: Line.DiscountLine.LineUnitPriceAfterDiscount */
+            $LineUnitPriceAfterDiscount := $PriceSetObj(
+								$PriceLocaleObj(
+                  					$PriceObj($LCY,$formatValue(unitPrice,"NUMERIC","ZERO")), 													/* LCY */
+                  				  		$localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$formatValue(unitPrice,"NUMERIC","ZERO"))  		/* BCY */
+                                    )
+                                );
+
+            /* MAP: Line.DiscountLine.LineDiscountTotal */
+            $LineDiscountTotal := $PriceSetObj(
+								$PriceLocaleObj(
+                  					$PriceObj($LCY,$formatValue(discountAmount,"NUMERIC","ZERO")), 													/* LCY */
+                  				  		$localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$formatValue(discountAmount,"NUMERIC","ZERO"))  		/* BCY */
+                                    )
+                                );
+
+            /* MAP: Line.DiscountLine.LineTotalAfterDiscount */
+            $LineTotalAfterDiscount := $PriceSetObj(
+								$PriceLocaleObj(
+                  					$PriceObj($LCY,$formatValue(discountedLinePrice,"NUMERIC","ZERO")), 											 /* LCY */
+                  				  		$localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$formatValue(discountedLinePrice,"NUMERIC","ZERO"))  	 /* BCY */
+                                    )
+                                );
+
+            /* MAP: Line.DiscountLine.LineTotalAfterDiscount */
+            $LineTotalBeforeDiscount := $PriceSetObj(
+								$PriceLocaleObj(
+                  					$PriceObj($LCY,$formatValue(discountedLinePrice + discountAmount,"NUMERIC","ZERO")), 											 	 /* LCY */
+                  				  		$localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$formatValue(discountedLinePrice + discountAmount,"NUMERIC","ZERO"))  	 /* BCY */
+                                    )
+                                );
+
+            /* MAP: Line.DiscountLine.DiscountType */
+            $DiscountType := $TypeObj("Discount","LineDiscount",discountType,NULL,NULL,NULL,NULL);
+
+            /* MAP: Line.DiscountLine.DiscountStatus */
+            $DiscountStatus := $StatusObj("Discount","FullyApplied");
+
+            $DiscountLevel := "Line";
+
+            $DiscountMethod := "Store";
+
+            $PercentageDiscount := $formatValue(percentageDiscountValue,"NUMERIC","ZERO");
+
+            /* MAP: Line.DiscountLine.Times */
+            $Times := {"AppliedOn": $dateTimeDim($originEvent.transCompletedAt,"2006-01-02T15:04:05.000Z","UTC","UTC")};
+
+            /* MAP: Line.DiscountLine.Prices */
+            $Prices := {"LineUnitPriceAfterDiscount" : $LineUnitPriceAfterDiscount};
+
+            /* MAP: Line.DiscountLine.Totals */
+            $Totals := {
+            	"LineDiscountTotal" : $LineDiscountTotal,
+                "LineTotalAfterDiscount" : $LineTotalAfterDiscount,
+                "LineTotalBeforeDiscount" : $LineTotalBeforeDiscount
+            };
+
+            /* MAP: Line.DiscountLine.AppliedToLineIds */
+            $AppliedToLineIds := $count(itemLineIds) > 0 ? itemLineIds : [itemLineId];
+
+            $Trigger := trigger; /* TODO */
+
+            /* MAP: Line.DiscountLine.Override1 */
+            $Override1 := $exists(priceManagerOverride) ? $OverrideObj(NULL,NULL,priceManagerOverride.userId,priceManagerOverride.originalUserId,$formatValue(priceManagerOverride.automaticApprove,"STRINGBOOL",null),"PriceManagerOverride") : NULL;
+
+           /* MAP: Line.DiscountLine.Override2 */
+            $Override2 := $exists(percentageDiscountManagerOverride) ? $OverrideObj(NULL,NULL,percentageDiscountManagerOverride.userId,percentageDiscountManagerOverride.originalUserId,$formatValue(percentageDiscountManagerOverride.automaticApprove,"STRINGBOOL",null),"PercentageDiscountManagerOverride") : NULL;
+
+            /* MAP: Line.DiscountLine.Overrides */
+            $Overrides := [$Override1,$Override2];
+
+            /* MAP: Line.DiscountLine.FinanceAtts */
+            $FinanceAtts := NULL;
+
+            /* MAP: Line.DiscountLine Final Merge*/
+      	  	$DiscountLine($DiscountIds,$DiscountType,$DiscountName,$DiscountDesc,$DiscountStatus,$DiscountLevel,$DiscountMethod,$PercentageDiscount,$Trigger,$DiscountReasonCode,$DiscountReasonDesc,$Times,$Prices,$Totals,$AppliedToLineIds,$Overrides,$FinanceAtts,$Lineage);
+
+   		)];
+
+   	$Line_DiscountLines := {"DiscountLines":$Line_DiscountLines};
+
+
+   /* MAP Line.PromotionLines[] */
+    $Line_PromotionLines := [
+      	PromotionLines.(
+
+        	$DiscountReasonCode := promotionType;
+
+            $DiscountReasonDesc:= NULL;
+
+            /* MAP: Line.DiscountLine.DiscountIds */
+            $DiscountIds := $DiscountIdsObj($LineIds.LineIds.HeaderIds,"SalesOrderDiscount_PMC_" & $LineIds.LineIds.HeaderIds.OrderKey & "_" & promotionId,promotionId,NULL,NULL,NULL,promotionId);
+
+            /* MAP: Line.DiscountLine.DiscountTotalIncTax */
+            $DiscountTotalIncTax := $formatValue(promotionAmount,"NUMERIC","ZERO");
+
+            $DiscountName := name;
+
+            $DiscountDesc := displayText;
+
+            /* MAP: Line.DiscountLine.LineUnitPriceAfterDiscount */
+            $LineUnitPriceAfterDiscount := NULL;
+
+            /* MAP: Line.DiscountLine.LineDiscountTotal */
+            $LineDiscountTotal := $PriceSetObj(
+								$PriceLocaleObj(
+                  					$PriceObj($LCY,$formatValue(promotionAmount,"NUMERIC","ZERO")), 													/* LCY */
+                  				  		$localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$DiscountTotalIncTax)  		/* BCY */
+                                    )
+                                );
+
+            /* MAP: Line.DiscountLine.LineTotalAfterDiscount */
+            $LineTotalAfterDiscount := $PriceSetObj(
+								$PriceLocaleObj(
+                  					$PriceObj($LCY,$formatValue(promotionLinePrice,"NUMERIC","ZERO")), 											 /* LCY */
+                  				  		$localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$formatValue(promotionLinePrice,"NUMERIC","ZERO"))  	 /* BCY */
+                                    )
+                                );
+
+            /* MAP: Line.DiscountLine.LineTotalBeforeDiscount */
+            $LineTotalBeforeDiscount := $PriceSetObj(
+								$PriceLocaleObj(
+                  					$PriceObj($LCY,$formatValue(promotionLinePrice + promotionAmount,"NUMERIC","ZERO")), 											 	 /* LCY */
+                  				  		$localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$formatValue(promotionLinePrice + promotionAmount,"NUMERIC","ZERO"))  	 /* BCY */
+                                    )
+                                );
+
+            /* MAP: Line.DiscountLine.DiscountType */
+            $DiscountType := $TypeObj("Discount","LinePromotion",promotionType,NULL,NULL,NULL,NULL);
+
+            /* MAP: Line.DiscountLine.DiscountStatus */
+            $DiscountStatus := $StatusObj("Discount","FullyApplied");
+
+            $DiscountLevel := "Line";
+
+            $DiscountMethod := "Store";
+
+            $PercentageDiscount := $formatValue(percentageDiscountValue,"NUMERIC","ZERO");
+
+            /* MAP: Line.DiscountLine.Times */
+            $Times := {"AppliedOn": $dateTimeDim($originEvent.transCompletedAt,"2006-01-02T15:04:05.000Z","UTC","UTC")};
+
+            /* MAP: Line.DiscountLine.Prices */
+            $Prices := {"LineUnitPriceAfterDiscount" : $LineUnitPriceAfterDiscount};
+
+            /* MAP: Line.DiscountLine.Totals */
+            $Totals := {
+            	"LineDiscountTotal" : $LineDiscountTotal,
+                "LineTotalAfterDiscount" : $LineTotalAfterDiscount,
+                "LineTotalBeforeDiscount" : $LineTotalBeforeDiscount
+            };
+
+            /* MAP: Line.DiscountLine.AppliedToLineIds */
+            $AppliedToLineIds := $count(itemLineIds) > 0 ? itemLineIds : [itemLineId];
+
+            $Trigger := trigger.(
+            	{"Quantity.Amount" : quantity}
+            ); /* TODO */
+
+            /* MAP: Line.DiscountLine.Override1 */
+            $Override1 := $exists(priceManagerOverride) ? $OverrideObj(NULL,NULL,priceManagerOverride.userId,priceManagerOverride.originalUserId,$formatValue(priceManagerOverride.automaticApprove,"STRINGBOOL",null),"PriceManagerOverride") : NULL;
+
+           /* MAP: Line.DiscountLine.Override2 */
+            $Override2 := $exists(percentageDiscountManagerOverride) ? $OverrideObj(NULL,NULL,percentageDiscountManagerOverride.userId,percentageDiscountManagerOverride.originalUserId,$formatValue(percentageDiscountManagerOverride.automaticApprove,"STRINGBOOL",null),"PercentageDiscountManagerOverride") : NULL;
+
+            /* MAP: Line.DiscountLine.Overrides */
+            $Overrides := [$Override1,$Override2];
+
+            /* MAP: Line.DiscountLine.FinanceAtts */
+            $FinanceAtts := NULL;
+
+            /* MAP: Line.DiscountLine Final Merge*/
+      	  	$DiscountLine($DiscountIds,$DiscountType,$DiscountName,$DiscountDesc,$DiscountStatus,$DiscountLevel,$DiscountMethod,$PercentageDiscount,$Trigger,$DiscountReasonCode,$DiscountReasonDesc,$Times,$Prices,$Totals,$AppliedToLineIds,$Overrides,$FinanceAtts,$Lineage);
+
+   		)];
+
+   	$Line_PromotionLines := {"PromotionLines":$Line_PromotionLines};
+
+
+
+    /* MAP: Line - Merge all line component parts into the final line line being processed in the array */
+    $Line := $merge([$LineEntityIds,$LineIds,$Line_XRefIds,$Line_Type,$Line_Status,$Line_Times,$Line_ProductAtts,$Line_Prices,$Line_Qtys,$Line_Totals,$Line_FulfilmentAtts,$Line_ReturnExchangeAtts,$Line_Flags,$Line_UniqueMeasures,$Line_DiscountLines,$Line_PromotionLines,$Line_TaxLines]);
+
+  )];
+
+  $Lines := {"Lines":$Lines};
+
+  /* ### END: PROCESS SalesOrder.Lines */
+  /* --------------------------------- */
+
+
+
+  /* ### START: PROCESS SalesOrder.TaxSummaryLines */
+  /* --------------------------------------------- */
+
+
+  $TaxSummaryLines := [
+      basket.totalTaxSummary.(
+      	  $TaxSummaryLine("SummaryByTaxCode","Order",VATCode,"VAT",$formatValue(VAT = 0,"STRINGBOOL",null),$formatValue(VAT,"NUMERIC","ZERO"),NULL,NULL,
+          					$PriceSetObj(
+								$PriceLocaleObj(
+                  					$PriceObj($LCY,$.TXrateSum,$.PreTaxSum,$.TaxSum), 													/* LCY */
+                  				  		$localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$.TXrateSum,$.PreTaxSum,$.TaxSum)  		/* BCY */
+                                    )
+                                )
+                             )
+
+  )];
+
+  $TaxSummaryLines := {"TaxSummaryLines":$TaxSummaryLines};
+
+  /* ### END: PROCESS SalesOrder.TaxSummaryLines */
+  /* ------------------------------------------- */
+
+
+
+  /* ### START: PROCESS SalesOrder.PaymentLines */
+  /* ------------------------------------------ */
+
+	$PaymentClass := function($inRaw) {
+    	$inRaw < 0 ? "Refund" : "Sale"
+	};
+
+	$PaymentType := function($inRaw) {
+      [
+          {"systemCode": "PDQ",                	"xfuzeCode": "PDQ"},
+          {"systemCode": "CASH",       		 	"xfuzeCode": "Cash"},
+          {"systemCode": "CARD",         		"xfuzeCode": "Card"},
+          {"systemCode": "GIFT",              	"xfuzeCode": "GiftCard"}
+      ][systemCode = $string($inRaw)].xfuzeCode
+	};
+
+	$TransactionType := function($inRaw) {
+      [
+          {"systemCode": "SALE",                "xfuzeCode": "Sale"},
+          {"systemCode": "SALE_EXCHANGE",       "xfuzeCode": "Exchange"},
+          {"systemCode": "SALE_REFUND",         "xfuzeCode": "Return"},
+          {"systemCode": "REFUND",              "xfuzeCode": "Return"},
+          {"systemCode": "UNREFERENCED_REFUND", "xfuzeCode": "Return"}
+      ][systemCode = $string($inRaw)].xfuzeCode
+	};
+
+	$PaymentResultType := function($inRaw) {
+      [
+          {"systemCode": "AUTHORISED",          "xfuzeCode": "Authorised"}
+      ][systemCode = $string($inRaw)].xfuzeCode
+  	};
+
+ 	$PaymentLines := [
+      	paymentDetails.(
+
+        	/* MAP: PaymentIds */
+            $PaymentIds := $PaymentIdsObj($HeaderIds.HeaderIds,"SalesOrderPayment_PMC_" & $HeaderIds.HeaderIds.OrderKey & "_" & transactionReference,transactionReference,NULL,NULL,NULL,hostReferenceId);
+
+
+            /* MAP: PaymentAmountIncTax */
+            $PaidTotalIncTax := $formatValue(amount,"NUMERIC","ZERO");
+
+            /* MAP: PaymentAmount */
+            $PaidTotal := $PriceSetObj(
+								$PriceLocaleObj(
+                  					$PriceObj($LCY,$formatValue(amount,"NUMERIC","ZERO")), 													/* LCY */
+                  				  		$localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$formatValue(amount,"NUMERIC","ZERO"))  		/* BCY */
+                                    )
+                                );
+
+
+            /* MAP: PaymentType */
+            $PaymentClass := $PaymentClass($PaymentAmountIncTax);
+
+            $PaymentType := $TypeObj("Payment",$PaymentClass,$PaymentType(paymentType),NULL,NULL,NULL,paymentType);
+
+            /* MAP: PaymentStatus */
+            $PaymentStatus := $StatusObj("Payment","FullyPaid");
+
+            /* MAP: TransactionType */
+            $TransactionType := $TypeObj("Payment",$TransactionType(transactionType),NULL,NULL,NULL,transactionType);
+
+            /* MAP: PaymentMethod */
+            /* MAP: CASH */
+            $PaymentMethodCash := $length(drawer.name) > 0 and drawer.name != "NA" ?
+            	{
+                	"DrawerName": DrawerName,
+                	"DrawerType": DrawerType
+                } : NULL;
+
+            /* MAP: CARD */
+            $PaymentMethodCard := $length(cardType) > 0 and cardType != "NA" ?
+            	{
+                	"CardType": cardType,
+                	"CardSchemeId": cardSchemeId,
+                    "PAN" : pan
+                } : NULL;
+
+            /* MAP: GiftCard */
+            $PaymentMethodGiftCard := $length(cardNumber) > 0 and cardNumber != "NA" ?
+            	{
+                	"CardType": "GiftCard",
+                	"CardNUmber": cardNumber,
+                	"SeqNum": sqNo,
+                    "RemainingBalance" : $formatValue(remainingBalance,"NUMERIC",null),
+                    "ExpiryDate": expiryDate
+                } : NULL;
+
+
+            /* MAP: PaymentMethod */
+            /* MAP: CASH */
+            $PaymentMethod := {"Card":$PaymentMethodCard,"Cash":$PaymentMethodCash,"GiftCard": $PaymentMethodGiftCard};
+
+            /* MAP: PaymentResult */
+            $PaymentResult := $TypeObj("Payment",$PaymentResultType(result),NULL,authcode,NULL,result);
+
+            /* MAP: Times */
+            $Times := {"PaidOn": $dateTimeDim(transactionDate,"2006-01-02T15:04:05.000Z","UTC","UTC")};
+
+            /* MAP: Totals */
+            $Totals := {"PaidTotal" : $PaidTotal};
+
+            /* MAP: ProviderAtts */
+            $ProviderAtts := NULL;
+
+            /* MAP: DeviceAtts */
+            $DeviceAtts := NULL;
+
+            /* MAP: FinanceAtts */
+            $FinanceAtts := NULL;
+
+            /* MAP: FinanceAtts */
+            $ProviderAtts := NULL;
+
+            /* MAP: PaymentLine */
+      	  	$PaymentLine($PaymentIds,$PaymentType,$PaymentStatus,$TransactionType,$PaymentMethod,$PaymentResult,$Times,$Totals,$ProviderAtts,$DeviceAtts,$FinanceAtts,$ProviderAtts,$Lineage);
+
+
+   )];
+
+   $PaymentLines := {"PaymentLines":$PaymentLines};
+
+  /* ### END: PROCESS SalesOrder.PaymentLines */
+  /* ---------------------------------------- */
+
+
+  /* ### START: PROCESS SalesOrder.DiscountLines */
+  /* ------------------------------------------- */
+
+  $DiscountLines := [
+      	basket.transactionDiscount.(
+        	/* MAP: DiscountIds */
+            $DiscountIds := $DiscountIdsObj($HeaderIds.HeaderIds,"SalesOrderDiscount_PMC_" & $HeaderIds.HeaderIds.OrderKey & "_" & reasonCode,reasonCode,NULL,NULL,NULL,reasonCode);
+
+            /* MAP: DiscountTotalIncTax */
+            $DiscountTotalIncTax := $formatValue(discountAmount,"NUMERIC","ZERO");
+
+            $DiscountName := "";
+
+            $DiscountDesc := reasonDisplayText;
+
+            /* MAP: DiscountTotal */
+            $DiscountTotal := $PriceSetObj(
+								$PriceLocaleObj(
+                  					$PriceObj($LCY,$formatValue(discountAmount,"NUMERIC","ZERO")), 													/* LCY */
+                  				  		$localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$formatValue(discountAmount,"NUMERIC","ZERO"))  		/* BCY */
+                                    )
+                                );
+
+
+
+
+            /* MAP: DiscountType */
+            $DiscountType := $TypeObj("Discount","OrderDiscount",discountType,NULL,NULL,NULL,NULL);
+
+            /* MAP: DiscountStatus */
+            $DiscountStatus := $StatusObj("Discount","FullyApplied");
+
+            $DiscountLevel := "Order";
+
+            $DiscountMethod := "Store";
+
+            $ReasonCode := reasonCode;
+
+            $ReasonDesc:= reasonDisplayText;
+
+            $PercentageDiscount := $formatValue(percentageDiscountValue,"NUMERIC","ZERO");
+
+            /* MAP: Times */
+            $Times := {"AppliedOn": $dateTimeDim($originEvent.transCompletedAt,"2006-01-02T15:04:05.000Z","UTC","UTC")};
+
+            /* MAP: Totals */
+            $Totals := {"DiscountTotal" : $DiscountTotal};
+
+            $AppliedToLineIds := $count(itemLineIds) > 0 ? itemLineIds : [itemLineId];
+
+            $Trigger := trigger; /* TODO */
+
+            /* MAP: Override */
+            $Override := $OverrideObj(NULL,NULL,override.userId,override.originalUserId,$formatValue(override.automaticApprove,"STRINGBOOL",null));
+
+            /* MAP: Overrides */
+            $Overrides := [$Override];
+
+            /* MAP: FinanceAtts */
+            $FinanceAtts := NULL;
+
+            /* MAP: DiscountLine */
+      	  	$DiscountLine($DiscountIds,$DiscountType,$DiscountName,$DiscountDesc,$DiscountStatus,$DiscountLevel,$DiscountMethod,$PercentageDiscount,$Trigger,$ReasonCode,$ReasonDesc,$Times,$Totals,$AppliedToLineIds,$Overrides,$FinanceAtts,$Lineage);
+
+
+   )];
+
+   $DiscountLines := {"DiscountLines":$DiscountLines};
+
+  /* ### END: PROCESS SalesOrder.DiscountLines */
+  /* ----------------------------------------- */
+
+
+  /* ### START: PROCESS SalesOrder.PromotionLines */
+  /* -------------------------------------------- */
+
+  $PromotionLines := [
+      	basket.transactionPromotion.(
+        	/* MAP: DiscountIds */
+            $DiscountIds := $DiscountIdsObj($HeaderIds.HeaderIds,"SalesOrderPromotion_PMC_" & $HeaderIds.HeaderIds.OrderKey & "_" & promotionId,promotionId,NULL,NULL,NULL,promotionId);
+
+            /* MAP: DiscountTotalIncTax */
+            $DiscountTotalIncTax := $formatValue(promotionAmount,"NUMERIC","ZERO");
+
+            $DiscountName := name;
+
+            $DiscountDesc := displayText;
+
+            /* MAP: DiscountTotal */
+            $DiscountTotal := $PriceSetObj(
+								$PriceLocaleObj(
+                  					$PriceObj($LCY,$DiscountTotalIncTax), 													/* LCY */
+                  				  		$localCurrencyLCY = $homeCurrencyBCY ? $PriceObj($BCY,$DiscountTotalIncTax)  		/* BCY */
+                                    )
+                                );
+
+
+            /* MAP: DiscountType */
+            $DiscountType := $TypeObj("Promotion","OrderPromotion",promotionType,NULL,NULL,NULL,NULL);
+
+            /* MAP: DiscountStatus */
+            $DiscountStatus := $StatusObj("Promotion","FullyApplied");
+
+            $DiscountLevel := "Order";
+
+            $DiscountMethod := "Store";
+
+            $ReasonCode := reasonCode;
+
+            $ReasonDesc := displayText;
+
+            $PercentageDiscount := $formatValue(percentageDiscountValue,"NUMERIC","ZERO");
+
+            /* MAP: Times */
+            $Times := {"AppliedOn": $dateTimeDim($originEvent.transCompletedAt,"2006-01-02T15:04:05.000Z","UTC","UTC")};
+
+            /* MAP: Totals */
+            $Totals := {"DiscountTotal" : $DiscountTotal};
+
+            $AppliedToLineIds := $count(itemLineIds) > 0 ? itemLineIds : [itemLineId];
+
+            $Trigger := trigger; /* TODO */
+
+            /* MAP: Override */
+            $Override := $OverrideObj(NULL,NULL,override.userId,override.originalUserId,$formatValue(override.automaticApprove,"STRINGBOOL",null));
+
+            /* MAP: Overrides */
+            $Overrides := [$Override];
+
+            /* MAP: FinanceAtts */
+            $FinanceAtts := NULL;
+
+            /* MAP: DiscountLine */
+      	  	$DiscountLine($DiscountIds,$DiscountType,$DiscountName,$DiscountDesc,$DiscountStatus,$DiscountLevel,$DiscountMethod,$PercentageDiscount,$Trigger,$ReasonCode,$ReasonDesc,$Times,$Totals,$AppliedToLineIds,$Overrides,$FinanceAtts,$Lineage);
+
+
+   )];
+
+   $PromotionLines := {"PromotionLines":$PromotionLines};
+
+  /* ### END: PROCESS SalesOrder.PromotionLines */
+  /* ------------------------------------------ */
+
+
+  /* ### START: PROCESS DomainEvent.TriggerEntity */
+  /* -------------------------------------------- */
+
+
+  $TriggerEntity := {$entityType:$merge([$Header,$Lines,$PaymentLines,$DiscountLines,$PromotionLines,$TaxSummaryLines])};
+
+  $DomainEvent := {"DomainEvent":{"TriggerEntity": $TriggerEntity}};
+
+  /* ### END: DomainEvent.TriggerEvent */
+
+  /* ### START: PostProcessing (Post XDM TriggerEvent generation, extra steps to merge back in like Hashes) */
+
+  $PayloadAtts := $buildPayloadAtts(
+      $originDataPayloadHash := $hashmd5($string($originEvent)),
+      $originEventPayloadHash := $hashmd5($string($originEvent)),   /* runtime bindings */
+      $originHashScheme := "MD5",
+      $xfuzeDataPayloadHash := $hashmd5($string($TriggerEntity)),
+      $xfuzeEventPayloadHash := null,
+      $xfuzeHashScheme := "MD5"
+  );
+
+  $EventMetadata := $buildEventMetadata([$BaseMetadata[[0,1,2]],$IngestAtts, $PrivacyAtts, $PayloadAtts]);
+
+  $eventPayload := $merge([$EventHeader,$EventMetadata,$DomainEvent]);
+
+  $event := $eventPayload ~> |EventMetadata.PayloadAtts.Xfuze|{"EventPayloadHash":$hashmd5($string($eventPayload))}|;
+
+
+  /* ### END: PROCESS DomainEvent.TriggerEntity */
+  /* ------------------------------------------ */
+
+  );
+
+
+/* ### START: REGRESSION TEST SUITE */
+/* -------------------------------- */
+
+
+/* #### START: SETUP REGRESSION TESTS #### */
+/* Create some sub data components for ease of test use / reuse */
+
+
+/* SalesOrder.Header.XRefIds */
+$orderIdsSummary := $xdmEvents.(
+	{
+    	"HeaderId": DomainEvent.TriggerEntity.SalesOrder.Header.HeaderIds.OrderKey,
+    	"Type": DomainEvent.TriggerEntity.SalesOrder.Header.Type,
+    	"HeaderIds": DomainEvent.TriggerEntity.SalesOrder.Header.HeaderIds,
+    	"XRefIds": DomainEvent.TriggerEntity.SalesOrder.Header.XRefIds
+    }
+);
+
+/* SalesOrder.Header.Totals.SalesTotals */
+$orderTotalSummary := $xdmEvents.(
+	{
+    	"HeaderId": DomainEvent.TriggerEntity.SalesOrder.Header.HeaderIds.OrderKey,
+    	"Type": DomainEvent.TriggerEntity.SalesOrder.Header.Type,
+    	"SalesTotals": DomainEvent.TriggerEntity.SalesOrder.Header.Totals.SalesTotals
+    }
+);
+
+
+/* SalesOrder.Header.Qtys */
+$orderQtysSummary := $xdmEvents.(
+	{
+    	"HeaderId": DomainEvent.TriggerEntity.SalesOrder.Header.HeaderIds.OrderKey,
+    	"Type": DomainEvent.TriggerEntity.SalesOrder.Header.Type,
+    	"Qtys": DomainEvent.TriggerEntity.SalesOrder.Header.Qtys
+    }
+);
+
+/* SalesOrder.Header.Times */
+$orderTimesSummary := $xdmEvents.(
+	{
+    	"HeaderId": DomainEvent.TriggerEntity.SalesOrder.Header.HeaderIds.OrderKey,
+    	"Type": DomainEvent.TriggerEntity.SalesOrder.Header.Type,
+    	"Times": DomainEvent.TriggerEntity.SalesOrder.Header.Times
+    }
+);
+
+/* SalesOrder.Header.Status */
+$orderStatusSummary := $xdmEvents.(
+	{
+    	"HeaderId": DomainEvent.TriggerEntity.SalesOrder.Header.HeaderIds.OrderKey,
+    	"Type": DomainEvent.TriggerEntity.SalesOrder.Header.Type,
+    	"Status": DomainEvent.TriggerEntity.SalesOrder.Header.Status
+    }
+);
+
+/* SalesOrder.Header.OrderLineage */
+$orderOrderLineageSummary := $xdmEvents.(
+	{
+    	"HeaderId": DomainEvent.TriggerEntity.SalesOrder.Header.HeaderIds.OrderKey,
+    	"Type": DomainEvent.TriggerEntity.SalesOrder.Header.Type,
+        "HeaderIds": DomainEvent.TriggerEntity.SalesOrder.Header.HeaderIds,
+    	"OrderLineage": DomainEvent.TriggerEntity.SalesOrder.Header.OrderLineage
+    }
+);
+
+/* SalesOrder.Payments */
+$orderPaymentsSummary := $xdmEvents.(
+	{
+    	"HeaderId": DomainEvent.TriggerEntity.SalesOrder.Header.HeaderIds.OrderKey,
+    	"Type": DomainEvent.TriggerEntity.SalesOrder.Header.Type,
+    	"Payments": DomainEvent.TriggerEntity.SalesOrder.PaymentLines
+    }
+);
+
+
+/* SalesOrder.Lines */
+/* SalesOrder.Lines.Channels & SalesChannel */
+$orderSalesChannelsLocationsSummary := $xdmEvents.(
+	{
+    	"HeaderId": DomainEvent.TriggerEntity.SalesOrder.Header.HeaderIds.OrderKey,
+    	"Type": DomainEvent.TriggerEntity.SalesOrder.Header.Type,
+    	"SalesChannel" : DomainEvent.TriggerEntity.SalesOrder.Header.Channels.SalesChannel,
+        "SalesLocation" : DomainEvent.TriggerEntity.SalesOrder.Header.Locations.SalesLocation
+    }
+);
+
+/* SalesOrder.Lines.LineIds|XRefIds */
+$lineIdsSummary := $xdmEvents.(
+	{
+    	"HeaderId": DomainEvent.TriggerEntity.SalesOrder.Header.HeaderIds.OrderKey,
+    	"Type": DomainEvent.TriggerEntity.SalesOrder.Header.Type,
+    	"Lines" : DomainEvent.TriggerEntity.SalesOrder.Lines.(
+           {
+             "LineEntityIds": $.LineEntityIds,
+             "LineIds": $.LineIds,
+             "XRefIds": $.XRefIds
+           })
+    }
+);
+
+/* Line.Status */
+$lineStatusSummary := $xdmEvents.(
+	{
+    	"HeaderId": DomainEvent.TriggerEntity.SalesOrder.Header.HeaderIds.OrderKey,
+    	"Type": DomainEvent.TriggerEntity.SalesOrder.Header.Type,
+    	"Lines" : DomainEvent.TriggerEntity.SalesOrder.Lines.(
+           {
+             "LineId": $.LineIds.LineKey,
+             "LineSeq": $.LineIds.LineSeq,
+             "Type": $.Type,
+             "Status" : $.Status
+           })
+    }
+);
+
+/* Line.Times */
+$lineTimesSummary := $xdmEvents.(
+	{
+    	"HeaderId": DomainEvent.TriggerEntity.SalesOrder.Header.HeaderIds.OrderKey,
+    	"Type": DomainEvent.TriggerEntity.SalesOrder.Header.Type,
+    	"Lines" : DomainEvent.TriggerEntity.SalesOrder.Lines.(
+           {
+             "LineId": $.LineIds.LineKey,
+             "LineSeq": $.LineIds.LineSeq,
+             "Type": $.Type,
+             "Times" : $.Times
+           })
+    }
+);
+
+/* Line.ProductAtts */
+$lineProductAttsSummary := $xdmEvents.(
+	{
+    	"HeaderId": DomainEvent.TriggerEntity.SalesOrder.Header.HeaderIds.OrderKey,
+    	"Type": DomainEvent.TriggerEntity.SalesOrder.Header.Type,
+    	"Lines" : DomainEvent.TriggerEntity.SalesOrder.Lines.(
+           {
+             "LineId": $.LineIds.LineKey,
+             "LineSeq": $.LineIds.LineSeq,
+             "Type": $.Type,
+             "ProductAtts" : $.ProductAtts
+           })
+    }
+);
+
+/* Line.Qtys */
+$lineQtysSummary := $xdmEvents.(
+	{
+    	"HeaderId": DomainEvent.TriggerEntity.SalesOrder.Header.HeaderIds.OrderKey,
+    	"Type": DomainEvent.TriggerEntity.SalesOrder.Header.Type,
+    	"Lines" : DomainEvent.TriggerEntity.SalesOrder.Lines.(
+           {
+             "LineId": $.LineIds.LineKey,
+             "LineSeq": $.LineIds.LineSeq,
+             "Type": $.Type,
+             "Qtys" : $.Qtys
+           })
+    }
+);
+
+/* Line.Totals */
+$lineTotalsSummary := $xdmEvents.(
+	{
+    	"HeaderId": DomainEvent.TriggerEntity.SalesOrder.Header.HeaderIds.OrderKey,
+    	"Type": DomainEvent.TriggerEntity.SalesOrder.Header.Type,
+    	"Lines" : DomainEvent.TriggerEntity.SalesOrder.Lines.(
+           {
+             "LineId": $.LineIds.LineKey,
+             "LineSeq": $.LineIds.LineSeq,
+             "Type": $.Type,
+             "Totals" : $.Totals
+           })
+    }
+);
+
+/* Line.TaxLines */
+$lineTaxSummary := $xdmEvents.(
+	{
+    	"HeaderId": DomainEvent.TriggerEntity.SalesOrder.Header.HeaderIds.OrderKey,
+    	"Type": DomainEvent.TriggerEntity.SalesOrder.Header.Type,
+    	"Lines" : DomainEvent.TriggerEntity.SalesOrder.Lines.(
+           {
+             "LineId": $.LineIds.LineKey,
+             "LineSeq": $.LineIds.LineSeq,
+             "Type": $.Type,
+             "TaxLines" : $.TaxLines
+           })
+    }
+);
+
+/* Line.DiscountLines */
+$lineDiscountSummary := $xdmEvents.(
+	{
+    	"HeaderId": DomainEvent.TriggerEntity.SalesOrder.Header.HeaderIds.OrderKey,
+    	"Type": DomainEvent.TriggerEntity.SalesOrder.Header.Type,
+    	"Lines" : DomainEvent.TriggerEntity.SalesOrder.Lines.(
+           {
+             "LineId": $.LineIds.LineKey,
+             "LineSeq": $.LineIds.LineSeq,
+             "Type": $.Type,
+             "DiscountLines" : $.DiscountLines
+           })
+    }
+);
+
+/* Line.PromotionLines */
+$linePromotionSummary := $xdmEvents.(
+	{
+    	"HeaderId": DomainEvent.TriggerEntity.SalesOrder.Header.HeaderIds.OrderKey,
+    	"Type": DomainEvent.TriggerEntity.SalesOrder.Header.Type,
+    	"Lines" : DomainEvent.TriggerEntity.SalesOrder.Lines.(
+           {
+             "LineId": $.LineIds.LineKey,
+             "LineSeq": $.LineIds.LineSeq,
+             "Type": $.Type,
+             "PromotionLines" : $.PromotionLines
+           })
+    }
+);
+
+/* Line.PromotionLines */
+$lineSalesChannelsLocationsSummary := $xdmEvents.(
+	{
+    	"HeaderId": DomainEvent.TriggerEntity.SalesOrder.Header.HeaderIds.OrderKey,
+    	"Type": DomainEvent.TriggerEntity.SalesOrder.Header.Type,
+    	"Lines" : DomainEvent.TriggerEntity.SalesOrder.Lines.(
+           {
+             "LineId": $.LineIds.LineKey,
+             "LineSeq": $.LineIds.LineSeq,
+             "Type": $.Type,
+             "SalesChannel" : $.Channels.SalesChannel,
+             "SalesLocation" : $.Channels.SalesLocation
+           })
+    }
+);
+
+
+/* #### START: EXEC REGRESSION TESTS #### */
+
+/* #### Test: Fold QtyNetUnits to test fold for an order across events/trans #### */
+$qtyNetUnitsArray := $orderQtysSummary.Qtys.**.QtyNetUnits;
+$foldQtyNetUnits := $reduce($qtyNetUnitsArray,
+    function($acc, $curr) { $acc + $curr.Amount },
+    0
+);
+
+$orderQtyNetReconSummary := {
+  "Test" : 											"orderQtyNetReconSummary",
+  "Desc" : 											"Quantities across events for golden test should = 0",
+  "Source" : 										"$foldQtyNetUnits",
+  "Passed" : 										$abs($foldQtyNetUnits) = 0,
+  "ActualValue":									$foldOrderTotalIncTax,
+  "ExpectedValue":									0
+};
+
+
+/* #### Test: Fold OrderTotalIncTax to test fold for an order across events/trans #### */
+$orderTotalIncTaxArray := $orderTotalSummary.SalesTotals.OrderTotal.**.BCY;
+$foldOrderTotalIncTax := $reduce($orderTotalIncTaxArray,
+    function($acc, $curr) { $acc + $curr.IncTax },
+    0
+);
+
+$orderTotalReconSummary := {
+  "Test" : 											"orderTotalReconSummary",
+  "Desc" : 											"Totals across events for golden test should = 0",
+  "Source" : 										"$foldOrderTotalIncTax",
+  "Passed" : 										$abs($foldOrderTotalIncTax) = 0.00,
+  "ActualValue":									$foldOrderTotalIncTax,
+  "ExpectedValue":									0.00
+};
+
+/* #### Test: Fold OrderTotalIncTax to test fold for an order across events/trans #### */
+$orderPaymentsTotalIncTaxArray := $orderTotalSummary.SalesTotals.PaymentsTotal.**.BCY;
+$foldOrderPaymentsTotalIncTax := $reduce($orderPaymentsTotalIncTaxArray,
+    function($acc, $curr) { $acc + $curr.IncTax },
+    0
+);
+
+$orderPaymentsTotalReconSummary := {
+  "Test" : 											"orderPaymentsTotalReconSummary",
+  "Desc" : 											"Payment Totals across events for golden test should = 0",
+  "Source" : 										"$foldOrderPaymentsTotalIncTax",
+  "Passed" : 										$abs($foldOrderPaymentsTotalIncTax) = 0.00,
+  "ActualValue":									$foldOrderPaymentsTotalIncTax,
+  "ExpectedValue":									0.00
+};
+
+/* #### LINE TESTS #### */
+/* #### Test: Fold OrderTotalIncTax to test fold for an order across events/trans #### */
+$orderPaymentsTotalIncTaxArray := $orderTotalSummary.SalesTotals.PaymentsTotal.**.BCY;
+$foldOrderPaymentsTotalIncTax := $reduce($orderPaymentsTotalIncTaxArray,
+    function($acc, $curr) { $acc + $curr.IncTax },
+    0
+);
+
+$orderPaymentsTotalReconSummary := {
+  "Test" : 											"orderPaymentsTotalReconSummary",
+  "Desc" : 											"Payment Totals across events for golden test should = 0",
+  "Source" : 										"$foldOrderPaymentsTotalIncTax",
+  "Passed" : 										$abs($foldOrderPaymentsTotalIncTax) = 0.00,
+  "ActualValue":									$foldOrderPaymentsTotalIncTax,
+  "ExpectedValue":									0.00
+};
+
+/* ### END: REGRESSION TEST SUITE */
+/* ------------------------------ */
+
+
+/* ### START: DEBUG */
+/* ---------------- */
+
+$orderTotalSummary;
+$orderTotalSummary[HeaderId = "A0001331"];
+$orderQtysSummary ;
+$orderQtysSummary[HeaderId = "A0001331"];
+$lineTotalsSummary;
+$lineTotalsSummary[HeaderId = "A0001335"];
+$lineQtysSummary;
+$lineQtysSummary[HeaderId = "A0001335"];
+
+$lineTotalsSummary[HeaderId = "A0001331"].Lines.Totals.SalesTotals.LineTotal;
+$lineTotalsSummary[HeaderId = "A0001331"].Lines[LineSeq=1].Totals.SalesTotals[Type ="LineTotal"];
+
+$lineTotalsSummary[HeaderId = "A0001331"].Lines[LineSeq=1].Totals.SalesTotals.**.BCY[$contains(Type,"Discount")];
+$lineTotalsIncTaxArray := $lineTotalsSummary[HeaderId = "A0001331"].Lines[LineSeq=1].Totals.SalesTotals.**.BCY;
+
+$isRecon := $lineTotalsIncTaxArray[Type = "LineTotal"].IncTax = $lineTotalsIncTaxArray[Type = "LineTotalBeforeDiscounts"].IncTax - $lineTotalsIncTaxArray[Type = "LineTotalDiscounts"].IncTax ;
+
+$lineTotalsIncTaxArray := $lineTotalsSummary.Lines.Totals.SalesTotals.**.BCY;
+
+$map($lineTotalsSummary,function($hdr) {
+  $map($hdr.Lines, function($line) {
+    $line.Totals.SalesTotals.LineTotal.**.BCY.IncTax
+  })
+});
+
+$sum($lineTotalsSummary.Lines.Totals.SalesTotals.LineTotal.**.BCY.IncTax);
+
+$lineTotalsSummary[HeaderId = "A0001334"].Lines[LineSeq=1].Totals.SalesTotals.**.BCY;
+
+$lineTotalsIncTaxArray := $lineTotalsSummary[HeaderId = "A0001334"].Lines[LineSeq=1].Totals.SalesTotals.**.BCY;
+$checkTotalObjRecon := function($price){
+  {
+  	"ExactRecon" : $formatValue($price.IncTax = $price.ExTax + $price.Tax,"STRINGBOOL",null),
+    "RoundedRecon" : $formatValue($round($price.IncTax,2) = $round($price.ExTax + $price.Tax,2),"STRINGBOOL",null),
+    "InputValues" : $formatValue($price.IncTax,"STRING",null) & " (IncTax),"
+    					& $formatValue($price.ExTax,"STRING",null)  & " (ExTax),"
+                        & $formatValue($price.Tax,"STRING",null)  & " (Tax)"
+  }
+};
+$checkTotalObjRecon($lineTotalsIncTaxArray[Type="LineTotal"]);
+
+$lineTotalsIncTaxArray := $lineTotalsSummary.Lines.Totals.SalesTotals.**.BCY[Type="LineTotal"];
+
+$map($lineTotalsIncTaxArray,$checkTotalObjRecon);
+
+$orderIdsSummary;
+$orderOrderLineageSummary;
+$orderIdsSummary;
+$lineIdsSummary;
+
+$lineIdsSummary[HeaderId = "A0001333"].Lines[LineIds.LineSeq=7];
+
+$lineStatusSummary[HeaderId = "A0001331"].Lines[LineSeq=1];
+
+$lineProductAttsSummary[HeaderId = "A0001331"].Lines;
+
+$lineStatusSummary[HeaderId = "A0001333"];
+
+/*
+$lineSumFn := $reduce($lineTotalsIncTaxArray,
+function($acc, $curr) { $acc + $curr.IncTax },
+    0
+);
+
+$reduce($lineTotalsIncTaxArray,$lineSumFn);
+*/
+
+$sum($lineTotalsIncTaxArray.(IncTax));
+
+$lineTotalsIncTaxArray;
+
+$sum($lineTotalsSummary.Lines.Totals.SalesTotals.LineTotal.**.BCY.IncTax);
+
+$lineTotalsIncTaxArray;
+
+$lineTaxSummary;
+
+/* TODO: Check A0001333 */
+$orderToLinesAllHeaderRecon := {
+	"SumOfLineTotalIncTax" : $sum($lineTotalsSummary.Lines.Totals.SalesTotals.LineTotal.**.BCY.IncTax),
+	"Header" : $sum($orderTotalSummary.SalesTotals.OrderTotal.**.BCY.IncTax),
+    "SumOfPayments" : $sum($orderPaymentsSummary.Payments.Totals.PaidTotal.**.BCY.IncTax),
+    "SumOfLineTaxableAmountTaxes" : $sum($lineTotalsSummary.Lines.Totals.SalesTotals.LineTaxableAmountTotal.**.BCY.IncTax),
+    "SumOfTaxLinesTaxableAmountTotal" : $sum($lineTaxSummary.Lines.TaxLines.**.BCY.IncTax)
+};
+
+/* TODO: Check A0001333 */
+$orderToLinesByHeaderRecon := {
+	"SumOfLineTotalIncTax" : $sum($lineTotalsSummary[HeaderId = "A0001334"].Lines.Totals.SalesTotals.LineTotal.**.BCY.IncTax),
+	"Header" : $orderTotalSummary[HeaderId = "A0001334"].SalesTotals.OrderTotal.**.BCY.IncTax,
+    "SumOfPayments" : $sum($orderPaymentsSummary[HeaderId = "A0001334"].Payments.Totals.PaidTotal.**.BCY.IncTax),
+    "SumOfLineTaxableAmountTaxes" : $sum($lineTotalsSummary[HeaderId = "A0001334"].Lines.Totals.SalesTotals.LineTaxableAmountTotal.**.BCY.IncTax),
+    "SumOfTaxLinesTaxableAmountTotal" : $sum($lineTaxSummary[HeaderId = "A0001334"].Lines.TaxLines.**.BCY.IncTax)
+};
+
+$orderToLinesByLinesRecon := {
+  	"SumOfLineTotalIncTax" : $sum($lineTotalsSummary[HeaderId = "A0001331"].Lines[LineSeq=5].Totals.SalesTotals.LineTotal.**.BCY.IncTax),
+  	"SumOfLineTaxableAmountTaxes" : $sum($lineTotalsSummary[HeaderId = "A0001331"].Lines[LineSeq=5].Totals.SalesTotals.LineTaxableAmountTotal.**.BCY.IncTax),
+   	"SumOfTaxLinesTaxableAmountTotal" : $sum($lineTaxSummary[HeaderId = "A0001331"].Lines[LineSeq=5].TaxLines.**.BCY.IncTax)
+};
+
+$lineTotalsSummary[HeaderId = "A0001335"].Lines[LineSeq=1].Totals.SalesTotals; /* line total disc broken */
+
+$lineDiscountSummary[HeaderId = "A0001331"].Lines[LineSeq=1].DiscountLines.Totals.LineDiscountTotal;
+
+$linePromotionSummary[HeaderId = "A0001331"].Lines[LineSeq=1].PromotionLines.Totals;
+
+$orderToLinesByLinesRecon := {
+      "SumOfLineTotalIncTax" : $sum($lineTotalsSummary[HeaderId = "A0001331"].Lines[LineSeq=5].Totals.SalesTotals.LineTotal.**.BCY.IncTax),
+      "SumOfLineTaxableAmountTaxes" : $sum($lineTotalsSummary[HeaderId = "A0001331"].Lines[LineSeq=5].Totals.SalesTotals.LineTaxableAmountTotal.**.BCY.IncTax),
+      "SumOfTaxLinesTaxableAmountTotal" : $sum($lineTaxSummary[HeaderId = "A0001331"].Lines[LineSeq=5].TaxLines.**.BCY.IncTax)
+};
+
+$orderToLinesByHeaderRecon;
+
+$lineTotalsSummary[HeaderId = "A0001335"].Lines.Totals.SalesTotals.LineTaxableAmountTotal.**.BCY.IncTax;
+
+$lineTaxSummary[HeaderId = "A0001335"].Lines.TaxLines.**.BCY.IncTax;
+
+$orderToLinesByHeaderRecon;
+
+$lineTotalsSummary[HeaderId = "A0001335"].Lines[LineSeq=2].Totals.SalesTotals; /* line total disc broken */
+
+$orderToLinesAllHeaderRecon;
+
+$sum($lineTotalsSummary.Lines.Totals.SalesTotals.LineTaxableAmountTotal.**.BCY.IncTax);
+
+$orderOrderLineageSummary;
+
+$orderToLinesByHeaderRecon ;
+
+$orderSalesChannelsLocationsSummary.SalesChannel;
+
+$lineTimesSummary;
+
+$orderTimesSummary;
+
+)

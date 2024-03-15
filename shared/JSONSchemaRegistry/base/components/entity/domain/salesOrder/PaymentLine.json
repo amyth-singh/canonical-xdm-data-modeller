@@ -1,0 +1,154 @@
+{
+  "type": "object",
+  "description": "A payment line related to the payment against a sales order entity (SOH, SOL).  Multiple payment lines are possible (1:*), thus this line object is typically in an array",
+  "unevaluatedProperties": false,
+  "allOf": [
+    {
+      "$ref": "../../common/Entity.json#/EntityHeader"
+    },
+    {
+      "properties": {
+        "LineIds": {
+          "$ref": "./LineIds.json#/LineIdsProperties",
+          "description": "The (required) common set of order line Ids for this payment line, not all a required individually, only what can be mapped & derived."
+        },
+        "PaymentLineId": {
+          "type": "string",
+          "description": "The Xfuze payment line id, in format [SOH]_Payment_[PaymentKey]"
+        },
+        "PaymentLineKey": {
+          "type": "string",
+          "description": "The 'natural' payment line key/number, typically either a combination of SalesOrderNumber & a 'sequence number' (derived) OR explicitly supplied unique Id from source - also used to construct the synthetic SOL Xfuze Ids. e.g 123456789_1"
+        },
+        "IsSplitPayment": {
+          "type": "string",
+          "description": "Is this payment part of a split payment? e.g Y",
+          "enum": [
+            "Y",
+            "N",
+            "U"
+          ]
+        },
+        "PaymentGroupId": {
+          "type": "string",
+          "description": "The Xfuze ID of a parent / group payment in the case of split payments"
+        },
+        "PaymentGroupKey": {
+          "type": "string",
+          "description": "The 'natural' key/number of a parent / group payment in the case of split payments"
+        },
+        "PaymentLineSeq": {
+          "type": "number",
+          "description": "The ordinal line sequence number e.g 2"
+        },
+        "PaymentType": {
+          "type": "string",
+          "description": "The type of the payment e.g Cash, CreditCard, Loyalty etc",
+          "enum": [
+            "Cash",
+            "CreditCard",
+            "DebitCard",
+            "eWallet",
+            "Crypto",
+            "GiftCard",
+            "LoyaltyPoints",
+            "EFT",
+            "Cheque",
+            "MoneyOrder",
+            "Layaway",
+            "Credit"
+          ]
+        },
+        "PaymentTypeCode": {
+          "type": "string",
+          "description": "The type of the payment e.g ApplePay, GooglePay, Visa, Venmo, Paypal etc further refining the instance of the PaymentType used"
+        },
+        "PaymentAccountingType": {
+          "type": "string",
+          "description": "The type of the payment in accounting terms e.g Debit, Credit",
+          "enum": [
+            "Debit",
+            "Credit"
+          ]
+        },
+        "PaymentTransactionType": {
+          "type": "string",
+          "description": "The type of the payment in business transaction terms e.g Sale, Auth, ChargeBack",
+          "enum": [
+            "Sale",
+            "Refund",
+            "Void",
+            "Auth",
+            "Capture",
+            "DelayedCapture",
+            "Settlement",
+            "ChargeBack",
+            "PreAuth",
+            "BatchSettlement",
+            "RecurringPayment",
+            "Tokenisation",
+            "SplitTender",
+            "ForceTransaction",
+            "InstallmentPayment",
+            "PartialAuth"
+          ]
+        },
+        "PaymentProviderTypeCode": {
+          "type": "string",
+          "description": "The type of the payment provider e.g Adyen, Apple, Visa"
+        },
+        "PaymentEntryType": {
+          "type": "string",
+          "description": "The entry type of the payment s e.g Manual, Auto",
+          "enum": [
+            "Manual",
+            "Auto"
+          ]
+        },
+        "PaymentMethod": {
+          "$ref": "../../common/PaymentMethod.json#/PaymentMethodProperties",
+          "description": "The payment method associated with this payment line"
+        },
+        "AuthCode": {
+          "type": "string",
+          "description": "The auth code"
+        },
+        "PaymentReference": {
+          "type": "string",
+          "description": "The customer-facing payment reference"
+        },
+        "Totals": {
+          "type": "object",
+          "description": "The collection of possible totals, related to the payment line.  Actual usage and ability to populate depends on the richness of the sources..",
+          "unevaluatedProperties": false,
+          "properties": {
+            "PaymentTotal": {
+              "description": "",
+              "$ref": "../../common/Price.json#/PriceProperties"
+            }
+          },
+          "required": [
+            "PaymentTotal"
+          ]
+        },
+        "ReasonCode": {
+          "type": "string",
+          "description": "The reason code for this payment line"
+        },
+        "ReasonDesc": {
+          "type": "string",
+          "description": "The reason desc for this payment line"
+        },
+        "Lineage": {
+          "$ref": "../../common/EventLineage.json#/EventLineageProperties",
+          "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+        }
+      },
+      "required": [
+        "LineIds",
+        "Payment",
+        "Totals"
+      ]
+    }
+  ]
+}

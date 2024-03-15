@@ -1,0 +1,85 @@
+{
+  "ExchangeRateObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/ExchangeRateProperties"
+    }
+  },
+  "ExchangeRateProperties": {
+    "type": "object",
+    "description": "An ExchangeRate object",
+    "unevaluatedProperties": false,
+    "properties": {
+      "ExchangeRateId": {
+        "type": "string",
+        "description": "The Xfuze Exchange Rate Entity Id format ExchangeRate_[sourceSystem]_[FromISO3]::[ToISO3] e.g ExchangeRate_Crew_GCP::EUR"
+      },
+      "ExchangeRateHistoryId": {
+        "type": "string",
+        "description": "The Xfuze Exchange Rate History ID of the exchange rate over time - usually ExchangeRateId_[FromDate/FromTimestamp] e.g ExchangeRate_Crew_GCP::EUR_20230101"
+      },
+      "ExchangeRateType": {
+        "type": "string",
+        "description": "The type of the exchange rate ",
+        "enum": [
+          "Fixed",
+          "Managed",
+          "ManagedFloat",
+          "Floating",
+          "CrawlingPeg",
+          "CrossRates",
+          "Floating",
+          "ExchangeRate",
+          "CurrencyBoard",
+          "Custom",
+          "Other"
+        ]
+      },
+      "EffectivePeriod": {
+        "$ref": "./TimePeriod.json#/TimePeriodProperties",
+        "description": "The period for which the FX rate is effective"
+      },
+      "FromCurrency": {
+        "$ref": "./Currency.json#/CurrencyProperties",
+        "description": "The 'from' currency object in this FX rate"
+      },
+      "ToCurrency": {
+        "$ref": "./Currency.json#/CurrencyProperties",
+        "description": "The 'to' currency object in this FX rate"
+      },
+      "Rate": {
+        "type": "number",
+        "description": "The (explicit) rate of the period specified"
+      },
+      "RateInverse": {
+        "type": "number",
+        "description": "The (explicit) inverse of the average rate of the period i.e (1/AverageRate)"
+      },
+      "RateCalcType": {
+        "type": "string",
+        "description": "The calc type of the FX value / reading e.g Exact, Estimated",
+        "enum": [
+          "Average",
+          "Exact",
+          "Other"
+        ]
+      },
+      "EstimatedRate": {
+        "type": "number",
+        "description": "The (estimated - i.e not explicit, rather derived) rate of the period specified"
+      },
+      "EstimatedRateInverse": {
+        "type": "number",
+        "description": "The inverse of the average rate of the period i.e (1/AverageRate)"
+      },
+
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of the containing object/data part"
+      }
+    },
+    "required": [
+      "ExchangeRateId","ExchangeRateHistoryId","FromCurrency","ToCurrency","AverageRate"
+    ]
+  }
+}

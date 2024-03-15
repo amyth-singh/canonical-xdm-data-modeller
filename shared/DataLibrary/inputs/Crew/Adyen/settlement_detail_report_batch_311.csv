@@ -1,0 +1,23 @@
+Company Account,Merchant Account,Psp Reference,Merchant Reference,Payment Method,Creation Date,TimeZone,Type,Modification Reference,Gross Currency,Gross Debit (GC),Gross Credit (GC),Exchange Rate,Net Currency,Net Debit (NC),Net Credit (NC),Commission (NC),Markup (NC),Scheme Fees (NC),Interchange (NC),Payment Method Variant,Modification Merchant Reference,Batch Number,Reserved4,Reserved5,Reserved6,Reserved7,Reserved8,Reserved9,Reserved10,Merchant Order Reference,Store
+CrewClothing,CrewClothingEURO,ZZ3RF884DPSBFF32,621A0119007,visa,2023-09-11 10:48:42,BST,Settled,KQFKR67XXH7NT6G2,EUR,,30.60,1,EUR,,30.51,,0.05,0.01,0.03,visastandarddebit,<auto>,311,,,,,,,,,621
+CrewClothing,CrewClothingEURO,F7PMKFDHKBHVM232,621A0119008,mc,2023-09-11 10:56:48,BST,Settled,S9N4W2L6JWDMM6G2,EUR,,117.00,1,EUR,,116.41,,0.19,0.05,0.35,mcpremiumcredit,<auto>,311,,,,,,,,,621
+CrewClothing,CrewClothingEURO,ZPM2GZ7FXJGTK2C2,2023-09-11 12:01:57,visa,2023-09-11 12:04:02,BST,Settled,P5W3KH8XXH7NT6G2,EUR,,112.50,1,EUR,,112.18,,0.18,0.03,0.11,visastandarddebit,<auto>,311,,,,,,,,,621
+CrewClothing,CrewClothingEURO,S7KJJHFP72TXZP52,621A0119011,visa,2023-09-11 12:13:36,BST,Settled,RZNVDDM6JWDMM6G2,EUR,,19.80,1,EUR,,19.69,,0.03,0.02,0.06,visastandardcredit,<auto>,311,,,,,,,,,621
+CrewClothing,CrewClothingEURO,P38QVCRWN3MGX632,2023-09-11 12:12:56,visa,2023-09-11 12:14:40,BST,Settled,HC4HWDM6JWDMM6G2,EUR,,77.94,1,EUR,,77.72,,0.12,0.02,0.08,visastandarddebit,<auto>,311,,,,,,,,,621
+CrewClothing,CrewClothingEURO,JPT6WHSP4QNTF232,621A0119012,visa,2023-09-11 12:15:05,BST,Settled,M4H4XN8XXH7NT6G2,EUR,,12.60,1,EUR,,12.56,,0.02,0.01,0.01,visastandarddebit,<auto>,311,,,,,,,,,621
+CrewClothing,CrewClothingEURO,R3VMQZLMHXMSC2C2,2023-09-11 12:19:26,mc,2023-09-11 12:20:40,BST,Settled,MDZDNR8XXH7NT6G2,EUR,,36.00,1,EUR,,35.88,,0.06,0.02,0.04,mcstandarddebit,<auto>,311,,,,,,,,,621
+CrewClothing,CrewClothingEURO,PSLDT5XS72HSGHG2,621A0119013,visa,2023-09-11 12:32:45,BST,Settled,VN4BKZ8XXH7NT6G2,EUR,,72.40,1,EUR,,72.19,,0.12,0.02,0.07,visastandarddebit,<auto>,311,,,,,,,,,621
+CrewClothing,CrewClothingEURO,ZSGDC8CVRCVPV832,621A0119014,visa,2023-09-11 12:35:24,BST,Settled,H5LQT29XXH7NT6G2,EUR,,28.80,1,EUR,,28.71,,0.05,0.01,0.03,visastandarddebit,<auto>,311,,,,,,,,,621
+CrewClothing,CrewClothingEURO,JTF77QR4N5FJBFG2,621A0119015,visa,2023-09-11 12:54:26,BST,Settled,VCST5D9XXH7NT6G2,EUR,,34.20,1,EUR,,34.11,,0.05,0.01,0.03,visastandarddebit,<auto>,311,,,,,,,,,621
+CrewClothing,CrewClothingEURO,LM9KVHZM8XNQ4932,621A0119016,visa,2023-09-11 13:32:04,BST,Settled,JDG8PQN6JWDMM6G2,EUR,,12.60,1,EUR,,12.56,,0.02,0.01,0.01,visasuperpremiumdebit,<auto>,311,,,,,,,,,621
+CrewClothing,CrewClothingEURO,XFWJZQVP4QNTF232,621A0119017,mc,2023-09-11 14:24:18,BST,Settled,R9P37NP6JWDMM6G2,EUR,,14.40,1,EUR,,14.33,,0.02,0.02,0.03,mcstandarddebit,<auto>,311,,,,,,,,,621
+CrewClothing,CrewClothingEURO,GLGZ6VD3RFNR8HG2,621A0119018,visa,2023-09-11 14:27:57,BST,Settled,QZ7VRZBXXH7NT6G2,EUR,,21.60,1,EUR,,21.54,,0.03,0.01,0.02,visastandarddebit,<auto>,311,,,,,,,,,621
+CrewClothing,CrewClothingEURO,S9DV8RRBW42B7F32,2023-09-11 15:22:44,mc,2023-09-11 15:24:38,BST,Settled,WF9JGZCXXH7NT6G2,EUR,,72.90,1,EUR,,72.53,,0.12,0.03,0.22,mcstandardcredit,<auto>,311,,,,,,,,,621
+CrewClothing,CrewClothingEURO,X2RGGNWWQF2XRP52,621A0119020,mc,2023-09-11 15:31:49,BST,Settled,WKNJ5TQ6JWDMM6G2,EUR,,19.80,1,EUR,,19.70,,0.03,0.01,0.06,mcstandardcredit,<auto>,311,,,,,,,,,621
+CrewClothing,CrewClothingEURO,JPDRB5MWW3LJ7XB2,621A0119021,visa,2023-09-11 17:02:51,BST,Settled,JM6RDPFXXH7NT6G2,EUR,,18.00,1,EUR,,17.94,,0.03,0.01,0.02,visasuperpremiumdebit,<auto>,311,,,,,,,,,621
+CrewClothing,CrewClothingEURO,JWWW3M4KJDM4KH52,621A0119022,visa,2023-09-11 17:29:25,BST,Settled,BJPNJVS6JWDMM6G2,EUR,,27.00,1,EUR,,26.92,,0.04,0.01,0.03,visastandarddebit,<auto>,311,,,,,,,,,621
+CrewClothing,CrewClothingEURO,HWL782TMHXMSC2C2,621A0119023,visa,2023-09-11 18:05:51,BST,Settled,ZXFQ5SGXXH7NT6G2,EUR,,28.80,1,EUR,,28.71,,0.05,0.01,0.03,visastandarddebit,<auto>,311,,,,,,,,,621
+CrewClothing,CrewClothingEURO,P92MT9NWW3LJ7XB2,621A0119024,visa,2023-09-11 18:09:26,BST,Settled,V44HVTGXXH7NT6G2,EUR,,10.80,1,EUR,,10.76,,0.02,0.01,0.01,visastandarddebit,<auto>,311,,,,,,,,,621
+CrewClothing,CrewClothingEURO,VNMM34JR3SS3CH52,621A0119025,visa,2023-09-11 18:12:03,BST,Settled,QPWJCMT6JWDMM6G2,EUR,,30.60,1,EUR,,30.44,,0.05,0.02,0.09,visastandardcredit,<auto>,311,,,,,,,,,621
+CrewClothing,CrewClothingEURO,,,,2023-09-13 02:16:19,BST,Fee,Transaction Fees September 11 2023,,,,,EUR,0.93,,,,,,,,311,,,,,,,,,
+CrewClothing,CrewClothingEURO,,,,2023-09-13 02:16:19,BST,MerchantPayout,"TX36092998800XT batch 311, CrewClothingEURO",,,,,EUR,794.46,,,,,,,,311,,,,,,,,,

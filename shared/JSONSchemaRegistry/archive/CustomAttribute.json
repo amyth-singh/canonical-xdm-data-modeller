@@ -1,0 +1,27 @@
+{
+    "$id": "CustomAttribute",
+    "description": "CDM Custom Attribute definition",
+    "type": "object",
+    "properties": {
+     "AttHeader": {"$ref": "./Definitions.json#/properties/AttHeader"},
+     "IsArray": {"$ref": "./Definitions.json#/properties/StringBool"},
+     "AttType": {"$ref": "./Definitions.json#/properties/AttDataType"},
+     "AttValue": {"type": "string"},
+     "AttValues": [{
+       "AttType": {"$ref": "./Definitions.json#/properties/AttDataType"},
+       "AttId": {"type": "string"},
+       "AttKey": {"type": "string"},
+       "AttValue": {"type": "string"}
+     }
+     ],
+     "AttMetadata": {"$ref": "./Definitions.json#/properties/AttMetadata"}
+    },
+    "required": [
+      "AttHeader",
+      "IsArray",
+      "AttType",
+      "AttValue",
+      "AttValues",
+      "AttMetadata"
+    ]
+}

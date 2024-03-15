@@ -1,0 +1,19 @@
+{
+  "id": "03041",
+  "name": "Aonach Mor",
+  "country": "GB",
+  "state": "SCT",
+  "wmo": "03041",
+  "icao": null,
+  "latitude": "56.8167",
+  "longitude": "-4.9667",
+  "elevation": "1130",
+  "timezone": "Europe/London",
+  "hourly_start": null,
+  "hourly_end": null,
+  "daily_start": null,
+  "daily_end": null,
+  "monthly_start": null,
+  "monthly_end": null,
+  "dt": "2023-06-07"
+}

@@ -1,0 +1,65 @@
+[
+  {
+    "SKU": "1196265",
+    "itemLineId": "1",
+    "lineExchanges": [
+      {
+        "lineItemId": 1,
+        "newItems": [
+          {
+            "Quantity": 1,
+            "lineItemId": 3
+          }
+        ],
+        "quantity": 1
+      }
+    ],
+    "qty": 1
+  },
+  {
+    "SKU": "1201761",
+    "currentLineDiscounts": [
+      {
+        "discount": 1.21,
+        "itemLineId": "2"
+      }
+    ],
+    "currentLines": [
+      {
+        "SKU": "1201761",
+        "itemLineId": 2,
+        "qty": 1
+      }
+    ],
+    "itemLineId": 2,
+    "lineDiscounts": [
+      {
+        "discount": 1.21,
+        "itemLineId": "2"
+      }
+    ],
+    "qty": 2
+  },
+  {
+    "itemLineId": 3,
+    "currentLineDiscounts": [
+      {
+        "discount": 1.21,
+        "itemLineId": "2"
+      }
+    ],
+    "currentLines": [
+      {
+        "SKU": "1201761",
+        "itemLineId": 2,
+        "qty": 1
+      }
+    ],
+    "lineDiscounts": [
+      {
+        "discount": 1.21,
+        "itemLineId": "2"
+      }
+    ]
+  }
+]

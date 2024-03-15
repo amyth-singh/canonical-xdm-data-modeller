@@ -1,0 +1,132 @@
+(
+  $upperTrim := $string ~> $trim ~> $uppercase;
+  $cleanStr := $string ~> $trim;
+  $cleanNum := function($num){$type($num) = "number" ? $num : $type($num) = "string" ? $contains($num,/^-?\d+(\.\d+)?$/) ? $number($num) : null};
+  $dateTimeRegexMap := {"[Y0001]-[M01]-[D01] [H01]:[m01]:[s01] [P]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]) (AM|PM)$/,
+                        "[M01]/[D01]/[Y0001]":/^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/[1-9][0-9]{3}$/,
+                        "ISO8601":/^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d)(\.\d+)?([+-]([01]\d|2[0-3]):([0-5]\d)|Z)$/
+                       };
+  $dateTimeFormatValidator := function($datetime,$dateTimeFormat){$exists($dateTimeFormat) ? $contains($datetime,$lookup($dateTimeRegexMap,$dateTimeFormat)): $contains($datetime,$lookup($dateTimeRegexMap,"ISO8601"))};
+  $stringBoolMap := {"Y":"Y","1":"Y","TRUE":"Y","N":"N","0":"N","FALSE":"Y"};
+  $stringBool := function($value){$exists($value)?$lookup($stringBoolMap, $upperTrim($value)):""};
+  $reverseBool := function($value){$value = "Y" ? "N" : $value = "N" ? "Y" : "U"};
+  $reverseStringBool := $stringBool ~> $reverseBool;
+  $buildEntityID := function($entityCode,$system,$rawEntityId){$replace($entityCode,".","_") & "_" & $system & "_" & $rawEntityId};
+  $buildAttributeID := function($entityID,$AttributeCode,$AttributeId){$entityID & "_" & $replace($AttributeCode,".","_") & ($exists($AttributeId) ? "_" & $AttributeId : "")};
+  $buildEventID := function($entityType,$eventVerb,$entityId,$eventOccurredTimestamp){$entityType & "_" & $eventVerb & "_" & $entityId & "_" & $eventOccurredTimestamp};
+
+  $getDateDimFn := function($dt,$isUTC,$tz,$format) {$exists($dt) ? $dateTimeFormatValidator($dt,$format) ?
+    { 
+          "DateId": $fromMillis($toMillis($dt,$format),"[Y0001][M01][D01]"),
+          "TimestampUTC": (isUTC ? $dt : NULL),
+          "DateUTC": (isUTC ? $dt : NULL), /* TODO convert to date */
+          "TimeZone": ($tz != null ? $tz : $rawSourceTimeZone),
+          "DateTimeLocal": $fromMillis($toMillis($dt,$format)),
+          "DateLocal": $fromMillis($toMillis($dt,$format),"[Y0001]-[M01]-[D01]"),
+          "HourId": $fromMillis($toMillis($dt,$format),"[H01]"),
+          "Millis": $toMillis($dt,$format)
+    } 
+    : NULL
+  };
+  
+ $eventOccurredTimestamp := $now();
+ $ProductId := $buildEntityID("Product","Dolfin",ProductCode);
+ $VariantId := $buildEntityID("Product_Variant","Dolfin",ProductCode);
+ $AvailabilityId := $buildEntityID("Product_Availability","Dolfin",ProductStopKey);
+ $EventId := $buildEventID("Product","Published",$ProductId,$eventOccurredTimestamp);
+ $AsOf := $eventOccurredTimestamp;
+ 
+{
+  "ProductId": $ProductId,
+  "Header": NULL,
+  "Variants": NULL,
+  "Prices": NULL,
+  "Suppliers": NULL,
+  "Availability": [
+    {
+      "ProductId": $ProductId,
+      "VariantId": $VariantId,
+      "AvailabilityId": $AvailabilityId,
+      "AvailabilityIds": [
+        {
+          "AttHeader": {
+            "Id": $AvailabilityId,
+            "RawId": ProductStopKey,
+            "Class": "ID",
+            "Code": "Availability.ID.ProductStopKey",
+            "Name": "ProductStopKey",
+            "Desc": NULL
+          },
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ProductStopKey",
+                "RawSourceVal": $string(ProductStopKey)
+              }
+            ]
+          }
+        }
+      ],
+      "Times": [
+        {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Availability.Time.FromDate"),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Availability.Time.FromDate",
+          "Name": "FromDate",
+          "Desc": "Date product not available from"
+        },
+        "DateDim": $getDateDimFn(FromDate,FALSE,'Europe/London'),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "FromDate",
+              "RawSourceVal": $string(FromDate)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($ProductId,"Availability.Time.ToDate"),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Availability.Time.ToDate",
+          "Name": "ToDate",
+          "Desc": "Date product not available to"
+        },
+        "DateDim": $getDateDimFn(ToDate,FALSE,'Europe/London'),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ToDate",
+              "RawSourceVal": $string(ToDate)
+            }
+          ]
+        }
+      }
+      ]
+    }
+  ],
+  "Features": NULL
+}
+)

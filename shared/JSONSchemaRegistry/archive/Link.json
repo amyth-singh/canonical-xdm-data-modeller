@@ -1,0 +1,21 @@
+{
+    "$id": "Link",
+    "description": "CDM Link definition",
+    "type": "object",
+    "properties": {
+      "AttHeader": {"$ref": "./Definitions.json#/properties/AttHeader"},
+      "FromEntityId": {"type": "string"},
+      "ToEntityId": {"type": "string"},
+      "LinkStatus": {"type": "string"},
+      "LinkName": {"type": "string"},
+      "AttMetadata": {"$ref": "./Definitions.json#/properties/AttMetadata"}
+    },
+    "required": [
+      "AttHeader",			
+      "FromEntityId",		
+      "ToEntityId",	
+      "LinkStatus",		
+      "LinkName",
+      "AttMetadata"
+    ]
+}

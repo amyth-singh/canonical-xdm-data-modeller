@@ -1,0 +1,70 @@
+CRW       ,BACL      ,BRAND ALLEY CANCELLATION                                    
+CRW       ,CANI      ,Cancel Item - Torque                                        
+CRW       ,CCEX      ,EXCHANGE-SWAP ITEM (NO RTN)                                 
+CRW       ,CCRI      ,FAIL DEL REPLACE ITEM (NO RTN)                              
+CRW       ,CCXR      ,EXCHANGE-SWAP ITEM (RTN STOCK)                              
+CRW       ,CI        ,Cancel Item - Crew                                          
+CRW       ,CICR      ,Cancel Item - Customer Request                              
+CRW       ,CINV      ,CHANNEL ADVISOR INVOICE                                     
+CRW       ,CIR       ,Refund Item (Return Stock)                                  
+CRW       ,CO        ,Cancel Order - Crew                                         
+CRW       ,COA       ,CHANGE OF ADDRESS                                           
+CRW       ,COCR      ,Cancel Order - Customer Requst                              
+CRW       ,COR       ,Refund Order (Return Stock)                                 
+CRW       ,CSHP      ,CHANGE SHIPPING OPTION                                      
+CRW       ,CUCC      ,Clean Up - Charge Customer                                  
+CRW       ,CUCI      ,Clean Up - Cancel Item                                      
+CRW       ,CUCO      ,Clean Up - Cancel Order                                     
+CRW       ,CUIC      ,Clean Up - Item/s Only Charge                               
+CRW       ,DCL2      ,DECLINED PAYMENT- 2ND REMINDER                              
+CRW       ,DCLC      ,DECLINED PAYMENT - CANCEL                                   
+CRW       ,DCLR      ,DECLINED PAYMENT - REMINDER                                 
+CRW       ,EXUN      ,EXCHANGE N/A - REFUND CUSTOMER                              
+CRW       ,FI        ,Faulty Item (DO NOT RETURN)                                 
+CRW       ,FRAC      ,Fraud                                                       
+CRW       ,FRDL      ,Fraud - Del to BILLING only                                 
+CRW       ,FRL1      ,Fraud - Mark ADDRESS L1 as bad                              
+CRW       ,FRPC      ,Fraud - Mark POSTCODE as bad                                
+CRW       ,GCI       ,GERMANY - Cancel Item                                       
+CRW       ,GCO       ,GERMANY - Cancel Order                                      
+CRW       ,GMC       ,GERMANY - Miscellaneous Charge                              
+CRW       ,GMR       ,GERMANY - Miscellaneous Refund                              
+CRW       ,GRI       ,GERMANY Replace Item (Cancel)                               
+CRW       ,GRO       ,GERMANY-Replace Order (Cancel)                              
+CRW       ,GSI       ,GERMANY - Swap Item  (Cancel)                               
+CRW       ,ISSU      ,ISSUED                                                      
+CRW       ,LD        ,Late delivery                                               
+CRW       ,MC        ,Misc Charge                                                 
+CRW       ,MR        ,Misc Refund _SUPERVISOR                                     
+CRW       ,MRO       ,Misc Refund_OPERATOR                                        
+CRW       ,MSRO      ,Release order missing stock                                 
+CRW       ,MSRP      ,Re-Process order missing stock                              
+CRW       ,MSSO      ,Split order missing stock                                   
+CRW       ,MSSR      ,Split Order Store Recall                                    
+CRW       ,MSTK      ,Missing stock                                               
+CRW       ,NBOD      ,NEW BO DATE - SEND CUST. EMAIL                              
+CRW       ,OOPO      ,OVERCHARGED ON ORDER                                        
+CRW       ,OVRS      ,Overselling                                                 
+CRW       ,PARF      ,Partial Refund (Item Level)                                 
+CRW       ,PPCI      ,Payment Problem - Cancel Item                               
+CRW       ,PPCO      ,Payment Problem - Cancel Order                              
+CRW       ,QC        ,QC FAIL - CANCEL ORDER                                      
+CRW       ,RA        ,Returns Authorisation                                       
+CRW       ,REDE      ,REDEEMED                                                    
+CRW       ,RFI       ,Refund Item(do not rtn stock)                               
+CRW       ,RFO       ,Refund Order (and post fee)                                 
+CRW       ,RI        ,Replace Item(do not rtn stock)                              
+CRW       ,RIBO      ,Release Back Order / Add Stock                              
+CRW       ,RIR       ,Replace Item (Return Stock)                                 
+CRW       ,RPDS      ,RE-PROCESS ORDER-DL FROM STORE                              
+CRW       ,SAJ       ,StoreActive Rejection                                       
+CRW       ,SAR       ,StoreActive Return                                          
+CRW       ,SCK1      ,SECURITY CHECK  1ST.  EMAIL                                 
+CRW       ,SCK2      ,SECURITY CHECK 2ND. EMAIL                                   
+CRW       ,SI        ,Swap Item(do not return Stock)                              
+CRW       ,SIR       ,Swap Item (Return Stock)                                    
+CRW       ,STOP      ,Stop Shipment                                               
+CRW       ,TEST      ,TEST ORDER                                                  
+CRW       ,WHBO      ,Warehouse Back Order                                        
+
+(68 rows affected)

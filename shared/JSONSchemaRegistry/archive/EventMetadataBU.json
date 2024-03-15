@@ -1,0 +1,312 @@
+{
+    "type": "object",
+    "properties": {
+      "EventAtts": {
+        "type": "object",
+        "properties": {
+          "Xfuze": {
+            "type": "object",
+            "properties": {
+              "EventId": {
+                "type": "string"
+              },
+              "EventCategory": {
+                "type": "string"
+              },
+              "EventName": {
+                "type": "string"
+              },
+              "EventValueStream": {
+                "type": "string"
+              },
+              "EventClass": {
+                "type": "string"
+              },
+              "EventChangePattern": {
+                "type": "string"
+              },
+              "ClientCode": {
+                "type": "string"
+              },
+              "Note": {
+                "type": "string"
+              },
+              "IsDerivedEvent": {
+                "type": "string"
+              }
+            }
+          },
+          "Origin": {
+            "type": "object",
+            "properties": {
+              "EventId": {
+                "type": "string"
+              },
+              "EventName": {
+                "type": "string"
+              },
+              "SourceSystem": {
+                "type": "string"
+              },
+              "SourceSubSystem": {
+                "type": "string"
+              },
+              "SourceFormatType": {
+                "type": "string"
+              },
+              "CorrelationId": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "EntityAtts": {
+        "type": "object",
+        "properties": {
+          "Xfuze": {
+            "type": "object",
+            "properties": {
+              "EntityId": {
+                "type": "string"
+              },
+              "EntityType": {
+                "type": "string"
+              },
+              "EntitySubType": {
+                "type": "string"
+              },
+              "EntityVariation": {
+                "type": "string"
+              },
+              "EntityDomain": {
+                "type": "string"
+              },
+              "ParentEntityId": {
+                "type": "string"
+              },
+              "ParentEntityType": {
+                "type": "string"
+              },
+              "IsSensitive": {
+                "type": "string"
+              }
+            }
+          },
+          "Origin": {
+            "type": "object",
+            "properties": {
+              "EntityId": {
+                "type": "string"
+              },
+              "ParentEntityId": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      },
+      "TimeAtts": {
+        "type": "object",
+        "properties": {
+          "Xfuze": {
+            "type": "object",
+            "properties": {
+              "TimeZones": {
+                "type": "object",
+                "properties": {
+                  "HomeTimeZone": {
+                    "type": "object",
+                    "properties": {
+                      "TimeZone": {
+                        "type": "string"
+                      },
+                      "TimeZoneOffset": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "EventTimeZone": {
+                    "type": "object",
+                    "properties": {
+                      "TimeZone": {
+                        "type": "string"
+                      },
+                      "TimeZoneOffset": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "Times": {
+                "type": "object",
+                "properties": {
+                  "EventOccurredTimestamp": {
+                    "type": "object",
+                    "properties": {
+                      "UTC": {
+                        "type": "string"
+                      },
+                      "Local": {
+                        "type": "string"
+                      },
+                      "Millis": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "EventReceivedTimestamp": {
+                    "type": "object",
+                    "properties": {
+                      "UTC": {
+                        "type": "string"
+                      },
+                      "Local": {
+                        "type": "string"
+                      },
+                      "Millis": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "EventIngestProcessedTimestamp": {
+                    "type": "object",
+                    "properties": {
+                      "UTC": {
+                        "type": "string"
+                      },
+                      "Local": {
+                        "type": "string"
+                      },
+                      "Millis": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "Origin": {
+            "type": "object",
+            "properties": {
+              "Times": {
+                "type": "object",
+                "properties": {
+                  "EventOccurredTimestamp": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ProductAtts": {
+        "type": "object",
+        "properties": {
+          "Xfuze": {
+            "type": "object",
+            "properties": {
+              "ProductId": {
+                "type": "string"
+              },
+              "ProductKey": {
+                "type": "string"
+              }
+            }
+          },
+          "Origin": {
+            "type": "object",
+            "properties": {
+              "ProductId": {
+                "type": "string"
+              },
+              "ProductKey": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "IngestAtts": {
+        "type": "object",
+        "properties": {
+          "Xfuze": {
+            "type": "object",
+            "properties": {
+              "File": {
+                "type": "object",
+                "properties": {
+                  "SystemCode": {
+                    "type": "string"
+                  },
+                  "URI": {
+                    "type": "string"
+                  },
+                  "ServerId": {
+                    "type": "string"
+                  },
+                  "Path": {
+                    "type": "string"
+                  },
+                  "Name": {
+                    "type": "string"
+                  },
+                  "SizeKBs": {
+                    "type": "null"
+                  },
+                  "LineNumber": {
+                    "type": "null"
+                  },
+                  "FormatType": {
+                    "type": "string"
+                  },
+                  "PatternType": {
+                    "type": "string"
+                  },
+                  "ModificationTimestampUTC ": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "PayloadAtts": {
+        "type": "object",
+        "properties": {
+          "Xfuze": {
+            "type": "object",
+            "properties": {
+              "DataPayloadHash": {
+                "type": "string"
+              },
+              "EventPayloadHash": {
+                "type": "string"
+              },
+              "HashScheme": {
+                "type": "string"
+              }
+            }
+          },
+          "Origin": {
+            "type": "object",
+            "properties": {
+              "DataPayloadHash": {
+                "type": "string"
+              },
+              "EventPayloadHash": {
+                "type": "string"
+              },
+              "HashScheme": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }

@@ -1,0 +1,127 @@
+{
+  "$id": "https://xfuze.io/xdm/schema/components/event/common/EventHeader/EventAtts",
+  "description": "XDM Schema for the common event component 'EventHeader/EventAtts'",
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "Xfuze": {
+      "type": "object",
+      "description": "The (required) Xfuze derived / enriched attributes that define the context of the entity the event is changing / notifying on",
+      "unevaluatedProperties": false,
+      "properties": {
+        "EntityId": {
+          "type": "string",
+          "description": "The (required) globally unique synthetic Xfuze Id for the entity instance this event is related to and whose payload is the subject of change, unique across all entities. Typically of the format [EntityType::EntitySubType]_[SystemCode]_[RawEntityId] where RawEntityId can be composed of 1 or more source fields to create singular uniqueness e.g SalesOrderLine::Return_Hybris_8106008620_RET1"
+        },
+        "EntityType": {
+          "type": "string",
+          "description": "The (required) entity type, allowing for a typing system (top level) for entities, where the type is sourced from the master Xfuze control list e.g SalesOrderLine"
+        },
+        "EntitySubType": {
+          "type": "string",
+          "description": "An (optional) entity subtype, allowing for further, more refined typing of the core type for accuracy of interpretation e.g ReturnLine, CancelLine, VoidLine etc"
+        },
+        "EntityVariation": {
+          "type": "string",
+          "description": "An (optional) instance variation of the type of entity and is contextual to the type of entity under change e.g RetailTransaction"
+        },
+        "EntityDomain": {
+          "type": "string",
+          "description": "The (required) core entity domain, sourced from the master Xfuze control list e.g SalesOrder",
+          "enum": [
+            "Customer",
+            "Product",
+            "Sales",
+            "SupplyChain",
+            "Inventory",
+            "Marketing",
+            "DigitalActivity",
+            "Finance",
+            "Analytics",
+            "Common",
+            "Other"
+          ]
+        },
+        "EntityClass": {
+          "type": "string",
+          "description": "The (required) class of the entity in this event, representing the levelling / granularity of the entity state being transferred and contained e.g Composite (multi entity composite)",
+          "enum": [
+            "Composite",
+            "Base",
+            "Raw",
+            "Analytical",
+            "Notification"
+          ]
+        },
+        "ParentEntityId": {
+          "type": "string",
+          "description": "An (required) canonical Xfuze parent entity Id, where there is a natural 'composition' and containing parent, this importantly allows natural grouping by the parent for different access patterns e.g SalesOrder_Hybris_8106008620"
+        },
+        "ParentEntityType": {
+          "type": "string",
+          "description": "An (required) canonical Xfuze parent entity type.  Ideally this should always be created even if the top parent (would have same values as EntityId and EntityType) allowing a consistent place to group by to get all records in the hierarchy  e.g SalesOrder"
+        },
+        "CompositeEntityId": {
+          "type": "string",
+          "description": "An (required) canonical Xfuze composite (root) entity Id, where there is a natural 'composition' and containing parent, this importantly allows natural grouping by the parent for different access patterns e.g SalesOrder_Hybris_8106008620"
+        },
+        "CompositeEntityType": {
+          "type": "string",
+          "description": "An (required) canonical Xfuze composite (root) entity type.  Ideally this should always be created even if the top parent (would have same values as EntityId and EntityType) allowing a consistent place to group by to get all records in the hierarchy  e.g SalesOrder"
+        },
+        "EntityStatusCode": {
+          "type": "string",
+          "description": "An (optional) canonical Xfuze entity status, often key for events and the state transition happening with the entity. e.g InProgress"
+        },
+        "EntityStatusDesc": {
+          "type": "string",
+          "description": "An (optional) canonical Xfuze entity status, often key for events and the state transition happening with the entity. e.g Line Processing In-Progress"
+        },
+        "IsSensitive": {
+          "type": "string",
+          "description": "e.g Y",
+          "enum": [
+            "Y",
+            "N",
+            "U"
+          ]
+        }
+      },
+      "required": [
+        "EntityId",
+        "EntityType",
+        "ParentEntityId",
+        "ParentEntityType",
+        "CompositeEntityId",
+        "CompositeEntityType",
+        "EntityDomain",
+        "IsSensitive"
+      ]
+    },
+    "Origin": {
+      "type": "object",
+      "description": "The (required) 'origin' source / raw attributes provided as input and that were consumed as part of producing the companion 'Xfuze' representations",
+      "unevaluatedProperties": false,
+      "properties": {
+        "EntityId": {
+          "type": "string",
+          "description": "Raw form (required) of the input EntityId from the source, used in transforming to 'Xfuze' representations e.g 8106008620_RET1"
+        },
+        "ParentEntityId": {
+          "type": "string",
+          "description": "Raw form (optional) of the input EntityId from the source, used in transforming to 'Xfuze' representations e.g 8106008620"
+        },
+        "EntityStatusCode": {
+          "type": "string",
+          "description": "Raw form (optional) of the input EntityId from the source, used in transforming to 'Xfuze' representations e.g INPROGRESS"
+        }
+      },
+      "required": [
+        "EntityId"
+      ]
+    }
+  },
+  "required": [
+    "Xfuze","Origin"
+  ]
+}

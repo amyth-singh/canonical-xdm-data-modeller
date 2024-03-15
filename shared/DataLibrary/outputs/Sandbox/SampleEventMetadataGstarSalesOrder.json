@@ -1,0 +1,309 @@
+[{
+  "EventId": "SalesOrderItemsDelivered_SalesOrderDelivery_Hybris_8106008620_JVGL0605379702588574_2023-01-12T12:03:00+00:00",
+  "EntityId": "SalesOrderDelivery_Hybris_8106008620_JVGL0605379702588574",
+  "EntityType": "SalesOrderDelivery",
+  "ParentEntityId": "SalesOrder_Hybris_8106008620",
+  "ParentEntityType": "SalesOrder",
+  "EventName": "SalesOrderItemsDelivered",
+  "EventOccurredTimestampUTC": "2023-01-12T12:03:00+00:00",
+  "EventOccurredTimestampLocal": "2023-01-12T13:03:00.000+0100",
+  "EventOccurredTimestampLocalParty": null,
+  "EventMetadata": {
+    "EventAtts": {
+      "Xfuze": {
+        "EventId": "SalesOrderItemsDelivered_SalesOrderDelivery_Hybris_8106008620_JVGL0605379702588574_2023-01-12T12:03:00+00:00",
+        "EventCategory": "Sales",
+        "EventName": "SalesOrderItemsDelivered",
+        "EventValueStream": "Order2Cash",
+        "EventClass": "ProcessedEvent",
+        "EventChangePattern": "BusinessEvent",
+        "ClientCode": "GSR",
+        "Note": "(Any context note like test)",
+        "IsDerivedEvent": "N"
+      },
+      "Origin": {
+        "EventId": "ORDER_ITEMS_DELIVERED_ORDERDELIVERY_8106008620_JVGL0605379702588574_2023-01-12T12:03:00Z",
+        "EventName": "OrderItemsDelivered",
+        "SourceSystem": "Sterling",
+        "SourceSubSystem": "OrderWebhookAPI",
+        "SourceFormatType": "JSON",
+        "CorrelationId": null
+      }
+    },
+    "EntityAtts": {
+      "Xfuze": {
+        "EntityId": "SalesOrderDelivery_Hybris_8106008620_JVGL0605379702588574",
+        "EntityType": "SalesOrderDelivery",
+        "EntitySubType": "Sale",
+        "EntityVariation": "DeliverToCustomer",
+        "EntityDomain": "Sell",
+        "ParentEntityId": "SalesOrder_Hybris_8106008620",
+        "ParentEntityType": "SalesOrder",
+        "EntityStatusCode": "ShipmentCompleted",
+        "EntityStatusDesc": "ShipmentCompleted",
+        "IsSensitive": "Y"
+      },
+      "Origin": {
+        "EntityId": "8106008620",
+        "ParentEntityId": "8106008620"
+      }
+    },
+    "TimeAtts": {
+      "Xfuze": {
+        "TimeZones": {
+          "HomeTimeZone": {
+            "TimeZone": "Europe/Amsterdam",
+            "TimeZoneOffset": "(TODO)"
+          },
+          "EventTimeZone": {
+            "TimeZone": "UTC",
+            "TimeZoneOffset": "UTC+00:00"
+          },
+          "PartyTimeZone": {
+            "TimeZone": null,
+            "TimeZoneOffset": "(TODO)"
+          }
+        },
+        "EventOccurredTimestamp": {
+          "UTC": "2023-01-12T12:03:00+00:00",
+          "Local": "2023-01-12T13:03:00.000+0100",
+          "Millis": "1673524980000"
+        },
+        "EventOccurredType": "TrueTime",
+        "EventSourceSentTimestamp": {
+          "UTC": null,
+          "Local": null,
+          "Millis": null
+        },
+        "EventExternalReceivedTimestamp": {
+          "UTC": null,
+          "Local": null,
+          "Millis": null
+        },
+        "EventReceivedTimestamp": {
+          "UTC": "2023-01-12T12:13:41.103807+00:00",
+          "Local": "2023-01-12T13:13:41.103+0100",
+          "Millis": "1673525621103"
+        },
+        "EventIngestProcessedTimestamp": {
+          "UTC": null,
+          "Local": null,
+          "Millis": null
+        },
+        "EventProcessedTimestamp": {
+          "UTC": "2023-01-12T12:13:41.671744+00:00",
+          "Local": "2023-01-12T13:13:41.671+0100",
+          "Millis": "1673525621671"
+        },
+        "EventPublishedTimestamp": {
+          "UTC": null,
+          "Local": null,
+          "Millis": null
+        },
+        "EventSeq": null
+      },
+      "Origin": {
+        "TimeZone": "UTC",
+        "EventOccurredTimestamp": "2023-01-12T12:03:00Z",
+        "EventSourceSentTimestamp": null
+      }
+    },
+    "PartyAtts": {
+      "Xfuze": {
+        "PartyId": "PARTY_69a79ae0-1d10-46b3-8dd2-7455c622aae2",
+        "PartyType": "Customer::Purchaser",
+        "CustomerId": "PartyRole_Customer_Hybris_d4490678-e233-4073-b67d-5d75e1bf98a8",
+        "CustomerKey": "d4490678-e233-4073-b67d-5d75e1bf98a8",
+        "CustomerType": "Registered",
+        "InvolvedReasonCode": "Purchaser"
+      },
+      "Origin": {
+        "CustomerId": null,
+        "CustomerKey": "d4490678-e233-4073-b67d-5d75e1bf98a8"
+      }
+    },
+    "ProductAtts": {
+      "Xfuze": {
+        "ProductId": null,
+        "ProductKey": null,
+        "ProductIds": ["PRODUCT_APP_DE_de_DE_D20165-7647-D578-XXL", "PRODUCT_APP_DE_de_DE_51001-C909-C762-3834", "PRODUCT_APP_DE_de_DE_D22284-D183-D338-3834", "PRODUCT_APP_DE_de_DE_D21087-C965-D422-XXL"],
+        "ProductKeys": ["D20165-7647-D578-XXL", "51001-C909-C762-3834", "D22284-D183-D338-3834", "D21087-C965-D422-XXL"],
+        "ProductNames": ["Marine Slim Hemd", "3301 Slim Jeans", "Triple A Regular Straight Selvedge Jeans", "Slant Pocket Slim Hemd"]
+      },
+      "Origin": {
+        "ProductId": null,
+        "ProductKey": null
+      }
+    },
+    "LocationAtts": {
+      "Xfuze": {
+        "ChannelCode": "APP",
+        "ChannelName": "Mobile App",
+        "LocationId": null,
+        "LocationNumber": null,
+        "LocationType": "Online",
+        "Latitude": "51.835630",
+        "Longitude": "6.700172"
+      },
+      "Origin": {
+        "ChannelCode": "GSSTER",
+        "LocationNumber": null
+      }
+    },
+    "MeasureMetricAtts": {
+      "Latest": {
+        "Value1": "232.98",
+        "Value1Code": "Totals.GrandTotal.BCY.IncTax",
+        "Value2": "50.15",
+        "Value2Code": "Totals.FinalMargin.BCY.Percent",
+        "Value3": "0.0",
+        "Value3Code": "Totals.DiscountsTotal.BCY.IncTax",
+        "Value4": null,
+        "Value4Code": "Totals.RefundedTotal.BCY.IncTax",
+        "Value5": "0.0",
+        "Value5Code": "Totals.DeliveryCharge.BCY.IncTax",
+        "Value6": "4",
+        "Value6Code": "Qtys.QtyNet",
+        "Value7": "4",
+        "Value7Code": "Qtys.QtySold"
+      },
+      "Event": {
+        "Value1": null,
+        "Value1Code": "Totals.GrandTotal.BCY.IncTax",
+        "Value2": null,
+        "Value2Code": "Totals.FinalMargin.BCY.Percent",
+        "Value3": null,
+        "Value3Code": "Totals.DiscountsTotal.BCY.IncTax",
+        "Value4": null,
+        "Value4Code": "Totals.RefundedTotal.BCY.IncTax",
+        "Value5": null,
+        "Value5Code": "Totals.DeliveryCharge.BCY.IncTax",
+        "Value6": "4",
+        "Value6Code": "Qtys.QtyNet",
+        "Value7": "4",
+        "Value7Code": "Qtys.QtySold"
+      }
+    },
+    "ReferenceDataAtts": {
+      "Atts": [{
+        "Code": null,
+        "Value": null,
+        "Type": null
+      }]
+    },
+    "PrivacyAtts": {
+      "Xfuze": {
+        "IsSensitiveEntity": "Y",
+        "IsEncrypted": "N",
+        "EncryptionKeyURI": null,
+        "EncryptionKeyHost": null,
+        "SensitiveFieldPaths": null
+      },
+      "Origin": {
+        "IsEncrypted": "N"
+      }
+    },
+    "DqTestAtts": {
+      "Atts": [{
+        "TestId": null,
+        "TestName": null,
+        "TestType": null,
+        "TestVersion": null,
+        "ActualResultCode": null,
+        "ActualResultValue": null,
+        "ExpectedResultCode": null,
+        "ExpectedResultValue": null,
+        "Note": null,
+        "SeverityCode": null
+      }]
+    },
+    "IngestAtts": {
+      "Xfuze": {
+        "File": {
+          "SystemCode": null,
+          "URI": null,
+          "Path": null,
+          "Name": null,
+          "LineNumber": null,
+          "SizeKBs": null,
+          "FormatType": null,
+          "PatternType": null,
+          "ModificationTimestampUTC": null
+        },
+        "Stream": {
+          "SystemCode": "AWS:Kinesis",
+          "ChannelURI": "arn:aws:kinesis:us-east-1:111122223333:stream/SalesOrderPlacedInbound",
+          "ChannelName": "SalesOrderPlacedInbound",
+          "ChannelType": "DataStream",
+          "Partition": "340282366920938463463374607431768211455",
+          "Offset": "8493053",
+          "FormatType": "JSON",
+          "PatternType": null,
+          "ReceiveTimestampUTC": null
+        },
+        "Api": {
+          "SystemCode": null,
+          "ApiURI": null,
+          "ApiName": null,
+          "ApiResource": null,
+          "HttpMethod": null,
+          "QueryString": null,
+          "FormatType": null,
+          "PatternType": null,
+          "InvokeTimestampUTC": null
+        },
+        "Table": {
+          "SystemCode": null,
+          "DatabaseURI": null,
+          "DatabaseName": null,
+          "SchemaName": null,
+          "TableName": null,
+          "RowKey": null,
+          "Method": null,
+          "PatternType": null,
+          "ReceiveTimestampUTC": null
+        }
+      }
+    },
+    "ReplayAtts": {
+      "Xfuze": {
+        "IsReplayed": null,
+        "ReplayStatusCode": null,
+        "ReplayStatusReason": null,
+        "ReplayCount": null,
+        "LastEventId": null,
+        "LastEventOccurredTimestampUTC": null
+      },
+      "Origin": {
+        "IsReplayed": null
+      }
+    },
+    "PayloadAtts": {
+      "Xfuze": {
+        "DataPayloadHash": null,
+        "EventPayloadHash": null,
+        "HashScheme": null
+      },
+      "Origin": {
+        "DataPayloadHash": null,
+        "EventPayloadHash": null,
+        "HashScheme": null
+      }
+    },
+    "ModelAtts": {
+      "Xfuze": {
+        "SchemaURI": null,
+        "SchemaName": null,
+        "SchemaVersion": null,
+        "MetaModellerId": null
+      }
+    },
+    "CustomAtts": {
+      "Atts": [{
+        "Code": null,
+        "Value": null,
+        "Type": null
+      }]
+    }
+  }
+}]

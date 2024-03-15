@@ -1,0 +1,79 @@
+{
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "SalesOrder": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "allOf": [
+        {
+          "$ref": "../components/entity/common/Entity.json#/EntityIds"
+        },
+        {
+          "properties": {
+            "Header": {
+              "description": "The top-level header of the order, specifying key details related to the overall order, associated with the composed sales order entity",
+              "$ref": "../components/entity/domain/salesOrder/OrderHeader.json"
+            },
+            "SaleLines": {
+              "type": "array",
+              "description": "The collection (array) of sales lines associated with the composed sales order entity",
+              "items": {
+                "$ref": "../components/entity/domain/salesOrder/OrderLine.json"
+              }
+            },
+            "ReturnLines": {
+              "type": "array",
+              "description": "The collection (array) of return/exchange lines associated with the composed sales order entity",
+              "items": {
+                "$ref": "../components/entity/domain/salesOrder/OrderLine.json"
+              }
+            },
+            "DiscountLines": {
+              "type": "array",
+              "description": "The collection (array) of discount lines associated with the composed sales order entity",
+              "items": {
+                "$ref": "../components/entity/domain/salesOrder/DiscountLine.json"
+              }
+            },
+            "PaymentLines": {
+              "type": "array",
+              "description": "The collection (array) of payment lines associated with the composed sales order entity",
+              "items": {
+                "$ref": "../components/entity/domain/salesOrder/PaymentLine.json"
+              }
+            },
+            "FulfilmentLines": {
+              "type": "array",
+              "description": "The collection (array) of fulfilment lines associated with the composed sales order entity",
+              "items": {
+                "$ref": "../components/entity/domain/salesOrder/FulfilmentLine.json"
+              }
+            },
+            "ChargeLines": {
+              "type": "array",
+              "description": "The collection (array) of charge lines associated with the composed sales order entity",
+              "items": {
+                "$ref": "../components/entity/domain/salesOrder/ChargeLine.json"
+              }
+            },
+            "AdjustmentLines": {
+              "type": "array",
+              "description": "The collection (array) of adjustment lines associated with the composed sales order entity",
+              "items": {
+                "$ref": "../components/entity/domain/salesOrder/AdjustmentLine.json"
+              }
+            },
+            "TaxLines": {
+              "type": "array",
+              "description": "The collection (array) of tax lines associated with the composed sales order entity",
+              "items": {
+                "$ref": "../components/entity/domain/salesOrder/TaxLine.json"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

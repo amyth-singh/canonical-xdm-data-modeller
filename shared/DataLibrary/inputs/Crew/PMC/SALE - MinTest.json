@@ -1,0 +1,64 @@
+{
+	"id": "82ecbbe8-62f2-420f-8b8a-644af26a4afe",
+	"type": "SALE_EXCHANGE",
+	"transactionId": "A0001824",
+	"basket": {
+		"products": [
+			{
+				"itemLineId": "1",
+				"SKU": "1196265",
+				"qty": 1
+			},
+			{
+				"itemLineId": "2",
+				"SKU": "1201761",
+				"qty": 2
+			}
+		],
+		"lineDiscount": [
+			{
+				"itemLineId": "2",
+				"discount": 1.21
+			}
+		],
+		"exchange": [
+			{
+				"lineItemId": 1,
+				"quantity": 1,
+				"newItems": [
+					{
+						"lineItemId": 3,
+						"Quantity": 1
+					}
+				]
+			}
+		]
+	},
+	"currentTransactionDetails": {
+		"products": [
+			{
+				"itemLineId": "2",
+				"SKU": "1201761",
+
+				"qty": 1
+			},
+			{
+				"itemLineId": "3",
+				"SKU": "2201739",
+
+				"qty": 1
+			}
+		],
+		"lineDiscount": [
+			{
+				"itemLineId": "2",
+				"discount": 1.21
+
+			},
+			{
+				"itemLineId": "3",
+				"discount": 4.00
+			}
+		]
+	}
+}

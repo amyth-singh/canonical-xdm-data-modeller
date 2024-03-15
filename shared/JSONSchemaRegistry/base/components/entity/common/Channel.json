@@ -1,0 +1,108 @@
+{
+  "ChannelObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/ChannelProperties"
+    }
+  },
+  "ChannelProperties": {
+    "type": "object",
+    "unevaluatedProperties": false,
+    "properties": {
+      "ChannelId": {
+        "type": "string",
+        "description": "The canonical (synthetic) Xfuze channel id, if the channel is identifiable, format Channel_[sourceSystem]_[ChannelNumber] e.g Channel_D365_012"
+      },
+      "ChannelKey": {
+        "type": "string",
+        "description": "The native channel number from source, if the channel is identifiable e.g 012"
+      },
+      "ChannelKeyType": {
+        "type": "string",
+        "description": "The type of the channel number e.g Store, DC etc"
+      },
+      "ChannelClass": {
+        "type": "string",
+        "description": "The native channel number from source, if the channel is identifiable e.g Concessions",
+        "enum": [
+          "Digital",
+          "Retail",
+          "Concession",
+          "Franchise",
+          "Marketplace",
+          "Direct",
+          "Wholesale",
+          "Outlet",
+          "Other"
+        ]
+      },
+      "ChannelCode": {
+        "type": "string",
+        "description": "The unique code of the channel where the transaction occurred e.g Web, Retail",
+        "enum": [
+          "RetailStore",
+          "Online",
+          "Mobile",
+          "OutletStore",
+          "Kiosk",
+          "VendingMachine",
+          "Social",
+          "Printed",
+          "Subscription",
+          "Employee",
+          "Speciality",
+          "Other"
+        ]
+      },
+      "ChannelPurpose": {
+        "type": "string",
+        "description": "The purpose of the channel usage e.g Sales, Return, Collection",
+        "enum": [
+          "Sale",
+          "Return",
+          "Exchange",
+          "Collection",
+          "Distribution",
+          "Support",
+          "Other"
+        ]
+      },
+      "ChannelType": {
+        "type": "string",
+        "description": "The class e.g Selling and type e.g B2B, B2C, Partner of the channel",
+        "enum": [
+          "B2C",
+          "B2B",
+          "Partner",
+          "Wholesale",
+          "Franchise",
+          "Other"
+        ]
+      },
+      "ChannelName": {
+        "type": "string",
+        "description": "The name of the channel e.g John Lewis Concession"
+      },
+      "Country": {
+        "$ref": "./Country.json#/CountryProperties",
+        "description": "The country of the channel"
+      },
+      "TouchPoint": {
+        "$ref": "./TouchPoint.json#/TouchPointProperties",
+        "description": "The touch-point 'system' details of the channel interaction"
+      },
+      "ReasonCode": {
+        "type": "string",
+        "description": "The reason for this channel"
+      },
+      "ReasonDesc": {
+        "type": "string",
+        "description": "The reason desc for this channel"
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

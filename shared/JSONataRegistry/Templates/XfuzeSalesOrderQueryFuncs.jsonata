@@ -1,0 +1,33 @@
+(
+  /* can we pass the price struct as a template for query? below would be ideal.
+  
+  $xf_entity_salesOrder_getPrices(
+  {
+      "PriceType": "Shipment",
+      "PriceName": "LineSubTotalBeforeDiscounts",
+      "PriceTimeClass": "CurrentPrice",
+      "PriceLocalisation": "BCY"
+  });
+  */
+  $xf_entity_salesOrder_getPricesFn := function($type,$name,$loc,$prcIncFn,$sortFunc) {
+   **.*[
+    ($type="" ? true : $contains(PriceType,$type)) 
+    and ($name="" ? true : $contains(PriceName,$name))
+    and ($loc="" ? true : PriceLocalisation = $loc)
+    and ($prcIncFn="" ? true : $prcIncFn(PriceIncTax))
+  ] ~> $sort($sortFunc)
+  };
+
+
+{
+  "test_xf_entity_salesOrder_getPricesFn" : 
+    $xf_entity_salesOrder_getPricesFn(
+      "Shipment",
+      "SubTotal",
+      "",
+      function($prc){$abs($prc) >= 10.00},
+      function($l,$r){$l.PriceIncTax > $r.PriceIncTax}
+    )
+}
+
+)

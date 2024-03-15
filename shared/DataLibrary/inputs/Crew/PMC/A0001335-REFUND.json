@@ -1,0 +1,276 @@
+{
+    "id": "dd22c577-99da-4acc-b128-901e72f2aca6",
+    "createdAt": "2023-11-06T17:23:20.281Z",
+    "transCompletedAt": "2023-11-06T17:23:41.454Z",
+    "originalTime": "2023-11-06T17:16:44.566Z",
+    "type": "REFUND",
+    "transactionId": "A0001335",
+    "offlineTransactionId": "",
+    "originalTransId": "A0001334",
+    "operationStatus": "PAY_SUCCESS",
+    "saleTotal": 110,
+    "transactionRef": "H6jdoJ6282023-11-06T17:23:20.277Z26b8",
+    "initiatingModule": "eBasket",
+    "storeId": "628",
+    "reasonCode": "600-1",
+    "reasonDescription": "Does not suit (unref)",
+    "deviceId": "429785ecd794e35d",
+    "terminalId": "62862",
+    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+    "userName": "taylorm",
+    "baseCurrency": "GBP",
+    "basketSummary": {
+        "webOrder": {
+            "totalItems": 0,
+            "saleTotal": 0,
+            "discountTotal": 0,
+            "refundTotal": 0,
+            "basketTotal": 0,
+            "VATTotal": 0
+        },
+        "totalItems": 4,
+        "saleTotal": 157,
+        "discountTotal": 61.94,
+        "inStore": {
+            "totalItems": 0,
+            "saleTotal": 157,
+            "discountTotal": 61.94,
+            "refundTotal": -110,
+            "basketTotal": -108.94,
+            "VATTotal": 17.781
+        },
+        "refundTotal": -110,
+        "cnc": {
+            "totalItems": 0,
+            "saleTotal": 0,
+            "discountTotal": 0,
+            "refundTotal": 0,
+            "basketTotal": 0,
+            "VATTotal": 0
+        },
+        "basketTotal": -108.94,
+        "VATTotal": 17.781
+    },
+    "basket": {
+        "products": [
+            {
+                "itemLineId": "2",
+                "refundedPromotionalQuantity": 0,
+                "quantity": 1,
+                "refundedReasonDescription": "Does not suit",
+                "deliveryMethod": "3",
+                "refundedReason": "600-1",
+                "refundedTotal": -50,
+                "excludePromotion": false,
+                "description": "STRIPE KNITTED RUGBY | MMC030 | XS | BRCBLTNVY",
+                "refundedQuantity": 1,
+                "itemDiscounts": {
+                    "trnDiscountsPortion": 1.503,
+                    "refundPortion": 0,
+                    "trnPromotionsPortion": 0
+                },
+                "deliveryGroup": "1",
+                "descriptions": [],
+                "totalLinePrice": 67,
+                "originFullfillmentId": "N/A",
+                "fullfilmentId": "628",
+                "price": 67,
+                "refunded": true,
+                "SKU": "1184873"
+            },
+            {
+                "itemLineId": "6",
+                "refundedPromotionalQuantity": 0,
+                "quantity": 3,
+                "refundedReasonDescription": "Does not suit",
+                "deliveryMethod": "3",
+                "refundedReason": "600-1",
+                "refundedTotal": -60,
+                "excludePromotion": false,
+                "description": "OXFORD SHIRT DRESS | OWNJ001 | 12 | NAVY",
+                "refundedQuantity": 3,
+                "itemDiscounts": {
+                    "trnDiscountsPortion": 1.804,
+                    "refundPortion": 0,
+                    "trnPromotionsPortion": 0
+                },
+                "deliveryGroup": "1",
+                "descriptions": [],
+                "originFullfillmentId": "N/A",
+                "totalLinePrice": 90,
+                "fullfilmentId": "628",
+                "price": 30,
+                "refunded": true,
+                "SKU": "1201761"
+            }
+        ],
+        "lineDiscount": [
+            {
+                "unitPrice": 50,
+                "priceOverrideReasonName": "Price override - wrong price",
+                "priceOverrideAmount": 50,
+                "discountedLinePrice": 50,
+                "name": "Price override - wrong price",
+                "itemLineId": "2",
+                "discountAmount": 17,
+                "discountType": "AMOUNT",
+                "percentageDiscountManagerOverride": {
+                    "automaticApprove": "false",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                },
+                "priceManagerOverride": {
+                    "automaticApprove": "true",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                },
+                "priceOverrideReasonCode": "100"
+            }
+        ],
+        "transactionDiscount": [
+            {
+                "cncDiscountAmount": 0,
+                "inStoreDiscountAmount": -1.06,
+                "webOrderDiscountAmount": 0,
+                "discountAmount": -1.06,
+                "itemLineIds": [
+                    3
+                ],
+                "discountType": "Amount",
+                "reasonCode": "Refunded Discount"
+            }
+        ],
+        "taxBreakdown": {
+            "totalTaxableAmount": 106.693,
+            "taxLines": [
+                {
+                    "taxableAmount": 48.497,
+                    "PreTax": 40.414,
+                    "VATCode": "H",
+                    "VAT": 20,
+                    "itemLineId": 2,
+                    "taxLineTotal": 8.082
+                },
+                {
+                    "taxableAmount": 58.196,
+                    "PreTax": 48.496,
+                    "VATCode": "H",
+                    "VAT": 20,
+                    "itemLineId": 6,
+                    "taxLineTotal": 9.699
+                }
+            ]
+        },
+        "totalTaxSummary": [
+            {
+                "PreTaxSum": 88.91,
+                "VATCode": "H",
+                "TaxSum": 17.781,
+                "VAT": 20,
+                "TXrateSum": 106.691
+            }
+        ],
+        "linePromotion": [
+            {
+                "displayText": "MT3for2new",
+                "promotionType": "MULTY_BUY",
+                "promotionLinePrice": 60,
+                "name": "MT3for2new",
+                "itemLineId": "6",
+                "trigger": [
+                    {
+                        "quantity": 3,
+                        "itemLineId": "6"
+                    }
+                ],
+                "promotionInfo": "undefined",
+                "promotionAmount": 30,
+                "promotionId": "c9098744-3daa-4836-bfe2-07e95a21a4c1"
+            }
+        ],
+        "transactionPromotion": []
+    },
+    "paymentDetails": [
+        {
+            "amount": "-108.94",
+            "hostReferenceId": "NA",
+            "transactionReference": "H6jdoJ6282023-11-06T17:23:20.277Z26b8",
+            "cardType": "NA",
+            "transactionDate": "2023-11-06T17:23:20.277Z",
+            "paymentType": "PDQ",
+            "cncAmount": "0",
+            "transactionType": "REFUND",
+            "authcode": "NA",
+            "result": "AUTHORISED",
+            "inStoreAmount": "-108.94",
+            "totalamount": "-108.94",
+            "webOrderAmount": "0",
+            "currency": "GBP",
+            "shippingAmount": "0",
+            "pan": "NA",
+            "entryMethod": "NA",
+            "aid": "NA"
+        }
+    ],
+    "transactionStructure": [
+        {
+            "isGiftRefund": false,
+            "type": "SALE",
+            "storeId": "628",
+            "parentId": "NA",
+            "transactionId": "A0001331"
+        },
+        {
+            "isGiftRefund": false,
+            "type": "SALE_REFUND",
+            "storeId": "628",
+            "parentId": "A0001331",
+            "transactionId": "A0001332"
+        },
+        {
+            "isGiftRefund": false,
+            "type": "SALE_EXCHANGE",
+            "storeId": "628",
+            "parentId": "A0001332",
+            "transactionId": "A0001333"
+        },
+        {
+            "isGiftRefund": false,
+            "type": "SALE_REFUND",
+            "storeId": "628",
+            "parentId": "A0001333",
+            "transactionId": "A0001334"
+        },
+        {
+            "isGiftRefund": false,
+            "type": "REFUND",
+            "storeId": "628",
+            "transactionId": "A0001335",
+            "parentId": "A0001334"
+        }
+    ],
+    "storeNodeStructure": [
+        {
+            "name": "Berkhamsted Test",
+            "nodeType": "STORE"
+        },
+        {
+            "name": "South East & Central",
+            "nodeType": "STORE_GROUP"
+        },
+        {
+            "name": "UK",
+            "nodeType": "TRADING_REGION"
+        },
+        {
+            "name": "Crew Clothing",
+            "nodeType": "COMPANY"
+        },
+        {
+            "name": "Crew Clothing",
+            "nodeType": "ORGANIZATION"
+        }
+    ],
+    "currentTransactionDetails": {}
+
+}

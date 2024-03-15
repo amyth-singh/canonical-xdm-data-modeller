@@ -1,0 +1,159 @@
+{
+    "CompositeEntityId": "ReferenceDocument_Country_AF",
+    "CompositeEntityType": "ReferenceDocument",
+    "DomainEvent": {
+        "TriggerEntity": {
+            "Country": {
+                "CompositeEntityId": "ReferenceDocument_Country_AF",
+                "CompositeEntityType": "ReferenceDocument",
+                "Country": {
+                    "ISO2": "AF",
+                    "IsEurope": "N",
+                    "Name": "Afghanistan"
+                },
+                "EntityId": "Country_AF",
+                "EntityType": "Country",
+                "ParentEntityId": "ReferenceDocument_Country_AF",
+                "ParentEntityType": "ReferenceDocument",
+                "Status": {
+                    "Code": "Active"
+                },
+                "Times": {
+                    "CreatedOn": {
+                        "DateId": "Dates_20211207",
+                        "Millis": 1698422376592,
+                        "UTC": "2021-12-07T15:57:43.000Z"
+                    }
+                },
+                "Type": {
+                    "Code": "CountryCode",
+                    "Desc": "Country Codes"
+                },
+                "XRefIds": [
+                    {
+                        "Code": "cont_of_origin",
+                        "Id": "AF",
+                        "SystemCode": "Retail247"
+                    }
+                ]
+            }
+        }
+    },
+    "EntityId": "Country_AF",
+    "EntityType": "Country",
+    "EventId": "CountryPublished_Country_AF_2023-10-27T15:59:36.592Z",
+    "EventMetadata": {
+        "EntityAtts": {
+            "Origin": {
+                "EntityId": "AF",
+                "ParentEntityId": "Country_AF"
+            },
+            "Xfuze": {
+                "CompositeEntityId": "ReferenceDocument_Country_AF",
+                "CompositeEntityType": "ReferenceDocument",
+                "EntityDomain": "Reference",
+                "EntityId": "Country_AF",
+                "EntityType": "Country",
+                "IsSensitive": "N",
+                "ParentEntityId": "ReferenceDocument_Country_AF",
+                "ParentEntityType": "ReferenceDocument"
+            }
+        },
+        "EventAtts": {
+            "Origin": {
+                "EventId": "AF_20231027",
+                "SourceFormatType": "CSV",
+                "SourceSystem": "Retail247"
+            },
+            "Xfuze": {
+                "ClientCode": "WHS",
+                "EventCategory": "Reference",
+                "EventChangePattern": "FullSnapshot",
+                "EventClass": "TriggerEvent",
+                "EventId": "CountryPublished_Country_AF_2023-10-27T15:59:36.592Z",
+                "EventName": "CountryPublished"
+            }
+        },
+        "IngestAtts": {
+            "Xfuze": {
+                "File": {
+                    "BatchId": null,
+                    "BatchNumber": null,
+                    "BytesOffsetInOriginalFile": 0,
+                    "ChangeTimestampUTC": null,
+                    "FormatType": "CSV",
+                    "LineNumber": 0,
+                    "Name": null,
+                    "ObjectNotificationPayload": null,
+                    "OriginalFileSizeBytes": 0,
+                    "OriginalRowSizeBytes": 0,
+                    "Path": null,
+                    "PatternType": "CloudObjectNotification",
+                    "SystemCode": "GCS",
+                    "TotalBatchLines": 0,
+                    "URI": null
+                }
+            }
+        },
+        "PayloadAtts": {
+            "Origin": {
+                "DataPayloadHash": "eyJjb250X29mX29yaWdpbiI6IkFGIiwiY291bnRyeSI6IkFmZ2hhbmlzdGFuIiwiY3JlYXRlX2RhdGUiOiIxMi8wNy8yMDIxIDE1OjU3OjQzIiwiZXVyb3BlX2NvdW50cnkiOiJOIn0=",
+                "EventPayloadHash": "eyJjb250X29mX29yaWdpbiI6IkFGIiwiY291bnRyeSI6IkFmZ2hhbmlzdGFuIiwiY3JlYXRlX2RhdGUiOiIxMi8wNy8yMDIxIDE1OjU3OjQzIiwiZXVyb3BlX2NvdW50cnkiOiJOIn0=",
+                "HashScheme": "BASE64"
+            },
+            "Xfuze": {
+                "DataPayloadHash": "eyJDb3VudHJ5Ijp7IkNvbXBvc2l0ZUVudGl0eUlkIjoiUmVmZXJlbmNlRG9jdW1lbnRfQ291bnRyeV9BRiIsIkNvbXBvc2l0ZUVudGl0eVR5cGUiOiJSZWZlcmVuY2VEb2N1bWVudCIsIkNvdW50cnkiOnsiSVNPMiI6IkFGIiwiSXNFdXJvcGUiOiJOIiwiTmFtZSI6IkFmZ2hhbmlzdGFuIn0sIkVudGl0eUlkIjoiQ291bnRyeV9BRiIsIkVudGl0eVR5cGUiOiJDb3VudHJ5IiwiUGFyZW50RW50aXR5SWQiOiJSZWZlcmVuY2VEb2N1bWVudF9Db3VudHJ5X0FGIiwiUGFyZW50RW50aXR5VHlwZSI6IlJlZmVyZW5jZURvY3VtZW50IiwiU3RhdHVzIjp7IkNvZGUiOiJBY3RpdmUifSwiVGltZXMiOnsiQ3JlYXRlZE9uIjp7IkRhdGVJZCI6IkRhdGVzXzIwMjExMjA3IiwiTWlsbGlzIjoxNjk4NDIyMzc2NTkyLCJVVEMiOiIyMDIxLTEyLTA3VDE1OjU3OjQzLjAwMFoifX0sIlR5cGUiOnsiQ29kZSI6IkNvdW50cnlDb2RlIiwiRGVzYyI6IkNvdW50cnkgQ29kZXMifSwiWFJlZklkcyI6W3siQ29kZSI6ImNvbnRfb2Zfb3JpZ2luIiwiSWQiOiJBRiIsIlN5c3RlbUNvZGUiOiJSZXRhaWwyNDcifV19fQ==",
+                "EventPayloadHash": "eyJDb21wb3NpdGVFbnRpdHlJZCI6IlJlZmVyZW5jZURvY3VtZW50X0NvdW50cnlfQUYiLCJDb21wb3NpdGVFbnRpdHlUeXBlIjoiUmVmZXJlbmNlRG9jdW1lbnQiLCJEb21haW5FdmVudCI6eyJUcmlnZ2VyRW50aXR5Ijp7IkNvdW50cnkiOnsiQ29tcG9zaXRlRW50aXR5SWQiOiJSZWZlcmVuY2VEb2N1bWVudF9Db3VudHJ5X0FGIiwiQ29tcG9zaXRlRW50aXR5VHlwZSI6IlJlZmVyZW5jZURvY3VtZW50IiwiQ291bnRyeSI6eyJJU08yIjoiQUYiLCJJc0V1cm9wZSI6Ik4iLCJOYW1lIjoiQWZnaGFuaXN0YW4ifSwiRW50aXR5SWQiOiJDb3VudHJ5X0FGIiwiRW50aXR5VHlwZSI6IkNvdW50cnkiLCJQYXJlbnRFbnRpdHlJZCI6IlJlZmVyZW5jZURvY3VtZW50X0NvdW50cnlfQUYiLCJQYXJlbnRFbnRpdHlUeXBlIjoiUmVmZXJlbmNlRG9jdW1lbnQiLCJTdGF0dXMiOnsiQ29kZSI6IkFjdGl2ZSJ9LCJUaW1lcyI6eyJDcmVhdGVkT24iOnsiRGF0ZUlkIjoiRGF0ZXNfMjAyMTEyMDciLCJNaWxsaXMiOjE2OTg0MjIzNzY1OTIsIlVUQyI6IjIwMjEtMTItMDdUMTU6NTc6NDMuMDAwWiJ9fSwiVHlwZSI6eyJDb2RlIjoiQ291bnRyeUNvZGUiLCJEZXNjIjoiQ291bnRyeSBDb2RlcyJ9LCJYUmVmSWRzIjpbeyJDb2RlIjoiY29udF9vZl9vcmlnaW4iLCJJZCI6IkFGIiwiU3lzdGVtQ29kZSI6IlJldGFpbDI0NyJ9XX19fSwiRW50aXR5SWQiOiJDb3VudHJ5X0FGIiwiRW50aXR5VHlwZSI6IkNvdW50cnkiLCJFdmVudElkIjoiQ291bnRyeVB1Ymxpc2hlZF9Db3VudHJ5X0FGXzIwMjMtMTAtMjdUMTU6NTk6MzYuNTkyWiIsIkV2ZW50TWV0YWRhdGEiOnsiRW50aXR5QXR0cyI6eyJPcmlnaW4iOnsiRW50aXR5SWQiOiJBRiIsIlBhcmVudEVudGl0eUlkIjoiQ291bnRyeV9BRiJ9LCJYZnV6ZSI6eyJDb21wb3NpdGVFbnRpdHlJZCI6IlJlZmVyZW5jZURvY3VtZW50X0NvdW50cnlfQUYiLCJDb21wb3NpdGVFbnRpdHlUeXBlIjoiUmVmZXJlbmNlRG9jdW1lbnQiLCJFbnRpdHlEb21haW4iOiJSZWZlcmVuY2UiLCJFbnRpdHlJZCI6IkNvdW50cnlfQUYiLCJFbnRpdHlUeXBlIjoiQ291bnRyeSIsIklzU2Vuc2l0aXZlIjoiTiIsIlBhcmVudEVudGl0eUlkIjoiUmVmZXJlbmNlRG9jdW1lbnRfQ291bnRyeV9BRiIsIlBhcmVudEVudGl0eVR5cGUiOiJSZWZlcmVuY2VEb2N1bWVudCJ9fSwiRXZlbnRBdHRzIjp7Ik9yaWdpbiI6eyJFdmVudElkIjoiQUZfMjAyMzEwMjciLCJTb3VyY2VGb3JtYXRUeXBlIjoiQ1NWIiwiU291cmNlU3lzdGVtIjoiUmV0YWlsMjQ3In0sIlhmdXplIjp7IkNsaWVudENvZGUiOiJXSFMiLCJFdmVudENhdGVnb3J5IjoiUmVmZXJlbmNlIiwiRXZlbnRDaGFuZ2VQYXR0ZXJuIjoiRnVsbFNuYXBzaG90IiwiRXZlbnRDbGFzcyI6IlRyaWdnZXJFdmVudCIsIkV2ZW50SWQiOiJDb3VudHJ5UHVibGlzaGVkX0NvdW50cnlfQUZfMjAyMy0xMC0yN1QxNTo1OTozNi41OTJaIiwiRXZlbnROYW1lIjoiQ291bnRyeVB1Ymxpc2hlZCJ9fSwiSW5nZXN0QXR0cyI6eyJYZnV6ZSI6eyJGaWxlIjp7IkJhdGNoSWQiOm51bGwsIkJhdGNoTnVtYmVyIjpudWxsLCJCeXRlc09mZnNldEluT3JpZ2luYWxGaWxlIjowLCJDaGFuZ2VUaW1lc3RhbXBVVEMiOm51bGwsIkZvcm1hdFR5cGUiOiJDU1YiLCJMaW5lTnVtYmVyIjowLCJOYW1lIjpudWxsLCJPYmplY3ROb3RpZmljYXRpb25QYXlsb2FkIjpudWxsLCJPcmlnaW5hbEZpbGVTaXplQnl0ZXMiOjAsIk9yaWdpbmFsUm93U2l6ZUJ5dGVzIjowLCJQYXRoIjpudWxsLCJQYXR0ZXJuVHlwZSI6IkNsb3VkT2JqZWN0Tm90aWZpY2F0aW9uIiwiU3lzdGVtQ29kZSI6IkdDUyIsIlRvdGFsQmF0Y2hMaW5lcyI6MCwiVVJJIjpudWxsfX19LCJQYXlsb2FkQXR0cyI6eyJPcmlnaW4iOnsiRGF0YVBheWxvYWRIYXNoIjoiZXlKamIyNTBYMjltWDI5eWFXZHBiaUk2SWtGR0lpd2lZMjkxYm5SeWVTSTZJa0ZtWjJoaGJtbHpkR0Z1SWl3aVkzSmxZWFJsWDJSaGRHVWlPaUl4TWk4d055OHlNREl4SURFMU9qVTNPalF6SWl3aVpYVnliM0JsWDJOdmRXNTBjbmtpT2lKT0luMD0iLCJFdmVudFBheWxvYWRIYXNoIjoiZXlKamIyNTBYMjltWDI5eWFXZHBiaUk2SWtGR0lpd2lZMjkxYm5SeWVTSTZJa0ZtWjJoaGJtbHpkR0Z1SWl3aVkzSmxZWFJsWDJSaGRHVWlPaUl4TWk4d055OHlNREl4SURFMU9qVTNPalF6SWl3aVpYVnliM0JsWDJOdmRXNTBjbmtpT2lKT0luMD0iLCJIYXNoU2NoZW1lIjoiQkFTRTY0In0sIlhmdXplIjp7IkRhdGFQYXlsb2FkSGFzaCI6ImV5SkRiM1Z1ZEhKNUlqcDdJa052YlhCdmMybDBaVVZ1ZEdsMGVVbGtJam9pVW1WbVpYSmxibU5sUkc5amRXMWxiblJmUTI5MWJuUnllVjlCUmlJc0lrTnZiWEJ2YzJsMFpVVnVkR2wwZVZSNWNHVWlPaUpTWldabGNtVnVZMlZFYjJOMWJXVnVkQ0lzSWtOdmRXNTBjbmtpT25zaVNWTlBNaUk2SWtGR0lpd2lTWE5GZFhKdmNHVWlPaUpPSWl3aVRtRnRaU0k2SWtGbVoyaGhibWx6ZEdGdUluMHNJa1Z1ZEdsMGVVbGtJam9pUTI5MWJuUnllVjlCUmlJc0lrVnVkR2wwZVZSNWNHVWlPaUpEYjNWdWRISjVJaXdpVUdGeVpXNTBSVzUwYVhSNVNXUWlPaUpTWldabGNtVnVZMlZFYjJOMWJXVnVkRjlEYjNWdWRISjVYMEZHSWl3aVVHRnlaVzUwUlc1MGFYUjVWSGx3WlNJNklsSmxabVZ5Wlc1alpVUnZZM1Z0Wlc1MElpd2lVM1JoZEhWeklqcDdJa052WkdVaU9pSkJZM1JwZG1VaWZTd2lWR2x0WlhNaU9uc2lRM0psWVhSbFpFOXVJanA3SWtSaGRHVkpaQ0k2SWtSaGRHVnpYekl3TWpFeE1qQTNJaXdpVFdsc2JHbHpJam94TmprNE5ESXlNemMyTlRreUxDSlZWRU1pT2lJeU1ESXhMVEV5TFRBM1ZERTFPalUzT2pRekxqQXdNRm9pZlgwc0lsUjVjR1VpT25zaVEyOWtaU0k2SWtOdmRXNTBjbmxEYjJSbElpd2lSR1Z6WXlJNklrTnZkVzUwY25rZ1EyOWtaWE1pZlN3aVdGSmxaa2xrY3lJNlczc2lRMjlrWlNJNkltTnZiblJmYjJaZmIzSnBaMmx1SWl3aVNXUWlPaUpCUmlJc0lsTjVjM1JsYlVOdlpHVWlPaUpTWlhSaGFXd3lORGNpZlYxOWZRPT0iLCJFdmVudFBheWxvYWRIYXNoIjpudWxsLCJIYXNoU2NoZW1lIjoiQkFTRTY0In19LCJQcml2YWN5QXR0cyI6eyJPcmlnaW4iOnsiSXNFbmNyeXB0ZWQiOiJOIn0sIlhmdXplIjp7IklzRW5jcnlwdGVkIjoiTiIsIklzU2Vuc2l0aXZlRW50aXR5IjoiTiJ9fSwiVGltZUF0dHMiOnsiT3JpZ2luIjp7IlRpbWVzIjp7IkV2ZW50T2NjdXJyZWRUaW1lc3RhbXAiOiIyMDIzLTEwLTI3VDE1OjU5OjM2LjU5MloifX0sIlhmdXplIjp7IlRpbWVab25lcyI6eyJFdmVudFRpbWVab25lIjp7IlRpbWVab25lIjoiRXVyb3BlL0xvbmRvbiJ9LCJIb21lVGltZVpvbmUiOnsiVGltZVpvbmUiOiJFdXJvcGUvTG9uZG9uIn19LCJUaW1lcyI6eyJFdmVudE9jY3VycmVkVGltZXN0YW1wIjp7IkRhdGVJZCI6IkRhdGVzXzIwMjMxMDI3IiwiTG9jYWwiOiIyMDIzLTEwLTI3VDE1OjU5OjM2LjU5MloiLCJNaWxsaXMiOjE2OTg0MjIzNzY1OTIsIlRpbWVab25lIjoiRXVyb3BlL0xvbmRvbiIsIlVUQyI6IjIwMjMtMTAtMjdUMTU6NTk6MzYuNTkyWiJ9LCJFdmVudE9jY3VycmVkVHlwZSI6IlN5c3RlbVRpbWUiLCJFdmVudFJlY2VpdmVkVGltZXN0YW1wIjp7IkRhdGVJZCI6IkRhdGVzXzIwMjMxMDI3IiwiTG9jYWwiOiIyMDIzLTEwLTI3VDE1OjU5OjM2LjU5MloiLCJNaWxsaXMiOjE2OTg0MjIzNzY1OTIsIlRpbWVab25lIjoiRXVyb3BlL0xvbmRvbiIsIlVUQyI6IjIwMjMtMTAtMjdUMTU6NTk6MzYuNTkyWiJ9fX19fSwiRXZlbnROYW1lIjoiQ291bnRyeVB1Ymxpc2hlZCIsIkV2ZW50T2NjdXJyZWRUaW1lc3RhbXBMb2NhbCI6IjIwMjMtMTAtMjdUMTU6NTk6MzYuNTkyWiIsIkV2ZW50T2NjdXJyZWRUaW1lc3RhbXBVVEMiOiIyMDIzLTEwLTI3VDE1OjU5OjM2LjU5MloiLCJQYXJlbnRFbnRpdHlJZCI6IlJlZmVyZW5jZURvY3VtZW50X0NvdW50cnlfQUYiLCJQYXJlbnRFbnRpdHlUeXBlIjoiUmVmZXJlbmNlRG9jdW1lbnQifQ==",
+                "HashScheme": "BASE64"
+            }
+        },
+        "PrivacyAtts": {
+            "Origin": {
+                "IsEncrypted": "N"
+            },
+            "Xfuze": {
+                "IsEncrypted": "N",
+                "IsSensitiveEntity": "N"
+            }
+        },
+        "TimeAtts": {
+            "Origin": {
+                "Times": {
+                    "EventOccurredTimestamp": "2023-10-27T15:59:36.592Z"
+                }
+            },
+            "Xfuze": {
+                "TimeZones": {
+                    "EventTimeZone": {
+                        "TimeZone": "Europe/London"
+                    },
+                    "HomeTimeZone": {
+                        "TimeZone": "Europe/London"
+                    }
+                },
+                "Times": {
+                    "EventOccurredTimestamp": {
+                        "DateId": "Dates_20231027",
+                        "Local": "2023-10-27T15:59:36.592Z",
+                        "Millis": 1698422376592,
+                        "TimeZone": "Europe/London",
+                        "UTC": "2023-10-27T15:59:36.592Z"
+                    },
+                    "EventOccurredType": "SystemTime",
+                    "EventReceivedTimestamp": {
+                        "DateId": "Dates_20231027",
+                        "Local": "2023-10-27T15:59:36.592Z",
+                        "Millis": 1698422376592,
+                        "TimeZone": "Europe/London",
+                        "UTC": "2023-10-27T15:59:36.592Z"
+                    }
+                }
+            }
+        }
+    },
+    "EventName": "CountryPublished",
+    "EventOccurredTimestampLocal": "2023-10-27T15:59:36.592Z",
+    "EventOccurredTimestampUTC": "2023-10-27T15:59:36.592Z",
+    "ParentEntityId": "ReferenceDocument_Country_AF",
+    "ParentEntityType": "ReferenceDocument"
+}

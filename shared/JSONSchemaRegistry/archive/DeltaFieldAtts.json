@@ -1,0 +1,75 @@
+{
+  "$id": "DeltaFieldAtts",
+  "description": "XDM Event 'EventField' atts definition (e.g CDC)",
+  "type": "object",
+  "properties": {
+    "DqTestAtts": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "properties": {
+        "Atts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Att"
+          }
+        }
+      },
+      "required": [
+        "Atts"
+      ],
+      "title": "DqTestAtts"
+    },
+    "Att": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "properties": {
+        "TestId": {
+          "type": "null"
+        },
+        "TestName": {
+          "type": "null"
+        },
+        "TestType": {
+          "type": "null"
+        },
+        "TestVersion": {
+          "type": "null"
+        },
+        "ActualResultCode": {
+          "type": "null"
+        },
+        "ActualResultValue": {
+          "type": "null"
+        },
+        "ExpectedResultCode": {
+          "type": "null"
+        },
+        "ExpectedResultValue": {
+          "type": "null"
+        },
+        "Note": {
+          "type": "null"
+        },
+        "SeverityCode": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "ActualResultCode",
+        "ActualResultValue",
+        "ExpectedResultCode",
+        "ExpectedResultValue",
+        "Note",
+        "SeverityCode",
+        "TestId",
+        "TestName",
+        "TestType",
+        "TestVersion"
+      ],
+      "title": "Att"
+    }
+  },
+  "required": [
+    "DqTestAtts"
+  ]
+}

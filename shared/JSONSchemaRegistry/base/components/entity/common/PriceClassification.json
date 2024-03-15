@@ -1,0 +1,27 @@
+{
+    "type": "object",
+    "unevaluatedProperties": false,
+    "properties": {
+        "PriceLevel": {
+            "type": "object",
+            "unevaluatedProperties": false,
+            "properties": {
+                "PriceLevelCode": {
+                    "type": "string"
+                },
+                "PriceLevelType": {
+                    "type": "string"
+                },
+                "PriceLevelDesc": {
+                    "type": "string"
+                }
+            }
+        },
+        "IsHighValue": {
+            "$ref": "./StringBool.json"
+        },
+        "IsMarkdown": {
+            "$ref": "./StringBool.json"
+        }
+    }
+}

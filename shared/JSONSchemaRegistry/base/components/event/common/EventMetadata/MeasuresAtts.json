@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xfuze.io/xdm/schema/components/event/common/EventHeader/EventMetadata/MeasuresAtts",
+  "description": "XDM Schema for the common event component 'EventHeader/EventMetadata/MeasuresAtts'",
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "TriggerEntity": {
+      "type": "object",
+      "description": "The Xfuze key contextual 'measures' (numerical values) contained in the event that contextualise the change itself (e.g for SalesOrderItemsCancelled event, the QtyCancelled)",
+      "unevaluatedProperties": false,
+      "properties": {
+        "Value1": {
+          "type": ["string","null"], "description": "e.g 232.98"
+        },
+        "Value1Code": {
+          "type": ["string","null"], "description": "e.g SalesOrder.Header.Totals.GrandTotal.BCY.IncTax"
+        },
+        "Value2": {
+          "type": ["string","null"], "description": "e.g 50.15"
+        },
+        "Value2Code": {
+          "type": ["string","null"], "description": "e.g SalesOrder.Header.Totals.FinalMargin.BCY.Percent"
+        },
+        "Value3": {
+          "type": ["string","null"], "description": "e.g 0.0"
+        },
+        "Value3Code": {
+          "type": ["string","null"], "description": "e.g SalesOrder.Header.Totals.DiscountsTotal.BCY.IncTax"
+        },
+        "Value4": {
+          "type": ["string","null"], "description": "e.g 50.15"
+        },
+        "Value4Code": {
+          "type": ["string","null"], "description": "e.g SalesOrder.Header.Totals.FinalMargin.BCY.Percent"
+        },
+        "Value5": {
+          "type": ["string","null"], "description": "e.g 0.0"
+        },
+        "Value5Code": {
+          "type": ["string","null"], "description": "e.g SalesOrder.Header.Totals.DiscountsTotal.BCY.IncTax"
+        },
+        "Value6": {
+          "type": ["string","null"], "description": "e.g 3"
+        },
+        "Value6Code": {
+          "type": ["string","null"], "description": "e.g SalesOrder.Header.Qtys.QtySold"
+        },
+        "Value7": {
+          "type": ["string","null"], "description": "e.g 3"
+        },
+        "Value7Code": {
+          "type": ["string","null"], "description": "e.g SalesOrder.Header.Qtys.QtySold"
+        }
+      }
+    },
+    "LatestEntity": {
+      "type": "object",
+      "description": "The Xfuze key contextual 'measures' (numerical values) contained in the event that contextualise the latest entity state itself (e.g stateful view - for SalesOrderItemsCancelled event, the QtyCancelled, QtyNet & QtySold)",
+      "unevaluatedProperties": false,
+      "properties": {
+        "Value1": {
+          "type": ["string","null"], "description": "e.g 232.98"
+        },
+        "Value1Code": {
+          "type": ["string","null"], "description": "e.g SalesOrder.Header.Totals.GrandTotal.BCY.IncTax"
+        },
+        "Value2": {
+          "type": ["string","null"], "description": "e.g 50.15"
+        },
+        "Value2Code": {
+          "type": ["string","null"], "description": "e.g SalesOrder.Header.Totals.FinalMargin.BCY.Percent"
+        },
+        "Value3": {
+          "type": ["string","null"], "description": "e.g 0.0"
+        },
+        "Value3Code": {
+          "type": ["string","null"], "description": "e.g SalesOrder.Header.Totals.DiscountsTotal.BCY.IncTax"
+        },
+        "Value4": {
+          "type": ["string","null"], "description": "e.g 50.15"
+        },
+        "Value4Code": {
+          "type": ["string","null"], "description": "e.g SalesOrder.Header.Totals.FinalMargin.BCY.Percent"
+        },
+        "Value5": {
+          "type": ["string","null"], "description": "e.g 0.0"
+        },
+        "Value5Code": {
+          "type": ["string","null"], "description": "e.g SalesOrder.Header.Totals.DiscountsTotal.BCY.IncTax"
+        },
+        "Value6": {
+          "type": ["string","null"], "description": "e.g 3"
+        },
+        "Value6Code": {
+          "type": ["string","null"], "description": "e.g SalesOrder.Header.Qtys.QtySold"
+        },
+        "Value7": {
+          "type": ["string","null"], "description": "e.g 3"
+        },
+        "Value7Code": {
+          "type": ["string","null"], "description": "e.g SalesOrder.Header.Qtys.QtySold"
+        }
+      }
+    }
+  }
+}

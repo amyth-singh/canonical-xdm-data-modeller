@@ -1,0 +1,23 @@
+{
+  "ClassificationObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/ClassificationProperties"
+    }
+  },
+  "ClassificationProperties": {
+    "type": "object",
+    "unevaluatedProperties": false,
+    "required": [
+      "Code"
+    ],
+    "properties": {
+      "Code": {
+        "type": "string"
+      },
+      "Desc": {
+        "type": "string"
+      }
+    }
+  }
+}

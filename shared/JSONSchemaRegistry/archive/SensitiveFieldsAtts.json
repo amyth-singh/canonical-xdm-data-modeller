@@ -1,0 +1,11 @@
+{
+    "$id": "Event",
+    "description": "CDM Event definition",
+    "type": "object",
+    "properties": {
+      "SecuringKeyId": {"type": "string"},
+      "SensitiveFields": [{"type": "string"}],
+      "IsEncrypted": {"$ref": "../../Definitions.json#/properties/StringBool"},
+      "CustomAtts": [{"$ref": "../../CustomAttribute.json"}]
+    }
+}

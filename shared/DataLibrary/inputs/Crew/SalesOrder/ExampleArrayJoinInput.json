@@ -1,0 +1,61 @@
+{
+	"products": [
+		{
+			"itemLineId": 1,
+			"totalLinePrice": 28,
+			"price": 14
+		},
+		{
+			"itemLineId": 2,
+			"totalLinePrice": 28,
+			"price": 14
+		},
+		{
+			"itemLineId": 3,
+			"totalLinePrice": 28,
+			"price": 14
+		}
+	],
+	"taxLines": [
+		{
+			"VAT": 0,
+			"VATCode": "Z",
+			"taxableAmount": 28,
+			"PreTax": 28,
+			"itemLineId": 1,
+			"taxLineTotal": 0
+		},
+		{
+			"VAT": 0,
+			"VATCode": "Z",
+			"taxableAmount": 28,
+			"PreTax": 28,
+			"itemLineId": 1,
+			"taxLineTotal": 0
+		},
+		{
+			"VAT": 0,
+			"VATCode": "Z",
+			"taxableAmount": 28,
+			"PreTax": 28,
+			"itemLineId": 2,
+			"taxLineTotal": 0
+		},
+		{
+			"VAT": 0,
+			"VATCode": "Z",
+			"taxableAmount": 28,
+			"PreTax": 28,
+			"itemLineId": 3,
+			"taxLineTotal": 0
+		},
+		{
+			"VAT": 0,
+			"VATCode": "Z",
+			"taxableAmount": 28,
+			"PreTax": 28,
+			"itemLineId": 3,
+			"taxLineTotal": 0
+		}
+	]
+}

@@ -1,0 +1,11 @@
+process:
+  - inputSchema: base/inventory/InventoryLedgerLineEvent.json
+    outputSchema: client-specific/crew/inventory/CrewInventoryLedgerLineSchema.json
+    test:
+      inputDocument: ../../shared/DataLibrary/outputs/Crew/Inventory/document_1.json
+      result: ../../tests/CrewInventoryLedgerLineSchema_TestResults.json
+
+bundle:
+  - jsonata:
+    jsonschema:
+

@@ -1,0 +1,694 @@
+{
+  "Events": [
+    {
+      "EventId": "SalesOrderLineCompleted_SalesOrderLine::Sale_Next_6R5C62P4_959071255_2023-07-29T00:00:00.000Z",
+      "EventName": "SalesOrderLineCompleted",
+      "EntityId": "SalesOrderLine::Sale_Next_6R5C62P4_959071255",
+      "EntityType": "SalesOrderLine",
+      "EntitySubType": "Sale",
+      "ParentEntityId": "SalesOrderHeader_Next_6R5C62P4",
+      "ParentEntityType": "SalesOrderHeader",
+      "CompositeEntityId": "SalesOrder_Next_6R5C62P4",
+      "CompositeEntityType": "SalesOrder",
+      "EventOccurredTimestampUTC": "2023-07-29T00:00:00.000Z",
+      "EventOccurredTimestampLocal": "2023-07-29T00:00:00.000Z",
+      "EventMetadata": {
+        "EventAtts": {
+          "Xfuze": {
+            "EventId": "SalesOrderLineCompleted_SalesOrderLine::Sale_Next_6R5C62P4_959071255_2023-07-29T00:00:00.000Z",
+            "EventCategory": "Sales",
+            "EventName": "SalesOrderLineCompleted",
+            "EventClass": "TriggerEvent",
+            "EventChangePattern": "FullSnapshot",
+            "EventValueStream": "Order2Cash",
+            "BizCapabilityL0": "Sell",
+            "BizCapabilityL1": "Sell & Serve",
+            "BizCapabilityL2": "Take Sale",
+            "ClientCode": "Crew",
+            "IsDerivedEvent": "N"
+          },
+          "Origin": {
+            "EventId": "959071255",
+            "SourceSystem": "Next",
+            "SourceSubSystem": "ConcessionCSV",
+            "SourceFormatType": "CSV",
+            "CorrelationId": "959071255"
+          }
+        },
+        "EntityAtts": {
+          "Xfuze": {
+            "EntityId": "SalesOrderLine::Sale_Next_6R5C62P4_959071255",
+            "EntityType": "SalesOrderLine",
+            "EntitySubType": "Sale",
+            "EntityVariation": "Concession",
+            "EntityDomain": "Sales",
+            "EntityClass": "Composite",
+            "ParentEntityId": "SalesOrderHeader_Next_6R5C62P4",
+            "ParentEntityType": "SalesOrderHeader",
+            "CompositeEntityId": "SalesOrder_Next_6R5C62P4",
+            "CompositeEntityType": "SalesOrder",
+            "IsSensitive": "N"
+          },
+          "Origin": {
+            "EntityId": "6R5C62P4_959071255",
+            "ParentEntityId": "6R5C62P4",
+            "SourceSystem": "Next"
+          }
+        },
+        "TimeAtts": {
+          "Xfuze": {
+            "TimeZones": {
+              "HomeTimeZone": {
+                "TimeZone": "Europe/London"
+              },
+              "EventTimeZone": {
+                "TimeZone": "Europe/London"
+              },
+              "PartyTimeZone": {
+                "TimeZone": "Europe/London"
+              }
+            },
+            "Times": {
+              "EventOccurredTimestamp": {
+                "DateId": "Dates_20230729",
+                "UTC": "2023-07-29T00:00:00.000Z",
+                "Local": "2023-07-29T00:00:00.000Z",
+                "Timezone": "Europe/London",
+                "Millis": 1690588800000
+              },
+              "EventOccurredType": "TrueTime",
+              "EventExternalReceivedTimestamp": {
+                "DateId": "Dates_20230731",
+                "UTC": "2023-07-31T00:00:00.000Z",
+                "Local": "2023-07-31T00:00:00.000Z",
+                "Timezone": "Europe/London",
+                "Millis": 1690761600000
+              },
+              "EventReceivedTimestamp": {
+                "DateId": "Dates_20231018",
+                "UTC": "2023-10-18T12:39:03.243Z",
+                "Local": "2023-10-18T12:39:03.243Z",
+                "Timezone": "UTC",
+                "Millis": 1697632743243
+              }
+            }
+          },
+          "Origin": {
+            "Times": {
+              "EventOccurredTimestamp": "2023-07-29",
+              "EventExternalReceivedTimestamp": "2023-07-31"
+            }
+          }
+        },
+        "ProductAtts": {
+          "Xfuze": {
+            "ProductIds": [
+              "ProductVariant_Retail247Origin_5059595888529"
+            ],
+            "ProductKeys": [
+              "5059595888529"
+            ],
+            "InvolvedReasonCode": "SoldProduct"
+          }
+        },
+        "LocationAtts": {
+          "Xfuze": {
+            "ChannelCode": "Online",
+            "ChannelName": "Online",
+            "LocationId": "Location_Next",
+            "CountryCode2": "GB"
+          }
+        },
+        "MeasuresAtts": {
+          "TriggerEntity": {
+            "Value1": "1",
+            "Value1Code": "Header.Lines.Qtys.QtyNet",
+            "Value2": "117.46",
+            "Value2Code": "Header.Lines.Totals.SubTotal.Current.BCY.IncTax"
+          }
+        },
+        "PrivacyAtts": {
+          "Xfuze": {
+            "IsSensitiveEntity": "N",
+            "IsEncrypted": "N",
+            "SensitiveFieldPaths": []
+          },
+          "Origin": {
+            "IsEncrypted": "N"
+          }
+        },
+        "IngestAtts": {
+          "Xfuze": {
+            "File": {
+              "SystemCode": "(runtime binding)",
+              "URI": "(runtime binding)",
+              "Path": "(runtime binding)",
+              "Name": "(runtime binding)",
+              "BatchId": "(runtime binding)",
+              "BatchNumber": "(runtime binding)",
+              "LineNumber": -1,
+              "TotalBatchLines": -1,
+              "OriginalFileSizeBytes": -1,
+              "OriginalRowSizeBytes": -1,
+              "BytesOffsetInOriginalFile": -1,
+              "FormatType": "CSV",
+              "PatternType": "CloudObjectNotification",
+              "ChangeTimestampUTC": "2023-10-16T09:02:54.530Z",
+              "ObjectNotificationPayload": "(runtime binding)"
+            }
+          }
+        },
+        "PayloadAtts": {
+          "Xfuze": {
+            "DataPayloadHash": "(runtime binding or custom jsonata func)",
+            "EventPayloadHash": "(runtime binding or custom jsonata func)",
+            "HashScheme": "MD5"
+          },
+          "Origin": {
+            "DataPayloadHash": "(runtime binding post processing of output event)",
+            "EventPayloadHash": "(runtime binding post processing of output event)",
+            "HashScheme": "MD5"
+          }
+        }
+      },
+      "DomainEvent": {
+        "TriggerEntity": {
+          "EntityId": "SalesOrderLine::Sale_Next_6R5C62P4_959071255",
+          "EntityType": "SalesOrderLine",
+          "EntitySubType": "Sale",
+          "ParentEntityId": "SalesOrderHeader_Next_6R5C62P4",
+          "ParentEntityType": "SalesOrderHeader",
+          "CompositeEntityId": "SalesOrder_Next_6R5C62P4",
+          "CompositeEntityType": "SalesOrder",
+          "SalesOrder": {
+            "Lines": [
+              {
+                "EntityId": "SalesOrderLine::Sale_Next_6R5C62P4_959071255",
+                "EntityType": "SalesOrderLine",
+                "EntitySubType": "Sale",
+                "ParentEntityId": "SalesOrderHeader_Next_6R5C62P4",
+                "ParentEntityType": "SalesOrderHeader",
+                "CompositeEntityId": "SalesOrder_Next_6R5C62P4",
+                "CompositeEntityType": "SalesOrder",
+                "SalesOrderNumber": "6R5C62P4",
+                "SalesOrderLineNumber": "6R5C62P4_959071255",
+                "SalesOrderLineProductNumber": "6R5C62P4_5059595888529",
+                "XRefIds": [
+                  {
+                    "SystemCode": "Xfuze",
+                    "Code": "EntityId"
+                  },
+                  {
+                    "Id": "SalesOrderHeader_Next_6R5C62P4",
+                    "SystemCode": "Xfuze",
+                    "Code": "ParentEntityId"
+                  },
+                  {
+                    "Id": "6R5C62P4_959071255",
+                    "SystemCode": "Next",
+                    "Code": "RawEntityId"
+                  },
+                  {
+                    "Id": "SalesOrderHeader_Next_6R5C62P4",
+                    "SystemCode": "Xfuze",
+                    "Code": "OrderId"
+                  },
+                  {
+                    "Id": "SalesOrderHeader_Next_6R5C62P4",
+                    "SystemCode": "Xfuze",
+                    "Code": "HeaderId"
+                  },
+                  {
+                    "SystemCode": "Xfuze",
+                    "Code": "LineId"
+                  },
+                  {
+                    "Id": "959071255",
+                    "SystemCode": "Next",
+                    "Code": "BIS_Ref_ID"
+                  },
+                  {
+                    "Id": "6R5C62P4_5059595888529",
+                    "SystemCode": "Next",
+                    "Code": "SalesOrderLineProductNumber"
+                  },
+                  {
+                    "Id": "6R5C62P4",
+                    "SystemCode": "Next",
+                    "Code": "OrderReferenceNumber"
+                  }
+                ],
+                "Type": {
+                  "Class": {},
+                  "Type": {
+                    "Code": "Sale"
+                  }
+                },
+                "Status": {
+                  "LineStatus": {
+                    "Code": "Completed"
+                  },
+                  "PaymentStatus": {
+                    "Code": "FullyPaid"
+                  },
+                  "FulfilmentStatus": {
+                    "Code": "FullyFulfilled"
+                  },
+                  "MarkdownStatus": {
+                    "Code": "FullPrice"
+                  }
+                },
+                "Times": {
+                  "PlacedOn": {
+                    "DateId": "Dates_20230729",
+                    "UTC": "2023-07-29T00:00:00.000Z",
+                    "Local": "2023-07-29T00:00:00.000Z",
+                    "Timezone": "2023-07-29T00:00:00.000Z"
+                  },
+                  "CompletedOn": {
+                    "DateId": "Dates_20230729",
+                    "UTC": "2023-07-29T00:00:00.000Z",
+                    "Local": "2023-07-29T00:00:00.000Z"
+                  }
+                },
+                "Channels": {
+                  "SalesChannel": {
+                    "Class": {
+                      "Code": "Concession"
+                    },
+                    "Type": {
+                      "Code": "Online",
+                      "Desc": "Online"
+                    }
+                  }
+                },
+                "Locations": {
+                  "SalesLocation": {
+                    "Id": "Location_Next",
+                    "CountryCode2": "GB"
+                  }
+                },
+                "ProductAtts": {
+                  "ProductId": "ProductVariant_Retail247Origin_5059595888529",
+                  "ProductNumber": "5059595888529",
+                  "ProductNumberType": "EAN",
+                  "VariantType": "SKU",
+                  "Brand": {
+                    "Name": "Crew Clothing Company"
+                  },
+                  "Style": {
+                    "Code": "MSE001_PROVBLU",
+                    "Desc": "CR BLU CREW CLOTHING"
+                  },
+                  "Variant": {
+                    "Code": "M8748806",
+                    "Desc": "X-Large"
+                  },
+                  "SubDepartment": {
+                    "Code": "4F05",
+                    "Desc": "MENS PP+"
+                  },
+                  "SupplierCode": {
+                    "Code": "A95230"
+                  }
+                },
+                "Qtys": {
+                  "QtySold": {
+                    "Amount": 1
+                  },
+                  "QtyReturned": {
+                    "Amount": 0
+                  },
+                  "QtyNet": {
+                    "Amount": 1
+                  }
+                },
+                "Prices": {
+                  "SellingPrices": {
+                    "SoldPrice": {
+                      "Current": {
+                        "LCY": {
+                          "CurrencyCode": "GBP",
+                          "IncTax": 117.46,
+                          "ExTax": 14.55,
+                          "Tax": 2.91
+                        },
+                        "BCY": {
+                          "CurrencyCode": "GBP",
+                          "IncTax": 117.46,
+                          "ExTax": 14.55,
+                          "Tax": 2.91
+                        }
+                      }
+                    },
+                    "OriginalPrice": {
+                      "Current": {
+                        "LCY": {
+                          "CurrencyCode": "GBP",
+                          "IncTax": 117.46,
+                          "ExTax": 14.55,
+                          "Tax": 2.91
+                        },
+                        "BCY": {
+                          "CurrencyCode": "GBP",
+                          "IncTax": 117.46,
+                          "ExTax": 14.55,
+                          "Tax": 2.91
+                        }
+                      }
+                    }
+                  }
+                },
+                "Totals": {
+                  "SaleTotals": {
+                    "SubTotal": {
+                      "Current": {
+                        "LCY": {
+                          "CurrencyCode": "GBP",
+                          "IncTax": 117.46,
+                          "ExTax": 14.55,
+                          "Tax": 2.91
+                        },
+                        "BCY": {
+                          "CurrencyCode": "GBP",
+                          "IncTax": 117.46,
+                          "ExTax": 14.55,
+                          "Tax": 2.91
+                        }
+                      }
+                    },
+                    "TaxTotal": {
+                      "Current": {
+                        "LCY": {
+                          "CurrencyCode": "GBP",
+                          "Tax": 2.91
+                        },
+                        "BCY": {
+                          "CurrencyCode": "GBP",
+                          "Tax": 2.91
+                        }
+                      }
+                    }
+                  },
+                  "CostTotals": {
+                    "CommissionTotal": {
+                      "Current": {
+                        "LCY": {
+                          "CurrencyCode": "GBP",
+                          "IncTax": 5.38
+                        },
+                        "BCY": {
+                          "CurrencyCode": "GBP",
+                          "IncTax": 5.38
+                        }
+                      }
+                    }
+                  },
+                  "ProfitMarginTotals": {
+                    "NetRevenueTotal": {
+                      "Current": {
+                        "LCY": {
+                          "CurrencyCode": "GBP",
+                          "ExTax": 9.17
+                        },
+                        "BCY": {
+                          "CurrencyCode": "GBP",
+                          "ExTax": 9.17
+                        }
+                      }
+                    }
+                  }
+                },
+                "CommissionAtts": {
+                  "CommissionRate": {
+                    "Pct": 37
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "Entity": {
+    "EntityId": "SalesOrderLine::Sale_Next_6R5C62P4_959071255",
+    "EntityType": "SalesOrderLine",
+    "EntitySubType": "Sale",
+    "ParentEntityId": "SalesOrderHeader_Next_6R5C62P4",
+    "ParentEntityType": "SalesOrderHeader",
+    "CompositeEntityId": "SalesOrder_Next_6R5C62P4",
+    "CompositeEntityType": "SalesOrder",
+    "SalesOrder": {
+      "Lines": [
+        {
+          "EntityId": "SalesOrderLine::Sale_Next_6R5C62P4_959071255",
+          "EntityType": "SalesOrderLine",
+          "EntitySubType": "Sale",
+          "ParentEntityId": "SalesOrderHeader_Next_6R5C62P4",
+          "ParentEntityType": "SalesOrderHeader",
+          "CompositeEntityId": "SalesOrder_Next_6R5C62P4",
+          "CompositeEntityType": "SalesOrder",
+          "SalesOrderNumber": "6R5C62P4",
+          "SalesOrderLineNumber": "6R5C62P4_959071255",
+          "SalesOrderLineProductNumber": "6R5C62P4_5059595888529",
+          "XRefIds": [
+            {
+              "SystemCode": "Xfuze",
+              "Code": "EntityId"
+            },
+            {
+              "Id": "SalesOrderHeader_Next_6R5C62P4",
+              "SystemCode": "Xfuze",
+              "Code": "ParentEntityId"
+            },
+            {
+              "Id": "6R5C62P4_959071255",
+              "SystemCode": "Next",
+              "Code": "RawEntityId"
+            },
+            {
+              "Id": "SalesOrderHeader_Next_6R5C62P4",
+              "SystemCode": "Xfuze",
+              "Code": "OrderId"
+            },
+            {
+              "Id": "SalesOrderHeader_Next_6R5C62P4",
+              "SystemCode": "Xfuze",
+              "Code": "HeaderId"
+            },
+            {
+              "SystemCode": "Xfuze",
+              "Code": "LineId"
+            },
+            {
+              "Id": "959071255",
+              "SystemCode": "Next",
+              "Code": "BIS_Ref_ID"
+            },
+            {
+              "Id": "6R5C62P4_5059595888529",
+              "SystemCode": "Next",
+              "Code": "SalesOrderLineProductNumber"
+            },
+            {
+              "Id": "6R5C62P4",
+              "SystemCode": "Next",
+              "Code": "OrderReferenceNumber"
+            }
+          ],
+          "Type": {
+            "Class": {},
+            "Type": {
+              "Code": "Sale"
+            }
+          },
+          "Status": {
+            "LineStatus": {
+              "Code": "Completed"
+            },
+            "PaymentStatus": {
+              "Code": "FullyPaid"
+            },
+            "FulfilmentStatus": {
+              "Code": "FullyFulfilled"
+            },
+            "MarkdownStatus": {
+              "Code": "FullPrice"
+            }
+          },
+          "Times": {
+            "PlacedOn": {
+              "DateId": "Dates_20230729",
+              "UTC": "2023-07-29T00:00:00.000Z",
+              "Local": "2023-07-29T00:00:00.000Z",
+              "Timezone": "2023-07-29T00:00:00.000Z"
+            },
+            "CompletedOn": {
+              "DateId": "Dates_20230729",
+              "UTC": "2023-07-29T00:00:00.000Z",
+              "Local": "2023-07-29T00:00:00.000Z"
+            }
+          },
+          "Channels": {
+            "SalesChannel": {
+              "Class": {
+                "Code": "Concession"
+              },
+              "Type": {
+                "Code": "Online",
+                "Desc": "Online"
+              }
+            }
+          },
+          "Locations": {
+            "SalesLocation": {
+              "Id": "Location_Next",
+              "CountryCode2": "GB"
+            }
+          },
+          "ProductAtts": {
+            "ProductId": "ProductVariant_Retail247Origin_5059595888529",
+            "ProductNumber": "5059595888529",
+            "ProductNumberType": "EAN",
+            "VariantType": "SKU",
+            "Brand": {
+              "Name": "Crew Clothing Company"
+            },
+            "Style": {
+              "Code": "MSE001_PROVBLU",
+              "Desc": "CR BLU CREW CLOTHING"
+            },
+            "Variant": {
+              "Code": "M8748806",
+              "Desc": "X-Large"
+            },
+            "SubDepartment": {
+              "Code": "4F05",
+              "Desc": "MENS PP+"
+            },
+            "SupplierCode": {
+              "Code": "A95230"
+            }
+          },
+          "Qtys": {
+            "QtySold": {
+              "Amount": 1
+            },
+            "QtyReturned": {
+              "Amount": 0
+            },
+            "QtyNet": {
+              "Amount": 1
+            }
+          },
+          "Prices": {
+            "SellingPrices": {
+              "SoldPrice": {
+                "Current": {
+                  "LCY": {
+                    "CurrencyCode": "GBP",
+                    "IncTax": 117.46,
+                    "ExTax": 14.55,
+                    "Tax": 2.91
+                  },
+                  "BCY": {
+                    "CurrencyCode": "GBP",
+                    "IncTax": 117.46,
+                    "ExTax": 14.55,
+                    "Tax": 2.91
+                  }
+                }
+              },
+              "OriginalPrice": {
+                "Current": {
+                  "LCY": {
+                    "CurrencyCode": "GBP",
+                    "IncTax": 117.46,
+                    "ExTax": 14.55,
+                    "Tax": 2.91
+                  },
+                  "BCY": {
+                    "CurrencyCode": "GBP",
+                    "IncTax": 117.46,
+                    "ExTax": 14.55,
+                    "Tax": 2.91
+                  }
+                }
+              }
+            }
+          },
+          "Totals": {
+            "SaleTotals": {
+              "SubTotal": {
+                "Current": {
+                  "LCY": {
+                    "CurrencyCode": "GBP",
+                    "IncTax": 117.46,
+                    "ExTax": 14.55,
+                    "Tax": 2.91
+                  },
+                  "BCY": {
+                    "CurrencyCode": "GBP",
+                    "IncTax": 117.46,
+                    "ExTax": 14.55,
+                    "Tax": 2.91
+                  }
+                }
+              },
+              "TaxTotal": {
+                "Current": {
+                  "LCY": {
+                    "CurrencyCode": "GBP",
+                    "Tax": 2.91
+                  },
+                  "BCY": {
+                    "CurrencyCode": "GBP",
+                    "Tax": 2.91
+                  }
+                }
+              }
+            },
+            "CostTotals": {
+              "CommissionTotal": {
+                "Current": {
+                  "LCY": {
+                    "CurrencyCode": "GBP",
+                    "IncTax": 5.38
+                  },
+                  "BCY": {
+                    "CurrencyCode": "GBP",
+                    "IncTax": 5.38
+                  }
+                }
+              }
+            },
+            "ProfitMarginTotals": {
+              "NetRevenueTotal": {
+                "Current": {
+                  "LCY": {
+                    "CurrencyCode": "GBP",
+                    "ExTax": 9.17
+                  },
+                  "BCY": {
+                    "CurrencyCode": "GBP",
+                    "ExTax": 9.17
+                  }
+                }
+              }
+            }
+          },
+          "CommissionAtts": {
+            "CommissionRate": {
+              "Pct": 37
+            }
+          }
+        }
+      ]
+    }
+  },
+  "TriggerEntityID": ""
+
+
+
+}

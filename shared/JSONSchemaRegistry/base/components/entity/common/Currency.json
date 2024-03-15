@@ -1,0 +1,58 @@
+{
+  "CurrencyObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/CurrencyProperties"
+    }
+  },
+  "CurrencyProperties": {
+    "type": "object",
+    "description": "A currency object, based on ISO 4217",
+    "anyOf": [
+      {
+        "required": [
+          "ISO2"
+        ]
+      },
+      {
+        "required": [
+          "ISO3"
+        ]
+      }
+    ],
+    "unevaluatedProperties": false,
+    "properties": {
+      "ISO2": {
+        "type": "string",
+        "description": "The canonical ISO2 currency code"
+      },
+      "ISO3": {
+        "type": "string",
+        "description": "The canonical ISO3 currency code"
+      },
+      "Number": {
+        "type": "string",
+        "description": "The canonical currency number"
+      },
+      "DecimalPlaces": {
+        "type": "string",
+        "description": "The canonical number of decimal places for the currency"
+      },
+      "CountryCodes": {
+        "type": "array",
+        "description": "The canonical array of ISO3 country codes officially using this currency",
+        "items": {
+          "type": "string"
+        }
+      },
+      "Symbol": {
+        "type": "string",
+        "description": "The canonical symbol for the currency"
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

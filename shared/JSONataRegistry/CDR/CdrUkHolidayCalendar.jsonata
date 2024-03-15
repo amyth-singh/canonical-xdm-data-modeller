@@ -1,0 +1,191 @@
+(
+      $formatValue := function($value, $dType, $format){(
+          $formatString := $string ~> $trim;
+          $formatNumber := function($num){$type($num) = "number" ? $num : $type($num) = "string" ? $contains($num,/^-?\d+(\.\d+)?$/) ? $number($num) : null};
+          $formatDateTime := function($dt,$format) {(
+          $dateTimeRegexMap := {"[Y0001]-[M01]-[D01] [H01]:[m01]:[s01] [P]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]) (AM|PM)$/,
+                                    "[Y0001]-[M01]-[D01] [H01]:[m01]:[s01].[f001]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]).\d{3}$/,
+                                    "[Y0001]-[M01]-[D01]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01])$/,
+                                    "[M01]/[D01]/[Y0001]":/^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/[1-9][0-9]{3}$/,
+                                    "ISO8601":/^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d)(\.\d+)?([+-]([01]\d|2[0-3]):([0-5]\d)|Z)$/
+                                  };
+          $dateTimeFormatValidator := function($datetime,$dateTimeFormat){$exists($dateTimeFormat) ? $contains($datetime,$lookup($dateTimeRegexMap,$dateTimeFormat)): $contains($datetime,$lookup($dateTimeRegexMap,"ISO8601"))};
+
+          $exists($dt) ? $dateTimeFormatValidator($dt,$format) ? $exists($format) ? $fromMillis($toMillis($dt,$format)) : $fromMillis($toMillis($dt)) : null;
+        )};
+
+        $formatStringBool := function($value,$format){(
+          $stringBoolMap := {"Y":"Y","YES":"Y","1":"Y","TRUE":"Y","N":"N","0":"N","FALSE":"N","NO":"N","UNSURVEYED":"U"};
+          $upperTrim := $string ~> $trim ~> $uppercase;
+          $stringBool := function($v){$exists($value)?$lookup($stringBoolMap, $upperTrim($value)):""};
+          $reverseBool := function($v){$v = "Y" ? "N" : $v = "N" ? "Y" : "U"};
+          $type($format)="null" ? $value ~> $stringBool : $format="reverse" ? $value ~> $stringBool ~> $reverseBool : null
+        )};
+
+        $dType = "TIMESTAMP"  ? $formatDateTime($value,$format) :
+        $dType = "STRINGBOOL" ? $formatStringBool($value,$format) :
+        $dType = "NUMERIC"    ? $formatNumber($value) :
+        $dType = "STRING"     ? $formatString($value) :
+        null;
+    )};
+
+    /* JW: need to handle better comparison of IsValueChanged */
+    $buildCustomAttribute := function($entityCode,$attributeId,$canonicalCode,$name,$value,$valueBefore,$isValueChanged,$rawValue,$rawValueBefore,$dType,$dFormat,$eot,$eventId, $isSensitive, $isEncrypted){(
+        $buildAttributeID := function($entityCode,$canonicalCode,$attributeId){$entityCode & "_" & $replace($canonicalCode,".","_") & ($type($attributeId) = "null" ? "" : "_" & $attributeId)};
+
+        {
+         "Id":$buildAttributeID($entityCode,$canonicalCode,$attributeId),
+         "Code":$canonicalCode,
+         "Name":$name,
+         "Value": $value != null ? $formatValue($value,$dType,$dFormat) : NULL,
+         "ValueBefore":$valueBefore != null ? $formatValue($valueBefore,$dType,$dFormat) : NULL,
+         /* TODO: "IsValueChanged":(($formatValue($value,$dType,$dFormat) != $formatValue($valueBefore,$dType,$dFormat) or $isValueChanged = "Y") ? "Y" : null),*/
+         "RawValue":$rawValue != null ? $formatValue($rawValue,"STRING") : NULL,
+         "RawValueBefore":$rawValueBefore != null ? $formatValue($rawValueBefore,$dType,$dFormat) : NULL,
+         /* TODO: "IsRawValueChanged":($rawValue != $rawValueBefore or $isValueChanged = NULL ? "Y" : "N"), */
+         "IsSensitive":$isSensitive != null ? $isSensitive : NULL,
+         "IsEncrypted":$isEncrypted != null ? $isEncrypted : NULL,
+         "Type": $dType = "STRING" ? NULL : $dType, /* default = STRING if not present, saves on space*/
+         "AsOf":$eot,
+         "EventId":$eventId};
+         )
+    };
+
+    $buildCustomEventMetadataAttribute := function($canonicalCode,$name,$value,$dType,$dFormat,$isSensitive, $isEncrypted)  {
+        {
+         "Code":$canonicalEventMetadataCodePrefix & "." & $canonicalCode,
+         "Value":$formatValue($value,$dType,$dFormat),
+         "IsSensitive":$isSensitive != null ? $isSensitive : NULL,
+         "IsEncrypted":$isEncrypted != null ? $isEncrypted : NULL,
+         "Type": $dType = "STRING" ? NULL : $dType /* default = STRING if not present, saves on space*/
+         }
+    };
+
+    $clientCode := "CDR";
+    $sourceSystem := "DW";
+    $canonicalCodePrefix:= "Location";
+    $canonicalEventMetadataCodePrefix:= "EventMetadata";
+    $tsFormat := "[Y0001]-[M01]-[D01] [H01]:[m01]:[s01].[f001]";
+    $tsIsoFormat := "YYYY-mm-DD HH:MM:SS.mmm";
+
+
+    /* Event Metadata / Info */
+    $rawSourceSystem := "UkGov";
+    $rawSourceSystemOrg := "CDR"; /* 888,WH,MRG */
+    $rawSourceSystemFull := $rawSourceSystemOrg & $rawSourceSystem;
+    $rawSourceTimeZone := "Europe/London";
+    $rawEventOccurredTimestamp := $formatValue(dt,"TIMESTAMP","[Y0001]-[M01]-[D01]"); /*  EventDateTime seems to be source event sent time? */
+    $rawEventOccurredTimestampField := "date"; /*  EventDateTime seems to be source event sent time? */
+    $rawEventReceivedTimestamp := "";
+    $rawEntityId := $formatValue(index,"STRING");
+    $rawParentEntityId := NULL;
+    $rawEventId := NULL;
+    $rawEventName := NULL;
+
+    $eventDomain := "Calendar";
+    $eventCategory := "UKCalendar";
+    $eventChangePattern := "FullSnapshot";
+    $eventClass := "Trigger";
+    $eventPriority := 5;
+    $defaultEventVerb := "Published";
+    $entityType := "PublicHoliday";
+    $parentEntityType := NULL;
+    $entityCode := ($entityType & "_" & $rawSourceSystemFull & "_" & $rawEntityId);
+    $entityId := $entityCode;
+    $parentEntityId := ($parentEntityType != NULL ? $parentEntityId :  NULL);
+    $eventName := "UKPublicHolidayPublished"; /* convert to Xfuze eventName?*/
+    $entityIsSensitive := "N";
+    $eventOccurredType := "TrueEventTime"; /* using DepositStatusChangeDateTime not EventDateTime as that seems to be when event sent */
+    $eventOccurredLocalTimeZone = $rawSourceTimeZone;
+    $eventOccurredTimestamp := ($rawEventOccurredTimestamp = null ? "" : $rawEventOccurredTimestamp);
+    $eventProcessedTimestamp := "";
+    $eventReceivedTimestamp := ($rawEventReceivedTimestamp = null ? "" : $rawEventReceivedTimestamp);
+    $eventId := $eventName & "_" & $entityCode & "_" & $eventOccurredTimestamp;
+    $siteId := NULL;
+
+    /* TODO doesnt work for +01:00 embedded timetamps */
+    $getDateDimFn := function($dt,$isUTC,$tz,$format) {$exists($dt) ? $dateTimeFormatValidator($dt,$format) ?
+    {
+          "DateId": $fromMillis($toMillis($dt,$format),"[Y0001][M01][D01]"),
+          "TimestampUTC": ($isUTC ? $dt : NULL),
+          "DateUTC": ($isUTC ? $dt : NULL), /* TODO convert to date */
+          "TimeZone": ($tz != null ? $tz : $rawSourceTimeZone),
+          "DateTimeLocal": $fromMillis($toMillis($dt,$format)),
+          "DateLocal": $fromMillis($toMillis($dt,$format),"[Y0001]-[M01]-[D01]"),
+          "HourId": $fromMillis($toMillis($dt,$format),"[H01]"),
+          "Millis": $toMillis($dt,$format)
+    }
+    : NULL
+  };
+
+/* Core Event mapping */
+/* NOTE: Need key top level fields concrete (i.e not just in EventMetadata array) to enable phsyical storage optimisations with PK/CK/Indexing */
+{
+  "EventId": $eventId,
+  "EventName": $eventName,
+  "EntityId": $entityId,
+  "ParentEntityId": ($parentEntityId != NULL ? $parentEntityId :  NULL),
+  "LocationId": $customerId,
+  "AccountId": $accountId,
+  "SessionId": $sessionId,
+  "EventOccurredTimestamp": $eventOccurredTimestamp, /* TODO: not using formatValue */
+
+  /* Consistent core event metadata */
+  "EventMetadata" : [
+    /* -----EventAtts----- */
+    /* canonical event atts: key event level features/atts defining core context related to the change event*/
+    $buildCustomEventMetadataAttribute("EventAtts.EventId","EventId",$eventId,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EventAtts.EventDomain","EventDomain",$eventDomain,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EventAtts.EventCategory","EventCategory",$eventCategory,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EventAtts.EventName","EventName",$eventName,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EventAtts.EventClass","EventClass",$eventClass,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EventAtts.EventChangePattern","EventChangePattern",$eventChangePattern,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EventAtts.ClientCode","ClientCode",$clientCode,"STRING",$tsFormat,NULL,NULL),
+
+    /* raw source event atts: key raw event level atts, from source/trigger event, defining core context related to the raw change event*/
+    $buildCustomEventMetadataAttribute("EventAtts.RawSourceSystemFullCode","RawSourceSystemFullCode",$rawSourceSystemFull,"STRING",$tsFormat,NULL,NULL),
+
+    /* -----EntityAtts----- */
+    /* entity atts: key entity features/atts contextualising the entity subject to change from the event*/
+    $buildCustomEventMetadataAttribute("EntityAtts.EntityId","EntityId",$entityId,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EntityAtts.EntityType","EntityType",$entityType,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("EntityAtts.IsSensitiveEntity","IsSensitiveEntity",$entityIsSensitive,"STRING",$tsFormat,NULL,NULL),
+
+    /* raw source entity atts: key raw event level atts, from source/trigger event, defining core context related to the raw change event*/
+    $buildCustomEventMetadataAttribute("EntityAtts.RawEntityId","RawEntityId",$rawEntityId,"STRING",$tsFormat,NULL,NULL),
+    /* -----TimeAtts----- */
+    /* time atts: key event 'time' features/atts contextualising the entity subject to change from the event*/
+    $buildCustomEventMetadataAttribute("TimeAtts.EventOccurredTimestamp","EventOccurredTimestamp",$eventOccurredTimestamp,"STRING",$tsFormat,NULL,NULL),
+    /*$buildCustomEventMetadataAttribute("TimeAtts.EventOccurredDateDim","EventOccurredDateDim", $getDateDimFn($eventOccurredTimestamp,false,$rawSourceTimeZone,$tsIsoFormat),"STRING",$tsFormat,NULL,NULL),*/
+    $buildCustomEventMetadataAttribute("TimeAtts.EventOccurredType","EventOccurredType",$eventOccurredType,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("TimeAtts.EventOccurredLocalTimeZone","EventOccurredLocalTimeZone",$rawSourceTimeZone,"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("TimeAtts.EventReceivedTimestamp","EventReceivedTimestamp",$eventReceivedTimestamp,"TIMESTAMP",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("TimeAtts.ExternalEventReceivedTimestamp","ExternalEventReceivedTimestamp",NULL,"TIMESTAMP",$tsFormat,NULL,NULL),
+
+    /* raw source time atts: key raw event level time based atts, from source/trigger event, defining core context related to the raw change event*/
+    $buildCustomEventMetadataAttribute("TimeAtts.RawEventOccurredTimestamp","RawEventOccurredTimestamp",$rawEventOccurredTimestamp,"TIMESTAMP",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("TimeAtts.RawEventOccurredTimestampFieldName","RawEventOccurredTimestampFieldName",$rawEventOccurredTimestampField,"STRING",$tsFormat,NULL,NULL),
+
+    /* -----LocationAtts----- */
+    /* product atts: key event 'location' based features/atts contextualising the entity subject to change from the event*/
+    $buildCustomEventMetadataAttribute("LocationAtts.CountryISO2Code","CountryISO2Code","GB","STRING",$tsFormat,NULL,NULL)
+
+    /* raw source product / brand atts: key raw event level product based atts, from source/trigger event, defining core context related to the raw change event*/
+    /*$buildCustomEventMetadataAttribute("ProductAtts.BrandId","BrandId",$mapRawBrandIdXrefFn($string(BrandID)),"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("ProductAtts.SubBrandId","SubBrandId",$mapRawSubBrandIdXrefFn($string(SubBrandID)),"STRING",$tsFormat,NULL,NULL),
+    $buildCustomEventMetadataAttribute("ProductAtts.ProductId","ProductId",$mapRawProductPackageIDXrefFn($string(ProductPackageID)),"STRING",$tsFormat,NULL,NULL)*/
+
+  ],
+
+  /* Business entity data subject of the event change */
+  "EventData" : [
+      /* Site Attributes: forecourt site attributers such as id, type, status etc */
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".EntityId","EntityId",$entityId,null,null,$rawEntityId,null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".HolidayAtts.HolidayName","HolidayAtts.HolidayName",$formatValue(holiday_name,"STRING"),null,null,$string(holiday_name),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".TimeAtts.HolidayDate","TimeAtts.HolidayDate",$formatValue(date,"STRING"),null,null,$string(date),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".LocationAtts.Geography","LocationAtts.Geography",$formatValue(geography,"STRING"),null,null,$string(geography),null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".LocationAtts.CountryISO2Code","LocationAtts.CountryISO2Code","GB",null,null,null,null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null),
+      $buildCustomAttribute($entityCode,null,$canonicalCodePrefix & ".LocationAtts.CountryISO2Code","LocationAtts.CountryISO3Code","GBP",null,null,null,null,"STRING",$tsFormat,$eventOccurredTimestamp,$eventId,null,null)
+]
+}
+)

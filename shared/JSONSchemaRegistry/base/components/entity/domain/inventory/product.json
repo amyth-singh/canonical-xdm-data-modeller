@@ -1,0 +1,12 @@
+{
+    "type": "object",
+    "unevaluatedProperties": false,
+    "properties": {
+      "ProductIds": {
+        "$ref": "../product/ProductIds.json#/ProductIdsProperties"
+      }
+    },
+    "required": [
+      "ProductIds"
+    ]
+  }

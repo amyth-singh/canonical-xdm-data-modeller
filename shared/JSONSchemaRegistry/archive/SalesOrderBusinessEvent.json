@@ -1,0 +1,23 @@
+{
+  "$id": "SalesOrderEvent",
+  "description": "Sales Order Event Model",
+  "type": "object",
+  "properties": {
+    "EventId": {"type": "string"},
+    "EntityId": {"type": "string"},
+    "ParentEntityId": {"type": "string"},
+    "EventOccurredTimestamp": {"type": "string"},
+    "EventMetadata": {"$ref": "../common/EventMetadata.json"},
+    "SalesOrderEvent": {"$ref": "./SalesOrderEvent.json"},
+    "PK": {"type": "string"},
+    "CK": {"type": "string"}
+  },
+  "required": [
+    "EventId",
+    "EntityId",
+    "EventOccurredTimestamp",
+    "SalesOrderEvent",
+    "PK",
+    "CK"
+  ]
+}

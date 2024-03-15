@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "unevaluatedProperties": false,
+  "allOf": [
+    { "$ref": "../components/event/common/EventHeader.json" },
+    {
+      "properties": {
+        "DomainEvent": {
+          "type": "object",
+          "required": ["TriggerEntity"],
+          "unevaluatedProperties": false,
+          "properties": {
+            "TriggerEntity": {"$ref": "./InventoryLedgerLineEntity.json"}
+          }
+        }
+      },
+      "required": ["DomainEvent"]
+    }
+  ]
+}

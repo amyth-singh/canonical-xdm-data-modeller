@@ -1,0 +1,4406 @@
+(
+  $upperTrim := $string ~> $trim ~> $uppercase;
+  $cleanStr := $string ~> $trim;
+  $cleanNum := function($num){$type($num) = "number" ? $num : $type($num) = "string" ? $contains($num,/^-?\d+(\.\d+)?$/) ? $number($num) : null};
+  $dateTimeRegexMap := {"[Y0001]-[M01]-[D01] [H01]:[m01]:[s01] [P]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]) (AM|PM)$/,
+                        "[M01]/[D01]/[Y0001]":/^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/[1-9][0-9]{3}$/,
+                        "ISO8601":/^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d)(\.\d+)?([+-]([01]\d|2[0-3]):([0-5]\d)|Z)$/
+                       };
+  $dateTimeFormatValidator := function($datetime,$dateTimeFormat){$exists($dateTimeFormat) ? $contains($datetime,$lookup($dateTimeRegexMap,$dateTimeFormat)): $contains($datetime,$lookup($dateTimeRegexMap,"ISO8601"))};
+  $stringBoolMap := {"Y":"Y","1":"Y","TRUE":"Y","N":"N","0":"N","FALSE":"Y"};
+  $stringBool := function($value){$exists($value)?$lookup($stringBoolMap, $upperTrim($value)):""};
+  $reverseBool := function($value){$value = "Y" ? "N" : $value = "N" ? "Y" : "U"};
+  $reverseStringBool := $stringBool ~> $reverseBool;
+  $buildEntityID := function($entityCode,$system,$rawEntityId){$replace($entityCode,".","_") & "_" & $system & "_" & $rawEntityId};
+  $buildAttributeID := function($entityID,$AttributeCode,$AttributeId){$entityID & "_" & $replace($AttributeCode,".","_") & ($exists($AttributeId) ? "_" & $AttributeId : "")};
+  $buildEventID := function($entityType,$eventVerb,$entityId,$eventOccurredTimestamp){$entityType & "_" & $eventVerb & "_" & $entityId & "_" & $eventOccurredTimestamp};
+
+  $getDateDimFn := function($dt,$isUTC,$tz,$format) {$exists($dt) ? $dateTimeFormatValidator($dt,$format) ?
+    { 
+          "DateId": $fromMillis($toMillis($dt,$format),"[Y0001][M01][D01]"),
+          "TimestampUTC": (isUTC ? $dt : NULL),
+          "DateUTC": (isUTC ? $dt : NULL), /* TODO convert to date */
+          "TimeZone": ($tz != null ? $tz : $rawSourceTimeZone),
+          "DateTimeLocal": $fromMillis($toMillis($dt,$format)),
+          "DateLocal": $fromMillis($toMillis($dt,$format),"[Y0001]-[M01]-[D01]"),
+          "HourId": $fromMillis($toMillis($dt,$format),"[H01]"),
+          "Millis": $toMillis($dt,$format)
+    } 
+    : NULL
+  };
+
+ $eventOccurredTimestamp := $now();
+ $rawSourceSystem := "Dolfin";
+ $rawSourceTimeZone := "Europe/London";
+ $HeaderId := $buildEntityID("SalesOrder.Header",$rawSourceSystem,ID);
+ $OrderId := $buildEntityID("SalesOrder",$rawSourceSystem,ID);
+ $CustomerId := $buildEntityID("Party",$rawSourceSystem,DebtorCode);
+ $LineId := function($rawLineID){$buildEntityID("SalesOrder.Line",$rawSourceSystem,$rawLineID)};
+ $ProductId := function($rawProductID){$buildEntityID("Product",$rawSourceSystem,$rawProductID)};
+ $EventId := $buildEventID("SalesOrder","Published",$OrderId,$eventOccurredTimestamp);
+ $AsOf := $eventOccurredTimestamp;
+ $OrderType := IsRetail = 1 ? "Retail" : IsHire = 1 ? "Hire" : IsReHire = 1 ? "Hire" : "";
+
+{
+  "OrderId": $OrderId,
+  "Header": {
+    "HeaderId": $HeaderId,
+    "OrderId": $OrderId,
+    "CustomerID": $CustomerId,
+    "HeaderIds": [
+      { 
+        "AttHeader": {
+          "Id": $HeaderId,
+          "RawId": $cleanStr(ID),
+          "Class": "ID",
+          "Code": Header.HeaderId.HeaderId,
+          "Name": "HeaderId",
+          "Desc": NULL},      
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ID",
+              "RawSourceVal": $string(ID)
+            }
+          ]
+        }
+      }
+    ],
+    "PartyIds": [
+      {
+        "AttHeader": {
+          "Id": $CustomerID,
+          "RawId": $cleanStr(DebtorCode),
+          "Class": "Party",
+          "Code": "Header.PartyId.Customer",
+          "Name": "Customer",
+          "Desc": NULL},
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "DebtorCode",
+              "RawSourceVal": $string(DebtorCode)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildEntityID("Party","Dolfin",OrganiserDebtorCode),
+          "RawId": $cleanStr(OrganiserDebtorCode),
+          "Class": "Party",
+          "Code": "Header.PartyId.Organiser",
+          "Name": "Customer",
+          "Desc": NULL},
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "OrganiserDebtorCode",
+              "RawSourceVal": $string(OrganiserDebtorCode)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildEntityID("Party","Dolfin",EmployeeNumber),
+          "RawId": NULL,
+          "Class": "Party",
+          "Code": "Header.PartyId.Employee",
+          "Name": "Employee",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(EmployeeNumber),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "EmployeeNumber",
+              "RawSourceVal": $string(EmployeeNumber)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildEntityID("Party","Dolfin",AssistantEmployeeNumber),
+          "RawId": NULL,
+          "Class": "Party",
+          "Code": "Header.PartyId.AssistantEmployee",
+          "Name": "AssistantEmployee",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(AssistantEmployeeNumber),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "AssistantEmployeeNumber",
+              "RawSourceVal": $string(AssistantEmployeeNumber)
+            }
+          ]
+        }
+      }
+    ],
+    "Status": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId,"Header.Status.OrderStatus"),
+          "RawID": $cleanStr(CustomerOccasionStatusID),
+          "Class": "Status",
+          "Code": "Header.Status.OrderStatus",
+          "Name": "OrderStatus",
+          "Desc": NULL},       
+        "StatusValue": $cleanStr(CustomerOccasionStatus),
+        "SeqNo": NULL,
+        "ReasonCode": NULL,
+        "ReasonDesc": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CustomerOccasionStatusID",
+              "RawSourceVal": $string(CustomerOccasionStatusID)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CustomerOccasionStatus",
+              "RawSourceVal": $string(CustomerOccasionStatus)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId,"Header.Status.Priority"),
+          "RawId": $cleanStr(Priority),
+          "Class": "Status",
+          "Code": "Header.Status.Priority",
+          "Name": "Priority",
+          "Desc": NULL},
+        "StatusValue": $cleanStr(Priority),
+        "SeqNo": NULL,
+        "ReasonCode": NULL,
+        "ReasonDesc": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "Priority",
+              "RawSourceVal": $string(Priority)
+            }
+          ]
+        }
+      }
+    ],
+      "Type": [
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($HeaderId, $join(["Header.Type",".",$OrderType])),
+            "RawId:": NULL,
+            "Class": "Type",
+            "Code": $join(["Header.Type",".",$OrderType]),
+            "Name": $OrderType,
+            "Desc": NULL},
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "IsRetail",
+                "RawSourceVal": $string(IsRetail)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "IsHire",
+                "RawSourceVal": $string(IsHire)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "IsReHire",
+                "RawSourceVal": $string(IsReHire)
+              }
+            ]
+          }
+        }
+      ],   
+    "Times": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Time.SizeLeadTimeWarningAcceptanceDate"),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Header.Time.SizeLeadTimeWarningAcceptanceDate",
+          "Name": "SizeLeadTimeWarningAcceptanceDate",
+          "Desc": NULL},
+        "DateDim": $getDateDimFn(SizeLeadTimeWarningAcceptanceDate,FALSE,$rawSourceTimeZone),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "SizeLeadTimeWarningAcceptanceDate",
+              "RawSourceVal": $string(SizeLeadTimeWarningAcceptanceDate)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Time.AppointmentDate"),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Header.Time.AppointmentDate",
+          "Name": "AppointmentDate",
+          "Desc": NULL},
+        "DateDim": $getDateDimFn(AppointmentDate,FALSE,$rawSourceTimeZone),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "AppointmentDate",
+              "RawSourceVal": $string(AppointmentDate)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId,"Header.Time.DateInserted"),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Header.Time.DateInserted",
+          "Name": "DateInserted",
+          "Desc": NULL},
+        "DateDim": $getDateDimFn(DateInserted,FALSE,$rawSourceTimeZone),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "DateInserted",
+              "RawSourceVal": $string(DateInserted)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Time.FunctionDate"),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Header.Time.FunctionDate",
+          "Name": "FunctionDate",
+          "Desc": NULL},
+        "DateDim": $getDateDimFn(FunctionDate,FALSE,$rawSourceTimeZone),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "FunctionDate",
+              "RawSourceVal": $string(FunctionDate)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Time.HirePackageAddedDate"),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Header.Time.HirePackageAddedDate",
+          "Name": "HirePackageAddedDate",
+          "Desc": NULL},
+        "DateDim": $getDateDimFn(HirePackageAddedDate,FALSE,$rawSourceTimeZone,"[M01]/[D01]/[Y0001]"),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "HirePackageAddedDate",
+              "RawSourceVal": $string(HirePackageAddedDate)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Time.BalancePaidOn"),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Header.Time.BalancePaidOn",
+          "Name": "BalancePaidOn",
+          "Desc": NULL},
+        "DateDim": $getDateDimFn(BalancePaidOn,FALSE,$rawSourceTimeZone),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "BalancePaidOn",
+              "RawSourceVal": $string(BalancePaidOn)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Time.MeasuredDateTime"),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Header.Time.MeasuredDateTime",
+          "Name": "MeasuredDateTime",
+          "Desc": NULL},
+        "DateDim": $getDateDimFn($join([$cleanStr(MeasuredDate)," ",$cleanStr(MeasuredTime)]),FALSE,$rawSourceTimeZone,"[Y0001]-[M01]-[D01] [H01]:[m01]:[s01] [P]"),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "MeasuredTime",
+              "RawSourceVal": $string(MeasuredTime)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "MeasuredDate",
+              "RawSourceVal": $string(MeasuredDate)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Time.DateCreated"),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Header.Time.DateCreated",
+          "Name": "DateCreated",
+          "Desc": NULL},
+        "DateDim": $getDateDimFn(DateCreated,FALSE,$rawSourceTimeZone),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "DateCreated",
+              "RawSourceVal": $string(DateCreated)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Time.CustomerAddressDate"),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Header.Time.CustomerAddressDate",
+          "Name": "CustomerAddressDate",
+          "Desc": NULL},
+        "DateDim": $getDateDimFn(CustomerDetail.AddressDate,FALSE,$rawSourceTimeZone),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CustomerDetail.AddressDate",
+              "RawSourceVal": $string(CustomerDetail.AddressDate)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Time.CollectionAddressDate"),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Header.Time.CollectionAddressDate",
+          "Name": "CollectionAddressDate",
+          "Desc": NULL},
+        "DateDim": $getDateDimFn(CollectionDetail.AddressDate,FALSE,$rawSourceTimeZone),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CollectionDetail.AddressDate",
+              "RawSourceVal": $string(CollectionDetail.AddressDate)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Time.ReturnAddressDate"),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Header.Time.ReturnAddressDate",
+          "Name": "ReturnAddressDate",
+          "Desc": NULL},
+        "DateDim": $getDateDimFn(ReturnDetail.AddressDate,FALSE,$rawSourceTimeZone),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ReturnDetail.AddressDate",
+              "RawSourceVal": $string(ReturnDetail.AddressDate)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Time.OriginalCollectDate"),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Header.Time.OriginalCollectDate",
+          "Name": "OriginalCollectDate",
+          "Desc": NULL},
+        "DateDim": $getDateDimFn(CollectionDetail.OriginalCollectDate,FALSE,$rawSourceTimeZone),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CollectionDetail.OriginalCollectDate",
+              "RawSourceVal": $string(CollectionDetail.OriginalCollectDate)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Time.CollectedOn"),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Header.Time.CollectedOn",
+          "Name": "CollectedOn",
+          "Desc": NULL},
+        "DateDim": $getDateDimFn(CollectionDetail.CollectedOn,FALSE,$rawSourceTimeZone),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CollectionDetail.CollectedOn",
+              "RawSourceVal": $string(CollectionDetail.CollectedOn)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Time.CollectDate"),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Header.Time.CollectDate",
+          "Name": "CollectDate",
+          "Desc": NULL},
+        "DateDim": $getDateDimFn(CollectionDetail.CollectDate,FALSE,$rawSourceTimeZone),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CollectionDetail.CollectDate",
+              "RawSourceVal": $string(CollectionDetail.CollectDate)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Time.ReturnDate"),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Header.Time.ReturnDate",
+          "Name": "ReturnDate",
+          "Desc": NULL},
+        "DateDim": $getDateDimFn(ReturnDetail.ReturnDate,FALSE,$rawSourceTimeZone),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ReturnDetail.ReturnDate",
+              "RawSourceVal": $string(ReturnDetail.ReturnDate)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Time.OriginalReturnDate"),
+          "RawId": NULL,
+          "Class": "Time",
+          "Code": "Header.Time.OriginalReturnDate",
+          "Name": "OriginalReturnDate",
+          "Desc": NULL},
+        "DateDim": $getDateDimFn(ReturnDetail.OriginalReturnDate,FALSE,$rawSourceTimeZone),
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ReturnDetail.OriginalReturnDate",
+              "RawSourceVal": $string(ReturnDetail.OriginalReturnDate)
+            }
+          ]
+        }
+      }
+
+    ],
+    "Locations": [
+          {
+            "AttHeader": {
+              "Id": $buildAttributeID($HeaderId, "Header.Location.Customer"),
+              "RawId": NULL,
+              "Class": "Location",
+              "Code": "Header.Location.Customer",
+              "Name": "Customer",
+              "Desc": "Customer Location"},
+            "IsArray": "Y",
+            "AttType": NULL,
+            "AttValue": NULL,
+            "AttValues": [
+              {
+                "AttType": "STRING",
+                "AttKey": "ID",
+                "AttValue": $cleanStr(CustomerDetail.ID)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "CustomerOccasionAddressTypeID",
+                "AttValue": $cleanStr(CustomerDetail.CustomerOccasionAddressTypeID)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "AddressType",
+                "AttValue": $cleanStr(CustomerDetail.AddressType)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "CompanyName",
+                "AttValue": $cleanStr(CustomerDetail.CompanyName)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "AddressLine1",
+                "AttValue": $cleanStr(CustomerDetail.Addr1)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "AddressLine2",
+                "AttValue": $cleanStr(CustomerDetail.Addr2)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "AddressLine3",
+                "AttValue": $cleanStr(CustomerDetail.Addr3)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "AddressLine4",
+                "AttValue": $cleanStr(CustomerDetail.Addr4)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "AddressLine5",
+                "AttValue": $cleanStr(CustomerDetail.Addr5)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "City",
+                "AttValue": $cleanStr(CustomerDetail.City)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "County",
+                "AttValue": $cleanStr(CustomerDetail.County)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "CountryCode",
+                "AttValue": $cleanStr(CustomerDetail.CountryCode)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "Postcode",
+                "AttValue": $cleanStr(CustomerDetail.Zip)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "PhoneNumber",
+                "AttValue": $cleanStr(CustomerDetail.Tel)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "StoreNumber",
+                "AttValue": $cleanStr(CustomerDetail.StoreNumber)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "IsCustomerType",
+                "AttValue": $stringBool(CustomerDetail.sCustomerType)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "IsStoreType",
+                "AttValue": $stringBool(CustomerDetail.IsStoreType)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "CourierOptionID",
+                "AttValue": $cleanStr(CustomerDetail.CourierOptionID)
+              },
+              {
+                "AttType": "NUMBER",
+                "AttKey": "CourierAmountInc",
+                "AttValue": $cleanStr(CustomerDetail.ourierAmountInc)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "TrackingNumber",
+                "AttValue": $cleanStr(CustomerDetail.TrackingNumber)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "Notes",
+                "AttValue": $cleanStr(CustomerDetail.Notes)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "IsOtherCourier",
+                "AttValue": $stringBool(CustomerDetail.IsOtherCourier)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "DeliveryCourierOption",
+                "AttValue": $cleanStr(CustomerDetail.DeliveryCourierOption)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "ReasonCode",
+                "AttValue": $cleanStr(CustomerDetail.ReasonCode)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "CommentCode",
+                "AttValue": $cleanStr(CustomerDetail.CommentCode)
+              }
+            ],
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsAnonymised": NULL,
+              "SecuringKeyId": NULL,
+              "AsOf": $AsOf,
+              "EventId": $EventId,
+              "RawSourceAtts": [
+                {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.CustomerOccasionAddressTypeID",
+                "RawSourceVal": $string(CustomerDetail.CustomerOccasionAddressTypeID)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.AddressType",
+                "RawSourceVal": $string(CustomerDetail.AddressType)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.CompanyName",
+                "RawSourceVal": $string(CustomerDetail.CompanyName)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.Addr1",
+                "RawSourceVal": $string(CustomerDetail.Addr1)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.Addr2",
+                "RawSourceVal": $string(CustomerDetail.Addr2)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.Addr3",
+                "RawSourceVal": $string(CustomerDetail.Addr3)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.Addr4",
+                "RawSourceVal": $string(CustomerDetail.Addr4)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.Addr5",
+                "RawSourceVal": $string(CustomerDetail.Addr5)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.City",
+                "RawSourceVal": $string(CustomerDetail.City)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.County",
+                "RawSourceVal": $string(CustomerDetail.County)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.CountryCode",
+                "RawSourceVal": $string(CustomerDetail.CountryCode)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.Zip",
+                "RawSourceVal": $string(CustomerDetail.Zip)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.Tel",
+                "RawSourceVal": $string(CustomerDetail.Tel)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.StoreNumber",
+                "RawSourceVal": $string(CustomerDetail.StoreNumber)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.sCustomerType",
+                "RawSourceVal": $string(CustomerDetail.sCustomerType)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.IsStoreType",
+                "RawSourceVal": $string(CustomerDetail.IsStoreType)
+              },              
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.CourierOptionID",
+                "RawSourceVal": $string(CustomerDetail.CourierOptionID)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.CourierAmountInc",
+                "RawSourceVal": $string(CustomerDetail.ourierAmountInc)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.TrackingNumber",
+                "RawSourceVal": $string(CustomerDetail.TrackingNumber)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.Notes",
+                "RawSourceVal": $string(CustomerDetail.Notes)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.IsOtherCourier",
+                "RawSourceVal": $string(CustomerDetail.IsOtherCourier)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.DeliveryCourierOption",
+                "RawSourceVal": $string(CustomerDetail.DeliveryCourierOption)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.ReasonCode",
+                "RawSourceVal": $string(CustomerDetail.ReasonCode)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CustomerDetail.CommentCode",
+                "RawSourceVal": $string(CustomerDetail.CommentCode)
+              }
+              ]
+            }
+          },
+        {
+            "AttHeader": {
+              "Id": $buildAttributeID($HeaderId, "Header.Location.Collect"),
+              "RawId": NULL,
+              "Class": "Location",
+              "Code": "Header.Location.Collect",
+              "Name": "Collect",
+              "Desc": "Collect Location"},
+            "IsArray": "Y",
+            "AttValues": [
+              {
+                "AttType": "STRING",
+                "AttKey": "ID",
+                "AttValue": $cleanStr(CollectionDetail.ID)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "CustomerOccasionAddressTypeID",
+                "AttValue": $cleanStr(CollectionDetail.CustomerOccasionAddressTypeID)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "AddressType",
+                "AttValue": $cleanStr(CollectionDetail.AddressType)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "CompanyName",
+                "AttValue": $cleanStr(CollectionDetail.CompanyName)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "AddressLine1",
+                "AttValue": $cleanStr(CollectionDetail.Addr1)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "AddressLine2",
+                "AttValue": $cleanStr(CollectionDetail.Addr2)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "AddressLine3",
+                "AttValue": $cleanStr(CollectionDetail.Addr3)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "AddressLine4",
+                "AttValue": $cleanStr(CollectionDetail.Addr4)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "AddressLine5",
+                "AttValue": $cleanStr(CollectionDetail.Addr5)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "City",
+                "AttValue": $cleanStr(CollectionDetail.City)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "County",
+                "AttValue": $cleanStr(CollectionDetail.County)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "CountryCode",
+                "AttValue": $cleanStr(CollectionDetail.CountryCode)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "Postcode",
+                "AttValue": $cleanStr(CollectionDetail.Zip)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "PhoneNumber",
+                "AttValue": $cleanStr(CollectionDetail.Tel)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "StoreNumber",
+                "AttValue": $cleanStr(CollectionDetail.StoreNumber)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "IsCustomerType",
+                "AttValue": $stringBool(CollectionDetail.sCustomerType)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "IsStoreType",
+                "AttValue": $stringBool(CollectionDetail.IsStoreType)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "CourierOptionID",
+                "AttValue": $cleanStr(CollectionDetail.CourierOptionID)
+              },
+              {
+                "AttType": "NUMBER",
+                "AttKey": "CourierAmountInc",
+                "AttValue": $cleanStr(CollectionDetail.ourierAmountInc)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "TrackingNumber",
+                "AttValue": $cleanStr(CollectionDetail.TrackingNumber)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "Notes",
+                "AttValue": $cleanStr(CollectionDetail.Notes)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "IsOtherCourier",
+                "AttValue": $stringBool(CollectionDetail.IsOtherCourier)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "DeliveryCourierOption",
+                "AttValue": $cleanStr(CollectionDetail.DeliveryCourierOption)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "ReasonCode",
+                "AttValue": $cleanStr(CollectionDetail.ReasonCode)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "CommentCode",
+                "AttValue": $cleanStr(CollectionDetail.CommentCode)
+              }
+            ],
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsAnonymised": NULL,
+              "SecuringKeyId": NULL,
+              "AsOf": $AsOf,
+              "EventId": $EventId,
+              "RawSourceAtts": [
+                {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.CustomerOccasionAddressTypeID",
+                "RawSourceVal": $string(CollectionDetail.CustomerOccasionAddressTypeID)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.AddressType",
+                "RawSourceVal": $string(CollectionDetail.AddressType)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.CompanyName",
+                "RawSourceVal": $string(CollectionDetail.CompanyName)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.Addr1",
+                "RawSourceVal": $string(CollectionDetail.Addr1)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.Addr2",
+                "RawSourceVal": $string(CollectionDetail.Addr2)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.Addr3",
+                "RawSourceVal": $string(CollectionDetail.Addr3)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.Addr4",
+                "RawSourceVal": $string(CollectionDetail.Addr4)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.Addr5",
+                "RawSourceVal": $string(CollectionDetail.Addr5)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.City",
+                "RawSourceVal": $string(CollectionDetail.City)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.County",
+                "RawSourceVal": $string(CollectionDetail.County)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.CountryCode",
+                "RawSourceVal": $string(CollectionDetail.CountryCode)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.Zip",
+                "RawSourceVal": $string(CollectionDetail.Zip)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.Tel",
+                "RawSourceVal": $string(CollectionDetail.Tel)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.StoreNumber",
+                "RawSourceVal": $string(CollectionDetail.StoreNumber)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.sCustomerType",
+                "RawSourceVal": $string(CollectionDetail.sCustomerType)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.IsStoreType",
+                "RawSourceVal": $string(CollectionDetail.IsStoreType)
+              },              
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.CourierOptionID",
+                "RawSourceVal": $string(CollectionDetail.CourierOptionID)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.CourierAmountInc",
+                "RawSourceVal": $string(CollectionDetail.ourierAmountInc)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.TrackingNumber",
+                "RawSourceVal": $string(CollectionDetail.TrackingNumber)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.Notes",
+                "RawSourceVal": $string(CollectionDetail.Notes)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.IsOtherCourier",
+                "RawSourceVal": $string(CollectionDetail.IsOtherCourier)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.DeliveryCourierOption",
+                "RawSourceVal": $string(CollectionDetail.DeliveryCourierOption)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.ReasonCode",
+                "RawSourceVal": $string(CollectionDetail.ReasonCode)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "CollectionDetail.CommentCode",
+                "RawSourceVal": $string(CollectionDetail.CommentCode)
+              }
+              ]
+            }
+          },
+          {
+            "AttHeader": {
+              "Id": $buildAttributeID($HeaderId, "Header.Location.ReturnLocation"),
+              "RawId": ReturnDetail.ID,
+              "Class": "Location",
+              "Code": "Header.Location.ReturnLocation",
+              "Name": "ReturnLocation",
+              "Desc": "Return Location"},
+            "IsArray": "Y",
+            "AttValues": [
+              {
+                "AttType": "STRING",
+                "AttKey": "ID",
+                "AttValue": $cleanStr(ReturnDetail.ID)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "CustomerOccasionAddressTypeID",
+                "AttValue": $cleanStr(ReturnDetail.CustomerOccasionAddressTypeID)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "AddressType",
+                "AttValue": $cleanStr(ReturnDetail.AddressType)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "CompanyName",
+                "AttValue": $cleanStr(ReturnDetail.CompanyName)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "AddressLine1",
+                "AttValue": $cleanStr(ReturnDetail.Addr1)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "AddressLine2",
+                "AttValue": $cleanStr(ReturnDetail.Addr2)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "AddressLine3",
+                "AttValue": $cleanStr(ReturnDetail.Addr3)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "AddressLine4",
+                "AttValue": $cleanStr(ReturnDetail.Addr4)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "AddressLine5",
+                "AttValue": $cleanStr(ReturnDetail.Addr5)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "City",
+                "AttValue": $cleanStr(ReturnDetail.City)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "County",
+                "AttValue": $cleanStr(ReturnDetail.County)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "CountryCode",
+                "AttValue": $cleanStr(ReturnDetail.CountryCode)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "Postcode",
+                "AttValue": $cleanStr(ReturnDetail.Zip)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "PhoneNumber",
+                "AttValue": $cleanStr(ReturnDetail.Tel)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "StoreNumber",
+                "AttValue": $cleanStr(ReturnDetail.StoreNumber)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "AddressDate",
+                "AttValue": $cleanStr(ReturnDetail.AddressDate)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "IsCustomerType",
+                "AttValue": $stringBool(ReturnDetail.sCustomerType)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "IsStoreType",
+                "AttValue": $stringBool(ReturnDetail.IsStoreType)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "CourierOptionID",
+                "AttValue": $cleanStr(ReturnDetail.CourierOptionID)
+              },
+              {
+                "AttType": "NUMBER",
+                "AttKey": "CourierAmountInc",
+                "AttValue": $cleanStr(ReturnDetail.ourierAmountInc)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "TrackingNumber",
+                "AttValue": $cleanStr(ReturnDetail.TrackingNumber)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "Notes",
+                "AttValue": $cleanStr(ReturnDetail.Notes)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "IsOtherCourier",
+                "AttValue": $stringBool(ReturnDetail.IsOtherCourier)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "DeliveryCourierOption",
+                "AttValue": $cleanStr(ReturnDetail.DeliveryCourierOption)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "ReasonCode",
+                "AttValue": $cleanStr(ReturnDetail.ReasonCode)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "CommentCode",
+                "AttValue": $cleanStr(ReturnDetail.CommentCode)
+              }
+            ],
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsAnonymised": NULL,
+              "SecuringKeyId": NULL,
+              "AsOf": $AsOf,
+              "EventId": $EventId,
+              "RawSourceAtts": [
+                {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.CustomerOccasionAddressTypeID",
+                "RawSourceVal": $string(ReturnDetail.CustomerOccasionAddressTypeID)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.AddressType",
+                "RawSourceVal": $string(ReturnDetail.AddressType)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.CompanyName",
+                "RawSourceVal": $string(ReturnDetail.CompanyName)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.Addr1",
+                "RawSourceVal": $string(ReturnDetail.Addr1)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.Addr2",
+                "RawSourceVal": $string(ReturnDetail.Addr2)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.Addr3",
+                "RawSourceVal": $string(ReturnDetail.Addr3)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.Addr4",
+                "RawSourceVal": $string(ReturnDetail.Addr4)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.Addr5",
+                "RawSourceVal": $string(ReturnDetail.Addr5)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.City",
+                "RawSourceVal": $string(ReturnDetail.City)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.County",
+                "RawSourceVal": $string(ReturnDetail.County)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.CountryCode",
+                "RawSourceVal": $string(ReturnDetail.CountryCode)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.Zip",
+                "RawSourceVal": $string(ReturnDetail.Zip)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.Tel",
+                "RawSourceVal": $string(ReturnDetail.Tel)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.StoreNumber",
+                "RawSourceVal": $string(ReturnDetail.StoreNumber)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.AddressDate",
+                "RawSourceVal": $string(ReturnDetail.AddressDate)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.sCustomerType",
+                "RawSourceVal": $string(ReturnDetail.sCustomerType)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.IsStoreType",
+                "RawSourceVal": $string(ReturnDetail.IsStoreType)
+              },              
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.CourierOptionID",
+                "RawSourceVal": $string(ReturnDetail.CourierOptionID)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.CourierAmountInc",
+                "RawSourceVal": $string(ReturnDetail.ourierAmountInc)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.TrackingNumber",
+                "RawSourceVal": $string(ReturnDetail.TrackingNumber)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.Notes",
+                "RawSourceVal": $string(ReturnDetail.Notes)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.IsOtherCourier",
+                "RawSourceVal": $string(ReturnDetail.IsOtherCourier)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.DeliveryCourierOption",
+                "RawSourceVal": $string(ReturnDetail.DeliveryCourierOption)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.ReasonCode",
+                "RawSourceVal": $string(ReturnDetail.ReasonCode)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "ReturnDetail.CommentCode",
+                "RawSourceVal": $string(ReturnDetail.CommentCode)
+              }
+              ]
+            }
+          }
+    ],
+    "Totals": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Total.HirePackagePrice"),
+          "RawId": NULL,
+          "Class": "Sales",
+          "Code": "Header.Total.HirePackagePrice",
+          "Name": "HirePackagePrice",
+          "Desc": NULL},
+        "PriceLocalisation": NULL,
+        "PriceIncTax": $cleanNum(HirePackagePriceInc),
+        "PriceExTax": $cleanNum(HirePackagePriceInc) - $cleanNum(HirePackagePriceTax),
+        "PriceTax": $cleanNum(HirePackagePriceTax),
+        "CurrencyCode": NULL,
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "HirePackagePriceInc",
+              "RawSourceVal": $string(HirePackagePriceInc)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "HirePackagePriceTax",
+              "RawSourceVal": $string(HirePackagePriceTax)
+            }
+          ]
+        }
+      },  
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Total.PeaceOfMindFee"),
+          "RawId": NULL,
+          "Class": "Sales",
+          "Code": "Header.Total.PeaceOfMindFee",
+          "Name": "PeaceOfMindFee",
+          "Desc": NULL},
+        "PriceLocalisation": NULL,
+        "PriceIncTax": $cleanNum(PeaceOfMindFee),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": NULL,
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "PeaceOfMindFee",
+              "RawSourceVal": $string(PeaceOfMindFee)
+            }
+          ]
+        }
+      },  
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Total.PackageTotal"),
+          "RawId": NULL,
+          "Class": "Sales",
+          "Code": "Header.Total.PackageTotal",
+          "Name": "PackageTotal",
+          "Desc": NULL},
+        "PriceLocalisation": NULL,
+        "PriceIncTax": $cleanNum(HirePackagePriceInc) + $cleanNum(PeaceOfMindFee),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": NULL,
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+             {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "HirePackagePriceInc",
+              "RawSourceVal": $string(HirePackagePriceInc)
+             },
+             {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "PeaceOfMindFee",
+              "RawSourceVal": $string(PeaceOfMindFee)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Total.EarlyCollectionAmount"),
+          "RawId": NULL,
+          "Class": "Surcharge",
+          "Code": "Header.Total.EarlyCollectionAmount",
+          "Name": "EarlyCollectionAmount",
+          "Desc": NULL},
+        "PriceLocalisation": NULL,
+        "PriceIncTax": $cleanNum(EarlyCollectionAmount),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": NULL,
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "EarlyCollectionAmount",
+              "RawSourceVal": $string(EarlyCollectionAmount)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Total.ExtendedHireAmount"),
+          "RawId": NULL,
+          "Class": "Surcharge",
+          "Code": "Header.Total.ExtendedHireAmount",
+          "Name": "ExtendedHireAmount",
+          "Desc": NULL},
+        "PriceLocalisation": NULL,
+        "PriceIncTax": $cleanNum(ExtendedHireAmount),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": NULL,
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ExtendedHireAmount",
+              "RawSourceVal": $string(ExtendedHireAmount)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Total.EmergencyCourierAmount"),
+          "RawId": NULL,
+          "Class": "Surcharge",
+          "Code": "Header.Total.EmergencyCourierAmount",
+          "Name": "EmergencyCourierAmount",
+          "Desc": NULL},
+        "PriceLocalisation": NULL,
+        "PriceIncTax": $cleanNum(EmergencyCourierAmount),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": NULL,
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "EmergencyCourierAmount",
+              "RawSourceVal": $string(EmergencyCourierAmount)
+            }
+          ]
+        }
+      },    
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Total.SurchargeAmount"),
+          "RawId": NULL,
+          "Class": "Surcharge",
+          "Code": "Header.Total.SurchargeAmount",
+          "Name": "SurchargeAmount",
+          "Desc": NULL},
+        "PriceLocalisation": NULL,
+        "PriceIncTax": $cleanNum(SurchargeAmount),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": NULL,
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "SurchargeAmount",
+              "RawSourceVal": $string(SurchargeAmount)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Total.LateSizingAmount"),
+          "RawId": NULL,
+          "Class": "Surcharge",
+          "Code": "Header.Total.LateSizingAmount",
+          "Name": "LateSizingAmount",
+          "Desc": NULL},
+        "PriceLocalisation": NULL,
+        "PriceIncTax": $cleanNum(LateSizingAmount),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": NULL,
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "LateSizingAmount",
+              "RawSourceVal": $string(LateSizingAmount)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Total.ReturnTotalChargeWithDiscount"),
+          "RawId": NULL,
+          "Class": "Surcharge",
+          "Code": "Header.Total.ReturnTotalChargeWithDiscount",
+          "Name": "ReturnTotalChargeWithDiscount",
+          "Desc": NULL},
+        "PriceLocalisation": NULL,
+        "PriceIncTax": $cleanNum(ReturnTotalChargeWithDiscount),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": NULL,
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ReturnTotalChargeWithDiscount",
+              "RawSourceVal": $string(ReturnTotalChargeWithDiscount)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Total.ReturnItemCharges"),
+          "RawId": NULL,
+          "Class": "Surcharge",
+          "Code": "Header.Total.ReturnItemCharges",
+          "Name": "ReturnItemCharges",
+          "Desc": NULL},
+        "PriceLocalisation": NULL,
+        "PriceIncTax": $cleanNum(ReturnItemCharges),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": NULL,
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ReturnItemCharges",
+              "RawSourceVal": $string(ReturnItemCharges)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Total.ReturnLateFee"),
+          "RawId": NULL,
+          "Class": "Surcharge",
+          "Code": "Header.Total.ReturnLateFee",
+          "Name": "ReturnLateFee",
+          "Desc": NULL},
+        "PriceLocalisation": NULL,
+        "PriceIncTax": $cleanNum(ReturnLateFee),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": NULL,
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ReturnLateFee",
+              "RawSourceVal": $string(ReturnLateFee)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Total.PackageDiscount"),
+          "RawId": NULL,
+          "Class": "Discount",
+          "Code": "Header.Total.PackageDiscount",
+          "Name": "PackageDiscount",
+          "Desc": NULL},
+        "PriceLocalisation": NULL,
+        "PriceIncTax": $cleanNum(PackageDiscountInc),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": NULL,
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "PackageDiscountInc",
+              "RawSourceVal": $string(PackageDiscountInc)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Total.AdjustmentAmount"),
+          "RawId": NULL,
+          "Class": "Adjustment",
+          "Code": "Header.Total.AdjustmentAmount",
+          "Name": "AdjustmentAmount",
+          "Desc": NULL},
+        "PriceLocalisation": NULL,
+        "PriceIncTax": $cleanNum(AdjustmentAmount),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": NULL,
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "AdjustmentAmount",
+              "RawSourceVal": $string(AdjustmentAmount)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Total.CancellationFee"),
+          "RawId": NULL,
+          "Class": "Adjustment",
+          "Code": "Header.Total.CancellationFee",
+          "Name": "CancellationFee",
+          "Desc": NULL},
+        "PriceLocalisation": NULL,
+        "PriceIncTax": $cleanNum(CancellationFee),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": NULL,
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CancellationFee",
+              "RawSourceVal": $string(CancellationFee)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Total.QuotedBalanceAmount"),
+          "RawId": NULL,
+          "Class": "Sales",
+          "Code": "Header.Total.QuotedBalanceAmount",
+          "Name": "QuotedBalanceAmount",
+          "Desc": NULL},
+        "PriceLocalisation": NULL,
+        "PriceIncTax": $cleanNum(QuotedBalanceAmount),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": NULL,
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "QuotedBalanceAmount",
+              "RawSourceVal": $string(QuotedBalanceAmount)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Total.SecurityDepositAmount"),
+          "RawId": NULL,
+          "Class": "Payment",
+          "Code": "Header.Total.SecurityDepositAmount",
+          "Name": "SecurityDepositAmount",
+          "Desc": NULL},
+        "PriceLocalisation": NULL,
+        "PriceIncTax": $cleanNum(CustomerDetail.SecurityDepositAmount),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": NULL,
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CustomerDetail.SecurityDepositAmount",
+              "RawSourceVal": $string(CustomerDetail.SecurityDepositAmount)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Total.InitialPaymentAmount"),
+          "RawId": NULL,
+          "Class": "Payment",
+          "Code": "Header.Total.InitialPaymentAmount",
+          "Name": "InitialPaymentAmount",
+          "Desc": NULL},
+        "PriceLocalisation": "BCY",
+        "PriceIncTax": $cleanNum(InitialPaymentAmount),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": NULL,
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "InitialPaymentAmount",
+              "RawSourceVal": $string(InitialPaymentAmount)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Total.HireAmountPaid"),
+          "RawId": NULL,
+          "Class": "Payment",
+          "Code": "Header.Total.HireAmountPaid",
+          "Name": "HireAmountPaid",
+          "Desc": NULL},
+        "PriceLocalisation": "BCY",
+        "PriceIncTax": $cleanNum(HireAmountPaid),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": NULL,
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "HireAmountPaid",
+              "RawSourceVal": $string(HireAmountPaid)
+            }
+          ]
+        }
+      },
+     {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Total.GrandTotalAmount"),
+          "RawId": NULL,
+          "Class": "Sales",
+          "Code": "Header.Total.GrandTotalAmount",
+          "Name": "GrandTotalAmount",
+          "Desc": NULL},
+        "PriceLocalisation": NULL,
+        "PriceIncTax": $cleanNum(GrandTotalAmount),
+        "PriceExTax": NULL,
+        "PriceTax": NULL,
+        "CurrencyCode": NULL,
+        "TaxRate": NULL,
+        "IsTaxRateEstimated": NULL,
+        "TaxRateCode": NULL,
+        "AccountingMethodType": NULL,
+        "ExchangeRate": NULL,
+        "ExchangeRateHistoryId": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "GrandTotalAmount",
+              "RawSourceVal": $string(GrandTotalAmount)
+            }
+          ]
+        }
+      }
+    ],
+    "Contacts": [
+          {
+            "AttHeader": {
+              "Id": $buildAttributeID($HeaderId, "Header.Contact.PrimaryContact"),
+              "RawId": $cleanStr(ContactInfoAddressId),
+              "Class": "Contact",
+              "Code": "Header.Contact.PrimaryContact",
+              "Name": "PrimaryContact",
+              "Desc": NULL},
+            "IsArray": "Y",
+            "AttType": NULL,
+            "AttValue": NULL,
+            "AttValues": [
+              {
+                "AttType": "STRING",
+                "AttKey": "ContactInfoAddressId",
+                "AttValue": $cleanStr(ContactInfoAddressId)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "Name",
+                "AttValue": $cleanStr(Name)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "Surname",
+                "AttValue": $cleanStr(Surname)
+              },
+              {
+                "AttType": "STRING",
+                "AttKey": "PartyName",
+                "AttValue": $cleanStr(PartyName)
+              }
+            ],
+            "AttMetadata": {
+              "RawChangeTrackingHash": NULL,
+              "IsAnonymised": NULL,
+              "SecuringKeyId": NULL,
+              "AsOf": $AsOf,
+              "EventId": $EventId,
+              "RawSourceAtts": [
+                {
+                  "RawSourceSystem": "Dolfin",
+                  "RawSourceId": "ContactInfoAddressId",
+                  "RawSourceVal": $string(ContactInfoAddressId)
+                },
+                {
+                  "RawSourceSystem": "Dolfin",
+                  "RawSourceId": "Name",
+                  "RawSourceVal": $string(Name)
+                },
+                {
+                  "RawSourceSystem": "Dolfin",
+                  "RawSourceId": "Surname",
+                  "RawSourceVal": $string(Surname)
+                },
+                {
+                  "RawSourceSystem": "Dolfin",
+                  "RawSourceId": "PartyName",
+                  "RawSourceVal": $string(PartyName)
+                }
+              ]
+            }
+          }
+        ],
+    "PaymentAtts": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Payment.SecurityDepositMethod"),
+          "RawId": NULL,
+          "Class": "Payment",
+          "Code": "Header.Payment.SecurityDepositMethod",
+          "Name": "SecurityDepositMethod",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(SecurityDepositMethod),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "SecurityDepositMethod",
+              "RawSourceVal": $string(SecurityDepositMethod)
+            }
+          ]
+        }
+      }
+    ],
+    "FulfilmentAtts": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Fulfilment.Collection"),
+          "RawId": NULL,
+          "Class": "Collect",
+          "Code": "Header.Fulfilment.Collection",
+          "Name": "Collection",
+          "Desc": NULL},
+        "IsArray": "Y",
+        "AttType": NULL,
+        "AttValue": NULL,
+        "AttValues": [
+          {
+            "AttType": "STRING",
+            "AttKey": "CollectID",
+            "AttValue": $cleanStr(CollectionDetail.CollectID)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "CollectStoreNumber",
+            "AttValue": $cleanStr(CollectionDetail.CollectStoreNumber)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "HasCollectedDateActualBy",
+            "AttValue": $cleanStr(CollectionDetail.asCollectedDateActualBy)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "CollectedBy",
+            "AttValue": $cleanStr(CollectionDetail.CollectedBy)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "CollectedByDLUserID",
+            "AttValue": $cleanStr(CollectionDetail.CollectedByDLUserID)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "OriginalCollectStoreNumber",
+            "AttValue": $cleanStr(CollectionDetail.OriginalCollectStoreNumber)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "IsSecurityDepositTaken",
+            "AttValue":  $stringBool(CollectionDetail.SecurityDepositTaken)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "IsCollected",
+            "AttValue":  $stringBool(IsCollected)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "IsHomeCollection",
+            "AttValue":  $stringBool(IsHomeCollectionInd)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "CanEditCollection",
+            "AttValue":  $stringBool(CollectionDetail.SecurityDepositTaken)
+          }
+        ],
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "CollectionDetail.CollectID",
+            "RawSourceVal": $string(CollectionDetail.CollectID)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "CollectionDetail.CollectStoreNumber",
+            "RawSourceVal": $string(CollectionDetail.CollectStoreNumber)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "CollectionDetail.asCollectedDateActualBy",
+            "RawSourceVal": $string(CollectionDetail.asCollectedDateActualBy)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "CollectionDetail.CollectedBy",
+            "RawSourceVal": $string(CollectionDetail.CollectedBy)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "CollectionDetail.CollectedByDLUserID",
+            "RawSourceVal": $string(CollectionDetail.CollectedByDLUserID)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "CollectionDetail.OriginalCollectStoreNumber",
+            "RawSourceVal": $string(CollectionDetail.OriginalCollectStoreNumber)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "CollectionDetail.SecurityDepositMethod",
+            "RawSourceVal": $string(CollectionDetail.OriginalCollectStoreNumber)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "CollectionDetail.SecurityDepositTaken",
+            "RawSourceVal":  $string(CollectionDetail.SecurityDepositTaken)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "IsCollected",
+            "RawSourceVal":  $string(IsCollected)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "IsHomeCollection",
+            "RawSourceVal":  $string(IsHomeCollectionInd)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "CanEditCollection",
+            "RawSourceVal":  $string(CanEditCollection)
+          }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Fulfilment.Return"),
+          "RawId": NULL,
+          "Class": "Return",
+          "Code": "Header.Fulfilment.Return",
+          "Name": "Return",
+          "Desc": NULL},
+        "IsArray": "Y",
+        "AttValues": [
+          {
+            "AttType": "STRING",
+            "AttKey": "ReturnID",
+            "AttValue": $cleanStr(ReturnDetail.ReturnID)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "ReturnStoreNumber",
+            "AttValue": $cleanStr(ReturnDetail.ReturnStoreNumber)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "OriginalReturnStoreNumber",
+            "AttValue": $cleanStr(ReturnDetail.OriginalReturnStoreNumber)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "IsCustomerPresentForReturn",
+            "AttValue": $stringBool(ReturnDetail.CustomerPresentForReturn)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "CheckedWhilstCustomerPresent",
+            "AttValue": $stringBool(ReturnDetail.CheckedWhilstCustomerPresent)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "HasReturnItemCharges",
+            "AttValue": $stringBool(ReturnDetail.ReturnItemCharges)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "ReturnUserId",
+            "AttValue": $cleanStr(ReturnDetail.ReturnUserId)
+          }
+        ],
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "ReturnDetail.ReturnID",
+            "AttValue": $string(ReturnDetail.ReturnID)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "ReturnDetail.ReturnStoreNumber",
+            "AttValue": $string(ReturnDetail.ReturnStoreNumber)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "ReturnDetail.OriginalReturnStoreNumber",
+            "AttValue": $string(ReturnDetail.OriginalReturnStoreNumber)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "ReturnDetail.CustomerPresentForReturn",
+            "AttValue": $string(ReturnDetail.CustomerPresentForReturn)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "ReturnDetail.CheckedWhilstCustomerPresent",
+            "AttValue": $string(ReturnDetail.CheckedWhilstCustomerPresent)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "ReturnDetail.ReturnItemCharges",
+            "AttValue": $string(ReturnDetail.ReturnItemCharges)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "ReturnDetail.ReturnUserId",
+            "AttValue": $string(ReturnDetail.ReturnUserId)
+          }
+          ]
+        }
+      }
+    ],
+    "FinanceAtts": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Finance.Sale"),
+          "RawId": NULL,
+          "Class": "Finance",
+          "Code": "Header.Finance.Sale",
+          "Name": "Sale",
+          "Desc": NULL},
+        "IsArray": "Y",
+        "AttType": NULL,
+        "AttValue": NULL,
+        "AttValues": [
+          {
+            "AttType": "STRING",
+            "AttKey": "IsPeaceOfMindSelected",
+            "AttValue": $stringBool(IsPeaceOfMindSelected)
+          }
+        ],
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "IsPeaceOfMindSelected",
+              "RawSourceVal": $string(IsPeaceOfMindSelected)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Finance.Discount"),
+          "RawId": NULL,
+          "Class": "Finance",
+          "Code": "Header.Finance.Discount",
+          "Name": "Discount",
+          "Desc": NULL},
+        "IsArray": "Y",
+        "AttType": NULL,
+        "AttValue": NULL,
+        "AttValues": [
+          {
+            "AttType": "STRING",
+            "AttKey": "DiscountReference",
+            "AttValue": $cleanStr(DiscountReference)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "DiscountCode",
+            "AttValue": $cleanStr(DiscountCode)
+          }
+        ],
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "DiscountReference",
+              "RawSourceVal": $string(DiscountReference)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "DiscountCode",
+              "RawSourceVal": $string(DiscountCode)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Finance.Payment"),
+          "RawId": NULL,
+          "Class": "Finance",
+          "Code": "Header.Finance.Payment",
+          "Name": "Payment",
+          "Desc": NULL},
+        "IsArray": "Y",
+        "AttType": NULL,
+        "AttValue": NULL,
+        "AttValues": [
+          {
+            "AttType": "STRING",
+            "AttKey": "IsParentPayingInd",
+            "AttValue": $stringBool(IsParentPayingInd)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "IsSecurityDepositTaken",
+            "AttValue": $stringBool(SecurityDepositTaken)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "IsPayingSecurityDeposit",
+            "AttValue": $stringBool(IsPayingSecurityDeposit)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "IsPaying",
+            "AttValue": $stringBool(IsPaying)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "PriceOverrideReasonId",
+            "AttValue": $stringBool(PriceOverrideReasonId)
+          }
+        ],
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "IsParentPayingInd",
+            "RawSourceVal": $string(IsParentPayingInd)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "IsSecurityDepositTaken",
+            "RawSourceVal": $string(SecurityDepositTaken)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "IsPayingSecurityDeposit",
+            "RawSourceVal": $string(IsPayingSecurityDeposit)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "IsPaying",
+            "RawSourceVal": $string(IsPaying)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "PriceOverrideReasonId",
+            "RawSourceVal": $string(PriceOverrideReasonId)
+          }
+          ]
+        }
+      }
+    ],
+    "OccasionAtts": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Occasion.OccasionName"),
+          "RawId": $cleanStr(OccasionID),
+          "Class": "Occasion",
+          "Code": "Header.Occasion.OccasionName",
+          "Name": "OccasionName",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(Occasion),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "OccasionID",
+            "RawSourceVal": $string(OccasionID)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "Occasion",
+            "RawSourceVal": $string(Occasion)
+          }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Occasion.OccasionRole"),
+          "RawId": $cleanStr(OccasionRoleID),
+          "Class": "Occasion",
+          "Code": "Header.Occasion.OccasionRole",
+          "Name": "OccasionRole",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(OccasionRole),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "OccasionRoleID",
+            "RawSourceVal": $string(OccasionRole)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "OccasionRoleID",
+            "RawSourceVal": $string(OccasionRoleID)
+          }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Occasion.OccasionType"),
+          "RawId": $cleanStr(CustomerOccasionTypeID),
+          "Class": "Occasion",
+          "Code": "Header.Occasion.OccasionType",
+          "Name": "OccasionType",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(CustomerOccasionType),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+          {
+           "RawSourceSystem": "Dolfin",
+            "RawSourceId": "CustomerOccasionTypeID",
+            "RawSourceVal": $string(CustomerOccasionTypeID)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "CustomerOccasionType",
+            "RawSourceVal": $string(CustomerOccasionType)
+          }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Occasion.Party"),
+          "RawId": NULL,
+          "Class": "Occasion",
+          "Code": "Header.Occasion.Party",
+          "Name": "Party",
+          "Desc": NULL},
+        "IsArray": "Y",
+        "AttType": NULL,
+        "AttValue": NULL,
+        "AttValues": [
+          {
+            "AttType": "STRING",
+            "AttKey": "PartyCode",
+            "AttValue": $cleanStr(PartyCode)
+          },
+          {
+            "AttType": "INTEGER",
+            "AttKey": "PartyNo",
+            "AttValue": $cleanStr(PartyNo)
+          },
+          {
+            "AttType": "INTEGER",
+            "AttKey": "PartyCount",
+            "AttValue": $cleanStr(PartyCount)
+          }
+        ],
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+          {
+            "RawSourceSystem": "Dolfin",
+            "AttKey": "PartyCode",
+            "AttValue": $string(PartyCode)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "AttKey": "PartyNo",
+            "AttValue": $string(PartyNo)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "AttKey": "PartyCount",
+            "AttValue": $string(PartyCount)
+          }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Occasion.Measurements"),
+          "RawId": NULL,
+          "Class": "Occasion",
+          "Code": "Header.Occasion.Measurements",
+          "Name": "Measurements",
+          "Desc": NULL},
+        "IsArray": "Y",
+        "AttType": NULL,
+        "AttValue": NULL,
+        "AttValues": [
+          {
+            "AttType": "STRING",
+            "AttKey": "MeasuredByAssistantId",
+            "AttValue": $cleanStr(MeasuredByAssistantId)
+          },
+          {
+            "AttType": "STRING",
+            "AttKey": "IsCustomerMeasurements",
+            "AttValue": $stringBool(IsCustomerMeasurementsInd)
+          },
+          {
+            "AttType": "INTEGER",
+            "AttKey": "IsSizeFromPreviousCustomerOccasion",
+            "AttValue": $stringBool(SizeFromPreviousCustomerOccasionInd)
+          }
+        ],
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "MeasuredByAssistantId",
+            "RawSourceVal": $string(MeasuredByAssistantId)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "IsCustomerMeasured",
+            "RawSourceVal": $string(IsCustomerMeasurementsInd)
+          },
+          {
+            "RawSourceSystem": "Dolfin",
+            "RawSourceId": "IsSizeFromPreviousCustomerOccasion",
+            "RawSourceVal": $string(SizeFromPreviousCustomerOccasionInd)
+          }
+          ]
+        }
+      }
+    ],
+    "SupplierAtts": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Suppliers.ExternalSupplierOrderNo"),
+          "RawId": NULL,
+          "Class": "Suppliers",
+          "Code": "Header.Suppliers.ExternalSupplierOrderNo",
+          "Name": "ExternalSupplierOrderNo",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(ExternalSupplierOrderNo),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ExternalSupplierOrderNo",
+              "RawSourceVal": $string(ExternalSupplierOrderNo)
+            }
+          ]
+        }
+      }
+    ],
+    "CustomAtt": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Custom.SavedReasonId"),
+          "RawId": NULL,
+          "Class": "Custom",
+          "Code": "Header.Custom.SavedReasonId",
+          "Name": "SavedReasonId",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(SavedReasonId),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "SavedReasonId",
+              "RawSourceVal": $string(SavedReasonId)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Custom.LastJournalId"),
+          "RawId": NULL,
+          "Class": "Custom",
+          "Code": "Header.Custom.LastJournalId",
+          "Name": "LastJournalId",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(LastJournalId),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "LastJournalId",
+              "RawSourceVal": $string(LastJournalId)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Custom.IsUpdateACSRequired"),
+          "RawId": NULL,
+          "Class": "Custom",
+          "Code": "Header.Custom.IsUpdateACSRequired",
+          "Name": "IsUpdateACSRequired",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(UpdateACSRequired),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "UpdateACSRequired",
+              "RawSourceVal": $string(UpdateACSRequired)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Custom.IsUpdateRFRequired"),
+          "RawId": NULL,
+          "Class": "Custom",
+          "Code": "Header.Custom.IsUpdateRFRequired",
+          "Name": "IsUpdateRFRequired",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(UpdateRFRequired),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "UpdateRFRequired",
+              "RawSourceVal": $string(UpdateRFRequired)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Custom.IsSentToRF"),
+          "RawId": NULL,
+          "Class": "Custom",
+          "Code": "Header.Custom.IsSentToRF",
+          "Name": "IsSentToRF",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(SentToRF),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "SentToRF",
+              "RawSourceVal": $string(SentToRF)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Custom.IsDraftOrder"),
+          "RawId": NULL,
+          "Class": "Custom",
+          "Code": "Header.Custom.IsDraftOrder",
+          "Name": "IsDraftOrder",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(IsDraftOrder),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "DraftOrder",
+              "RawSourceVal": $string(DraftOrder)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Custom.Barcode"),
+          "RawId": NULL,
+          "Class": "Custom",
+          "Code": "Header.Custom.Barcode",
+          "Name": "Barcode",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(Barcode),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "Barcode",
+              "RawSourceVal": $string(Barcode)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Custom.LeadID"),
+          "RawId": NULL,
+          "Class": "Custom",
+          "Code": "Header.Custom.LeadID",
+          "Name": "LeadID",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(LeadID),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "LeadID",
+              "RawSourceVal": $string(LeadID)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Custom.AuditID"),
+          "RawId": NULL,
+          "Class": "Custom",
+          "Code": "Header.Custom.AuditID",
+          "Name": "AuditID",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(AuditID),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "AuditID",
+              "RawSourceVal": $string(AuditID)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId, "Header.Custom.IsReHire"),
+          "RawId": NULL,
+          "Class": "Custom",
+          "Code": "Header.Custom.IsReHire",
+          "Name": "IsReHire",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $stringBool(IsReHire),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "AuditID",
+              "RawSourceVal": $string(IsReHire)
+            }
+          ]
+        }
+      }
+      
+    ],
+    "LinkedOrders": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId,"Header.LinkedOrder.ParentOccasion"),
+          "RawId": NULL,
+          "Class": "Link",
+          "Code": "Header.LinkedOrder.ParentOccasion",
+          "Name": "ParentOccasion",
+          "Desc": NULL},
+        "FromId": $OrderId,
+        "ToId": "SalesOrder_Dolfin_" & $cleanStr(ParentCustomerOccasionID),
+        "LinkStatus": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ParentCustomerOccasionID",
+              "RawSourceVal": $string(ParentCustomerOccasionID)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId,"Header.LinkedOrder.TryOnParent"),
+          "RawId": NULL,
+          "Class": "Link",
+          "Code": "Header.LinkedOrder.TryOnParent",
+          "Name": "TryOnParent",
+          "Desc": NULL},
+        "FromId": $OrderId,
+        "ToId": "SalesOrder_Dolfin_" & $cleanStr(TryOnParentID),
+        "LinkStatus": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "TryOnParentID",
+              "RawSourceVal": $string(TryOnParentID)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId,"Header.LinkedOrder.EmergencyParent"),
+          "RawId": NULL,
+          "Class": "Link",
+          "Code": "Header.LinkedOrder.EmergencyParent",
+          "Name": "EmergencyParent",
+          "Desc": NULL},
+        "FromId": $OrderId,
+        "ToId": "SalesOrder_Dolfin_" & $cleanStr(EmergencyParentID),
+        "LinkStatus": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "EmergencyParentID",
+              "RawSourceVal": $string(EmergencyParentID)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($HeaderId,"Header.LinkedOrder.TryOnParentID"),
+          "RawId": NULL,
+          "Class": "Link",
+          "Code": "Header.LinkedOrder.DeliveryParent",
+          "Name": "DeliveryParent",
+          "Desc": NULL},
+        "FromId": $OrderId,
+        "ToId": "SalesOrder_Dolfin_" & $cleanStr(DeliveryParentId),
+        "LinkStatus": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "DeliveryParentId",
+              "RawSourceVal": $string(DeliveryParentId)
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "Line": $append($append(HireItem.Item.
+    {
+      "LineId": $LineId($cleanStr(SkuCode)),
+      "HeaderId": $HeaderId,
+      "OrderId:": $OrderId,
+      "CustomerID": $CustomerId,
+      "ProductId": $ProductId($cleanStr(SkuCode)),
+      "LineIds": [
+        {
+          "AttHeader": {
+            "Id": $LineId($cleanStr(SkuCode)),
+            "RawId": $cleanStr(SkuCode),
+            "Class": "ID",
+            "Code": "Line.ID.SKU",
+            "Name": SKU,
+            "Desc": NULL},       
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "Hiretem.Item.SkuCode",
+                "RawSourceVal": $string(SkuCode)
+              }
+            ]
+          }
+        }
+      ],
+      "PartyIds": [
+        {
+        "AttHeader": {
+          "Id": $CustomerId,
+          "RawId": $cleanStr($$.DebtorCode),
+          "Class": "Party",
+          "Code": "Line.PartyId.Customer",
+          "Name": "Customer",
+          "Desc": NULL},
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "DebtorCode",
+              "RawSourceVal": $string($$.DebtorCode)
+            }
+          ]
+        }
+      }
+      ],
+      "Type": [
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($LineId($cleanStr(SkuCode)),"Line.Type.Sales"),
+            "RawId": NULL,
+            "Class": "Sale",
+            "Code": "Line.Type.Sale",
+            "Name": "Sales",
+            "Desc": NULL},
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": NULL,
+                "RawSourceId": NULL,
+                "RawSourceVal": NULL
+              }
+            ]
+          }
+        }
+      ],
+      "Times": [
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($LineId($cleanStr(SkuCode)),"Line.Times.AddedDate"),
+            "RawId": NULL,
+            "Class": "Times",
+            "Code": "Line.Times.AddedDate",
+            "Name": "AddedDate",
+            "Desc": "Date product Added"},
+          "DateDim": $getDateDimFn(AddedDate,False,$rawSourceTimeZone),
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "HireItem.Item.AddedDate",
+                "RawSourceVal": $string(AddedDate)
+              }
+            ]
+          }
+        }
+      ],
+      "Qtys": [
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($LineId($cleanStr(SkuCode)),"Line.Qtys.ProductQty"),
+            "RawId": NULL,
+            "Class": "Qtys",
+            "Code": "Line.Qtys.ProductQty",
+            "Name": "ProductQty",
+            "Desc": "Number of products"},
+          "Amount": $cleanNum(Qty),
+          "AmountFloat": NULL,
+          "AccountingMethodType": NULL,
+          "UnitMeasure": NULL,
+          "UnitType": NULL,
+          "UnitScheme": NULL,
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "Hire.Item.Qty",
+                "RawSourceVal": $string(Qty)
+              }
+            ]
+          }
+          }
+      ],
+      "Prices": [
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($LineId($cleanStr(SkuCode)),"Line.Prices.UnitPrice"),
+            "RawId": NULL,
+            "Class": "Sales",
+            "Code": "Line.Prices.UnitPrice",
+            "Name": "UnitPrice",
+            "Desc": NULL},
+          "PriceLocalisation": "BCY",
+          "PriceIncTax": $cleanNum(UnitPriceInc),
+          "PriceExTax": $cleanNum(UnitPriceInc) - $cleanNum(UnitPriceVat),
+          "PriceTax": $cleanNum(UnitPriceVat),
+          "CurrencyCode": NULL,
+          "TaxRate": NULL,
+          "IsTaxRateEstimated": NULL,
+          "TaxRateCode": NULL,
+          "AccountingMethodType": NULL,
+          "ExchangeRate": NULL,
+          "ExchangeRateHistoryId": NULL,
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "UnitPriceInc",
+                "RawSourceVal": $string(UnitPriceInc)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "UnitPriceVat",
+                "RawSourceVal": $string(UnitPriceVat)
+              }
+            ]
+          }
+        },
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($LineId($cleanStr(SkuCode)),"Line.Prices.UnitDiscount"),
+            "RawId": NULL,
+            "Class": "Discount",
+            "Code": "Line.Prices.UnitDiscount",
+            "Name": "UnitDiscount",
+            "Desc": NULL},
+          "PriceLocalisation": "BCY",
+          "PriceIncTax": $cleanNum(UnitDiscountInc),
+          "PriceExTax": NULL,
+          "PriceTax": NULL,
+          "CurrencyCode": NULL,
+          "TaxRate": NULL,
+          "IsTaxRateEstimated": NULL,
+          "TaxRateCode": NULL,
+          "AccountingMethodType": NULL,
+          "ExchangeRate": NULL,
+          "ExchangeRateHistoryId": NULL,
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "UnitDiscountInc",
+                "RawSourceVal": $string(UnitDiscountInc)
+              }
+            ]
+          }
+        }
+      ],
+      "FulfilmentAtts": [
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($LineId($cleanStr(SkuCode)),"Line.Fulfilment.Dispatch"),
+            "RawId": NULL,
+            "Class": "Fulfilment",
+            "Code": "Line.Fulfilment.Dispatch",
+            "Name": "Dispatch",
+            "Desc": NULL},
+          "IsArray": "Y",
+          "AttType": NULL,
+          "AttValue": NULL,
+          "AttValues": [
+            {
+              "AttType": "STRING",
+              "AttKey": "IsPicked",
+              "AttValue": $stringBool(IsPicked)
+            },
+            {
+              "AttType": "STRING",
+              "AttKey": "IsStoreSupply",
+              "AttValue": $stringBool(IsStoreSupply)
+            }
+          ],
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "IsPicked",
+              "RawSourceVal": $string(IsPicked)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "IsStoreSupply",
+              "RawSourceVal": $string(IsStoreSupply)
+            }
+            ]
+          }
+        },
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($LineId($cleanStr(SkuCode)),"Line.Fulfilment.Return"),
+            "RawId": NULL,
+            "Class": "Fulfilment",
+            "Code": "Line.Fulfilment.Return",
+            "Name": "Return",
+            "Desc": NULL},
+          "IsArray": "Y",
+          "AttType": NULL,
+          "AttValue": NULL,
+          "AttValues": [
+            {
+              "AttType": "STRING",
+              "AttKey": "IsReturned",
+              "AttValue": $stringBool(IsReturned)
+            },
+            {
+              "AttType": "STRING",
+              "AttKey": "IsRemovedForHireReturnToWarehouse",
+              "AttValue": $stringBool(RemoveForHireReturnToWarehouse)
+            },
+            {
+              "AttType": "STRING",
+              "AttKey": "ReturnCondition",
+              "AttValue": $stringBool(ReturnCondition)
+            },
+            {
+              "AttType": "STRING",
+              "AttKey": "ReturnLiability",
+              "AttValue": $stringBool(ReturnLiability)
+            }
+          ],
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "IsReturned",
+              "RawSourceVal": $string(IsReturned)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "RemoveForHireReturnToWarehouse",
+              "RawSourceVal": $string(RemoveForHireReturnToWarehouse)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ReturnCondition",
+              "RawSourceVal": $string(ReturnCondition)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ReturnLiability",
+              "RawSourceVal": $string(ReturnLiability)
+            }
+            ]
+          }
+        }
+      ],
+      "FinanceAtts": [
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($LineId($cleanStr(SkuCode)),"Line.Fulfilment.Sale"),
+            "RawId": NULL,
+            "Class": "Product",
+            "Code": "Line.Finance.Sale",
+            "Name": "Sale",
+            "Desc": NULL},
+          "IsArray": "Y",
+          "AttType": NULL,
+          "AttValue": NULL,
+          "AttValues": [
+            {
+              "AttType": "STRING",
+              "AttKey": "IsFreeOfCharge",
+              "AttValue": $stringBool(IsFreeOfCharge)
+            }
+          ],
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "IsFreeOfCharge",
+                "RawSourceVal": $string(IsFreeOfCharge)
+              }
+            ]
+          }
+        }
+      ],
+      "ProductAtts": [
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($LineId($cleanStr(SkuCode)),"Line.Fulfilment.OrderItem"),
+            "RawId": NULL,
+            "Class": "Product",
+            "Code": "Product.OrderItem",
+            "Name": "OrderItem",
+            "Desc": NULL},
+          "IsArray": "Y",
+          "AttType": NULL,
+          "AttValue": NULL,
+          "AttValues": [
+            {
+              "AttType": "INTEGER",
+              "AttKey": "ProductCode",
+              "AttValue": $cleanStr(ProductCode)
+            },
+            {
+              "AttType": "STRING",
+              "AttKey": "ProductDescription",
+              "AttValue": $cleanStr(ProductDescription)
+            },
+            {
+              "AttType": "STRING",
+              "AttKey": "DCSerialNumber",
+              "AttValue": $cleanStr(DCSerialNumber)
+            },
+            {
+              "AttType": "STRING",
+              "AttKey": "GroupCode",
+              "AttValue": $cleanStr(GroupCode)
+            },
+            {
+              "AttType": "STRING",
+              "AttKey": "SerialNumber",
+              "AttValue": $cleanStr(SerialNumber)
+            },
+            {
+              "AttType": "STRING",
+              "AttKey": "SizeCode",
+              "AttValue": $cleanStr(SizeCode)
+            },
+            {
+              "AttType": "STRING",
+              "AttKey": "SkuCode",
+              "AttValue": $cleanStr(SkuCode)
+            }
+          ],
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ProductCode",
+              "RawSourceVal": $string(ProductCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ProductDescription",
+              "RawSourceVal": $string(ProductDescription)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "DCSerialNumber",
+              "RawSourceVal": $string(DCSerialNumber)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "GroupCode",
+              "RawSourceVal": $string(GroupCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "SerialNumber",
+              "RawSourceVal": $string(SerialNumber)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "SizeCode",
+              "RawSourceVal": $string(SizeCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "SkuCode",
+              "RawSourceVal": $string(SkuCode)
+            }
+            ]
+          }
+        },
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($LineId($cleanStr(SkuCode)),"Line.Fulfilment.Package"),
+            "RawId": NULL,
+            "Class": "Product",
+            "Code": "Line.Product.Package",
+            "Name": "Package",
+            "Desc": NULL},
+          "IsArray": "Y",
+          "AttType": NULL,
+          "AttValue": NULL,
+          "AttValues": [
+            {
+              "AttType": "STRING",
+              "AttKey": "HirePackageId",
+              "AttValue": $cleanStr(HirePackageId)
+            },
+            {
+              "AttType": "STRING",
+              "AttKey": "HirePackage",
+              "AttValue": $cleanStr(HirePackage)
+            }
+          ],
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "HirePackageId",
+              "RawSourceVal": $string(HirePackageId)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "HirePackage",
+              "RawSourceVal": $string(HirePackage)
+            }
+            ]
+          }
+        }
+      ]
+    },
+    HireTransaction.Transaction.
+    {
+      "LineId": $LineId($cleanStr(TransactionID)),
+      "HeaderId": $HeaderId,
+      "OrderId:": $OrderId,
+      "CustomerID": $CustomerId,
+      "ProductId": $ProductId($cleanStr(HireSKUCode)),
+      "LineIds": [
+        {
+          "AttHeader": {
+            "Id": $LineId($cleanStr(TransactionID)),
+            "RawId": $cleanStr(TransactionID),
+            "Class": "ID",
+            "Code": "Line.ID.TransactionId",
+            "Name": "TransactionId",
+            "Desc": NULL},
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "HireTransaction.Transaction.TransactionID",
+                "RawSourceVal": $string(TransactionID)
+              }
+            ]
+          }
+        }
+      ],
+      "PartyIds": [
+        {
+        "AttHeader": {
+          "Id": $CustomerId,
+          "RawId": $cleanStr($$.DebtorCode),
+          "Class": "Party",
+          "Code": "Line.PartyId.Customer",
+          "Name": "Customer",
+          "Desc": NULL},
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "DebtorCode",
+              "RawSourceVal": $string($$.DebtorCode)
+            }
+          ]
+        }
+      }
+      ],
+      "Type": [
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($LineId($cleanStr(TransactionID)),"Line.Type.Payment"),
+            "RawId": NULL,
+            "Class": "Payment",
+            "Code": "Line.Type.Payment",
+            "Name": "Payment",
+            "Desc": NULL},
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": NULL
+          }
+        }
+      ],
+      "Times": [
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($LineId($cleanStr(TransactionID)),"Line.Times.TransactionDate"),
+            "RawId": NULL,
+            "Class": "Time",
+            "Code": "Line.Times.TransactionDate",
+            "Name": TransactionDate,
+            "Desc": "Date product Added"},
+          "DateDim": $getDateDimFn(TranDate,False,$rawSourceTimeZone),
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "HireTransaction.Transaction.TranDate",
+                "RawSourceVal": $string(TranDate)
+              }
+            ]
+          }
+        }
+      ],
+      "Prices": [
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($LineId($cleanStr(TransactionID)),"Line.Payment.Amount"),
+            "RawId": NULL,
+            "Class": "Payment",
+            "Code": "Line.Payment.Amount",
+            "Name": "Amount",
+            "Desc": NULL},
+          "PriceLocalisation": "BCY",
+          "PriceIncTax": $cleanNum(AmountInc),
+          "PriceExTax": $cleanNum(AmountInc) / (1 + ($cleanNum(VATRate)/100)),
+          "PriceTax": ($cleanNum(AmountInc) / (1 + ($cleanNum(VATRate)/100))) * ($cleanNum(VATRate)/100),
+          "CurrencyCode": NULL,
+          "TaxRate": VATRate,
+          "IsTaxRateEstimated": NULL,
+          "TaxRateCode": NULL,
+          "AccountingMethodType": NULL,
+          "ExchangeRate": NULL,
+          "ExchangeRateHistoryId": NULL,
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "HireTransaction.Transaction.AmountInc",
+                "RawSourceVal": $string(AmountInc)
+              },
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "VATRate",
+                "RawSourceVal": $string(VATRate)
+              }
+            ]
+          }
+        }
+      ],
+      "FulfilmentAtts": NULL,
+      "FinanceAtts": [
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($LineId($cleanStr(TransactionID)),"Line.Finance.Payment"),
+            "RawId": NULL,
+            "Class": "Finance",
+            "Code": "Line.Finance.Payment",
+            "Name": "Payment",
+            "Desc": NULL},
+          "IsArray": "Y",
+          "AttType": NULL,
+          "AttValue": NULL,
+          "AttValues": [
+            {
+              "AttType": "STRING",
+              "AttKey": "CreditNoteId",
+              "AttValue": $cleanStr(CreditNoteId)
+            },
+            {
+              "AttType": "STRING",
+              "AttKey": "Terminal",
+              "AttValue": $cleanStr(Terminal)
+            },
+            {
+              "AttType": "STRING",
+              "AttKey": "AdyenRecurringRef",
+              "AttValue": $cleanStr(AdyenRecurringRef)
+            }
+          ],
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+              "RawSourceSystem": "Dolfin",
+              "AttKey": "CreditNoteId",
+              "AttValue": $string(CreditNoteId)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "AttKey": "Terminal",
+              "AttValue": $string(Terminal)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "AttKey": "AdyenRecurringRef",
+              "AttValue": $string(AdyenRecurringRef)
+            }
+            ]
+          }
+        },
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($LineId($cleanStr(TransactionID)),"Line.Finance.Discount"),
+            "RawId": NULL,
+            "Class": "Finance",
+            "Code": "Line.Finance.Discount",
+            "Name": "Discount",
+            "Desc": NULL},
+          "IsArray": "Y",
+          "AttType": NULL,
+          "AttValue": NULL,
+          "AttValues": [
+            {
+              "AttType": "STRING",
+              "AttKey": "DiscountReference",
+              "AttValue": $cleanStr(DiscountReference)
+            },
+            {
+              "AttType": "STRING",
+              "AttKey": "DiscountType",
+              "AttValue": $cleanStr(DiscountType)
+            },
+            {
+              "AttType": "STRING",
+              "AttKey": "AdyenRecurringRef",
+              "AttValue": $cleanStr(DiscountTypeReasonCode)
+            }
+          ],
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+              "RawSourceSystem": "Dolfin",
+              "AttKey": "DiscountReference",
+              "AttValue": $string(DiscountReference)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "AttKey": "DiscountType",
+              "AttValue": $string(DiscountType)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "AttKey": "DiscountTypeReasonCode",
+              "AttValue": $string(DiscountTypeReasonCode)
+            }
+            ]
+          }
+        }
+      ],
+      "ProductAtts": [
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($LineId($cleanStr(TransactionID)),"Line.Product.PaymentItem"),
+            "RawId": NULL,
+            "Class": "Product",
+            "Code": "Line.Product.PaymentItem",
+            "Name": "PaymentItem",
+            "Desc": NULL},
+          "IsArray": "Y",
+          "AttType": NULL,
+          "AttValue": NULL,
+          "AttValues": [
+            {
+              "AttType": "STRING",
+              "AttKey": "HireSKUCode",
+              "AttValue": $cleanStr(HireSKUCode)
+            },
+            {
+              "AttType": "STRING",
+              "AttKey": "CustomerOccasionItemType",
+              "AttValue": $cleanStr(CustomerOccasionItemType)
+            },
+            {
+              "AttType": "STRING",
+              "AttKey": "CustomerOccasionItemID",
+              "AttValue": $cleanStr(CustomerOccasionItemID)
+            }
+          ],
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "HireSKUCode",
+              "RawSourceVal": $string(HireSKUCode)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CustomerOccasionItemType",
+              "RawSourceVal": $string(CustomerOccasionItemType)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CustomerOccasionItemID",
+              "RawSourceVal": $string(CustomerOccasionItemID)
+            }
+            ]
+          }
+    
+        }
+      ],
+      "CustomAtt": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($LineId($cleanStr(TransactionID)), "Line.Custom.ContractNumber"),
+          "RawId": NULL,
+          "Class": "Custom",
+          "Code": "Line.Custom.ContractNumber",
+          "Name": "ContractNumber",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(ContractNumber),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ContractNumber",
+              "RawSourceVal": $string(ContractNumber)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($LineId($cleanStr(TransactionID)), "Line.Custom.StoreNumber"),
+          "RawId": NULL,
+          "Class": "Custom",
+          "Code": "Line.Custom.StoreNumber",
+          "Name": "StoreNumber",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(StoreNumber),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "StoreNumber",
+              "RawSourceVal": $string(StoreNumber)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($LineId($cleanStr(TransactionID)), "Line.Custom.TransactionType"),
+          "RawId": NULL,
+          "Class": "Custom",
+          "Code": "Line.Custom.TransactionType",
+          "Name": "TransactionType",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(TransactionType),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "TransactionType",
+              "RawSourceVal": $string(TransactionType)
+            }
+          ]
+        }
+      }
+      ]
+        
+    }),
+    Journal.Type.
+    {
+      "LineId": $LineId($cleanStr(JournalID)),
+      "HeaderId": $HeaderId,
+      "OrderId:": $OrderId,
+      "CustomerID": $CustomerId,
+      "ProductId": NULL,
+      "LineIds": [
+        {
+          "AttHeader": {
+            "Id": $LineId($cleanStr(JournalID)),
+            "RawId": $cleanStr(JournalID),
+            "Class": "ID",
+            "Code": "Line.ID.JournalId",
+            "Name": "JournalId",
+            "Desc": NULL},
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "Journal.Type.JournalID",
+                "RawSourceVal": $string(JournalID)
+              }
+            ]
+          }
+        }
+      ],
+      "PartyIds": [
+        {
+          "AttHeader": {
+            "Id": $CustomerId,
+            "RawId": $cleanStr($$.DebtorCode),
+            "Class": "Party",
+            "Code": "Line.PartyId.Customer",
+            "Name": "Customer",
+            "Desc": NULL},
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "DebtorCode",
+                "RawSourceVal": $string(DebtorCode)
+              }
+            ]
+          }
+        }
+      ],
+      "Type": [
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($LineId($cleanStr(JournalID)),"Line.Type.Journal"),
+            "RawId": NULL,
+            "Class": "Journal",
+            "Code": "Line.Type.Journal",
+            "Name": "Journal",
+            "Desc": NULL},
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": NULL
+          }
+        }
+      ],
+      "Times": [
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($LineId($cleanStr(JournalID)),"Line.Times.CreatedOn"),
+            "RawId": NULL,
+            "Class": "Time",
+            "Code": "Line.Times.CreatedOn",
+            "Name": "CreatedOn",
+            "Desc": "Date product Added"},
+          "DateDim": $getDateDimFn(CreatedOn,False,$rawSourceTimeZone),
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "Journal.Type.CreatedOn",
+                "RawSourceVal": $string(CreatedOn)
+              }
+            ]
+          }
+        },
+        {
+          "AttHeader": {
+            "Id": $buildAttributeID($LineId($cleanStr(JournalID)),"Line.Times.ReadOn"),
+            "RawId": NULL,
+            "Class": "Time",
+            "Code": "Line.Times.ReadOn",
+            "Name": "ReadOn",
+            "Desc": "Date product Added"},
+          "DateDim": $getDateDimFn(ReadOn,False,$rawSourceTimeZone),
+          "AttMetadata": {
+            "RawChangeTrackingHash": NULL,
+            "IsAnonymised": NULL,
+            "SecuringKeyId": NULL,
+            "AsOf": $AsOf,
+            "EventId": $EventId,
+            "RawSourceAtts": [
+              {
+                "RawSourceSystem": "Dolfin",
+                "RawSourceId": "Journal.Type.ReadOn",
+                "RawSourceVal": $string(CreatedOn)
+              }
+            ]
+          }
+        }
+      ],
+      "Prices": NULL,
+      "FulfilmentAtts": NULL,
+      "FinanceAtts": NULL,
+      "ProductAtts": NULL,
+      "CustomAtt": [
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($LineId($cleanStr(JournalID)),"Line.Custom.JournalType"),
+          "RawId": JournalTypeID,
+          "Class": "Custom",
+          "Code": "Line.Custom.JournalType",
+          "Name": "JournalType",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(JournalType),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "JournalTypeID",
+              "RawSourceVal": $string(JournalTypeID)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "JournalType",
+              "RawSourceVal": $string(JournalType)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($LineId($cleanStr(JournalID)),"Line.Custom.Description"),
+          "RawId": NULL,
+          "Class": "Custom",
+          "Code": "Line.Custom.Description",
+          "Name": "Description",
+          "Desc": NULL},
+        "IsArray": "N",
+        "AttType": "STRING",
+        "AttValue": $cleanStr(Description),
+        "AttValues": NULL,
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "Description",
+              "RawSourceVal": $string(Description)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($LineId($cleanStr(JournalID)),"Line.Custom.Stores"),
+          "RawId": NULL,
+          "Class": "Custom",
+          "Code": "Line.Custom.Stores",
+          "Name": "Stores",
+          "Desc": NULL},
+        "IsArray": "Y",
+        "AttType": NULL,
+        "AttValue": NULL,
+        "AttValues": [
+            {
+              "AttType": "STRING",
+              "AttKey": "ReadStoreNumber",
+              "AttValue": $cleanStr(ReadStoreNumber)
+            },
+            {
+              "AttType": "STRING",
+              "AttKey": "CreatedStoreNumber",
+              "AttValue": $cleanStr(CreatedStoreNumber)
+            }
+          ],
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ReadStoreNumber",
+              "RawSourceVal": $string(ReadStoreNumber)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CreatedStoreNumber",
+              "RawSourceVal": $string(CreatedStoreNumber)
+            }
+          ]
+        }
+      },
+      {
+        "AttHeader": {
+          "Id": $buildAttributeID($LineId($cleanStr(JournalID)),"Line.Custom.Users"),
+          "RawId": NULL,
+          "Class": "Custom",
+          "Code": "Line.Custom.Users",
+          "Name": "Users",
+          "Desc": NULL},
+        "IsArray": "Y",
+        "AttType": NULL,
+        "AttValue": NULL,
+        "AttValues": [
+            {
+              "AttType": "STRING",
+              "AttKey": "ReadBy",
+              "AttValue": $cleanStr(ReadBy)
+            },
+            {
+              "AttType": "STRING",
+              "AttKey": "ReadByDLUserID",
+              "AttValue": $cleanStr(ReadByDLUserID)
+            },
+            {
+              "AttType": "STRING",
+              "AttKey": "CreatedBy",
+              "AttValue": $cleanStr(CreatedBy)
+            },
+            {
+              "AttType": "STRING",
+              "AttKey": "CreatedByDLUserID",
+              "AttValue": $cleanStr(CreatedByDLUserID)
+            }
+          ],
+        "AttMetadata": {
+          "RawChangeTrackingHash": NULL,
+          "IsAnonymised": NULL,
+          "SecuringKeyId": NULL,
+          "AsOf": $AsOf,
+          "EventId": $EventId,
+          "RawSourceAtts": [
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ReadBy",
+              "RawSourceVal": $string(ReadBy)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "ReadByDLUserID",
+              "RawSourceVal": $string(ReadByDLUserID)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CreatedBy",
+              "RawSourceVal": $string(CreatedBy)
+            },
+            {
+              "RawSourceSystem": "Dolfin",
+              "RawSourceId": "CreatedByDLUserID",
+              "RawSourceVal": $string(CreatedByDLUserID)
+            }
+          ]
+        }
+      }
+      ]
+        
+    }
+    )
+
+}
+
+)

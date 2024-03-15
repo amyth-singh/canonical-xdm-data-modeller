@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "ProductCode": {
+      "type": "string"
+    },
+    "ProductName": {
+      "type": "string"
+    },
+    "Description": {
+      "type": "string"
+    },
+    "Barcode": {
+      "type": "string"
+    }
+  }
+}

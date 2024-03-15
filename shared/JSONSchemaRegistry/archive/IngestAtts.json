@@ -1,0 +1,22 @@
+{
+    "$id": "IngestAtts",
+    "description": "XDM Event 'Ingest' atts definition",
+    "type": "object",
+    "properties": {
+      "ExternalFilePath": {"AttId": {"type": "string"}},
+      "ExternalFileName": {"AttId": {"type": "string"}},
+      "ExternalFileSize": {"AttId": {"type": "string"}},
+      "ExternalFileModificationTime": {"AttId": {"type": "string"}},
+      "ExternalSourceSystem": {"AttId": {"type": "string"}},
+      "ExternalProcessingType": {"AttId": {"type": "string"}},
+      "ExternalTopicStreamUri": {"AttId": {"type": "string"}},
+      "ExternalTopicStreamName": {"AttId": {"type": "string"}},
+      "ExternalTopicStreamType": {"AttId": {"type": "string"}},
+      "ExternalTopicStreamPartitionKey": {"AttId": {"type": "string"}},
+      "ExternalTopicStreamPartitionOffset": {"AttId": {"type": "string"}},
+      "ExternalDbName": {"AttId": {"type": "string"}},
+      "ExternalDbSchemaName": {"AttId": {"type": "string"}},
+      "ExternalDbTableName": {"AttId": {"type": "string"}},
+      "CustomAtts": [{"$ref": "../../CustomAttribute.json"}]
+    }
+}

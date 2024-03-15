@@ -1,0 +1,164 @@
+{
+  "$id": "https://xfuze.io/xdm/schema/components/event/common/EventHeader/EventMetadata/EventAtts",
+  "description": "XDM Schema for the common event component 'EventHeader/EventMetadata/EventAtts'",
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "Xfuze": {
+      "type": "object",
+      "description": "The (required) Xfuze derived / enriched attributes that define the context of the event itself",
+      "unevaluatedProperties": false,
+      "properties": {
+        "EventId": {
+          "type": "string",
+          "description": "The (required) globally unique synthetic Xfuze ID for this event instance, unique across all events. Typically of the format [EventName]_[EntityId]_[EventUniqueWatermark] e.g SalesOrderItemsDelivered_SalesOrderDelivery_Hybris_8106008620_JVGL06053_2023-01-12T12:03:00+00:00"
+        },
+        "EventCategory": {
+          "type": "string",
+          "description": "The (required) event category of this domain event (refer controlled list of allowed values) e.g SalesOrder"
+        },
+        "EventName": {
+          "type": "string",
+          "description": "The (required) event name defines the 'type' of the event (in business terms) and key for routing to specific event handlers (refer to controlled list of allowed values per entity type).  Format is [EntityType][VerbPastTense] e.g SalesOrderItemsDelivered"
+        },
+        "EventClass": {
+          "type": "string",
+          "description": "The class of the event as defined by where this event instance was generated e.g TriggerEvent",
+          "enum": [
+            "RawDataEvent",
+            "TriggerEvent",
+            "ProcessedEvent",
+            "DerivedEvent"
+          ]
+        },
+        "EventChangePattern": {
+          "type": "string",
+          "description": "The type of triggering data/change pattern of the source that resulted in this event e.g BusinessEvent",
+          "enum": [
+            "CDCEvent",
+            "FullSnapshot",
+            "BusinessEvent",
+            "NotificationEvent"
+          ]
+        },
+        "EventValueStream": {
+          "type": "string",
+          "description": "The retail value stream this event is related to e.g Order2Cash",
+          "enum": [
+            "Order2Cash",
+            "Return2Refund",
+            "Product2Offer",
+            "Purchase2Pay",
+            "Forecast2Stock",
+            "Issue2Resolution",
+            "Concept2Customer",
+            "Hire2Retire",
+            "Market2Lead",
+            "Lead2Conversion"
+          ]
+        },
+        "BizCapabilityL0": {
+          "type": "string",
+          "description": "The Level 0 (top) of Xiatech's Industry Specific Business Capability Model (i.e Retail BCM Model) e.g Sell"
+        },
+        "BizCapabilityL1": {
+          "type": "string",
+          "description": "The Level 1 (top) of Xiatech's Industry Specific Business Capability Model (i.e Retail BCM Model) e.g Sell & Serve"
+        },
+        "BizCapabilityL2": {
+          "type": "string",
+          "description": "The Level 2 (top) of Xiatech's Industry Specific Business Capability Model (i.e Retail BCM Model) e.g Process Returns & Exchanges"
+        },
+        "ClientCode": {
+          "type": "string",
+          "description": "An (required) client code used for event ownership and billing attribution where required e.g GSR"
+        },
+        "EnvCode": {
+          "type": "string",
+          "description": "The Xfuze env this event was generated in e.g xfuze-crew-prd"
+        },
+        "ConnectorInstance": {
+          "type": "string",
+          "description": "The instance of the Xfuze smart connector that generated this event e.g pod instance id"
+        },
+        "ConnectorType": {
+          "type": "string",
+          "description": "The type of the connector e.g csv-writer"
+        },
+        "Note": {
+          "type": "string",
+          "description": "An (optional) free form test field to add some comment to the note, typically for testing purposes e.g (Test case name, or a prod smoke test)"
+        },
+        "IsDerivedEvent": {
+          "type": "string",
+          "description": "String bool indicator for whether this event is a derived one (i.e derived from a processedEvent such as 'CustomerLastNameChanged' derived off 'CustomerProfileUpdated' e.g 'N'",
+          "enum": [
+            "Y",
+            "N",
+            "U"
+          ]
+        }
+      },
+      "required": [
+        "EventId",
+        "EventCategory",
+        "EventName",
+        "EventClass",
+        "EventChangePattern",
+        "ClientCode",
+        "EnvCode"
+      ]
+    },
+    "Origin": {
+      "type": "object",
+      "description": "The (required) 'origin' source / raw attributes provided as input and that were consumed as part of producing the companion 'Xfuze' representations",
+      "unevaluatedProperties": false,
+      "properties": {
+        "EventId": {
+          "type": "string",
+          "description": "Raw form (optional) of the input eventId from the source, used in transforming to 'Xfuze' representations e.g d1d982ef-6dc6-47bb-80fb-2eaaf572deca"
+        },
+        "EventName": {
+          "type": "string",
+          "description": "Raw form (optional) of the input eventName from the source, used in transforming to 'Xfuze' representations e.g ORDER_PARCEL_DELIVERED"
+        },
+        "SourceSystem": {
+          "type": "string",
+          "description": "The (required) Xfuze system code of the external source system that is the genesis of the raw data trigger e.g Hybris"
+        },
+        "SourceSubSystem": {
+          "type": "string",
+          "description": "The (optional) Xfuze subsystem system code of the external (sub) source system that is the genesis of the raw data trigger e.g OrdersAPI"
+        },
+        "SourceFormatType": {
+          "type": "string",
+          "description": "The (required) code of the data interchange format of the raw data e.g JSON",
+          "enum": [
+            "JSON",
+            "CSV",
+            "XML",
+            "YAML",
+            "BINARY",
+            "EXCEL",
+            "Other"
+          ]
+        },
+        "CorrelationId": {
+          "type": "string",
+          "description": "The (optional) external correlation Id as provided by the source (often, but not always, the same as the rawEventId) e.g 3e35cec2-050d-4334-b564-5f1ce704a5f8"
+        },
+        "EnvCode": {
+          "type": "string",
+          "description": "The external client env the raw data was generated from in e.g production"
+        }
+      },
+      "required": [
+        "SourceSystem",
+        "SourceFormatType"
+      ]
+    }
+  },
+  "required": [
+    "Xfuze","Origin"
+  ]
+}

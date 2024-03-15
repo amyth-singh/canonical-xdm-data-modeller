@@ -1,0 +1,6 @@
+(
+
+$$ ~> |DomainEvent.TriggerEntity.ProductVariant.RegulatoryCompliance.CountryOfOrigin|{"Country": $event.EventMetadata.ReferenceAtts.Atts[LookupCode="DomainEvent.TriggerEntity.ProductVariant.RegulatoryCompliance.CountryOfOrigin.ISO2"].LookupResult.country,
+                                                                                      "IsEuropeanCountry": $event.EventMetadata.ReferenceAtts.Atts[LookupCode="DomainEvent.TriggerEntity.ProductVariant.RegulatoryCompliance.CountryOfOrigin.ISO2"].LookupResult.europe_country}|;
+                                                                                  
+)

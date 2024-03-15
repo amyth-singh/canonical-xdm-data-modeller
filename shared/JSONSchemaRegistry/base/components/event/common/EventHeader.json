@@ -1,0 +1,70 @@
+{
+  "$id": "https://xfuze.io/xdm/schema/components/event/common/EventHeader",
+  "title": "EventHeader",
+  "description": "XDM Schema for the common event component 'EventHeader'",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../../entity/common/Entity.json#/EntityIds"
+    },
+    {
+      "properties": {
+        "EventId": {
+          "type": "string",
+          "description": "Core event fields at top level to enable storage and query optimisations in physical systems (e.g PK/CK/ and various indexes for access patterns) that require these to be top level only (e.g BQ) - refer core definition from EventMetadata.EventAtts.Xfuze.EventId for business definition"
+        },
+        "EventName": {
+          "type": "string",
+          "description": "Core event fields at top level to enable storage and query optimisations in physical systems (e.g PK/CK/ and various indexes for access patterns) that require these to be top level only (e.g BQ) - refer core definition from EventMetadata.EventAtts.Xfuze.EventName for business definition"
+        },
+        "EventOccurredDateUTC": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Core event fields at top level to enable storage and query optimisations in physical systems (e.g PK/CK/ and various indexes for access patterns) that require these to be top level only (e.g BQ) - refer core definition from EventMetadata.TimeAtts.Xfuze.Times.* for business definition"
+        },
+        "EventOccurredDateLocal": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Core event fields at top level to enable storage and query optimisations in physical systems (e.g PK/CK/ and various indexes for access patterns) that require these to be top level only (e.g BQ) - refer core definition from EventMetadata.TimeAtts.Xfuze.Times.* for business definition"
+        },
+        "EventOccurredTimestampUTC": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Core event fields at top level to enable storage and query optimisations in physical systems (e.g PK/CK/ and various indexes for access patterns) that require these to be top level only (e.g BQ) - refer core definition from EventMetadata.TimeAtts.Xfuze.Times.* for business definition"
+        },
+        "EventOccurredTimestampLocal": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Core event fields at top level to enable storage and query optimisations in physical systems (e.g PK/CK/ and various indexes for access patterns) that require these to be top level only (e.g BQ) - refer core definition from EventMetadata.TimeAtts.Xfuze.Times.* for business definition"
+        },
+        "EventOccurredTimestampPartyLocal": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Core event fields at top level to enable storage and query optimisations in physical systems (e.g PK/CK/ and various indexes for access patterns) that require these to be top level only (e.g BQ) - refer core definition from EventMetadata.TimeAtts.Xfuze.Times.* for business definition"
+        },
+        "EventReceivedTimestampUTC": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Core event fields at top level to enable storage and query optimisations in physical systems (e.g PK/CK/ and various indexes for access patterns) that require these to be top level only (e.g BQ) - refer core definition from EventMetadata.TimeAtts.Xfuze.Times.* for business definition"
+        },
+        "DataPayloadHash": {
+          "type": "string",
+          "description": "Core event fields at top level to enable storage and query optimisations in physical systems (e.g PK/CK/ and various indexes for access patterns) that require these to be top level only (e.g BQ) - refer core definition from EventMetadata.PayloadAtts.Xfuze.DataPayloadHash for business definition"
+        },
+        "EventMetadata": {
+          "$ref": "./EventMetadata.json",
+          "description": "Core event fields at top level to enable storage and query optimisations in physical systems (e.g PK/CK/ and various indexes for access patterns) that require these to be top level only (e.g BQ) - refer core definition from EventMetadata for business definition"
+        }
+      }
+    },
+    {
+      "required": [
+        "EventId",
+        "EventName",
+        "EventOccurredTimestampUTC",
+        "EventOccurredTimestampLocal",
+        "EventMetadata"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "CustomAttObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/CustomAttProperties"
+    }
+  },
+  "CustomAttProperties": {
+    "type": "object",
+    "description": "A custom att object, a generic extension object",
+    "unevaluatedProperties": false,
+    "properties": {
+      "Code": {
+        "type": "string",
+        "description": "The canonical Xfuze code in full dot namespace for as per a canonical code"
+      },
+      "CodeShort": {
+        "type": "string",
+        "description": "The short version of the code in the leaf element of 'Code'"
+      },
+      "Name": {
+        "type": "string",
+        "description": "The name of the att"
+      },
+      "Value": {
+        "type": "string",
+        "description": "The value of the att"
+      } ,
+      "Desc": {
+        "type": "string",
+        "description": "The desc of the att"
+      },
+      "SourceSystem": {
+        "type": "string",
+        "description": "The source system this att is from"
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "QuantityItemsObject": {
+    "type": "object",
+    "description": "A value object to encapsulate generic quantity of something against an identifiable object - e.g qty of product in delivery parcel, or an exchange line reference to qty on a new line",
+    "additionalProperties": {
+      "$ref": "#/QuantityItemsProperties"
+    }
+  },
+  "QuantityItemsProperties": {
+    "type": "object",
+    "required": [
+      "Qty"
+    ],
+    "unevaluatedProperties": false,
+    "properties": {
+      "Qty": {
+        "$ref": "./Measure.json#/MeasureProperties",
+        "description": "The quantity of items if this bundle"
+      },
+      "ItemType": {
+        "type": "string",
+        "description": "The type of the qty bundle as will be either product related or order, so this specifies the exact detail e.g Product, ProductVariant, SaleOrderLine, PurchaseOrderLine"
+      },
+      "ProductId": {
+        "type": "string",
+        "description": "The Xfuze product Id, if the quantity bundle refers to product"
+      },
+      "ProductKey": {
+        "type": "string",
+        "description": "The native product key/number"
+      },
+      "ProductKeyType": {
+        "type": "string",
+        "description": "The type of the product key e.g SKU, EAN, UPC etc"
+      },
+      "LineId": {
+        "type": "string",
+        "description": "The order line Id, in Xfuze canonical form, identifying this sales o"
+      },
+      "LineNumberKey": {
+        "type": "string",
+        "description": "The 'natural' order line number key e.g 123456789_1"
+      },
+      "LineSeq": {
+        "type": "number",
+        "description": "The ordinal line sequence number e.g 1"
+      }
+    }
+  }
+}

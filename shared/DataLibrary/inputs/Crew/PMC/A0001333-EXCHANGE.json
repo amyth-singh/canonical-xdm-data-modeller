@@ -1,0 +1,602 @@
+{
+    "id": "c4c595f3-6e57-4493-8a4c-ec547a0aec15",
+    "createdAt": "2023-11-06T17:14:30.771Z",
+    "transCompletedAt": "2023-11-06T17:14:43.536Z",
+    "originalTime": "2023-11-06T17:12:30.780Z",
+    "type": "SALE_EXCHANGE",
+    "transactionId": "A0001333",
+    "offlineTransactionId": "",
+    "originalTransId": "A0001332",
+    "operationStatus": "PAY_SUCCESS",
+    "saleTotal": 352.55,
+    "transactionRef": "H6jdoJ6282023-11-06T17:14:30.763Z0a49",
+    "initiatingModule": "eBasket",
+    "storeId": "628",
+    "deviceId": "429785ecd794e35d",
+    "terminalId": "62862",
+    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+    "userName": "taylorm",
+    "baseCurrency": "GBP",
+    "basketSummary": {
+        "webOrder": {
+            "totalItems": 0,
+            "saleTotal": 0,
+            "discountTotal": 0,
+            "refundTotal": 0,
+            "basketTotal": 0,
+            "VATTotal": 0
+        },
+        "totalItems": 1,
+        "saleTotal": 422,
+        "discountTotal": 69.449,
+        "inStore": {
+            "totalItems": 7,
+            "saleTotal": 422,
+            "discountTotal": 70.509,
+            "refundTotal": -35,
+            "basketTotal": 316.49,
+            "VATTotal": 51.608
+        },
+        "refundTotal": -35,
+        "basketTotal": 317.55,
+        "cnc": {
+            "totalItems": 0,
+            "saleTotal": 0,
+            "discountTotal": 0,
+            "refundTotal": 0,
+            "basketTotal": 0,
+            "VATTotal": 0
+        },
+        "VATTotal": 51.608
+    },
+    "basket": {
+        "products": [
+            {
+                "itemLineId": "1",
+                "quantity": 1,
+                "deliveryMethod": "3",
+                "excludePromotion": false,
+                "description": "RIVERTON BLAZER | MNA053 | 44 | IVY",
+                "itemDiscounts": {
+                    "trnDiscountsPortion": 2.828,
+                    "refundPortion": 0,
+                    "trnPromotionsPortion": 0
+                },
+                "deliveryGroup": "1",
+                "descriptions": [],
+                "totalLinePrice": 110,
+                "originFullfillmentId": "N/A",
+                "fullfilmentId": "628",
+                "price": 110,
+                "SKU": "1200677"
+            },
+            {
+                "itemLineId": "2",
+                "quantity": 1,
+                "deliveryMethod": "3",
+                "excludePromotion": false,
+                "description": "STRIPE KNITTED RUGBY | MMC030 | XS | BRCBLTNVY",
+                "leadTime": {
+                    "type": "Days",
+                    "value": "0"
+                },
+                "deliveryGroup": "1",
+                "itemDiscounts": {
+                    "trnDiscountsPortion": 1.503,
+                    "refundPortion": 0,
+                    "trnPromotionsPortion": 0
+                },
+                "descriptions": [],
+                "originFullfillmentId": "N/A",
+                "totalLinePrice": 67,
+                "fullfilmentId": "628",
+                "price": 67,
+                "SKU": "1184873"
+            },
+            {
+                "itemLineId": "3",
+                "isLastExchanged": false,
+                "deliveryMethod": "3",
+                "refundedReason": "601-1",
+                "description": "LW RUGBY | OMOE018 | XXL | INK",
+                "deliveryGroup": "1",
+                "itemDiscounts": {
+                    "trnDiscountsPortion": 1.052,
+                    "refundPortion": 1.052,
+                    "trnPromotionsPortion": 0,
+                    "currentRefundPortion": 1.052
+                },
+                "descriptions": [],
+                "totalLinePrice": 35,
+                "fullfilmentId": "628",
+                "price": 35,
+                "refunded": true,
+                "refundedPromotionalQuantity": 0,
+                "quantity": 1,
+                "refundedReasonDescription": "Changed Mind",
+                "refundedTotal": -35,
+                "excludePromotion": false,
+                "refundedQuantity": 1,
+                "originFullfillmentId": "N/A",
+                "exchange": {
+                    "exchangeId": 1,
+                    "reason": "601-1",
+                    "newItems": [
+                        {
+                            "lineItemId": 7,
+                            "Quantity": 1
+                        }
+                    ],
+                    "quantity": 1,
+                    "lineItemId": 3
+                },
+                "SKU": "1212479"
+            },
+            {
+                "itemLineId": "5",
+                "quantity": 1,
+                "deliveryMethod": "3",
+                "excludePromotion": false,
+                "description": "LOZENGE LS CLASSIC PRINT | MMB081 | M | BLUWHT",
+
+                "itemDiscounts": {
+                    "trnDiscountsPortion": 1.759,
+                    "refundPortion": 0,
+                    "trnPromotionsPortion": 0
+                },
+                "deliveryGroup": "1",
+                "descriptions": [],
+                "totalLinePrice": 65,
+                "originFullfillmentId": "N/A",
+                "fullfilmentId": "628",
+                "price": 65,
+                "SKU": "1189147"
+            },
+            {
+                "itemLineId": "6",
+                "quantity": 3,
+                "deliveryMethod": "3",
+                "excludePromotion": false,
+                "description": "OXFORD SHIRT DRESS | OWNJ001 | 12 | NAVY",
+                "deliveryGroup": "1",
+                "itemDiscounts": {
+                    "trnDiscountsPortion": 1.804,
+                    "refundPortion": 0,
+                    "trnPromotionsPortion": 0
+                },
+                "descriptions": [],
+                "totalLinePrice": 90,
+                "originFullfillmentId": "N/A",
+                "fullfilmentId": "628",
+                "price": 30,
+                "SKU": "1201761"
+            },
+            {
+                "itemLineId": "7",
+                "quantity": 1,
+                "deliveryMethod": "3",
+                "excludePromotion": false,
+                "description": "COOMBE DRESS | WNJ009 | 14 | GREEN",
+                "deliveryGroup": "1",
+                "itemDiscounts": {
+                    "trnDiscountsPortion": 0,
+                    "refundPortion": 0,
+                    "trnPromotionsPortion": 0
+                },
+                "descriptions": [],
+                "originFullfillmentId": "N/A",
+                "totalLinePrice": 55,
+                "fullfilmentId": "628",
+                "price": 55,
+                "SKU": "1207941"
+            }
+        ],
+        "lineDiscount": [
+            {
+                "unitPrice": 104.5,
+                "percentageDiscountValue": 5,
+                "discountedLinePrice": 104.5,
+                "name": "LD Wrong Price",
+                "itemLineId": "1",
+                "discountAmount": 5.5,
+                "discountType": "AMOUNT",
+                "percentageDiscountManagerOverride": {
+                    "automaticApprove": "false",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                },
+                "percentageDiscountReasonCode": "9901",
+                "priceManagerOverride": {
+                    "automaticApprove": "true",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                },
+                "percentageDiscountReasonName": "LD Wrong Price"
+            },
+            {
+                "unitPrice": 50,
+                "priceOverrideReasonName": "Price override - wrong price",
+                "priceOverrideAmount": 50,
+                "discountedLinePrice": 50,
+                "name": "Price override - wrong price",
+                "itemLineId": "2",
+                "discountAmount": 17,
+                "percentageDiscountManagerOverride": {
+                    "automaticApprove": "false",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                },
+                "discountType": "AMOUNT",
+                "priceOverrideReasonCode": "100",
+                "priceManagerOverride": {
+                    "automaticApprove": "true",
+                    "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+                    "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+                }
+            }
+        ],
+        "transactionDiscount": [
+            {
+                "cncDiscountAmount": 0,
+                "inStoreDiscountAmount": -1.06,
+                "webOrderDiscountAmount": 0,
+                "discountAmount": -1.06,
+                "itemLineIds": [
+                    3
+                ],
+                "discountType": "Amount",
+                "reasonCode": "Refunded Discount"
+            }
+        ],
+        "exchange": [
+            {
+                "exchangeId": 1,
+                "reason": "601-1",
+                "newItems": [
+                    {
+                        "lineItemId": 7,
+                        "Quantity": 1
+                    }
+                ],
+                "quantity": 1,
+                "lineItemId": 3
+            }
+        ],
+        "taxBreakdown": {
+            "totalTaxableAmount": 309.655,
+            "taxLines": [
+                {
+                    "PreTax": 76.018,
+                    "taxableAmount": 91.222,
+                    "VATCode": "H",
+                    "VAT": 20,
+                    "itemLineId": 1,
+                    "taxLineTotal": 15.203
+                },
+                {
+                    "taxableAmount": 48.497,
+                    "PreTax": 40.414,
+                    "VATCode": "H",
+                    "VAT": 20,
+                    "itemLineId": 2,
+                    "taxLineTotal": 8.082
+                },
+                {
+                    "taxableAmount": 0,
+                    "PreTax": 0,
+                    "VATCode": "H",
+                    "VAT": 20,
+                    "itemLineId": 3,
+                    "taxLineTotal": 0
+                },
+                {
+                    "taxableAmount": 56.741,
+                    "PreTax": 47.284,
+                    "VATCode": "H",
+                    "VAT": 20,
+                    "itemLineId": 5,
+                    "taxLineTotal": 9.457
+                },
+                {
+                    "taxableAmount": 58.196,
+                    "PreTax": 48.496,
+                    "VATCode": "H",
+                    "VAT": 20,
+                    "itemLineId": 6,
+                    "taxLineTotal": 9.699
+                },
+                {
+                    "taxableAmount": 55,
+                    "PreTax": 45.833,
+                    "VATCode": "H",
+                    "VAT": 20,
+                    "itemLineId": 7,
+                    "taxLineTotal": 9.167
+                }
+            ]
+        },
+        "totalTaxSummary": [
+            {
+                "PreTaxSum": 258.045,
+                "VATCode": "H",
+                "TaxSum": 51.608000000000004,
+                "VAT": 20,
+                "TXrateSum": 309.653
+            }
+        ],
+        "linePromotion": [
+            {
+                "displayText": "10percentline",
+                "promotionType": "PERCENTAGE_OFF",
+                "promotionLinePrice": 94.05,
+                "name": "10percentline",
+                "itemLineId": "1",
+                "promotionInfo": "undefined",
+                "trigger": [
+                    {
+                        "quantity": 1,
+                        "itemLineId": "1"
+                    }
+                ],
+                "promotionAmount": 10.45,
+                "promotionId": "74931dbf-a8c1-451c-b29a-d482c90078cb"
+            },
+            {
+                "displayText": "10percentline",
+                "promotionType": "PERCENTAGE_OFF",
+                "promotionLinePrice": 58.5,
+                "name": "10percentline",
+                "itemLineId": "5",
+                "promotionInfo": "undefined",
+                "trigger": [
+                    {
+                        "quantity": 1,
+                        "itemLineId": "5"
+                    }
+                ],
+                "promotionAmount": 6.5,
+                "promotionId": "74931dbf-a8c1-451c-b29a-d482c90078cb"
+            },
+            {
+                "displayText": "MT3for2new",
+                "promotionType": "MULTY_BUY",
+                "promotionLinePrice": 60,
+                "name": "MT3for2new",
+                "itemLineId": "6",
+                "promotionInfo": "undefined",
+                "trigger": [
+                    {
+                        "quantity": 3,
+                        "itemLineId": "6"
+                    }
+                ],
+                "promotionAmount": 30,
+                "promotionId": "c9098744-3daa-4836-bfe2-07e95a21a4c1"
+            }
+        ],
+        "transactionPromotion": []
+
+    },
+    "currentTransactionDetails": {
+        "products": [
+            {
+                "itemLineId": 3,
+                "isLastExchanged": false,
+                "deliveryMethod": "3",
+                "selectedVATCode": "H",
+                "refundedReason": "601-1",
+                "description": "LW RUGBY | OMOE018 | XXL | INK",
+                "inReturnItem": true,
+                "deliveryGroup": "1",
+                "itemDiscounts": {
+                    "trnDiscountsPortion": 1.052,
+                    "refundPortion": 1.052,
+                    "trnPromotionsPortion": 0,
+                    "currentRefundPortion": 1.052
+                },
+                "descriptions": [],
+                "totalLinePrice": 35,
+                "total": 35,
+                "selectedPrice": 35,
+                "fullfilmentId": "628",
+                "currency": "GBP",
+                "refunded": true,
+                "quantity": 1,
+                "refundedReasonDescription": "Changed Mind",
+                "sealed": true,
+                "refundedTotal": -35,
+                "excludePromotion": false,
+                "selectedVAT": 20,
+                "refundPromotionalQuantity": 0,
+                "refundedQuantity": 1,
+                "isChecked": false,
+                "exchange": {
+                    "exchangeId": 1,
+                    "reason": "601-1",
+                    "newItems": [
+                        {
+                            "lineItemId": 7,
+                            "Quantity": 1
+                        }
+                    ],
+                    "quantity": 1,
+                    "lineItemId": 3
+                },
+                "SKU": "1212479"
+            },
+            {
+                "itemLineId": 7,
+                "isnewProduct": true,
+                "updateDate": "2022-02-22T16:51:00.256Z",
+                "deliveryMethod": "3",
+                "selectedVATCode": "H",
+                "description": "COOMBE DRESS | WNJ009 | 14 | GREEN",
+                "deliveryGroup": "1",
+                "itemDiscounts": {
+                    "trnDiscountsPortion": 0,
+                    "refundPortion": 0,
+                    "trnPromotionsPortion": 0
+                },
+                "type": "SKU",
+                "addedInBasket": true,
+                "totalLinePrice": 55,
+                "total": 55,
+                "selectedPrice": 55,
+                "fullfilmentId": "628",
+                "quantity": 1,
+                "selectedVAT": 20,
+                "parentItemLineId": 3,
+                "SKU": "1207941"
+            }
+        ],
+        "lineDiscount": [],
+        "transactionDiscount": [
+            {
+                "cncDiscountAmount": 0,
+                "inStoreDiscountAmount": -1.06,
+                "webOrderDiscountAmount": 0,
+                "discountAmount": -1.06,
+                "itemLineIds": [
+                    3,1
+                ],
+                "discountType": "Amount",
+                "reasonCode": "Refunded Discount"
+            }
+        ],
+        "taxBreakdown": {
+            "totalTaxableAmount": 21.052,
+            "taxLines": [
+                {
+                    "taxableAmount": -33.948,
+                    "PreTax": -28.291,
+                    "VATCode": "H",
+                    "VAT": 20,
+                    "itemLineId": 3,
+                    "taxLineTotal": -5.657
+                },
+                {
+                    "taxableAmount": 55,
+                    "PreTax": 45.833,
+                    "VATCode": "H",
+                    "VAT": 20,
+                    "itemLineId": 7,
+                    "taxLineTotal": 9.167
+                }
+            ]
+        },
+        "totalTaxSummary": [
+            {
+                "PreTaxSum": 17.54,
+                "VATCode": "H",
+                "TaxSum": 3.51,
+                "VAT": 20,
+                "TXrateSum": 21.05
+            }
+        ],
+        "linePromotion": [],
+        "basketSummary": {
+            "webOrder": {
+                "totalItems": 0,
+                "saleTotal": 0,
+                "discountTotal": 0,
+                "refundTotal": 0,
+                "basketTotal": 0,
+                "VATTotal": 0
+            },
+            "totalItems": 1,
+            "saleTotal": 90,
+            "discountTotal": 33.94,
+            "inStore": {
+                "totalItems": 1,
+                "saleTotal": 90,
+                "discountTotal": 33.94,
+                "refundTotal": -35,
+                "basketTotal": 21.06,
+                "VATTotal": 3.51
+            },
+            "refundTotal": -35,
+            "basketTotal": 21.06,
+            "cnc": {
+                "totalItems": 0,
+                "saleTotal": 0,
+                "discountTotal": 0,
+                "refundTotal": 0,
+                "basketTotal": 0,
+                "VATTotal": 0
+            },
+            "VATTotal": 3.51
+        }
+    },
+    "override": {
+        "automaticApprove": "true",
+        "originalUserId": "9eda50c9-71c0-444d-878b-25c1c718fb12",
+        "userId": "9eda50c9-71c0-444d-878b-25c1c718fb12"
+    },
+    "paymentDetails": [
+        {
+            "amount": "21.06",
+            "hostReferenceId": "NA",
+            "transactionReference": "H6jdoJ6282023-11-06T17:14:30.763Z0a49",
+            "cardType": "NA",
+            "transactionDate": "2023-11-06T17:14:30.764Z",
+            "paymentType": "PDQ",
+            "result": "AUTHORISED",
+            "authcode": "NA",
+            "transactionType": "SALE_EXCHANGE",
+            "cncAmount": "0",
+            "inStoreAmount": "296.489",
+            "totalamount": "21.06",
+            "webOrderAmount": "0",
+            "currency": "GBP",
+            "shippingAmount": "0",
+            "pan": "NA",
+            "aid": "NA",
+            "entryMethod": "NA"
+        }
+    ],
+    "transactionStructure": [
+        {
+            "isGiftRefund": false,
+            "type": "SALE",
+            "storeId": "628",
+            "transactionId": "A0001331",
+            "parentId": "NA"
+        },
+        {
+            "isGiftRefund": false,
+            "type": "SALE_REFUND",
+            "storeId": "628",
+            "parentId": "A0001331",
+            "transactionId": "A0001332"
+        },
+        {
+            "isGiftRefund": false,
+            "type": "SALE_EXCHANGE",
+            "storeId": "628",
+            "parentId": "A0001332",
+            "transactionId": "A0001333"
+        }
+    ],
+    "storeNodeStructure": [
+        {
+            "name": "Berkhamsted Test",
+            "nodeType": "STORE"
+        },
+        {
+            "name": "South East & Central",
+            "nodeType": "STORE_GROUP"
+        },
+        {
+            "name": "UK",
+            "nodeType": "TRADING_REGION"
+        },
+        {
+            "name": "Crew Clothing",
+            "nodeType": "COMPANY"
+        },
+        {
+            "name": "Crew Clothing",
+            "nodeType": "ORGANIZATION"
+        }
+    ]
+}

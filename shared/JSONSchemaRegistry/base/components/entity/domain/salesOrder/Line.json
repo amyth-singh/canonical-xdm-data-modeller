@@ -1,0 +1,447 @@
+{
+  "type": "object",
+  "unevaluatedProperties": false,
+  "allOf": [
+    {
+      "$ref": "../../common/Entity.json#/EntityHeader"
+    },
+    {
+      "properties": {
+        "LineIds": {
+          "$ref": "../LineIds.json#/LineIdsProperties",
+          "description": "The various sales line ids identifying this line"
+        },
+        "Status": {
+          "type": "object",
+          "description": "",
+          "unevaluatedProperties": false,
+          "properties": {
+            "ProcessingStatus": {
+              "description": "",
+              "$ref": "../../common/Status.json#/StatusProperties"
+            },
+            "PaymentStatus": {
+              "description": "",
+              "$ref": "../../common/Status.json#/StatusProperties"
+            },
+            "FulfilmentStatus": {
+              "description": "",
+              "$ref": "../../common/Status.json#/StatusProperties"
+            },
+            "MarkdownStatus": {
+              "description": "",
+              "$ref": "../../common/Status.json#/StatusProperties"
+            }
+          }
+        },
+        "Times": {
+          "type": "object",
+          "description": "",
+          "oneOf": [
+            {
+              "required": [
+                "PlacedOn"
+              ]
+            },
+            {
+              "required": [
+                "AcceptedOn"
+              ]
+            },
+            {
+              "required": [
+                "CreatedOn"
+              ]
+            }
+          ],
+          "unevaluatedProperties": false,
+          "properties": {
+            "PlacedOn": {
+              "description": "",
+              "$ref": "../../common/Time.json#/TimeProperties"
+            },
+            "AcceptedOn": {
+              "description": "",
+              "$ref": "../../common/Time.json#/TimeProperties"
+            },
+            "CompletedOn": {
+              "description": "",
+              "$ref": "../../common/Time.json#/TimeProperties"
+            },
+            "PaidOn": {
+              "description": "",
+              "$ref": "../../common/Time.json#/TimeProperties"
+            },
+            "FulfilledOn": {
+              "description": "",
+              "$ref": "../../common/Time.json#/TimeProperties"
+            },
+            "CancelledOn": {
+              "description": "",
+              "$ref": "../../common/Time.json#/TimeProperties"
+            },
+            "VoidedOn": {
+              "description": "",
+              "$ref": "../../common/Time.json#/TimeProperties"
+            },
+            "ReturnedOn": {
+              "description": "",
+              "$ref": "../../common/Time.json#/TimeProperties"
+            },
+            "CreatedOn": {
+              "description": "",
+              "$ref": "../../common/Time.json#/TimeProperties"
+            },
+            "LastUpdatedOn": {
+              "description": "",
+              "$ref": "../../common/Time.json#/TimeProperties"
+            },
+            "LastStatusUpdatedOn": {
+              "description": "",
+              "$ref": "../../common/Time.json#/TimeProperties"
+            }
+          }
+        },
+        "Channels": {
+          "type": "object",
+          "description": "",
+          "unevaluatedProperties": false,
+          "properties": {
+            "SalesChannel": {
+              "description": "",
+              "$ref": "../../common/Channel.json#/ChannelProperties"
+            },
+            "ReturnChannel": {
+              "description": "",
+              "$ref": "../../common/Channel.json#/ChannelProperties"
+            },
+            "ExchangeChannel": {
+              "description": "",
+              "$ref": "../../common/Channel.json#/ChannelProperties"
+            },
+            "DistributionChannel": {
+              "description": "",
+              "$ref": "../../common/Channel.json#/ChannelProperties"
+            }
+          }
+        },
+        "Locations": {
+          "type": "object",
+          "description": "",
+          "unevaluatedProperties": false,
+          "properties": {
+            "SalesLocation": {
+              "description": "",
+              "$ref": "../../common/Location.json#/LocationObject"
+            },
+            "ReturnLocation": {
+              "description": "",
+              "$ref": "../../common/Location.json#/LocationObject"
+            },
+            "ExchangeLocation": {
+              "description": "",
+              "$ref": "../../common/Location.json#/LocationObject"
+            },
+            "DistributionLocation": {
+              "description": "",
+              "$ref": "../../common/Location.json#/LocationObject"
+            }
+          }
+        },
+        "ProductIds": {
+          "$ref": "../product/ProductIds.json#/ProductIdsProperties",
+          "description": "The various product ids of the product on this line"
+        },
+        "ProductAtts": {
+          "type": "object",
+          "description": "The (required) collection of product attributes, of the product purchased, at the point of sale (not at latest/current time)",
+          "unevaluatedProperties": false,
+          "anyOf": [
+            {
+              "required": ["ProductId","ProductNumber"]
+            },
+            {
+              "required": ["ProductVariantId","ProductVariantNumber"]
+            }
+          ],
+          "properties": {
+            "ProductName": {
+              "type": "string",
+              "description": "The product name of the product  on this line (at the point of sale and as captured/defined at that time)"
+            },
+            "ProductDesc": {
+              "type": "string",
+              "description": "The product description of the product on this line (at the point of sale and as captured/defined at that time)"
+            },
+            "ProductCategoryCode": {
+              "type": "string",
+              "description": "The product category code of the product on this line (at the point of sale and as captured/defined at that time)"
+            },
+            "ProductCategoryDesc": {
+              "type": "string",
+              "description": "The product category description of the product purchased on this line (at the point of sale and as captured/defined at that time)"
+            },
+            "ProductTypeCode": {
+              "type": "string",
+              "description": "The product type code of the product purchased on this line e.g "
+            },
+            "ProductTypeDesc": {
+              "type": "string",
+              "description": "The product type description of the product purchased on this line e.g "
+            },
+            "ProductSubTypeCode": {
+              "type": "string",
+              "description": "The product sub type code of the product purchased on this line e.g "
+            },
+            "ProductSubTypeDesc": {
+              "type": "string",
+              "description": "The product sub type description of the product purchased on this line e.g "
+            },
+            "ProductGroupCode": {
+              "type": "string",
+              "description": "The product group code of the product purchased on this line e.g "
+            },
+            "ProductGroupDesc": {
+              "type": "string",
+              "description": "The product group description of the product purchased on this line e.g "
+            },
+            "ProductSubGroupCode": {
+              "type": "string",
+              "description": "The product sub group code of the product purchased on this line e.g "
+            },
+            "ProductSubGroupDesc": {
+              "type": "string",
+              "description": "The product sub group description of the product purchased on this line e.g "
+            },
+            "HierarchyCode": {
+              "type": "string",
+              "description": "The hierarchy code of the product purchased on this line"
+            },
+            "HierarchyDesc": {
+              "type": "string",
+              "description": "The hierarchy description of the product purchased on this line"
+            },
+            "StyleCode": {
+              "type": "string",
+              "description": "The style code of the product purchased on this line"
+            },
+            "StyleDesc": {
+              "type": "string",
+              "description": "The style description of the product purchased on this line"
+            },
+            "ItemOptionCode": {
+              "type": "string",
+              "description": "The item option code of the product purchased on this line"
+            },
+            "ItemOptionDesc": {
+              "type": "string",
+              "description": "The item option desc of the product purchased on this line"
+            },
+            "BrandCode": {
+              "type": "string",
+              "description": "The brand code of the product purchased on this line"
+            },
+            "BrandName": {
+              "type": "string",
+              "description": "The brand description of the product purchased on this line"
+            },
+            "SupplierId": {
+              "type": "string",
+              "description": "The supplierId of the product purchased on this line"
+            },
+            "SupplierCode": {
+              "type": "string",
+              "description": "The supplier code of the product purchased on this line"
+            }
+          }
+        },
+        "Qtys": {
+          "type": "object",
+          "description": "The collection of (possible) quantities, related to various unit level measures, across the lifecycle, of this line.  Actual usage and ability to populate depends on the richness of the sources.  Some can be derived, while others are typically provided",
+          "unevaluatedProperties": false,
+          "properties": {
+            "QtyNet": {
+              "description": "The 'net' (current) qty, for the line, of product sold, net AFTER any subsequent retractions and adjustments post sale (e.g cancels, returns etc), at a point in time (e.g event time, latest entity time), ultimately the sellable billable qty in the end.  Can be explicit from source and also derived (e.g multiple lines qith qty 1 agg up to > 1)",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtySold": {
+              "description": "The 'gross' (as sold / original) qty, for the line, of product sold, gross BEFORE any subsequent retractions and adjustments (e.g cancels, returns etc), at a point in time of the sale (immutable thereafter), ultimately the 'as sold'  billable qty.  Always explicit from source but needs to be mapped from the 'first' event or derived equiv",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyPaid": {
+              "description": "The aggregate quantity paid, for the line, at the time at a point in time (e.g event time, latest entity time)",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyCancelled": {
+              "description": "The aggregate quantity cancelled, for the line, at the time at a point in time (e.g event time, latest entity time).  This is a '-' number to support a ledger styled approach to accounting.",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyVoided": {
+              "description": "The aggregate quantity voided, for the line, at the time at a point in time (e.g event time, latest entity time).   This is a '-' number to support a ledger styled approach to accounting.",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyReturned": {
+              "description": "The aggregate quantity returned (but not exchanged), for the line, at the time at a point in time (e.g event time, latest entity time).  This is a '-' number to support a ledger styled approach to accounting.",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyExchanged": {
+              "description": "The aggregate quantity exchanged (but not returned), for the line, at the time at a point in time (e.g event time, latest entity time)",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyRefunded": {
+              "description": "The aggregate quantity refunded (i.e refund payment - note: some returns/cancellation may or may not get refunded so can be different to them), for the line, at the time at a point in time (e.g event time, latest entity time)",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyShipped": {
+              "description": "The aggregate quantity shipped, for the line, at the time at a point in time (e.g event time, latest entity time)",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyFulfilled": {
+              "description": "The aggregate quantity fulfilled, for the line, at the time at a point in time (e.g event time, latest entity time) - context dependant to the fulfilment options (e.g delivered to customer, picked-up) - ultimately with end recipient",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "QtyCompleted": {
+              "description": "The aggregate quantity 'completed' (context dependant), for the line, at the time at a point in time (e.g event time, latest entity time)",
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            }
+          }
+        },
+        "Prices": {
+          "type": "object",
+          "description": "The collection of possible UNIT prices, both selling and cost related, related to the sale of this line.  Actual usage and ability to populate depends on the richness of the sources.  Some can be derived, while others are typically provided",
+          "unevaluatedProperties": false,
+          "properties": {
+            "SellingPrices": {
+              "type": "object",
+              "description": "The (required) collection of possible SELLING UNIT prices, related to the sale of the product this line.  Actual usage and ability to populate depends on the richness of the sources, only SoldPrice is mandatory.  Some can be derived, while others are typically provided",
+              "unevaluatedProperties": false,
+              "properties": {
+                "SoldPrice": {
+                  "description": "The (required) final 'as sold' unit price of the sale of this lines product, often provided, but sometimes needs to be derived from GrandTotal / QtySold (QtyNet)",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "OriginalPrice": {
+                  "description": "The 'original selling price', typically the first release of a unit price for this product, typically has to be explicitly provided and not derivable",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                }
+              },
+              "required": [
+                "SoldPrice"
+              ]
+            },
+            "CostPrices": {
+              "type": "object",
+              "description": "The (optional) collection of possible COST UNIT prices (COGS related), related to the sale of the product on this line.  Actual usage and ability to populate depends on the richness of the sources.  Some can be derived, while others are typically provided",
+              "unevaluatedProperties": false,
+              "properties": {
+                "ProductCostPrice": {
+                  "type": "object",
+                  "description": "The product 'cost price' - unit cost related to the buying/making of the product on this line (not marketing or logistics related), often provided, but sometimes needs to be derived from ProductCostTotal / QtySold (QtyNet).  Quite often this is derived by joining to core product/price entities, which includes costs, and enriching subsequent",
+                  "unevaluatedProperties": false,
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "LogisticsCostPrice": {
+                  "description": "The logistics 'cost price' - unit cost related to the transport/logistics of the product on this line (not marketing or logistics related), often an apportioned amount.",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                }
+              }
+            },
+            "MarginPrices": {
+              "type": "object",
+              "description": "The (optional) collection of possible Margin UNIT prices (COGS related), related to the profitability of the product on this line.  Actual usage and ability to populate depends on the richness of the sources, having both selling and cost price(s).  Most often needs to be derived",
+              "unevaluatedProperties": false,
+              "properties": {
+                "ProductMarginPrice": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                }
+              }
+            }
+          },
+          "required": [
+            "SellingPrices"
+          ]
+        },
+        "Totals": {
+          "type": "object",
+          "description": "The collection of possible AGGREGATE totals (unit * qty), both selling and cost related, related to the sale of this line.  Actual usage and ability to populate depends on the richness of the sources.  Some can be derived, while others are typically provided",
+          "unevaluatedProperties": false,
+          "properties": {
+            "SaleTotals": {
+              "type": "object",
+              "description": "",
+              "unevaluatedProperties": false,
+              "properties": {
+                "SubTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "SubTotalBeforeDiscounts": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "DiscountsTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "ChargesTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "TaxesTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                }
+              }
+            },
+            "CostTotals": {
+              "type": "object",
+              "description": "",
+              "unevaluatedProperties": false,
+              "properties": {
+                "ProductCostTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "LogisticsCostTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "MarketingCostTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                },
+                "CommissionTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                }
+              }
+            },
+            "MarginTotals": {
+              "type": "object",
+              "description": "",
+              "unevaluatedProperties": false,
+              "properties": {
+                "ProductMarginTotal": {
+                  "description": "",
+                  "$ref": "../../common/Price.json#/PriceProperties"
+                }
+              }
+            }
+          },
+          "required": [
+            "SaleTotals"
+          ]
+        }
+      },
+      "required": [
+        "SalesOrderNumber",
+        "SalesOrderLineNumber",
+        "ProductAtts",
+        "Qtys",
+        "Prices",
+        "Totals"
+      ]
+    }
+  ]
+}

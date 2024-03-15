@@ -1,0 +1,126 @@
+{
+  "type": "object",
+  "description": "An adjustment line related to a single charnge against a sales order entity (SOH, SOL).  Multiple charges lines are possible (1:*), thus this line object is typically in an array",
+  "unevaluatedProperties": false,
+  "allOf": [
+    {
+      "$ref": "../../common/Entity.json#/EntityHeader"
+    },
+    {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "ChargeId": {
+        "type": "string",
+        "description": "The canonical (synthetic) Xfuze Charge ID, if identifiable, format Charge_[SourceSystem]_[Number] e.g Charge_D365_AD123456"
+      },
+      "ChargeNumber": {
+        "type": "string",
+        "description": "The natural Charge number / key, if identifiable e.g AD123456"
+      },
+      "ChargeCode": {
+        "type": "string",
+        "description": "The unique code of the charge"
+      },
+      "ChargeType": {
+        "type": "string",
+        "description": "The type of the Charge e.g Service, Fee, ProductUsage"
+      },
+      "ChargePurpose": {
+        "type": "string",
+        "description": "The purpose of the Charge e.g Usage, Penalty"
+      },
+      "ChargeName": {
+        "type": "string",
+        "description": "The name of the Charge"
+      },
+      "ChargeDesc": {
+        "type": "string",
+        "description": "The description of the Charge instance"
+      },
+      "Status": {
+        "type": "object",
+        "description": "The collection of Status for this Charge",
+        "unevaluatedProperties": false,
+        "properties": {
+          "ProcessingStatus": {
+            "description": "",
+            "$ref": "../../common/Status.json#/StatusProperties"
+          }
+        }
+      },
+      "Times": {
+        "type": "object",
+        "description": "The collection of key Time points for this Charge",
+        "oneOf": [
+          {
+            "required": [
+              "AppliedOn"
+            ]
+          },
+          {
+            "required": [
+              "CreatedOn"
+            ]
+          }
+        ],
+        "unevaluatedProperties": false,
+        "properties": {
+          "AppliedOn": {
+            "description": "",
+            "$ref": "../../common/Time.json#/TimeProperties"
+          },
+          "CancelledOn": {
+            "description": "",
+            "$ref": "../../common/Time.json#/TimeProperties"
+          },
+          "VoidedOn": {
+            "description": "",
+            "$ref": "../../common/Time.json#/TimeProperties"
+          },
+          "CreatedOn": {
+            "description": "",
+            "$ref": "../../common/Time.json#/TimeProperties"
+          },
+          "LastUpdatedOn": {
+            "description": "",
+            "$ref": "../../common/Time.json#/TimeProperties"
+          },
+          "LastStatusUpdatedOn": {
+            "description": "",
+            "$ref": "../../common/Time.json#/TimeProperties"
+          }
+        }
+      },
+      "Totals": {
+        "type": "object",
+        "description": "The collection of possible totals, related to the Charge.  Actual usage and ability to populate depends on the richness of the sources..",
+        "unevaluatedProperties": false,
+        "properties": {
+          "ChargeTotal": {
+            "description": "",
+            "$ref": "../../common/Price.json#/PriceProperties"
+          }
+        },
+        "required": [
+          "ChargeTotal"
+        ]
+      },
+      "GLCode": {
+        "type": "string",
+        "description": "A GL code associated with this Charge"
+      },
+      "ReasonCode": {
+        "type": "string",
+        "description": "The reason code for this Charge"
+      },
+      "ReasonDesc": {
+        "type": "string",
+        "description": "The reason desc for this Charge"
+      },
+      "Lineage": {
+        "$ref": "../../common/EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  ]
+}

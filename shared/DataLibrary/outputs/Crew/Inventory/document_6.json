@@ -1,0 +1,309 @@
+{
+ "CompositeEntityId": "InventoryLedger_20231113100800000",
+ "CompositeEntityType": "InventoryLedger",
+ "DomainEvent": {
+  "TriggerEntity": {
+   "InventoryLedgerLine": {
+    "CompositeEntityId": "InventoryLedger_20231113100800000",
+    "CompositeEntityType": "InventoryLedger",
+    "EntityId": "InventoryLedgerLine_20231113100800000_166_1125569",
+    "EntityType": "InventoryLedgerLine",
+    "ParentEntityId": "InventoryLedgerLocation_20231113100800000_166",
+    "ParentEntityType": "InventoryLedgerLocation",
+    "Product": {
+     "ProductIds": {
+      "ProductVariantId": "ProductVariant_1125569",
+      "ProductVariantKey": "1125569",
+      "ProductVariantKeyType": "SKU",
+      "SKU": "1125569"
+     }
+    },
+    "Status": {
+     "AvailablityStatus": {
+      "StatusCode": "In Stock"
+     }
+    },
+    "StockLevel": {
+     "Allocation": {
+      "Allocated": {
+       "Total": {
+        "Amount": 0
+       }
+      },
+      "BackOrder": {
+       "Total": {
+        "Amount": 0
+       }
+      },
+      "Unallocated": {
+       "Total": {
+        "Amount": 4
+       }
+      }
+     },
+     "Availability": {
+      "OnHand": {
+       "Total": {
+        "Amount": 4
+       }
+      }
+     },
+     "Fulfilment": {
+      "Picking": {
+       "B2C": {
+        "Amount": 0
+       },
+       "Other": {
+        "Amount": 0
+       },
+       "Pending": {
+        "Amount": 0
+       },
+       "Total": {
+        "Amount": 0
+       }
+      }
+     },
+     "Return": {
+      "ExpectedReturns": {
+       "Total": {
+        "Amount": 0
+       }
+      },
+      "ReceivedReturns": {
+       "Total": {
+        "Amount": 0
+       }
+      }
+     },
+     "Transit": {
+      "Inbound": {
+       "Total": {
+        "Amount": 0
+       }
+      },
+      "Outbound": {
+       "Total": {
+        "Amount": 0
+       }
+      }
+     }
+    },
+    "StockLocation": {
+     "StockLocationKey": "166"
+    },
+    "Times": {
+     "CreatedOn": {
+      "DateId": "Dates_20231113",
+      "DateKey": 20231113,
+      "DateLocal": "2023-11-13",
+      "DateTimeKey": 20231113100800000,
+      "DateUTC": "2023-11-13",
+      "HourId": "Hours_2023111310",
+      "HourKey": 2023111310,
+      "HourLocal": 10,
+      "HourUTC": 10,
+      "Local": "2023-11-13T10:08:00.000+00:00",
+      "Millis": 1699870080000,
+      "RawValue": "13/11/2023 10:08",
+      "TimeZone": "Europe/London",
+      "TimeZoneOffset": "+00:00",
+      "UTC": "2023-11-13T10:08:00.000Z",
+      "YearDay": 2023317,
+      "YearIsoWeek": 202346,
+      "YearMonth": 202311,
+      "YearWeek": 202345
+     },
+     "UpdatedOn": {
+      "DateId": "Dates_20231113",
+      "DateKey": 20231113,
+      "DateLocal": "2023-11-13",
+      "DateTimeKey": 20231113100800000,
+      "DateUTC": "2023-11-13",
+      "HourId": "Hours_2023111310",
+      "HourKey": 2023111310,
+      "HourLocal": 10,
+      "HourUTC": 10,
+      "Local": "2023-11-13T10:08:00.000+00:00",
+      "Millis": 1699870080000,
+      "RawValue": "13/11/2023 10:08",
+      "TimeZone": "Europe/London",
+      "TimeZoneOffset": "+00:00",
+      "UTC": "2023-11-13T10:08:00.000Z",
+      "YearDay": 2023317,
+      "YearIsoWeek": 202346,
+      "YearMonth": 202311,
+      "YearWeek": 202345
+     }
+    },
+    "Type": {
+     "TypeCode": "InventorySnapshot",
+     "TypeDesc": "Daily Inventory Snapshot"
+    },
+    "XRefIds": [
+     {
+      "Code": "SKU",
+      "Id": "1125569",
+      "SystemCode": "Archean"
+     },
+     {
+      "Code": "Site",
+      "Id": "166",
+      "SystemCode": "Archean"
+     }
+    ]
+   }
+  }
+ },
+ "EntityId": "InventoryLedgerLine_20231113100800000_166_1125569",
+ "EntityType": "InventoryLedgerLine",
+ "EventId": "InventoryLedgerLinePublished_InventoryLedgerLine_20231113100800000_166_1125569_20231113100800000",
+ "EventMetadata": {
+  "EntityAtts": {
+   "Origin": {
+    "EntityId": "20231113100800000_166_1125569",
+    "ParentEntityId": "20231113100800000_166"
+   },
+   "Xfuze": {
+    "CompositeEntityId": "InventoryLedger_20231113100800000",
+    "CompositeEntityType": "InventoryLedger",
+    "EntityDomain": "Inventory",
+    "EntityId": "InventoryLedgerLine_20231113100800000_166_1125569",
+    "EntityType": "InventoryLedgerLine",
+    "IsSensitive": "N",
+    "ParentEntityId": "InventoryLedgerLocation_20231113100800000_166",
+    "ParentEntityType": "InventoryLedgerLocation"
+   }
+  },
+  "EventAtts": {
+   "Origin": {
+    "EventId": "20231113100800000_166_1125569",
+    "SourceFormatType": "CSV",
+    "SourceSystem": "Archaean"
+   },
+   "Xfuze": {
+    "ClientCode": "Crew",
+    "EnvCode": "dev",
+    "EventCategory": "Stock",
+    "EventChangePattern": "FullSnapshot",
+    "EventClass": "TriggerEvent",
+    "EventId": "InventoryLedgerLinePublished_InventoryLedgerLine_20231113100800000_166_1125569_20231113100800000",
+    "EventName": "InventoryLedgerLinePublished"
+   }
+  },
+  "IngestAtts": {
+   "Xfuze": {
+    "File": {
+     "BatchId": null,
+     "BatchNumber": null,
+     "BytesOffsetInOriginalFile": 0,
+     "ChangeTimestampUTC": null,
+     "FormatType": "CSV",
+     "LineNumber": 0,
+     "Name": null,
+     "ObjectNotificationPayload": null,
+     "OriginalFileSizeBytes": 0,
+     "OriginalRowSizeBytes": 0,
+     "Path": null,
+     "PatternType": "CloudObjectNotification",
+     "SystemCode": "GCS",
+     "TotalBatchLines": 0,
+     "URI": null
+    }
+   }
+  },
+  "PayloadAtts": {
+   "Origin": {
+    "DataPayloadHash": "ed511d1cf6d4726b169acb8e72759b41",
+    "EventPayloadHash": "ed511d1cf6d4726b169acb8e72759b41",
+    "HashScheme": "MD5"
+   },
+   "Xfuze": {
+    "DataPayloadHash": "862e3f44ade96b5449e03c29ebeacae8",
+    "EventPayloadHash": "0e6e4e1816b621b76ea3810c649c7c6f",
+    "HashScheme": "MD5"
+   }
+  },
+  "PrivacyAtts": {
+   "Origin": {
+    "IsEncrypted": "N"
+   },
+   "Xfuze": {
+    "IsEncrypted": "N",
+    "IsSensitiveEntity": "N"
+   }
+  },
+  "TimeAtts": {
+   "Origin": {
+    "Times": {
+     "EventOccurredTimestamp": "13/11/2023 10:08"
+    }
+   },
+   "Xfuze": {
+    "TimeZones": {
+     "EventTimeZone": {
+      "TimeZone": "Europe/London",
+      "TimeZoneOffset": "+00:00"
+     },
+     "HomeTimeZone": {
+      "TimeZone": "Europe/London",
+      "TimeZoneOffset": "+00:00"
+     }
+    },
+    "Times": {
+     "EventOccurredTimestamp": {
+      "DateId": "Dates_20231113",
+      "DateKey": 20231113,
+      "DateLocal": "2023-11-13",
+      "DateTimeKey": 20231113100800000,
+      "DateUTC": "2023-11-13",
+      "HourId": "Hours_2023111310",
+      "HourKey": 2023111310,
+      "HourLocal": 10,
+      "HourUTC": 10,
+      "Local": "2023-11-13T10:08:00.000+00:00",
+      "Millis": 1699870080000,
+      "RawValue": "13/11/2023 10:08",
+      "TimeZone": "Europe/London",
+      "TimeZoneOffset": "+00:00",
+      "UTC": "2023-11-13T10:08:00.000Z",
+      "YearDay": 2023317,
+      "YearIsoWeek": 202346,
+      "YearMonth": 202311,
+      "YearWeek": 202345
+     },
+     "EventOccurredType": "TrueTime",
+     "EventReceivedTimestamp": {
+      "DateId": "Dates_20231113",
+      "DateKey": 20231113,
+      "DateLocal": "2023-11-13",
+      "DateTimeKey": 20231113100800000,
+      "DateUTC": "2023-11-13",
+      "HourId": "Hours_2023111310",
+      "HourKey": 2023111310,
+      "HourLocal": 10,
+      "HourUTC": 10,
+      "Local": "2023-11-13T10:08:00.000+00:00",
+      "Millis": 1699870080000,
+      "RawValue": "13/11/2023 10:08",
+      "TimeZone": "Europe/London",
+      "TimeZoneOffset": "+00:00",
+      "UTC": "2023-11-13T10:08:00.000Z",
+      "YearDay": 2023317,
+      "YearIsoWeek": 202346,
+      "YearMonth": 202311,
+      "YearWeek": 202345
+     }
+    }
+   }
+  }
+ },
+ "EventName": "InventoryLedgerLinePublished",
+ "EventOccurredDateLocal": "2023-11-13",
+ "EventOccurredDateUTC": "2023-11-13",
+ "EventOccurredTimestampLocal": "2023-11-13T10:08:00.000+00:00",
+ "EventOccurredTimestampUTC": "2023-11-13T10:08:00.000Z",
+ "EventReceivedTimestampUTC": "2023-11-13T10:08:00.000Z",
+ "ParentEntityId": "InventoryLedgerLocation_20231113100800000_166",
+ "ParentEntityType": "InventoryLedgerLocation"
+}

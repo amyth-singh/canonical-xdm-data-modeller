@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xfuze.io/xdm/schema/components/event/common/EventHeader/EventMetadata/ReferenceAtts",
+  "description": "XDM Schema for the common event component 'EventHeader/EventMetadata/ReferenceAtts'",
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "ReferenceAtts": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "description": "The Xfuze derived / enriched attributes that define core reference data / lookup data fields to enrich other structs/fields with in the event",
+      "properties": {
+        "Atts": {
+          "type": "array",
+          "items": {
+            "$ref": "../../../entity/common/CustomAtt.json#/CustomAttProperties"
+          }
+        }
+      },
+      "required": [
+        "Atts"
+      ]
+    }
+  },
+  "required": [
+    "ReferenceAtts"
+  ]
+}

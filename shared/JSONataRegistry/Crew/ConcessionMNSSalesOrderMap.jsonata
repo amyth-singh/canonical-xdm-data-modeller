@@ -1,0 +1,841 @@
+(
+    $formatValue := function($value, $dType, $format){(
+        $formatString := $string ~> $trim;
+        $formatArray := function($array){$type($array) = "array" ? $array : [$array]};
+        $formatNumber := function($num){$type($num) = "number" ? $num : $type($num) = "string" ? $contains($num,/^-?\d+(\.\d+)?$/) ? $number($num) : null};
+        $formatDateTime := function($dt,$format) {(
+            $dateTimeRegexMap := {"[Y0001]-[M01]-[D01] [H01]:[m01]:[s01] [P]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]) (AM|PM)$/,
+                                  "[Y0001]-[M01]-[D01] [H01]:[m01]:[s01].[f001]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]).\d{3}$/,
+                                  "[M01]/[D01]/[Y0001]":/^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/[1-9][0-9]{3}$/,
+                                  "[M01]/[D01]/[Y0001] [H01]:[m01]:[s01]":/^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/[1-9][0-9]{3} ([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/,
+                                  "ISO8601":/^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d)(\.\d+)?([+-]([01]\d|2[0-3]):([0-5]\d)|Z)$/
+                                 };
+            $dateTimeFormatValidator := function($datetime,$dateTimeFormat){$boolean($dateTimeFormat) ? $contains($datetime,$lookup($dateTimeRegexMap,$dateTimeFormat)): $contains($datetime,$lookup($dateTimeRegexMap,"ISO8601"))};
+
+            $exists($dt) ? $dateTimeFormatValidator($dt,$format) ? $boolean($format) and $not($format = "ISO8601") ? $fromMillis($toMillis($dt,$format)) : $fromMillis($toMillis($dt)) : null;
+            )};
+        $formatStringBool := function($value,$format){(
+            $stringBoolMap := {"Y":"Y","1":"Y","TRUE":"Y","N":"N","0":"N","FALSE":"N","false":"N","true":"Y","F":"N","T":"Y"};
+            $upperTrim := $string ~> $trim ~> $uppercase;
+            $stringBool := function($v){$exists($value)?$lookup($stringBoolMap, $upperTrim($value)):""};
+            $reverseBool := function($v){$v = "Y" ? "N" : $v = "N" ? "Y" : "U"};
+            $type($format)="null" ? $value ~> $stringBool : $format="reverse" ? $value ~> $stringBool ~> $reverseBool : null
+        )};
+
+        $dType = "TIMESTAMP"  ? $formatDateTime($value,$format) :
+        $dType = "STRINGBOOL" ? $formatStringBool($value,$format) :
+        $dType = "NUMERIC"    ? $formatNumber($value) :
+        $dType = "STRING"     ? $formatString($value) :
+        $dType = "ARRAY"      ? $formatArray($value) :
+        null;
+    )};
+
+    $attributeSplitter := function($v,$sep,$pos){$split($v, $sep) ~> function($v){$trim($v[$pos])}};
+
+    $buildCustomAttribute := function($rawEntityId       /* Unique code describing the associated event (e.g., Sale, Return, Deposit) */
+                                     ,$attributeId      /* ID for distinct attributes (e.g., unique line ID for sales lines) */
+                                     ,$canonicalCode    /* Hierarchical code in dot notation, indicating position in hierarchy */
+                                     ,$desc             /* Explanation of the attribute's purpose to avoid ambiguity */
+                                     ,$value            /* Value of the attribute */
+                                     ,$dType            /* Type of data (options: TIMESTAMP, STRINGBOOL, NUMERIC, STRING) */
+                                     ,$dFormat          /* Format details e.g. input time format or bool direction */
+                                     ,$includeMetadata  /* Boolean: Whether to include metadata in the hierarchical output */
+                                     )
+    {(
+        /* Build attribute unique id by concatenating entity code, canonical code and attribute id */
+        $buildAttributeID := function($rawEntityId,$canonicalCode,$attributeId){$rawEntityId & "_" & $replace($canonicalCode,".","_") & ($type($attributeId) = "null" ? "" : "_" & $attributeId)};
+
+
+        {"Id":$buildAttributeID($rawEntityId,$canonicalCode,$attributeId),
+         "Desc":$desc,
+         "Code":$canonicalCode,
+         "Value":$formatValue($value,$dType,$dFormat),
+         "Type":$dType,
+         "IncludeMetadata":$includeMetadata
+         }
+    )};
+
+    $convertCustomAttribute := function($jsonDoc){(
+
+        /* This function converts a custom attribute in the input JSON document into a hierarchy of objects.           */
+        /* The hierarchy is based on the 'Code' attribute value and creates objects accordingly.                       */
+        /* An example of which is shown below                                                                          */
+
+        /* INPUT CUSTOM ATTRIBUTE                                                                                      */
+        /*   {                                                                                                         */
+        /*     "ID": "Get_Customer_1234_Header_Contact_Address_AddresLine1",                                           */
+        /*     "Desc": "First Line of Contact Address",                                                                */
+        /*     "Code": "Header.Contact.Address.AddresLine1",                                                           */
+        /*     "Value": "Test Street",                                                                                 */
+        /*     "Type": "STRING"                                                                                        */
+        /*   }                                                                                                         */
+
+        /* OUTPUT ARRAY OF COMPONENT ATTRIBUTES                                                                        */
+        /*  [{                                                                                                         */
+        /*     "Key": "Header",                                                                                        */
+        /*     "Location": "$",                                                                                        */
+        /*     "Value": {                                                                                              */
+        /*       "Header": {}                                                                                          */
+        /*     }                                                                                                       */
+        /*   },                                                                                                        */
+        /*   {                                                                                                         */
+        /*     "Key": "Header.Contact",                                                                                */
+        /*     "Location": "Header",                                                                                   */
+        /*     "Value": {                                                                                              */
+        /*       "Contact": {}                                                                                         */
+        /*     }                                                                                                       */
+        /*   },                                                                                                        */
+        /*   {                                                                                                         */
+        /*     "Key": "Header.Contact.Address",                                                                        */
+        /*     "Location": "Header.Contact",                                                                           */
+        /*     "Value": {                                                                                              */
+        /*       "Address": {}                                                                                         */
+        /*     }                                                                                                       */
+        /*   },                                                                                                        */
+        /*   {                                                                                                         */
+        /*     "Key": "Header.Contact.Address.AddresLine1",                                                            */
+        /*     "Location": "Header.Address",                                                                           */
+        /*     "Value": {                                                                                              */
+        /*       "AddresLine1": "Test Street"                                                                          */
+        /*     }                                                                                                       */
+        /*   }]                                                                                                        */
+
+        $nestedObjectParts := $jsonDoc.(
+          $codeParts := $split(Code, ".");
+          $codeLength := $count($codeParts)-1;
+          $value := Value;
+          $description := Desc;
+          $includeMetadata := IncludeMetadata;
+          $Id := Id;
+
+          /* Determine the structure of the 'Value' field based on whether 'IncludeMetadata' is true or false */
+          $metadataValue := {"Id":$Id, "Value":$value,"Description":$description};
+
+          /* Build attribute array using the accumulator of the reduce function                     */
+          /* (https://docs.jsonata.org/higher-order-functions#reduce)                               */
+          /* and the append array function to concatenate the output array to the accumulator array */
+          /* https://docs.jsonata.org/array-functions#append                                        */
+          $codeValues := $reduce($codeParts, function($a, $v, $i) {(
+
+            $valueBaseStruct := $i=$codeLength ? [{"Key":$v,"Location":"$","Value":{$v:$value}}] :[{"Key":$v,"Location":"$","Value":{$v:{}}}];
+            $valueLeafStruct := [{"Key":$a[-1].Key & "." & $v,"Location":$a[-1].Key,"Value":{$v:{}}}];
+            $valueStruct := [{"Key":$a[-1].Key & "." & $v,"Location":$a[-1].Key,"Value":{$v: $value}}];
+
+            $append($a, $i=0           ? $valueBaseStruct :
+                        $i=$codeLength ? $valueStruct :
+                                         $valueLeafStruct
+                   )
+          )}, []);
+
+          $metadataValues := $reduce($codeParts, function($a, $v, $i) {(
+
+            $metadataBaseStruct := $includeMetadata ? [{"Key":$v & ".EntityMetadata","Location":$v,"Value":{"EntityMetadata":{}}}] : [];
+            $metadataLeafStruct := $includeMetadata ? [{"Key":$a[-1].Key & "." & $v,"Location":$a[-1].Key,"Value":{$v:{}}}] : [];
+            $metadataStruct := $includeMetadata ? [{"Key":$a[-1].Key & "." & $v,"Location":$a[-1].Key,"Value":{$v: $metadataValue}}] : [];
+
+            $append($a, $i=0           ?  $metadataBaseStruct:
+                        $i=$codeLength ?  $metadataStruct:
+                                          $metadataLeafStruct
+                   )
+          )}, []);
+
+          {"Values":$codeValues, "Metadata":$metadataValues};
+        );
+
+        /*  Remove duplicate objects from the array           */
+        /*  https://docs.jsonata.org/array-functions#distinct */
+
+        $distinctValueObjectParts := $distinct($nestedObjectParts.Values);
+        $distinctMetadataObjectParts := $distinct($nestedObjectParts.Metadata);
+        $distinctObjectParts := $append($distinctValueObjectParts, $distinctMetadataObjectParts);
+
+        /*  Build the final JSON document by iteratively inserting values                */
+        /*  The object is built using the accumulator of the reduce function             */
+        /*  (https://docs.jsonata.org/higher-order-functions#reduce)                     */
+        /*  to iteratively add to the json document                                      */
+        /*  in combination with the transform higher order function                      */
+        /*  (https://docs.jsonata.org/other-operators#-------transform)                  */
+        /*  to insert values into the document at the location defined in each attribute */
+
+        /* FINAL HIERARCHICAL OUTPUT                                                     */
+        /*   {                                                                           */
+        /*     "Header": {                                                               */
+        /*       "Contact": {                                                            */
+        /*         "Address": {                                                          */
+        /*           "AddresLine1": "Test Street"                                        */
+        /*         },                                                                    */
+        /*       }                                                                       */
+        /*     }                                                                         */
+        /*   }                                                                           */
+
+        $reduce($distinctObjectParts,function($a, $v){
+          $a ~> |$eval($v.Location)|$v.Value|
+        },{});
+
+
+    )};
+
+    /* MAPPING START */
+
+
+    /* ENTITY ATTS */
+    /* Key consts & ids */
+    $entityDomain := "Sales";
+    /* SOL is the core entity grain for the mapping, but we will wrap it in outer composite */
+    $entityTypeCode := "SalesOrderLine";
+    $entitySubTypeCode := function() {
+      $formatValue(`Sales (Units)`,"NUMERIC") >= 0 ? "Sale" : "ReturnRefunded"
+    };
+    $entityType := $entityTypeCode & "::" & $entitySubTypeCode();
+    $entityCompositeTypeCode := "SalesOrder";
+    $entityCompositeSubTypeCode:= "Sale";
+    $entityCompositeSubType := $entityCompositeTypeCode & "::" & $entityCompositeSubTypeCode;
+
+    $entityVariation := "Concession";
+    $entityClass := "Composite";
+    $sourceSystem := "MNS";
+    $sourceSubSystem := "ConcessionCSV";
+    $sourceFormatType := "CSV";
+    $rawEntityId := function() {
+      $formatValue("(TODO)","STRING")
+    };
+    $entityId := $join([$entityType,$sourceSystem,$rawEntityId()][$type($) != "null"],"_");
+
+    $rawParentEntityId := function() {
+      NULL
+    };
+    $parentEntityTypeCode := "SalesOrder";
+    $parentEntitySubTypeCode := "Sale";
+    $parentEntityType := $parentEntityTypeCode & "::" & $parentEntitySubTypeCode;
+    $parentEntityId := $join([$parentEntityType,$sourceSystem,$rawParentEntityId()][$type($) != "null"],"_");
+
+    $entityCompositeId := $join([$entityCompositeSubType,$sourceSystem,$rawParentEntityId()][$type($) != "null"],"_");
+
+
+    /* EVENT ATTS */
+    /* Key consts & ids */
+    $canonicalEventMetadataCodePrefix := "EventMetadata";
+    $eventBusinessRoot := "DomainEvent";
+    $eventTriggerPrefix := $eventBusinessRoot & ".TriggerEntity";
+    $eventLatestPrefix := $eventBusinessRoot & ".LatestEntity";
+    $eventCategory := "Sales";
+    $eventClass := "TriggerEvent";
+    $eventChangePattern := "FullSnapshot";
+    $eventSourceFormatType := "JSON";
+    $clientCode := "Crew";
+    $eventValueStream := "Order2Cash";
+    $bizCapL0 := "Sell";
+    $bizCapL1 := "Sell & Serve";
+    $bizCapL2 := "Take Sale";
+
+    /* EventName */
+    $rawEventName := NULL;
+    $eventVerb := "Completed"; /* seems all are completed ? need more data to validate */
+    $eventName := $replace($entityType & $eventVerb,"::","");
+
+    /* TimeZones */
+    $homeTimeZone := "Europe/London";
+    $homeTimeZoneOffset := "UTC +1"; /* TODO: to derive */
+    $eventTimeZone := "Europe/London";
+    $eventTimeZoneOffset := "UTC +1"; /* TODO: to derive */
+    $partyTimeZone := "Europe/London";
+    $partyTimeZoneOffset := "UTC +1"; /* TODO: to derive */
+
+    /* TimeAtts */
+    /* EventOccurredTimestamp */
+    $rawEventOccurredTimestamp := "0"& `Date`; /* TODO: fix */
+    $eventOccurredType = "TrueTime";
+    $rawEventOccurredTz := $eventTimeZone; /* TODO: Use for local conversion within the event */
+    $eventOccurredTsFormat := "[M01]/[D01]/[Y0001]";
+    $eventOccurredTimestamp := $formatValue($rawEventOccurredTimestamp,"TIMESTAMP",$eventOccurredTsFormat);
+    $eventOccurredTimestampLocal := $formatValue($rawEventOccurredTimestamp,"TIMESTAMP",$eventOccurredTsFormat);
+    $eventOccurredTimestampMillis := $millis();
+
+
+    /* EventId */
+    $eventWatermark := $eventOccurredTimestamp;
+    $rawEventId := "5059595888529"; /* TODO: need to build something up using source metadata as no ids */
+    $eventId := $join([$eventName,$entityId,$eventWatermark ][$type($) != "null"],"_");
+    $correlationId := "5059595888529";
+
+    /* EventReceivedTimestamp - should always be passed in as UTC, typically time.now() once connector erceives */
+    $eventReceivedTimestamp := $formatValue($now(),"TIMESTAMP");
+    $eventReceivedTimestampLocal := $formatValue($now(),"TIMESTAMP");
+    $eventReceivedTimestampMillis := $millis();
+
+    /* Party - Customer Atts */
+    /* No party info in this */
+    $rawSystemPartyId := NULL;
+    $systemPartyId := NULL;
+    $partyRoleType := NULL;
+    $partyRoleTypeCode := NULL;
+    $partyRoleSubTypeCode := NULL;
+
+    /* Product Atts */
+    $mapProductIdFromNumberFn := function($prodNum) {
+      "ProductVariant_" & "Retail247Origin" & "_" & $prodNum
+    };
+    $productId := $mapProductIdFromNumberFn(EAN);
+    $productNumber := EAN;
+    $productIdArray := $map([EAN],$mapProductIdFromNumberFn);
+    $productNumberArray := [EAN];
+    $productInvolvedReasonCode := function() {
+      $formatValue(`Sales (Units)`,"NUMERIC") >= 0 ? "SoldProduct" : "ReturnedRefundedProduct"
+    };
+
+    /* Location Atts */
+    /* TODO - check if crew locations have an id for concession partners */
+    $rawLocationId := $replace($attributeSplitter(`Site Hierarchy`," ",1),/[()]/,"");
+    $locationId := "Location_" & $sourceSystem & "_" & $rawLocationId;
+    $locationNumber := $rawLocationId;
+    $locationName := $formatValue(`Site Hierarchy`,"STRING");
+
+    /* Privacy Atts */
+    $isRawEncrypted := "N";
+    $isSensitiveEntity := "N";
+    $isEncrypted := "N";
+    $encryptionKeyURI := NULL;
+    $encryptionKeyHost := NULL;
+    $sensitiveFieldPaths := NULL;
+
+    /* Ingest Atts */
+    /* TODO runtime bindings */
+
+    /* Currency */
+    $homeCurrencyBCY := "GBP";
+    $localCurrencyLCY := "GBP";
+
+    /* SPECIFIC SUB ENTITIES */
+
+    /* ### Header (SOH) ### */
+    /* Ids & code */
+    $entityType_SOH := "SalesOrderHeader";
+    $rawEntityId_SOH := $rawParentEntityId();
+    $entityId_SOH := ($entityType_SOH & "_" & $sourceSystem & "_" & $rawEntityId_SOH);
+
+    /* ### Header Type ### */
+    $rawClassList := [
+    ];
+
+    $mapLineRawClassXrefFn := function($rawValue) {
+      "Concession"
+    };
+
+    $rawTypeList := [
+    ];
+
+    $mapRawTypeXrefFn := function($rawValue) {
+      "Sale"
+    };
+
+    /* ### Header Status ### */
+    $rawStatusList := [
+    ];
+
+    $mapRawLineStatusXrefFn := function($rawName) {
+      "Completed"
+    };
+
+    /* ### Header.Times ### */
+    /* CreatedOn */
+    $mapHeaderTimesCreatedOn := function($rawValue,$tsFormat) {
+      NULL
+    };
+
+    /* PlacedOn */
+    $mapLineTimesPlacedOn := function($rawValue,$tsFormat) {
+      $formatValue($rawValue,"TIMESTAMP",$tsFormat)
+    };
+
+    /* CompletedOn */
+    $mapLineTimesCompletedOn := function($rawValue,$tsFormat) {
+      $formatValue($rawValue,"TIMESTAMP",$tsFormat)
+    };
+
+    /* ### Header.Channels ### */
+    /* SalesChannel */
+    $mapLineChannelsSalesChannelClassCode := function($rawValue) {
+      "Concession"
+    };
+
+    $mapLineChannelsSalesChannelTypeCode := function($rawValue) {
+      $contains($formatValue(`Site Hierarchy`,"STRING"),"E-Commerce") ? "Online" : "Retail"
+    };
+
+    $mapLineChannelsSalesChannelTypeName := function($rawValue) {
+      $contains($formatValue(`Site Hierarchy`,"STRING"),"E-Commerce") ? "Online" : "Retail"
+    };
+
+    /* ### Lines[].CurrencyExchangeRates ### */
+    /* Lines[].SalesChannel */
+    $mapLineCurrencyExchangeRatesSalesFxRate := function($rawValue) {
+      NULL
+    };
+
+    /* ### Lines[].Qtys ### */
+        /* QtySold */
+    $mapLineQtysQtNetAmount := function() {
+      $formatValue(`Sales (Units)`,"NUMERIC")
+    };
+
+    /* QtySold */
+    $mapLineQtysQtSoldAmount := function() {
+      $formatValue(`Sales (Units)`,"NUMERIC") >= 0 ? $formatValue(`Sales (Units)`,"NUMERIC") : 0
+    };
+
+   /* QtyNet */
+    $mapLineQtysQtReturnedAmount := function() {
+      $formatValue(`Sales (Units)`,"NUMERIC") < 0 ? $formatValue(`Sales (Units)`,"NUMERIC") : 0
+    };
+
+    /* ### Line[].Prices.SellingPrices. ### */
+    /* SoldPrice */
+    $mapLinePricesSoldPriceCurrentLCYIncTax := function() {
+      $formatValue(`Sales (Units)`,"NUMERIC") != 0 ? $formatValue(`Sales Revenue Inc Vat`,"NUMERIC") / $abs($formatValue(`Sales (Units)`,"NUMERIC"))
+
+    };
+
+    $mapLinePricesSoldPriceCurrentLCYExTax := function() {
+      NULL
+    };
+
+    $mapLinePricesSoldPriceCurrentLCYTax := function() {
+      NULL
+    };
+
+
+    /* TotalsTaxTotal */
+    $mapLineTotalsTaxTotalCurrentLCYTax := function() {
+      NULL
+    };
+
+    /* TaxableAmountTotal */
+    $mapLineTotalsTaxableAmountTotalCurrentLCYTax := function() {
+      NULL
+    };
+
+    /* ### Line[].Totals ### */
+    /* SubTotal */
+    $mapLineTotalsSubTotalCurrentLCYIncTax := function() {
+      $formatValue(`Sales Revenue Inc Vat`,"NUMERIC")
+
+    };
+
+    $mapLineTotalsSubTotalCurrentLCYExTax := function() {
+      NULL
+    };
+
+    $mapLineTotalsSubTotalCurrentLCYTax := function() {
+      NULL
+    };
+
+
+    /* CommissionTotal */
+    $mapLineTotalsCommissionCurrentLCYIncTax := function() {
+      NULL
+    };
+
+    /* NetRevenueTotal */
+    $mapLineTotalsNetRevenueTotalCurrentLCYExTax := function() {
+      NULL
+    };
+
+    /* TaxDueTotal */
+    $mapLineTotalsTaxTotalCurrentLCYTax := function() {
+      NULL
+    };
+
+    /* TaxableAmountTotal */
+    $mapLineTotalsTaxableAmountTotalCurrentLCYTax := function() {
+      NULL
+    };
+
+
+    /* ### TaxSummary ### */
+    /* TODO - investigate totalTaxSummary, can be more then. 1entry in array?   */
+    $taxTypeCode := "VAT";
+
+    $mapHeaderTaxSummaryRateEstimated := function() {
+      $mapLineTotalsTaxTotalCurrentLCYTax() / $mapLineTotalsSubTotalCurrentLCYExTax()
+    };
+
+    $mapHeaderTaxSummaryRateActual := function() {
+      $formatValue(`VATRate`,"NUMERIC")
+    };
+
+    /* ### SalesOrderLine (SOL) ### */
+    /* Ids & core codes */
+    $entityTypeClass_SOL := "RetailTransaction";
+    $entityTypeCode_SOL := "SalesOrderLine";
+    $mapLineRawTypeXrefFn := function() {
+      $formatValue(`Sales (Units)`,"NUMERIC") >= 0 ? "Sale" : "Return"
+    };
+    $entitySubTypeCode_SOL := $mapLineRawTypeXrefFn();
+
+
+
+    $entityType_SOL := $entityTypeCode_SOL & "::" & $entitySubTypeCode_SOL;
+
+    $mapRawEntityId_SOL := function($rawEntityId, $rawValue) {
+      $rawEntityId & "_" & $rawValue
+    };
+
+    $mapEntityId_SOL := function($rawEntityId, $rawValue) {
+      $join([$entityType_SOL,$sourceSystem,$mapRawEntityId_SOL($rawEntityId,$rawValue)])
+    };
+
+    $mapLineSeqNo := function($rawVal) {
+      $formatValue($rawVal,"NUMERIC")
+    };
+
+    $sortLines := function($lineArray) {
+      $sort($lineArray, function($l, $r) {
+        $formatValue($l.`EAN`,"NUMERIC") > $formatValue($r.`EAN`,"NUMERIC")
+      })
+    };
+
+    $mapLinesQtysNetQty := function($rawVal) {
+      $formatValue($rawVal,"NUMERIC")
+    };
+
+    $mapLinesPricesUnitPriceBeforeDiscountsIncTax := function($rawVal) {
+      $formatValue($rawVal,"NUMERIC")
+    };
+
+    $mapLinesTotalsSubTotalIncTax := function($rawVal) {
+      $formatValue($rawVal,"NUMERIC")
+    };
+
+    $mapLinesTotalsSubTotalBeforeDiscountsIncTax:= function($qty,$unitPrice) {
+      $formatValue($qty,"NUMERIC") * $formatValue($unitPrice,"NUMERIC")
+    };
+
+    $mapLinesTotalsDiscountsApportionedTotalCurrentLCYIncTax:= function($rawVal) {
+      -1.0 * $formatValue($rawVal,"NUMERIC")
+    };
+
+    $mapLinesTotalsPromotionsApportionedTotalCurrentLCYIncTax:= function($rawVal) {
+      -1.0 * $formatValue($rawVal,"NUMERIC")
+    };
+
+    $mapLinesTotalsDiscountRefundApportionedTotalCurrentLCYIncTax:= function($rawVal) {
+      $formatValue($rawVal,"NUMERIC")
+    };
+
+    /* Map Payment Result Code */
+    $rawLineMarkdownStatusList := [
+      {"systemCode": "Full Price",         "xfuzeCode": "FullPrice"},
+      {"systemCode": "Reduced",            "xfuzeCode": "Markdown"}
+    ];
+
+    $mapLineMarkdownStatusXrefFn := function($rawName) {
+      $rawLineMarkdownStatusList[systemCode = $string($rawName)].xfuzeCode
+    };
+
+
+    /* ### SalesOrderPayment (SOP) ###*/
+    $entityType_SOP := "SalesOrderPayment";
+
+    /* Map Payment Result Code */
+    $rawPaymentResultList := [
+    ];
+
+    $mapRawPaymentResultXrefFn := function($rawName) {
+      NULL
+    };
+
+    /* Map Payment Status Code */
+    $linePaymentStatusCode := "FullyPaid";
+    $lineFulfilmentStatusCode := "FullyFulfilled"; /* store so assumed constant for now! */
+
+    /* Map Line Status Code */
+    $mapLineStatusCodeFn := function($rawCode) {
+      "Completed"
+    };
+
+    $convertCustomAttribute(
+    [
+      /* EVENT HEADER*/
+      /* Top level key atts for partitioning, clustering etc often needed at the top level */
+      $buildCustomAttribute($entityId,null,"EventId","",$eventId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,"EntityId","",$entityId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,"EntityType","",$entityType,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,"ParentEntityId","",$parentEntityId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,"ParentEntityType","",$parentEntityType,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,"EventOccurredTimestampUTC","",$eventOccurredTimestamp,"TIMESTAMP",null,false),
+      $buildCustomAttribute($entityId,null,"EventOccurredTimestampLocal","",$eventOccurredTimestamp,"TIMESTAMP",null,false),
+
+      /* EVENT METADATA */
+      /* EventAtts */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.EventId","",$eventId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.EventCategory","",$eventCategory,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.EventName","",$eventName,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.EventClass","",$eventClass,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.EventChangePattern","",$eventChangePattern,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.EventValueStream","",$eventValueStream,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.BizCapabilityL0","",$bizCapL0,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.BizCapabilityL1","",$bizCapL1,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.BizCapabilityL2","",$bizCapL2,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.ClientCode","",$clientCode,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.Note","","(Any context note like test)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Xfuze.IsDerivedEvent","","N","STRINGBOOL",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Origin.EventId","",$rawEventId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Origin.EventName","",$rawEventName,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Origin.SourceSystem","",$sourceSystem,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Origin.SourceSubSystem","",$sourceSubSystem,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Origin.SourceFormatType","",$sourceFormatType,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EventAtts.Origin.CorrelationId","",$correlationId,"STRING",null,false),
+
+      /* EntityAtts */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Xfuze.EntityId","",$entityId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Xfuze.EntityType","",$entityType,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Xfuze.EntitySubType","",$entitySubType,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Xfuze.EntityVariation","",$entityVariation,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Xfuze.EntityDomain","",$entityDomain,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Xfuze.EntityClass","",$entityClass,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Xfuze.ParentEntityId","",$parentEntityId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Xfuze.ParentEntityType","",$parentEntityType,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Xfuze.IsSensitive","","N","STRINGBOOL",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Origin.EntityId","",$rawEntityId(),"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".EntityAtts.Origin.ParentEntityId","",$rawParentEntityId(),"STRING",null,false),
+
+      /* TimeAtts */
+      /* TimeZones */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.TimeZones.HomeTimeZone.TimeZone","",$homeTimeZone,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.TimeZones.HomeTimeZone.TimeZoneOffset","",$homeTimeZoneOffset,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.TimeZones.EventTimeZone.TimeZone","",$eventTimeZone,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.TimeZones.EventTimeZone.TimeZoneOffset","",$eventTimeZoneOffset,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.TimeZones.PartyTimeZone.TimeZone","",$partyTimeZone,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.TimeZones.PartyTimeZone.TimeZoneOffset","",$partyTimeZoneOffset,"STRING",null,false),
+
+      /* EventOccurredTimestamp */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.Times.EventOccurredTimestamp.UTC","",$eventOccurredTimestamp,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.Times.EventOccurredTimestamp.Local","",$eventOccurredTimestampLocal,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.Times.EventOccurredTimestamp.Millis","",$eventOccurredTimestampMillis,"NUMERIC",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.Times.EventOccurredType","",$eventOccurredType,"STRING",null,false), /* JW: not showing ? */
+
+      /* EventExternalReceivedTimestamp: To be passed in from connector */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.Times.EventExternalReceivedTimestamp.UTC","",$eventExternalReceivedTimestamp,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.Times.EventExternalReceivedTimestamp.Local","",$eventExternalReceivedTimestampLocal,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.Times.EventExternalReceivedTimestamp.Millis","",$eventExternalReceivedTimestampMillis,"NUMERIC",null,false),
+
+      /* EventReceivedTimestamp: To be passed in from connector */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.Times.EventReceivedTimestamp.UTC","",$eventReceivedTimestamp,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.Times.EventReceivedTimestamp.Local","",$eventReceivedTimestampLocal,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Xfuze.Times.EventReceivedTimestamp.Millis","",$eventReceivedTimestampMillis,"NUMERIC",null,false),
+
+
+      /* EventProcessedTimestamp: Not mappable as done by event processor*/
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Origin.Times.EventOccurredTimestamp","",`TransDate`,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".TimeAtts.Origin.Times.EventExternalReceivedTimestamp","",`PolledDate`,"STRING",null,false),
+
+
+      /* Event Metadata -PartyAtts */
+      /* Canonical data */
+      /* No party atts */
+
+      /* Event Metadata - ProductAtts */
+      /* Canonical data */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".ProductAtts.Xfuze.ProductIds","",$productIdArray,"ARRAY",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".ProductAtts.Xfuze.ProductSkus","",$productNumberArray,"ARRAY",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".ProductAtts.Xfuze.InvolvedReasonCode","",$productInvolvedReasonCode(),"STRING",null,false),
+
+      /* Event Metadata - LocationAtts */
+      /* Canonical data */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".LocationAtts.Xfuze.ChannelCode",$mapLineChannelsSalesChannelTypeCode(),"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".LocationAtts.Xfuze.ChannelName","",$mapLineChannelsSalesChannelTypeName(),"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".LocationAtts.Xfuze.LocationId","",$locationId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".LocationAtts.Xfuze.LocationNumber","",$locationNumber,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".LocationAtts.Xfuze.LocationName","",$locationName,"STRING",null,false),
+
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".LocationAtts.Xfuze.CountryCode2","",`CountryCode`,"STRING",null,false),
+
+      /* Event Metadata - LocationAtts */
+      /* Canonical data */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".MeasuresAtts.TriggerEntity.Value1",$mapLineTotalsSubTotalCurrentLCYIncTax(),"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".MeasuresAtts.TriggerEntity.Value1Code","","Header.Lines.Qtys.QtyNet","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".MeasuresAtts.TriggerEntity.Value2","",$mapLineTotalsSubTotalCurrentLCYIncTax(),"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".MeasuresAtts.TriggerEntity.Value2Code","","Header.Lines.Totals.SubTotal.Current.LCY.IncTax","STRING",null,false),
+
+
+      /* Event Metadata - LocationAtts */
+      /* Canonical data */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PrivacyAtts.Xfuze.IsSensitiveEntity","",$isSensitiveEntity ,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PrivacyAtts.Xfuze.IsEncrypted","",$isEncrypted,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PrivacyAtts.Xfuze.EncryptionKeyURI","",$encryptionKeyURI,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PrivacyAtts.Xfuze.EncryptionKeyHost","",$encryptionKeyHost,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PrivacyAtts.Xfuze.SensitiveFieldPaths","",$sensitiveFieldPaths,"ARRAY",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PrivacyAtts.Origin.IsEncrypted","",$isRawEncrypted ,"STRING",null,false),
+
+
+      /* Event Metadata - IngestAtts */
+      /* Canonical data */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".IngestAtts.Xfuze.File.SystemCode","","(runtime binding)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".IngestAtts.Xfuze.File.URI","","(runtime binding)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".IngestAtts.Xfuze.File.Path","","(runtime binding)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".IngestAtts.Xfuze.File.Name","","(runtime binding)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".IngestAtts.Xfuze.File.BatchId","","(runtime binding)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".IngestAtts.Xfuze.File.BatchNumber","","(runtime binding)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".IngestAtts.Xfuze.File.LineNumber","","(runtime binding)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".IngestAtts.Xfuze.File.TotalBatchLines","","(runtime binding)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".IngestAtts.Xfuze.File.SizeKBs","","(runtime binding)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".IngestAtts.Xfuze.File.FormatType","","(runtime binding)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".IngestAtts.Xfuze.File.PatternType","","(runtime binding)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".IngestAtts.Xfuze.File.ModificationTimestampUTC","","(runtime binding)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".IngestAtts.Xfuze.File.NotificationEventPayload","","(runtime binding)","STRING",null,false),
+
+      /* Event Metadata - PayloadAtts */
+      /* Canonical data */
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PayloadAtts.Xfuze.DataPayloadHash","", "(runtime binding or custom jsonata func)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PayloadAtts.Xfuze.EventPayloadHash","", "(runtime binding or custom jsonata func)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PayloadAtts.Xfuze.HashScheme","", "(runtime binding)","STRING",null,false),
+
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PayloadAtts.Origin.DataPayloadHash","", "(runtime binding post processing of output event)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PayloadAtts.Origin.EventPayloadHash","", "(runtime binding post processing of output event)","STRING",null,false),
+      $buildCustomAttribute($entityId,null,$canonicalEventMetadataCodePrefix & ".PayloadAtts.Origin.HashScheme","", "(runtime binding)","STRING",null,false),
+
+
+      /* ENTITY DATA - Sales Order (Composite) */
+      /* TOP LEVEL IDS at composite level */
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".EntityId","",$entityId_SOH,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".EntityType","",$entityType_SOH,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".ParentEntityId","",$parentEntityId,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".ParentEntityType","",$parentEntityType,"STRING",null,false),
+
+      /* Order Ids */
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.EntityId","",$entityId_SOH,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.HeaderId","",$entityId_SOH,"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.SalesOrderNumber","",$rawParentEntityId(),"STRING",null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.XRefIds","",
+      [
+          {"Id":$entityId_SOH,"SystemCode":"Xfuze","Code":"EntityId"},
+          {"Id":$rawParentEntityId(),"SystemCode":$sourceSystem,"Code":"RawEntityId"},
+          {"Id":$entityCompositeId,"SystemCode":"Xfuze","Code":"OrderId"},
+          {"Id":$entityId_SOH,"SystemCode":"Xfuze","Code":"HeaderId"},
+          {"Id":$string(BIS_Ref_ID),"SystemCode":$sourceSystem,"Code":"BIS_Ref_ID"},
+          $length(OrderReferenceNumber) > 0 ? {"Id":$string(OrderReferenceNumber),"SystemCode":$sourceSystem,"Code":"OrderReferenceNumber"} : NULL
+      ]
+      ,"ARRAY",null,false),
+
+      /* TimeZones */
+      /* TBD */
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.TimeZones.DefaultTimeZone","",$homeTimeZone,"STRING", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.TimeZones.DefaultTimeZoneOffset","",$homeTimeZoneOffset,"STRING", null,false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.TimeZones.EventTimeZone","",$eventTimeZone,"STRING",null, false),
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Header.TimeZones.EventTimeZoneOffset","",$eventTimeZoneOffset,"STRING", null,false),
+
+      $buildCustomAttribute($entityId,null,$eventTriggerPrefix & ".Lines","",
+
+        $convertCustomAttribute(
+        [
+            $buildCustomAttribute($entityId,null,"EntityId","",$mapEntityId_SOL($rawEntityId,`EAN`),"STRING",false),
+            $buildCustomAttribute($entityId,null,"EntityType","",$entityTypeCode_SOL,"STRING",false),
+            $buildCustomAttribute($entityId,null,"ParentEntityId","",$entityId,"STRING",false),
+            $buildCustomAttribute($entityId,null,"ParentEntityType","",$entityType,"STRING",false),
+            $buildCustomAttribute($entityId,null,"HeaderId","",$entityId_SOH,"STRING",false),
+            $buildCustomAttribute($entityId,null,"SalesOrderNumber","",$rawParentEntityId(),"STRING",false),
+            $buildCustomAttribute($entityId,null,"SalesOrderLineNumber","",$mapRawEntityId_SOL($rawParentEntityId(),`BIS_Ref_ID`),"STRING",false),
+            $buildCustomAttribute($entityId,null,"SalesOrderLineProductNumber","",$mapRawEntityId_SOL($rawParentEntityId(),`EAN`),"STRING",false),
+            $buildCustomAttribute($entityId,null,"XRefIds","",
+            [
+                {"Id":$entityId_SOL,"SystemCode":"Xfuze","Code":"EntityId"},
+                {"Id":$entityId_SOH,"SystemCode":"Xfuze","Code":"ParentEntityId"},
+                {"Id":$rawEntityId(),"SystemCode":$sourceSystem,"Code":"RawEntityId"},
+                {"Id":$parentEntityId,"SystemCode":"Xfuze","Code":"OrderId"},
+                {"Id":$entityId_SOH,"SystemCode":"Xfuze","Code":"HeaderId"},
+                {"Id":$entityId_SOL,"SystemCode":"Xfuze","Code":"LineId"},
+                {"Id":$string(BIS_Ref_ID),"SystemCode":$sourceSystem,"Code":"BIS_Ref_ID"},
+                {"Id":$mapRawEntityId_SOL($rawParentEntityId(),`EAN`),"SystemCode":$sourceSystem,"Code":"SalesOrderLineProductNumber"},
+                $length(OrderReferenceNumber) > 0 ? {"Id":$string(OrderReferenceNumber),"SystemCode":$sourceSystem,"Code":"OrderReferenceNumber"} : NULL
+            ]
+            ,"ARRAY",null,false),
+
+            /* Lines[].Type */
+            $buildCustomAttribute($entityId,null,"Type.Class.Code","",$mapLineRawClassXrefFn(`ModelType`),"STRING", null,false),
+            $buildCustomAttribute($entityId,null,"Type.Type.Code","",$mapLineRawTypeXrefFn(),"STRING", null,false),
+
+            /* Lines[].Status */
+            $buildCustomAttribute($entityId,null,"Status.LineStatus.Code","",$mapRawLineStatusXrefFn($string(`operationStatus`)),"STRING", null,false),
+            $buildCustomAttribute($entityId,null,"Status.PaymentStatus.Code","",$linePaymentStatusCode,"STRING", null,false),
+            $buildCustomAttribute($entityId,null,"Status.FulfilmentStatus.Code","",$lineFulfilmentStatusCode,"STRING", null,false),
+            $buildCustomAttribute($entityId,null,"Status.MarkdownStatus.Code","",$mapLineMarkdownStatusXrefFn(`FullPriceInd`),"STRING", null,false),
+
+            /* Lines[].Times */
+            /* TODO - format and local needs a func */
+            $buildCustomAttribute($entityId,null,"Times.PlacedOn.DateId","",$replace(`TransDate`,"-" ,"" ),"STRING", null,false),
+            $buildCustomAttribute($entityId,null,"Times.PlacedOn.UTC","",$mapLineTimesPlacedOn($rawEventOccurredTimestamp,$tsFormat),"STRING", null,false),
+            $buildCustomAttribute($entityId,null,"Times.PlacedOn.Local","",$mapLineTimesPlacedOn($rawEventOccurredTimestamp,$tsFormat),"STRING", null,false),
+            $buildCustomAttribute($entityId,null,"Times.CompletedOn.UTC","",$mapLineTimesCompletedOn($rawEventOccurredTimestamp,$tsFormat),"STRING", null,false),
+            $buildCustomAttribute($entityId,null,"Times.CompletedOn.Local","",$mapLineTimesCompletedOn($rawEventOccurredTimestamp,$tsFormat),"STRING",null, false),
+
+            /* Lines[].Channels */
+            $mapLineRawTypeXrefFn() = "Sale" ?
+              $buildCustomAttribute($entityId,null,"Channels.SalesChannel.Class.Code","",$mapLineChannelsSalesChannelClassCode(),"STRING", false),
+            $mapLineRawTypeXrefFn() = "Sale" ?
+              $buildCustomAttribute($entityId,null,"Channels.SalesChannel.Type.Code","",$mapLineChannelsSalesChannelTypeCode(),"STRING", false),
+            $mapLineRawTypeXrefFn() = "Sale" ?
+              $buildCustomAttribute($entityId,null,"Channels.SalesChannel.Type.Desc","",$mapLineChannelsSalesChannelTypeName(),"STRING", false),
+
+            $mapLineRawTypeXrefFn() = "Return" ?
+              $buildCustomAttribute($entityId,null,"Channels.ReturnChannel.Class.Code","",$mapLineChannelsSalesChannelClassCode(),"STRING", false),
+            $mapLineRawTypeXrefFn() = "Return" ?
+              $buildCustomAttribute($entityId,null,"Channels.ReturnChannel.Type.Code","",$mapLineChannelsSalesChannelTypeCode(),"STRING", false),
+            $mapLineRawTypeXrefFn() = "Return" ?
+              $buildCustomAttribute($entityId,null,"Channels.ReturnChannel.Type.Desc","",$mapLineChannelsSalesChannelTypeName(),"STRING", false),
+
+            $mapLineRawTypeXrefFn() = "Sale" ?
+              $buildCustomAttribute($entityId,null,"Locations.SalesLocation.Id","",$locationId,"STRING", false),
+            $mapLineRawTypeXrefFn() = "Sale" ?
+              $buildCustomAttribute($entityId,null,"Locations.SalesLocation.Name","",$locationName,"STRING", false),
+            $mapLineRawTypeXrefFn() = "Return" ?
+              $buildCustomAttribute($entityId,null,"Locations.ReturnLocation.Id","",$locationId,"STRING", false),
+            $mapLineRawTypeXrefFn() = "Return" ?
+              $buildCustomAttribute($entityId,null,"Locations.ReturnLocation.Name","",$locationName,"STRING", false),
+
+            /* Lines[].ProductAtts */
+            $buildCustomAttribute($entityId,null,"ProductAtts.ProductId","",$mapProductIdFromNumberFn(EAN),"STRING",false),
+            $buildCustomAttribute($entityId,null,"ProductAtts.ProductNumber","",`EAN`,"STRING",false),
+            $buildCustomAttribute($entityId,null,"ProductAtts.ProductNumberType","","EAN","STRING",false),
+            $buildCustomAttribute($entityId,null,"ProductAtts.VariantType","","SKU","STRING",false),
+            $buildCustomAttribute($entityId,null,"ProductAtts.Sku","",`Article Variant`,"STRING",false),
+            $buildCustomAttribute($entityId,null,"ProductAtts.Barcodes.EAN","",$formatValue(`EAN`,"STRING"),"STRING",false),
+            $buildCustomAttribute($entityId,null,"ProductAtts.Barcodes.UPC","",$formatValue(`UPC`,"STRING"),"STRING",false),
+            $buildCustomAttribute($entityId,null,"ProductAtts.Variant.Code","",$formatValue(`Article Variant`,"STRING"),"STRING",false),
+
+            /* Lines[].Qtys */
+            $buildCustomAttribute($entityId,null,"Qtys.QtySold.Amount","",$mapLineQtysQtSoldAmount(),"NUMERIC", false),
+            $buildCustomAttribute($entityId,null,"Qtys.QtyReturned.Amount","",$mapLineQtysQtReturnedAmount(),"NUMERIC", false),
+            $buildCustomAttribute($entityId,null,"Qtys.QtyNet.Amount","",$mapLineQtysQtNetAmount(),"NUMERIC", false),
+
+            /* Line.Prices */
+            /* Lines[].Prices.SellingPrices */
+            /* Lines[].Prices.SellingPrices.SoldPrice */
+            $buildCustomAttribute($entityId,null,"Prices.SellingPrices.SoldPrice.Current.LCY.CurrencyCode","",$localCurrencyLCY,"STRING", false),
+            $buildCustomAttribute($entityId,null,"Prices.SellingPrices.SoldPrice.Current.LCY.IncTax","",$mapLinePricesSoldPriceCurrentLCYIncTax(),"NUMERIC", false),
+            $buildCustomAttribute($entityId,null,"Prices.SellingPrices.SoldPrice.Current.LCY.ExTax","",$mapLinePricesSoldPriceCurrentLCYExTax(),"NUMERIC", false),
+            $buildCustomAttribute($entityId,null,"Prices.SellingPrices.SoldPrice.Current.LCY.Tax","",$mapLinePricesSoldPriceCurrentLCYTax(),"NUMERIC", false),
+            $buildCustomAttribute($entityId,null,"Prices.SellingPrices.SoldPrice.Current.BCY.CurrencyCode","",$homeCurrencyBCY,"STRING", false),
+            $buildCustomAttribute($entityId,null,"Prices.SellingPrices.SoldPrice.Current.BCY.IncTax","",$mapLinePricesSoldPriceCurrentLCYIncTax(),"NUMERIC", false),
+            $buildCustomAttribute($entityId,null,"Prices.SellingPrices.SoldPrice.Current.BCY.ExTax","",$mapLinePricesSoldPriceCurrentLCYExTax(),"NUMERIC", false),
+            $buildCustomAttribute($entityId,null,"Prices.SellingPrices.SoldPrice.Current.BCY.Tax","",$mapLinePricesSoldPriceCurrentLCYTax(),"NUMERIC", false),
+
+            /* Lines[].Totals */
+            /* Lines[].Totals.SaleTotals */
+            /* Lines[].Totals.SaleTotals.SubTotal */
+            $buildCustomAttribute($entityId,null,"Totals.SaleTotals.SubTotal.Current.LCY.CurrencyCode","",$localCurrencyLCY,"STRING", false),
+            $buildCustomAttribute($entityId,null,"Totals.SaleTotals.SubTotal.Current.LCY.IncTax","",$mapLineTotalsSubTotalCurrentLCYIncTax(),"NUMERIC", false),
+            $buildCustomAttribute($entityId,null,"Totals.SaleTotals.SubTotal.Current.LCY.ExTax","",$mapLineTotalsSubTotalCurrentLCYExTax(),"NUMERIC", false),
+            $buildCustomAttribute($entityId,null,"Totals.SaleTotals.SubTotal.Current.LCY.Tax","",$mapLineTotalsSubTotalCurrentLCYTax(),"NUMERIC", false),
+            $buildCustomAttribute($entityId,null,"Totals.SaleTotals.SubTotal.Current.BCY.CurrencyCode","",$homeCurrencyBCY,"STRING", false),
+            $buildCustomAttribute($entityId,null,"Totals.SaleTotals.SubTotal.Current.BCY.IncTax","",$mapLineTotalsSubTotalCurrentLCYIncTax(),"NUMERIC", false),
+            $buildCustomAttribute($entityId,null,"Totals.SaleTotals.SubTotal.Current.BCY.ExTax","",$mapLineTotalsSubTotalCurrentLCYExTax(),"NUMERIC", false),
+            $buildCustomAttribute($entityId,null,"Totals.SaleTotals.SubTotal.Current.BCY.Tax","",$mapLineTotalsSubTotalCurrentLCYTax(),"NUMERIC", false)
+
+          ]
+        )
+
+      ,"ARRAY",null,false)
+
+    ]
+    );
+)

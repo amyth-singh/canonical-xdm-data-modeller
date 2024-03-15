@@ -1,0 +1,62 @@
+{
+  "type": "object",
+  "properties": {
+    "Colour": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "properties": {
+        "ColourCode": {
+          "type": "string"
+        },
+        "ColourDescription": {
+          "type": "string"
+        },
+        "ColourGroup": {
+          "type": "string"
+        }
+      }
+    },
+    "Measurements": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "properties": {
+        "Weight": {
+          "$ref": "../../common/Measure.json#/MeasureProperties"
+        },
+        "Volume": {
+          "$ref": "../../common/Measure.json#/MeasureProperties"
+        },
+        "Dimensions": {
+          "type": "object",
+          "unevaluatedProperties": false,
+          "properties": {
+            "Height": {
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "Width": {
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "Depth": {
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "Length": {
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            }
+          }
+        },
+        "StandardSize": {
+          "type": "object",
+          "unevaluatedProperties": false,
+          "properties": {
+            "SizeCode": {
+              "type": "string"
+            },
+            "SizeDescription": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

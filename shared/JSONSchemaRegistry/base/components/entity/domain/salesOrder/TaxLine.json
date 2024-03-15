@@ -1,0 +1,64 @@
+{
+  "type": "object",
+  "description": "A tax line related to the tax against a sales order entity (SOH, SOL).  Multiple tax lines are possible (1:*), thus this line object is typically in an array",
+  "unevaluatedProperties": false,
+  "allOf": [
+    {
+      "$ref": "../../common/Entity.json#/EntityHeader"
+    },
+    {
+      "properties": {
+        "LineIds": {
+          "$ref": "./LineIds.json#/LineIdsProperties",
+          "description": "The (required) common set of order line Ids for this Tax line, not all a required individually, only what can be mapped & derived."
+        },
+        "TaxLineKey": {
+          "type": "string",
+          "description": "The 'natural' Tax line key/number, typically either a combination of SalesOrderNumber & a 'sequence number' (derived) OR explicitly supplied unique Id from source - also used to construct the synthetic SOL Xfuze Ids. e.g 123456789_1"
+        },
+        "TaxLineSeq": {
+          "type": "number",
+          "description": "The ordinal line sequence number e.g 2"
+        },
+        "Tax": {
+          "$ref": "../../common/Tax.json#/TaxProperties",
+          "description": "The Tax associated with this line"
+        },
+        "Totals": {
+          "type": "object",
+          "description": "The collection of possible totals, related to the tax line.  Actual usage and ability to populate depends on the richness of the sources.",
+          "unevaluatedProperties": false,
+          "properties": {
+            "TaxTotal": {
+              "description": "The total tax paid / payable on this line",
+              "$ref": "../../common/Price.json#/PriceProperties"
+            },
+            "TaxableAmountTotal": {
+              "description": "The total amount of sale subject to tax on this line",
+              "$ref": "../../common/Price.json#/PriceProperties"
+            }
+          },
+          "required": [
+            "TaxTotal"
+          ]
+        },
+        "JurisdictionLines": {
+          "type": "array",
+          "description": "The collection (array) of duty jurisdiction lines associated with the line.",
+          "items": {
+            "$ref" : "../../common/TaxJurisdiction.json#/TaxJurisdictionProperties"
+          }
+        },
+        "Lineage": {
+          "$ref": "../../common/EventLineage.json#/EventLineageProperties",
+          "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+        }
+      },
+      "required": [
+        "LineIds",
+        "Tax",
+        "Totals"
+      ]
+    }
+  ]
+}

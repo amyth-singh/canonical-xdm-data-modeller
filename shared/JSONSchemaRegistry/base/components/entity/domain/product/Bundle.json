@@ -1,0 +1,31 @@
+{
+    "BundleObject": {
+        "type": "object",
+        "additionalProperties": {
+            "$ref": "#/BundleProperties"
+        }
+    },
+    "BundleProperties": {
+        "type": "object",
+        "required": [
+            "BundleID"
+        ],
+        "properties": {
+            "BundleID": {
+                "type": "string"
+            },
+            "BundleName": {
+                "type": "string"
+            },
+            "BundleDescription": {
+                "type": "string"
+            },
+            "IncludedProducts": {
+                "type": "array",
+                "items": {
+                    "$ref": "./ProductIds.json#/ProductIdsObject"
+                }
+            }
+        }
+    }
+}

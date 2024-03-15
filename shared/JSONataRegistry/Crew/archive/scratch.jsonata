@@ -1,0 +1,81 @@
+(
+	/* Reconcile payments */
+    $paymentDetailsAmount := Events.(paymentDetails).$number(amount);
+
+    $sum($paymentDetailsAmount);
+
+    /* Basket Summary*/
+    $basketTotalsCompare := Events.(
+    	{
+        "transactionId": transactionId,
+        "type": type,
+        "itemLineIds" : {
+        	"basketSummary": [basket.products.{"itemLineId" : $number(itemLineId),"SKU": SKU,"quantity": quantity,"refundedQuantity": refundedQuantity, "UnitPrice": price, "totalLinePrice": totalLinePrice,"itemDiscounts": itemDiscounts}],
+        	"currentTransactionDetails" : [currentTransactionDetails.products.{"itemLineId" : $number(itemLineId),"SKU": SKU,"quantity": quantity,"refundedQuantity": refundedQuantity, "UnitPrice": price, "totalLinePrice": totalLinePrice,"itemDiscounts": itemDiscounts}]
+        },
+        "totalItems" : {
+            "basketSummary" : basketSummary.totalItems,
+            "currentTransactionDetails" : currentTransactionDetails.basketSummary.totalItems,
+            "inStore-basketSummary": basketSummary.inStore.totalItems,
+            "inStore-currentTransactionDetails": currentTransactionDetails.basketSummary.inStore.totalItems
+        },
+        "totalItemsByLinesAgg" : {
+            "basketSummary" : $sum(basket.products.(quantity - ($exists(refundedQuantity) ? refundedQuantity : 0))),
+            "currentTransactionDetails" : $sum(currentTransactionDetails.products.(quantity - ($exists(refundedQuantity) ? refundedQuantity : 0)))
+        },
+        "basketTotal": {
+        	"basketSummary": basketSummary.basketTotal,
+        	"currentTransactionDetails" : currentTransactionDetails.basketSummary.basketTotal
+        },
+        "VATTotal": {
+        	"basketSummary": basketSummary.VATTotal,
+        	"currentTransactionDetails" : currentTransactionDetails.basketSummary.VATTotal
+        },
+        "saleTotal": {
+        	"basketSummary": basketSummary.saleTotal,
+        	"currentTransactionDetails" : currentTransactionDetails.basketSummary.saleTotal,
+            "topLevel": saleTotal
+        },
+        "discountTotal": {
+        	"basketSummary": basketSummary.discountTotal,
+        	"currentTransactionDetails" : currentTransactionDetails.basketSummary.discountTotal
+        },
+        "refundTotal": {
+        	"basketSummary": basketSummary.refundTotal,
+        	"currentTransactionDetails" : currentTransactionDetails.basketSummary.refundTotal
+        },
+        "paidTotal": {
+        	"amount": $sum(paymentDetails.$number(amount))
+        }
+
+    });
+
+    /* Basket Summary*/
+    $basketTotalsCompare[transactionId = "A0001332"];
+
+    /*$sum($basketTotalsCompare.basketTotal.basketSummary)*/
+
+    /* Try ame reconcile between events */
+
+    $OrigOrderTotalIncTax := $basketTotalsCompare[transactionId = "A0001331"].basketTotal.basketSummary; 							/* EV1 */
+    $PartialRefundOrderTotalIncTax := $basketTotalsCompare[transactionId = "A0001332"].basketTotal.currentTransactionDetails;		/* EV2 */
+    $PartialExchangeOrderTotalIncTax := $basketTotalsCompare[transactionId = "A0001333"].basketTotal.currentTransactionDetails;		/* EV3 */
+    $PartialRefund2OrderTotalIncTax := $basketTotalsCompare[transactionId = "A0001334"].basketTotal.currentTransactionDetails;		/* EV4 */
+    $FullRefundOrderTotalIncTax := $basketTotalsCompare[transactionId = "A0001335"].basketTotal.basketSummary;						/* EV5 */
+
+    $OrderTotalRecon := {
+    	"1-OrigSaleOrderTotal": $OrigOrderTotalIncTax,
+        "2-PartialRefundOrderTotalIncTax": $PartialRefundOrderTotalIncTax,
+        "3-PartialExchangeOrderTotalIncTax" : $PartialExchangeOrderTotalIncTax,
+        "4-PartialRefund2OrderTotalIncTax" : $PartialRefund2OrderTotalIncTax,
+        "5-FullRefundOrderTotalIncTax" : $FullRefundOrderTotalIncTax
+    };
+
+    {
+    	"sumOfTotals": $sum($OrderTotalRecon.*),
+    	"basketTotals": $OrderTotalRecon
+	}
+
+
+
+)

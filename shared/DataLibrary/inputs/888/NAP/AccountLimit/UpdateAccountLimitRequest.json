@@ -1,0 +1,8 @@
+Cid - Int32
+LimitOffering - Int32 (Nullable)
+LimitTypeId - Int32
+PerformedBy - String
+PeriodId - Int32
+Value - Int32
+RequestedBy - String
+SystemID - Int32

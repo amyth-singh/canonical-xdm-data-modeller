@@ -1,0 +1,151 @@
+{
+  "$id": "https://xfuze.io/xdm/schema/components/event/common/EventHeader/EventMetadata/TimeAtts",
+  "description": "XDM Schema for the common event component 'EventHeader/EventMetadata/TimeAtts'",
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "Xfuze": {
+      "type": "object",
+      "description": "The (required) Xfuze derived / enriched attributes that define the context of the time points (external / internal) related to the event is changing / notifying on",
+      "unevaluatedProperties": false,
+      "properties": {
+        "TimeZones": {
+          "type": "object",
+          "unevaluatedProperties": false,
+          "properties": {
+            "HomeTimeZone": {
+              "$ref": "../../../entity/common/TimeZone.json#/TimeZoneProperties",
+              "description": "A TimeZone object (required) representing the main 'home' timezone the client is and reports form"
+            },
+            "EventTimeZone": {
+              "$ref": "../../../entity/common/TimeZone.json#/TimeZoneProperties",
+              "description": "A TimeZone object (required) representing the main 'event' timezone i.e event source could represent all times in UTC.  Can be same as HomeTimeZone but also different"
+            },
+            "PartyTimeZone": {
+              "$ref": "../../../entity/common/TimeZone.json#/TimeZoneProperties",
+              "description": "A TimeZone object (optional) representing the contextual 'party' timezone associated with the party (e.b customer) in the context of the event (e.g order placed timezone)"
+
+            }
+          },
+          "required": [
+            "HomeTimeZone",
+            "EventTimeZone"
+          ]
+        },
+        "Times": {
+          "type": "object",
+          "unevaluatedProperties": false,
+          "properties": {
+            "EventOccurredTimestamp": {
+              "$ref": "../../../entity/common/Time.json#/TimeProperties",
+              "description": "Time properties (required) representing the 'true' real-world time the event occurred (EOT) e.g orderPlaced time, (typically) sourced from.  If the DQ of the source is poor, fallback on system time (not great).  This should be the timestamp(s) to use for any analysis and operational handling e.g ordering"
+            },
+            "EventOccurredType": {
+              "type": "string",
+              "description": "The (required) type of the EventOccurredTimestamp, indicator of the quality.  TrueTime is if EOT is sourced from correct / best timestamp from the source and is the highest quality.",
+              "enum": [
+                "TrueTime",
+                "ApproximateTime",
+                "SystemTime"
+              ]
+            } ,
+            "EventSourceSentTimestamp": {
+              "$ref": "../../../entity/common/Time.json#/TimeProperties",
+              "description": "Time properties (optional) representing the time the inbound originating / raw event was originally sent from source leaving its boundary of control e.g time an external client service published the event"
+            },
+            "EventExternalReceivedTimestamp": {
+              "$ref": "../../../entity/common/Time.json#/TimeProperties",
+              "description": "Time properties (optional) representing the time the inbound originating / raw event was received into an interim landing zone, prior to SmartConnector processing e.g time landed in GSC, PubSub prior to the smart connector processing"
+            },
+            "EventExternalLandingZoneType": {
+              "type": "string",
+              "description": "The (optional) type of the EventExternalReceivedTimestamp (should be provided if EventExternalReceivedTimestamp set), indicator of the external landing zone type. e.g GCS",
+              "enum": [
+                "GCS",
+                "S3",
+                "Pub/Sub",
+                "Pulsar",
+                "Kafka",
+                "Kinesis",
+                "SQS",
+                "SNS",
+                "EventBridge",
+                "EventGrid",
+                "WebMethods",
+                "SFTP",
+                "FTP",
+                "MongoDB",
+                "MongoDBStream",
+                "DynamoDB",
+                "DynamoDBStream",
+                "DocumentDB",
+                "DocumentDBStream",
+                "Other"
+              ]
+            } ,
+            "EventReceivedTimestamp": {
+              "$ref": "../../../entity/common/Time.json#/TimeProperties",
+              "description": "Time properties (required) representing the time at which the SmartConnector received (to process) the inbound originating / raw event"
+            },
+            "EventIngestProcessedTimestamp": {
+              "$ref": "../../../entity/common/Time.json#/TimeProperties",
+              "description": "Time properties (optional) representing when a SmartConnector finished 'processing' the inbound originating / raw event e.g just prior to publishing downstream"
+            },
+            "EventProcessedTimestamp": {
+              "$ref": "../../../entity/common/Time.json#/TimeProperties",
+              "description": "Time properties (optional) representing when an EventProcessor finished 'processing' the trigger event and all changes and enrichments data wise"
+            },
+            "EventPublishedTimestamp": {
+              "$ref": "../../../entity/common/Time.json#/TimeProperties",
+              "description": "Time properties (optional) representing when an EventProcessor, post 'processing' the trigger event and all changes, publishes the event downstream "
+            },
+            "EventSeq" : {
+              "type": "number",
+              "description": "The (optional) sequence number of this event over life of entity, typically explicitly provided or sometimes derived"
+            }
+          },
+          "required": [
+            "EventOccurredTimestamp",
+            "EventOccurredType",
+            "EventReceivedTimestamp"
+          ]
+        }
+      },
+      "required": [
+        "TimeZones",
+        "Times"
+      ]
+    },
+    "Origin": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "properties":{      
+        "Times": {
+          "type": "object",
+          "description": "The Origin (i.e source / raw attributes) input fields provided used in transforming to 'Xfuze' representations",
+          "unevaluatedProperties": false,
+          "properties": {
+            "EventOccurredTimestamp": {
+              "type": "string",
+              "description": "Raw form (as provided) of the input timestamp used in generating Xfuze EventOccurredTimestamp e.g 2023-01-12 12:03:00+00:00"
+            },
+            "EventSourceSentTimestamp": {
+              "type": "string",
+              "description": "Raw form (as provided) of the input timestamp used in generating Xfuze EventSourceSentTimestamp e.g 1673525621103"
+            },
+            "EventExternalReceivedTimestamp": {
+              "type": "string",
+              "description": "Raw form (as provided) of the input timestamp used in generating Xfuze EventExternalReceivedTimestamp e.g 1673525621012"
+            }
+          },
+          "required": [
+            "EventOccurredTimestamp"
+          ]
+        }
+      }
+    }
+  },
+  "required": [
+    "Xfuze","Origin"
+  ]
+}

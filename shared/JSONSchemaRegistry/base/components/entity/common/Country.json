@@ -1,0 +1,100 @@
+{
+  "CountryObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/CountryProperties"
+    }
+  },
+  "CountryProperties": {
+    "type": "object",
+    "description": "A country object, based on official ISO 3166",
+    "anyOf": [
+      {
+        "properties": {
+          "ISO2": {
+            "type": "string",
+            "description": "The canonical ISO2 (alpha-2) country code e.g AU"
+          }
+        },
+        "required": [
+          "ISO2"
+        ]
+      },
+      {
+        "properties": {
+          "ISO3": {
+            "type": "string",
+            "description": "The canonical ISO2 (alpha-2) country code e.g AU"
+          }
+        },
+        "required": [
+          "ISO3"
+        ]
+      }
+    ],
+    "unevaluatedProperties": false,
+    "properties": {
+      "CountryCode": {
+        "type": "string",
+        "description": "The canonical CountryCode (country-code) country code e.g 036"
+      },
+      "Name": {
+        "type": "string",
+        "description": "The canonical (official) 'Name' of the country e.g Australia"
+      },
+      "AltName": {
+        "type": "string",
+        "description": "An alternate name for the country"
+      },
+      "RegionCode": {
+        "type": "string",
+        "description": "The canonical RegionCode (region-code) for the country code e.g 009"
+      },
+      "RegionName": {
+        "type": "string",
+        "description": "The canonical RegionName (region) for the country code e.g Oceania"
+      },
+      "SubRegionCode": {
+        "type": "string",
+        "description": "The canonical SubRegionCode (sub-region-code) for the country code e.g 053"
+      },
+      "SubRegionName": {
+        "type": "string",
+        "description": "The canonical Sub Region Name (sub-region) for the country code e.g Australia and New Zealand"
+      },
+      "IntermediateRegionCode": {
+        "type": "string",
+        "description": "The canonical Intermediate Region Code (intermediate-region-code) for the country code"
+      },
+      "IntermediateRegionName": {
+        "type": "string",
+        "description": "The canonical Intermediate Region Name (intermediate-region) for the country code"
+      },
+      "Coordinates": {
+        "$ref": "./Coordinates.json#/CoordinatesProperties",
+        "description": "The canonical Coordinates of the country (canonical from google)"
+      },
+      "PrimaryLanguage": {
+        "type": "string",
+        "description": "The canonical Primary Language of the country"
+      },
+      "Currency": {
+        "$ref": "./Currency.json#/CurrencyProperties",
+        "description": "The canonical Currency Code of the country (canonical from google)"
+      },
+      "IsEuropeanCountry": {
+        "type": "string",
+        "description": "Is this country an european one? e.g Y",
+        "enum": [
+          "Y",
+          "N",
+          "U"
+        ]
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

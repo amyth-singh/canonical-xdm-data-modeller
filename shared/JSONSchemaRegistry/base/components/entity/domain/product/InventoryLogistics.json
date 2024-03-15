@@ -1,0 +1,63 @@
+{
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "Supplier": {
+      "$ref": "../../common/ContactProfile.json#/ContactProfileProperties"
+    },
+    "Fulfilment": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "properties": {
+        "FulfilmentChannel": {
+          "$ref": "../../common/Channel.json#/ChannelProperties"
+        }
+      }
+    },
+    "TradeClassification": {
+      "$ref": "../inventory/TradeClassifications.json"
+    },
+    "InventoryManagement": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "properties": {
+        "Stock": {
+          "type": "object",
+          "unevaluatedProperties": false,
+          "properties": {
+            "StockAge": {
+              "$ref": "../../common/Measure.json#/MeasureProperties"
+            },
+            "IsReturnable": {
+              "$ref": "../../common/StringBool.json"
+            }
+          }
+        }
+      }
+    },
+    "Distribution": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "properties": {
+        "ULD": {
+          "$ref": "../../domain/inventory/ULD.json"
+        },
+        "Packaging": {
+          "type": "object",
+          "unevaluatedProperties": false,
+          "properties": {
+            "PackagingCode": {
+              "type": "string"
+            },
+            "PackagingType": {
+              "type": "string"
+            },
+            "PackagingDesc": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

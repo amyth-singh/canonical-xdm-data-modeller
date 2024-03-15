@@ -1,0 +1,189 @@
+(
+	/* Reconcile payments */
+    $paymentDetailsAmount := Events.(paymentDetails).$number(amount);
+
+    $sum($paymentDetailsAmount);
+
+    /* Basket Summary*/
+
+    $basketTotalsCompare := Events.(
+    	$tranType = $.`type`;
+        $transactionId := $.transactionId;
+
+    	{
+        "transactionId": transactionId,"type": type,
+        "lines" : {
+        	"transactionId": transactionId,"type": type,
+        	"basketSummary": [basket.products.{"transactionId": $transactionId, "Src":"basketSummary","tranType": $tranType,"itemLineId" : $number(itemLineId),"SKU": SKU,"quantity": quantity,"refundedQuantity": $exists(refundedQuantity) ? refundedQuantity : 0, "refundedPromotionalQuantity": $exists(refundedPromotionalQuantity) ? refundedPromotionalQuantity : 0, "exchangeQuantity": $exists(exchange) ? exchange.quantity : 0 ,"exchangeQuantityNew": $exists(exchange) ? $sum(exchange.newItems.Quantity) : 0,"UnitPrice": price, "totalLinePrice": totalLinePrice,"isnewProduct": isnewProduct, "itemDiscounts": itemDiscounts}],
+        	"currentTransactionDetails" : [currentTransactionDetails.products.{"transactionId": $transactionId, "Src":"currentTransactionDetails","tranType": $tranType,"itemLineId" : $number(itemLineId),"SKU": SKU,"quantity": quantity,"refundedQuantity": $exists(refundedQuantity) ? refundedQuantity : 0, "refundedPromotionalQuantity": $exists(refundedPromotionalQuantity) ? refundedPromotionalQuantity : 0, "exchangeQuantity": $exists(exchange) ? exchange.quantity : 0,"exchangeQuantityNew": $exists(exchange) ? $sum(exchange.newItems.Quantity) : 0 ,"UnitPrice": price, "totalLinePrice": totalLinePrice,"itemDiscounts": itemDiscounts,"isnewProduct": isnewProduct }]
+        },
+        "totalItems" : {
+        	"transactionId": transactionId,"type": type,
+            "basketSummary" : basketSummary.totalItems,
+            "currentTransactionDetails" : currentTransactionDetails.basketSummary.totalItems,
+            "inStore-basketSummary": basketSummary.inStore.totalItems,
+            "inStore-currentTransactionDetails": currentTransactionDetails.basketSummary.inStore.totalItems
+        },
+        "basketTotal": {
+        	"transactionId": transactionId,"type": type,
+        	"basketSummary": basketSummary.basketTotal,
+        	"currentTransactionDetails" : currentTransactionDetails.basketSummary.basketTotal
+        },
+        "VATTotal": {
+        	"transactionId": transactionId,"type": type,
+        	"basketSummary": basketSummary.VATTotal,
+        	"currentTransactionDetails" : currentTransactionDetails.basketSummary.VATTotal
+        },
+        "saleTotal": {
+        	"transactionId": transactionId,"type": type,
+        	"basketSummary": basketSummary.saleTotal,
+        	"currentTransactionDetails" : currentTransactionDetails.basketSummary.saleTotal,
+            "topLevel": saleTotal
+        },
+        "discountTotal": {
+        	"transactionId": transactionId,"type": type,
+        	"basketSummary": basketSummary.discountTotal,
+        	"currentTransactionDetails" : currentTransactionDetails.basketSummary.discountTotal
+        },
+        "refundTotal": {
+        	"transactionId": transactionId,"type": type,
+        	"basketSummary": basketSummary.refundTotal,
+        	"currentTransactionDetails" : currentTransactionDetails.basketSummary.refundTotal
+        },
+        "paidTotal": {
+        	"transactionId": transactionId,"type": type,
+        	"amount": $sum(paymentDetails.$number(amount))
+        }
+
+    });
+
+    $basketTotalsCompare.lines;
+
+    /* Basket Summary*/
+    $basketTotalsCompare[transactionId = "A0001332"];
+
+    /*$sum($basketTotalsCompare.basketTotal.basketSummary)*/
+
+    /* Try ame reconcile between events */
+
+    $OrigOrderTotalIncTax := $basketTotalsCompare[transactionId = "A0001331"].basketTotal.basketSummary; 							/* EV1 */
+    $PartialRefundOrderTotalIncTax := $basketTotalsCompare[transactionId = "A0001332"].basketTotal.currentTransactionDetails;		/* EV2 */
+    $PartialExchangeOrderTotalIncTax := $basketTotalsCompare[transactionId = "A0001333"].basketTotal.currentTransactionDetails;		/* EV3 */
+    $PartialRefund2OrderTotalIncTax := $basketTotalsCompare[transactionId = "A0001334"].basketTotal.currentTransactionDetails;		/* EV4 */
+    $FullRefundOrderTotalIncTax := $basketTotalsCompare[transactionId = "A0001335"].basketTotal.basketSummary;						/* EV5 */
+
+    /* #### Recon order OrderTotalsIncTax */
+    /* SUMMARY: Not reconciling alone */
+    $OrderTotalRecon := {
+    	"1-OrigSaleOrderTotal": $OrigOrderTotalIncTax,
+        "2-PartialRefundOrderTotalIncTax": $PartialRefundOrderTotalIncTax,
+        "3-PartialExchangeOrderTotalIncTax" : $PartialExchangeOrderTotalIncTax,
+        "4-PartialRefund2OrderTotalIncTax" : $PartialRefund2OrderTotalIncTax,
+        "5-FullRefundOrderTotalIncTax" : $FullRefundOrderTotalIncTax
+    };
+
+    $OrderTotalReconSummmary := {
+    	"sumOfTotals": $sum($OrderTotalRecon.*),
+    	"orderTotals": $OrderTotalRecon
+	};
+
+    /* Recon order Qtys */
+    /* SUMMARY: Not reconciling alone */
+    $OrigOrderQty := $basketTotalsCompare[transactionId = "A0001331"].totalItems.basketSummary; 							/* EV1 */
+    $PartialRefundOrderQty := $basketTotalsCompare[transactionId = "A0001332"].totalItems.currentTransactionDetails;		/* EV2 */
+    $PartialExchangeOrderQty := $basketTotalsCompare[transactionId = "A0001333"].totalItems.currentTransactionDetails;		/* EV3 */
+    $PartialRefund2OrderQty := $basketTotalsCompare[transactionId = "A0001334"].totalItems.currentTransactionDetails;		/* EV4 */
+    $FullRefundOrderQty := $basketTotalsCompare[transactionId = "A0001335"].totalItems.basketSummary;						/* EV5 */
+
+
+    $OrderQtyRecon := {
+    	"1-OrigOrderQty": $OrigOrderQty,
+        "2-PartialRefundOrderQty": -1.0 * $PartialRefundOrderQty,
+        "3-PartialExchangeOrderQty" : -1.0 * $PartialExchangeOrderQty, /* missing the +1 fror the exchange */
+        "4-PartialRefund2OrderQty" : -1.0 * $PartialRefund2OrderQty,
+        "5-FullRefundOrderQty" : -1.0 * $FullRefundOrderQty
+    };
+
+
+    $OrderQtyReconSummmary := {
+    	"sumOfTotals": $sum($OrderQtyRecon.*),
+    	"orderTotals": $OrderQtyRecon
+	};
+
+	$OrderTotalReconSummmary;
+    $OrderQtyReconSummmary;
+    $OrderQtyByLinesAggReconSummmary;
+    $basketTotalsCompare;
+
+    $append([$basketTotalsCompare.lines.basketSummary[transactionId = "A0001334"][itemLineId=1]],
+    		[$basketTotalsCompare.lines.currentTransactionDetails[transactionId = "A0001334"][itemLineId=1]]
+           );
+
+    $append([$basketTotalsCompare.lines.basketSummary[itemLineId=1]],
+    		[$basketTotalsCompare.lines.currentTransactionDetails[itemLineId=1]]
+           );
+
+
+    /* Step 2 - Partial Refun for lines 4 */
+    $Line4QtyRecon := $append(
+    		[$basketTotalsCompare.lines.basketSummary[transactionId = "A0001331"][itemLineId=4].quantity],
+    		[$basketTotalsCompare.lines.currentTransactionDetails[transactionId = "A0001332"][itemLineId=4].refundedQuantity *-1]
+           );
+
+    /* Step 3 - Partial Exchange for lines 3 & 7 */
+    $Line3QtyRecon :=
+    	[
+        	{"transactionId": "A0001331","Qty": $basketTotalsCompare.lines.basketSummary[transactionId = "A0001331"][itemLineId=3].quantity},
+            {"transactionId": "A0001332","Qty": $basketTotalsCompare.lines.currentTransactionDetails[transactionId = "A0001332"][itemLineId=3].($exists(refundedQuantity) ? -1 * refundedQuantity : 0)},
+            {"transactionId": "A0001333","Qty": $basketTotalsCompare.lines.currentTransactionDetails[transactionId = "A0001333"][itemLineId=3].(isnewProduct ? quantity : ($exists(exchangeQuantity) ? -1 * exchangeQuantity : 0))},
+            {"transactionId": "A0001334","Qty": $basketTotalsCompare.lines.currentTransactionDetails[transactionId = "A0001334"][itemLineId=3].($exists(refundedQuantity) ? -1 * refundedQuantity : 0)},
+        	{"transactionId": "A0001335","Qty": $basketTotalsCompare.lines.basketSummary[transactionId = "A0001335"][itemLineId=3].quantity}
+        ];
+
+    /* Step 3 - Partial Exchange for lines 3 & 7 */
+    $Line7QtyRecon :=
+    	[
+        	{"transactionId": "A0001331","Qty": $basketTotalsCompare.lines.basketSummary[transactionId = "A0001331"][itemLineId=7].quantity},
+            {"transactionId": "A0001332","Qty": $basketTotalsCompare.lines.currentTransactionDetails[transactionId = "A0001332"][itemLineId=7].($exists(refundedQuantity) ? -1 * refundedQuantity : 0)},
+            {"transactionId": "A0001333","Qty": $basketTotalsCompare.lines.currentTransactionDetails[transactionId = "A0001333"][itemLineId=7].(isnewProduct ? quantity : ($exists(exchangeQuantity) ? -1 * exchangeQuantity : 0))},
+            {"transactionId": "A0001334","Qty": $basketTotalsCompare.lines.currentTransactionDetails[transactionId = "A0001334"][itemLineId=7].($exists(refundedQuantity) ? -1 * refundedQuantity : 0)},
+        	{"transactionId": "A0001335","Qty": $basketTotalsCompare.lines.basketSummary[transactionId = "A0001335"][itemLineId=7].quantity}
+        ];
+
+    $Line1QtyRecon :=
+    	[
+        	{"transactionId": "A0001331","Qty": $basketTotalsCompare.lines.basketSummary[transactionId = "A0001331"][itemLineId=1].quantity},
+            {"transactionId": "A0001332","Qty": $basketTotalsCompare.lines.currentTransactionDetails[transactionId = "A0001332"][itemLineId=1].($exists(refundedQuantity) ? -1 * refundedQuantity : 0)},
+            {"transactionId": "A0001333","Qty": $basketTotalsCompare.lines.currentTransactionDetails[transactionId = "A0001333"][itemLineId=1].(isnewProduct ? quantity : ($exists(exchangeQuantity) ? -1 * exchangeQuantity : 0))},
+            {"transactionId": "A0001334","Qty": $basketTotalsCompare.lines.currentTransactionDetails[transactionId = "A0001334"][itemLineId=1].($exists(refundedQuantity) ? -1 * refundedQuantity : 0)},
+        	{"transactionId": "A0001335","Qty": $basketTotalsCompare.lines.basketSummary[transactionId = "A0001335"][itemLineId=1].quantity}
+        ];
+
+    $Line2QtyRecon :=
+    	[
+        	{"transactionId": "A0001331","Qty": $basketTotalsCompare.lines.basketSummary[transactionId = "A0001331"][itemLineId=2].quantity},
+            {"transactionId": "A0001332","Qty": $basketTotalsCompare.lines.currentTransactionDetails[transactionId = "A0001332"][itemLineId=2].($exists(refundedQuantity) ? -1 * refundedQuantity : 0)},
+            {"transactionId": "A0001333","Qty": $basketTotalsCompare.lines.currentTransactionDetails[transactionId = "A0001333"][itemLineId=2].(isnewProduct ? quantity : ($exists(exchangeQuantity) ? -1 * exchangeQuantity : 0))},
+            {"transactionId": "A0001334","Qty": $basketTotalsCompare.lines.currentTransactionDetails[transactionId = "A0001334"][itemLineId=2].($exists(refundedQuantity) ? -1 * refundedQuantity : 0)},
+        	{"transactionId": "A0001335","Qty": $basketTotalsCompare.lines.basketSummary[transactionId = "A0001335"][itemLineId=2].($exists(refundedQuantity) ? -1 * refundedQuantity : quantity)}
+        ];
+
+    $Line6QtyRecon :=
+    	[
+        	{"transactionId": "A0001331","Qty": $basketTotalsCompare.lines.basketSummary[transactionId = "A0001331"][itemLineId=6].quantity},
+            {"transactionId": "A0001332","Qty": $basketTotalsCompare.lines.currentTransactionDetails[transactionId = "A0001332"][itemLineId=6].($exists(refundedQuantity) ? -1 * refundedQuantity : 0)},
+            {"transactionId": "A0001333","Qty": $basketTotalsCompare.lines.currentTransactionDetails[transactionId = "A0001333"][itemLineId=6].(isnewProduct ? quantity : ($exists(exchangeQuantity) ? -1 * exchangeQuantity : 0))},
+            {"transactionId": "A0001334","Qty": $basketTotalsCompare.lines.currentTransactionDetails[transactionId = "A0001334"][itemLineId=6].($exists(refundedQuantity) ? -1 * refundedQuantity : 0)},
+        	{"transactionId": "A0001335","Qty": $basketTotalsCompare.lines.basketSummary[transactionId = "A0001335"][itemLineId=6].($exists(refundedQuantity) ? -1 * refundedQuantity : quantity)}
+        ];
+
+    $basketTotalsCompare.lines.currentTransactionDetails[transactionId = "A0001333"][itemLineId=3] ;
+
+    $Line3QtyRecon;
+    $Line7QtyRecon;
+    $Line1QtyRecon;
+    $Line2QtyRecon;
+    $Line3QtyRecon
+
+
+)

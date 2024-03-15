@@ -1,0 +1,53 @@
+{
+  "CityObject": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/CityProperties"
+    }
+  },
+  "CityProperties": {
+    "type": "object",
+    "description": "A townCity object",
+    "oneOf": [
+      {
+        "required": [
+          "name"
+        ]
+      },
+      {
+        "required": [
+          "country"
+        ]
+      }
+    ],
+    "unevaluatedProperties": false,
+    "properties": {
+      "Name": {
+        "type": "string",
+        "description": "The name of the city or town."
+      },
+      "Code": {
+        "type": "string",
+        "description": "The code of the city or town."
+      },
+      "Country": {
+        "$ref": "./Country.json#/CountryProperties",
+        "description": "The country where the city or town is located."
+      },
+      "Population": {
+        "type": "number",
+        "minimum": 0,
+        "description": "The population of the city or town."
+      },
+      "Coordinates": {
+        "description": "The geographical coordinates of the city or town.",
+        "$ref": "./Coordinates.json#/CoordinatesProperties"
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    },
+    "required": ["name"]
+  }
+}

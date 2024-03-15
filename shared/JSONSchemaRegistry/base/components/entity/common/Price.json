@@ -1,0 +1,55 @@
+  {
+  "PriceObject": {
+    "type": "object",
+    "description": "A common component definng a 'Price', used for financial measures such as Unit Prices, Totals etc",
+    "additionalProperties": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "anyOf": [
+        {
+          "required": ["BCY"]
+        },
+        {
+          "required": ["LCY"]
+        }
+      ],
+      "properties": {
+        "BCY": {
+          "$ref": "#/PriceProperties"
+        },
+        "LCY": {
+          "$ref": "#/PriceProperties"
+        }
+      }
+    }
+  },
+  "PriceProperties": {
+    "type": "object",
+    "properties": {
+      "ExTax": {
+        "type": ["number", "null"],
+        "description": "The financial amount of the Price, exclusive of any tax.  One of this OR IncTax OR Tax required"
+      },
+      "IncTax": {
+        "type": ["number", "null"],
+        "description": "The financial amount of the Price, inclusive of any tax.  One of this OR ExTax OR Tax required"
+      },
+      "Tax": {
+        "type": ["number", "null"],
+        "description": "The financial tax amount of the Price, sometimes explicit, sometimes can be derived as IncTax - ExTax.  One of this OR ExTax OR IncTax required"
+      },
+      "Localisation": {
+        "type": ["string", "null"],
+        "description": "The localisation of the price indicating the locale of the LCY values e.g UK, IE"
+      },
+      "Currency": {
+        "$ref": "./Currency.json#/CurrencyProperties",
+        "description": "The canonical Currency of the price"
+      },
+      "Lineage": {
+        "$ref": "./EventLineage.json#/EventLineageProperties",
+        "description": "The event lineage (e.g eventId, asOf) that lead to the observed/derived state of this object/data part"
+      }
+    }
+  }
+}

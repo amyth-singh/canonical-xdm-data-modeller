@@ -1,0 +1,187 @@
+{
+ "CompositeEntityId": "ProductGroup_AdventCalendar",
+ "CompositeEntityType": "ProductGroup",
+ "DomainEvent": {
+  "TriggerEntity": {
+   "ProductVariant": {
+    "CompositeEntityId": "ProductGroup_AdventCalendar",
+    "CompositeEntityType": "ProductGroup",
+    "EntityId": "ProductVariant_AdventCalendar_F33A_29355686",
+    "EntityType": "ProductVariant",
+    "ParentEntityId": "ProductCategory_AdventCalendar_F33A",
+    "ParentEntityType": "ProductCategory",
+    "Times": {
+     "UpdatedOn": {
+      "DateId": "Dates_20231213",
+      "DateKey": 20231213,
+      "DateLocal": "2023-12-13",
+      "DateTimeKey": 20231213132102000,
+      "DateUTC": "2023-12-13",
+      "HourId": "Hours_2023121313",
+      "HourKey": 2023121313,
+      "HourLocal": 13,
+      "HourUTC": 13,
+      "Local": "2023-12-13T13:21:02.088+00:00",
+      "Millis": 1702473662088,
+      "RawValue": "2023-12-13T13:21:02.088Z",
+      "TimeZone": "Europe/London",
+      "TimeZoneOffset": "+00:00",
+      "UTC": "2023-12-13T13:21:02.088Z",
+      "YearDay": 2023347,
+      "YearIsoWeek": 202350,
+      "YearMonth": 202312,
+      "YearWeek": 202349
+     }
+    }
+   }
+  }
+ },
+ "EntityId": "ProductVariant_AdventCalendar_F33A_29355686",
+ "EntityType": "ProductVariant",
+ "EventId": "ProductVariantPublished_ProductVariant_AdventCalendar_F33A_29355686_20231213132102000",
+ "EventMetadata": {
+  "EntityAtts": {
+   "Origin": {
+    "EntityId": "AdventCalendar_F33A_29355686",
+    "ParentEntityId": "AdventCalendar_F33A"
+   },
+   "Xfuze": {
+    "CompositeEntityId": "ProductGroup_AdventCalendar",
+    "CompositeEntityType": "ProductGroup",
+    "EntityDomain": "Product",
+    "EntityId": "ProductVariant_AdventCalendar_F33A_29355686",
+    "EntityType": "ProductVariant",
+    "IsSensitive": "N",
+    "ParentEntityId": "ProductCategory_AdventCalendar_F33A",
+    "ParentEntityType": "ProductCategory"
+   }
+  },
+  "EventAtts": {
+   "Origin": {
+    "EventId": null,
+    "SourceFormatType": "CSV",
+    "SourceSystem": "Retail247"
+   },
+   "Xfuze": {
+    "ClientCode": "WHS",
+    "EnvCode": "dev",
+    "EventCategory": "Product",
+    "EventChangePattern": "FullSnapshot",
+    "EventClass": "TriggerEvent",
+    "EventId": "ProductVariantPublished_ProductVariant_AdventCalendar_F33A_29355686_20231213132102000",
+    "EventName": "ProductVariantPublished"
+   }
+  },
+  "IngestAtts": {
+   "Xfuze": {
+    "File": {
+     "BatchId": null,
+     "BatchNumber": null,
+     "BytesOffsetInOriginalFile": 0,
+     "ChangeTimestampUTC": null,
+     "FormatType": "CSV",
+     "LineNumber": 0,
+     "Name": null,
+     "ObjectNotificationPayload": null,
+     "OriginalFileSizeBytes": 0,
+     "OriginalRowSizeBytes": 0,
+     "Path": null,
+     "PatternType": "CloudObjectNotification",
+     "SystemCode": "GCS",
+     "TotalBatchLines": 0,
+     "URI": null
+    }
+   }
+  },
+  "PayloadAtts": {
+   "Origin": {
+    "DataPayloadHash": "dbad64b2711fe86e4e22f87c59951b66",
+    "EventPayloadHash": "dbad64b2711fe86e4e22f87c59951b66",
+    "HashScheme": "MD5"
+   },
+   "Xfuze": {
+    "DataPayloadHash": "a163d30401d1d3b66ece67856fca1933",
+    "EventPayloadHash": "8766c019e2747708a8ee2c833587d40f",
+    "HashScheme": "MD5"
+   }
+  },
+  "PrivacyAtts": {
+   "Origin": {
+    "IsEncrypted": "N"
+   },
+   "Xfuze": {
+    "IsEncrypted": "N",
+    "IsSensitiveEntity": "N"
+   }
+  },
+  "TimeAtts": {
+   "Origin": {
+    "Times": {
+     "EventOccurredTimestamp": "2023-12-13T13:21:02.088Z"
+    }
+   },
+   "Xfuze": {
+    "TimeZones": {
+     "EventTimeZone": {
+      "TimeZone": "Europe/London",
+      "TimeZoneOffset": "+00:00"
+     },
+     "HomeTimeZone": {
+      "TimeZone": "Europe/London",
+      "TimeZoneOffset": "+00:00"
+     }
+    },
+    "Times": {
+     "EventOccurredTimestamp": {
+      "DateId": "Dates_20231213",
+      "DateKey": 20231213,
+      "DateLocal": "2023-12-13",
+      "DateTimeKey": 20231213132102000,
+      "DateUTC": "2023-12-13",
+      "HourId": "Hours_2023121313",
+      "HourKey": 2023121313,
+      "HourLocal": 13,
+      "HourUTC": 13,
+      "Local": "2023-12-13T13:21:02.088+00:00",
+      "Millis": 1702473662088,
+      "RawValue": "2023-12-13T13:21:02.088Z",
+      "TimeZone": "Europe/London",
+      "TimeZoneOffset": "+00:00",
+      "UTC": "2023-12-13T13:21:02.088Z",
+      "YearDay": 2023347,
+      "YearIsoWeek": 202350,
+      "YearMonth": 202312,
+      "YearWeek": 202349
+     },
+     "EventOccurredType": "TrueTime",
+     "EventReceivedTimestamp": {
+      "DateId": "Dates_20231213",
+      "DateKey": 20231213,
+      "DateLocal": "2023-12-13",
+      "DateTimeKey": 20231213132102000,
+      "DateUTC": "2023-12-13",
+      "HourId": "Hours_2023121313",
+      "HourKey": 2023121313,
+      "HourLocal": 13,
+      "HourUTC": 13,
+      "Local": "2023-12-13T13:21:02.088+00:00",
+      "Millis": 1702473662088,
+      "RawValue": "2023-12-13T13:21:02.088Z",
+      "TimeZone": "Europe/London",
+      "TimeZoneOffset": "+00:00",
+      "UTC": "2023-12-13T13:21:02.088Z",
+      "YearDay": 2023347,
+      "YearIsoWeek": 202350,
+      "YearMonth": 202312,
+      "YearWeek": 202349
+     }
+    }
+   }
+  }
+ },
+ "EventName": "ProductVariantPublished",
+ "EventOccurredTimestampLocal": "2023-12-13T13:21:02.088+00:00",
+ "EventOccurredTimestampUTC": "2023-12-13T13:21:02.088Z",
+ "ParentEntityId": "ProductCategory_AdventCalendar_F33A",
+ "ParentEntityType": "ProductCategory"
+}

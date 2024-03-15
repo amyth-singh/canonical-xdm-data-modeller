@@ -1,0 +1,35 @@
+{
+  "type": "object",
+  "unevaluatedProperties": false,
+  "properties": {
+    "Web": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "properties": {
+        "WebExclusive": {
+          "$ref": "../../common/StringBool.json"
+        },
+        "WebDescription": {
+          "type": "object",
+          "unevaluatedProperties": false,
+          "properties": {
+            "WebDescriptionShort": {
+              "type": "string"
+            },
+            "WebDescriptionLong": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "Images": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "properties": {}
+    },
+    "Bundles": {
+      "$ref": "./Bundle.json#/BundleObject"
+    }
+  }
+}

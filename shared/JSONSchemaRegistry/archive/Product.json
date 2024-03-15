@@ -1,0 +1,78 @@
+{
+  "$id": "SalesOrder",
+  "description": "Sales Order Model",
+  "type": "object",
+  "properties": {
+    "ProductId": {"type": "string"},
+    "Header": {
+      "ProductId": {"type": "string"},
+      "ProductIds": [{"$ref": "./components/Id.json"}],
+      "PartyIds": [{"$ref": "./components/Id.json"}],
+      "Times": [{"$ref": "./components/Time.json"}],
+      "Type": [{"$ref": "./components/Type.json"}],
+      "Status": [{"$ref": "./components/Status.json"}],
+      "PrimaryAtts": [{"$ref": "./components/CustomAttribute.json"}],
+      "Classifications": [{"$ref": "./components/CustomAttribute.json"}],
+      "SellingAtts": [{"$ref": "./components/CustomAttribute.json"}],
+      "WebMerchAtts": [{"$ref": "./components/CustomAttribute.json"}],
+      "SupplierBuyerAtts": [{"$ref": "./components/CustomAttribute.json"}],
+      "StyleAtts": [{"$ref": "./components/CustomAttribute.json"}],
+      "SizeAtts": [{"$ref": "./components/CustomAttribute.json"}],
+      "ColourAtts": [{"$ref": "./components/CustomAttribute.json"}],
+      "HireAtts": [{"$ref": "./components/CustomAttribute.json"}],
+      "Qtys": [{"$ref": "./components/Measure.json"}],
+      "Totals": [{"$ref": "./components/Price.json#/PriceObject"}]
+    },
+    "Variants": [{
+      "ProductId": {"type": "string"},
+      "ProductVariantId": {"type": "string"},
+      "ProductVariantIds": [{"$ref": "./components/Id.json"}],
+      "VariantAtts": [{"$ref": "./components/CustomAttribute.json"}],
+      "SizeAtts": [{"$ref": "./components/CustomAttribute.json"}]
+    }],
+    "Prices": [{
+      "ProductId": {"type": "string"},
+      "PriceId": {"type": "string"},
+      "PriceIds": [{"$ref": "./components/Id.json"}],
+      "Times": [{"$ref": "./components/Time.json"}],
+      "Location": [{"$ref": "./components/CustomAttribute.json"}],
+      "Price": [{"$ref": "./components/Price.json#/PriceObject"}]
+    }],
+    "Suppliers": [{
+      "ProductId": {"type": "string"},
+      "SupplierId": {"type": "string"},
+      "SupplierIds": [{"$ref": "./components/Id.json"}],
+      "SupplierAtts": [{"$ref": "./components/CustomAttribute.json"}]
+    }],
+    "Availability": [{
+      "ProductId": {"type": "string"},
+      "AvailabilityId": {"type": "string"},
+      "AvailabilityIds": [{"$ref": "./components/Id.json"}],
+      "Times": [{"$ref": "./components/Time.json"}]
+    }],
+    "Features": [{
+      "ProductId": {"type": "string"},
+      "FeatureId": {"type": "string"},
+      "FeatureIds": [{"$ref": "./components/Id.json"}],
+      "FeatureAtts": [{"$ref": "./components/CustomAttribute.json"}]
+    }],
+    "ProductGroupItems": [{
+      "ProductId": {"type": "string"},
+      "ProductGroupItemId": {"type": "string"},
+      "ProductGroupItemIds": [{"$ref": "./components/Id.json"}],
+      "Times": [{"$ref": "./components/Time.json"}],
+      "Price": [{"$ref": "./components/Price.json#/PriceObject"}],
+      "ProductLinks": [{"$ref": "./components/Link.json"}]
+    }]
+  },
+  "required": [
+    "ProductId",
+    "Header",
+    "Variants",
+    "Prices",
+    "Suppliers",
+    "Availability",
+    "Features",
+    "ProdcutGroup"
+  ]
+}
