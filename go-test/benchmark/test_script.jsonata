@@ -1,0 +1,83 @@
+(
+$formatValue := function($value, $dType, $format){(
+    $formatString := $string ~> $trim;
+    $formatArray := function($array){$type($array) = "array" ? $array : [$array]};
+    $formatNumber := function($num){$type($num) = "number" ? $num : $type($num) = "string" ? $contains($num,/^-?\d+(\.\d+)?$/) ? $number($num) : $format = "ZERO" ? 0 : null : $format = "ZERO" ? 0 : null};
+    $formatDateTime := function($dt,$format) {(
+        $dateTimeRegexMap := {"[Y0001]-[M01]-[D01] [H01]:[m01]:[s01] [P]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]) (AM|PM)$/,
+                              "[Y0001]-[M01]-[D01] [H01]:[m01]:[s01].[f001]":/^(19|20)\d{2}-(0[1-9]|1[012])-([012][1-9]|3[01]) (0?[1-9]|1[0-2]):([0-5][0-9]):([0-5][0-9]).\d{3}$/,
+                              "[M01]/[D01]/[Y0001]":/^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/[1-9][0-9]{3}$/,
+                              "[M01]/[D01]/[Y0001] [H01]:[m01]:[s01]":/^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/[1-9][0-9]{3} ([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/,
+                              "ISO8601":/^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d)(\.\d+)?([+-]([01]\d|2[0-3]):([0-5]\d)|Z)$/
+                             };
+        $dateTimeFormatValidator := function($datetime,$dateTimeFormat){$boolean($dateTimeFormat) ? $contains($datetime,$lookup($dateTimeRegexMap,$dateTimeFormat)): $contains($datetime,$lookup($dateTimeRegexMap,"ISO8601"))};
+
+        $exists($dt) ? $dateTimeFormatValidator($dt,$format) ? $boolean($format) and $not($format = "ISO8601") ? $fromMillis($toMillis($dt,$format)) : $fromMillis($toMillis($dt)) : null;
+        )};
+    $formatStringBool := function($value,$format){(
+        $stringBoolMap := {"Y":"Y","1":"Y","TRUE":"Y","N":"N","0":"N","FALSE":"N","false":"N","true":"Y","F":"N","T":"Y"};
+        $upperTrim := $string ~> $trim ~> $uppercase;
+        $stringBool := function($v){$exists($value)?$lookup($stringBoolMap, $upperTrim($value)):""};
+        $reverseBool := function($v){$v = "Y" ? "N" : $v = "N" ? "Y" : "U"};
+        $type($format)="null" ? $value ~> $stringBool : $format="reverse" ? $value ~> $stringBool ~> $reverseBool : null
+    )};
+
+    $dType = "TIMESTAMP"  ? $formatDateTime($value,$format) :
+    $dType = "STRINGBOOL" ? $formatStringBool($value,$format) :
+    $dType = "NUMERIC"    ? $formatNumber($value) :
+    $dType = "STRING"     ? $formatString($value) :
+    $dType = "ARRAY"      ? $formatArray($value) :
+    null;
+)};
+
+    $eventTimeZone := "Europe/London";                    
+    $homeTimeZone := "Europe/London";             
+    $homeTimeZoneOffset;       
+    $eventOccurredTimestampLocal := $formatValue(`last updated`,"TIMESTAMP","[M01]/[D01]/[Y0001] [H01]:[m01]:[s01]");  
+    $eventOccurredTimestampUTC := $formatValue(`last updated`,"TIMESTAMP","[M01]/[D01]/[Y0001] [H01]:[m01]:[s01]");     
+    $eventOccurredType := "SystemTime";            
+    $eventReceivedTimestampLocal := $formatValue(`last updated`,"TIMESTAMP","[M01]/[D01]/[Y0001] [H01]:[m01]:[s01]");  
+    $eventReceivedTimestampUTC := $formatValue(`last updated`,"TIMESTAMP","[M01]/[D01]/[Y0001] [H01]:[m01]:[s01]");
+
+{
+"TimeAtts": {
+        "Origin": {
+            "Times": {
+                "EventOccurredTimestamp": $originEventOccurredTimestamp
+            }
+        },
+        "Xfuze": {
+            "TimeZones": {
+                "EventTimeZone": {
+                    "TimeZone": $eventTimeZone,
+                    "TimeZoneOffset": $eventTimeZoneOffset
+                },
+                "HomeTimeZone": {
+                    "TimeZone": $homeTimeZone,
+                    "TimeZoneOffset": $homeTimeZoneOffset
+                }
+            },
+            
+            "Times": {
+                "EventOccurredTimestamp": {
+                    "DateId": $join(["Dates",$replace($formatValue($substringBefore($eventOccurredTimestampUTC, "T"),"STRING"),"-","")],"_"),
+                    "TimeZone": $eventTimeZone,
+                    "Local": $eventOccurredTimestampLocal,
+                    "Millis": $millis($eventOccurredTimestampUTC),
+                    "UTC": $eventOccurredTimestampUTC
+                },
+                "EventOccurredType": $eventOccurredType,
+                "EventReceivedTimestamp": {
+                    "DateId": $join(["Dates",$replace($formatValue($substringBefore($eventReceivedTimestampUTC, "T"),"STRING"),"-","")],"_"),
+                    "TimeZone": $eventTimeZone,
+                    "Local": $eventReceivedTimestampLocal,
+                    "Millis": $millis($eventReceivedTimestampUTC),
+                    "UTC": $eventReceivedTimestampUTC
+                }
+            }
+        }
+       }
+     
+}
+
+)
