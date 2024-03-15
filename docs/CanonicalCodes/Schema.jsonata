@@ -1,0 +1,21 @@
+(
+  $nestedObjectParts := $$.(
+    $codeParts := $split(Code, ".");
+    $codeLength := $count($codeParts)-1;
+    $value := Value;
+    
+    $codeValues := $reduce($codeParts, function($a, $v, $i) {(
+      $append($a, $i=0 ? {"Key":$v,"Location":"$","Value":{$v:{}}} : 
+                  $i=$codeLength ? {"Key":$a[-1].Key & "." & $v,"Location":$a[-1].Key,"Value":{$v:$value}} : 
+                  {"Key":$a[-1].Key & "." & $v,"Location":$a[-1].Key,"Value":{$v:{}}})
+    )}, []);
+
+    $codeValues;
+  );
+
+  $distinctObjectParts := $distinct($nestedObjectParts);
+  
+  $reduce($distinctObjectParts,function($a, $v){
+    $a ~> |$eval($v.Location)|$v.Value|
+  },{})
+)

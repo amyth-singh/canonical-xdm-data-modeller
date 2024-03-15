@@ -1,0 +1,692 @@
+[
+  {
+    "Code": "SalesOrder.Header.Status.OrderStatus",
+    "Value": "Completed",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Header.Status.FulfilmentStatus",
+    "Value": "In Progress",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Header.Status.PaymentStatus",
+    "Value": "Paid",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Header.Times.CreatedOn",
+    "Value": "2023-08-15 10:30:00",
+    "Type": "TIMESTAMP"
+  },
+  {
+    "Code": "SalesOrder.Header.Times.PlacedOn",
+    "Value": "2023-08-15 11:45:00",
+    "Type": "TIMESTAMP"
+  },
+  {
+    "Code": "SalesOrder.Header.Times.AcceptedOn",
+    "Value": "2023-08-15 12:15:00",
+    "Type": "TIMESTAMP"
+  },
+  {
+    "Code": "SalesOrder.Header.Times.CancelledOn",
+    "Value": "2023-08-16 09:20:00",
+    "Type": "TIMESTAMP"
+  },
+  {
+    "Code": "SalesOrder.Header.Times.RefundedOn",
+    "Value": "2023-08-17 14:05:00",
+    "Type": "TIMESTAMP"
+  },
+  {
+    "Code": "SalesOrder.Header.Times.CompletedOn",
+    "Value": "2023-08-17 15:30:00",
+    "Type": "TIMESTAMP"
+  },
+  {
+    "Code": "SalesOrder.Header.Times.LastUpdatedOn",
+    "Value": "2023-08-17 16:45:00",
+    "Type": "TIMESTAMP"
+  },
+  {
+    "Code": "SalesOrder.Header.Locations.Customer",
+    "Value": "123 Main Street, Anytown",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Header.Locations.Billing",
+    "Value": "456 Elm Street, Another Town",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Header.Locations.Delivery",
+    "Value": "789 Oak Avenue, Somewhereville",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Header.Locations.Return",
+    "Value": "321 Maple Lane, Elsewhere City",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Header.Qtys.QtySold",
+    "Value": 100,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Qtys.QtyNet",
+    "Value": 95,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Qtys.QtyPaid",
+    "Value": 90,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Qtys.QtyShipped",
+    "Value": 85,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Qtys.QtyDelivered",
+    "Value": 80,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Qtys.QtyCancelled",
+    "Value": 5,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Qtys.QtyVoided",
+    "Value": 0,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Qtys.QtyHired",
+    "Value": 15,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Qtys.QtyReturned",
+    "Value": 10,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Qtys.QtyRefunded",
+    "Value": 5,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Qtys.QtyExchanged",
+    "Value": 2,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.GrandTotal.CurrentBCY",
+    "Value": 1500.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.GrandTotal.CurrentLCY",
+    "Value": 1800.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.GrandTotal.OriginalBCY",
+    "Value": 1600.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.GrandTotal.OriginalLCY",
+    "Value": 1900.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.OutstandingTotal.CurrentBCY",
+    "Value": 200.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.OutstandingTotal.CurrentLCY",
+    "Value": 240.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.OutstandingTotal.OriginalBCY",
+    "Value": 220.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.OutstandingTotal.OriginalLCY",
+    "Value": 260.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.PaidTotal.CurrentBCY",
+    "Value": 1300.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.PaidTotal.CurrentLCY",
+    "Value": 1560.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.PaidTotal.OriginalBCY",
+    "Value": 1380.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.PaidTotal.OriginalLCY",
+    "Value": 1640.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.DiscountTotal.CurrentBCY",
+    "Value": 200.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.DiscountTotal.CurrentLCY",
+    "Value": 240.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.DiscountTotal.OriginalBCY",
+    "Value": 220.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.DiscountTotal.OriginalLCY",
+    "Value": 260.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.NetTotal.CurrentBCY",
+    "Value": 1300.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.NetTotal.CurrentLCY",
+    "Value": 1560.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.NetTotal.OriginalBCY",
+    "Value": 1380.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.NetTotal.OriginalLCY",
+    "Value": 1640.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.TaxTotal.CurrentBCY",
+    "Value": 100.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.TaxTotal.CurrentLCY",
+    "Value": 120.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.TaxTotal.OriginalBCY",
+    "Value": 110.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Header.Totals.TaxTotal.OriginalLCY",
+    "Value": 130.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Type.Sales",
+    "Value": "Product Sale",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Type.Void",
+    "Value": "Void",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Type.Cancel",
+    "Value": "Cancellation",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Type.PriceOverride",
+    "Value": "Price Adjustment",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Type.Discount",
+    "Value": "Discount Applied",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Type.Charge",
+    "Value": "Additional Charge",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Type.LoyaltyCard",
+    "Value": "Loyalty Card Redemption",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Type.ReturnRefund",
+    "Value": "Return and Refund",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Type.PurchasePayment",
+    "Value": "Payment Received",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Type.RefundPayment",
+    "Value": "Payment Refund",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Type.CreditPayment",
+    "Value": "Credit Applied",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Type.CashTender",
+    "Value": "Cash Payment",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Type.ManualAdjustment",
+    "Value": "Manual Adjustment",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Type.Invoice",
+    "Value": "Invoice Issued",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Type.Credit",
+    "Value": "Credit Issued",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Type.Shipping",
+    "Value": "Shipping",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Type.Fulfillment",
+    "Value": "Order Fulfillment",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Type.Tax",
+    "Value": "Tax Applied",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Type.Duty",
+    "Value": "Duty Charged",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Type.ChangeJournal",
+    "Value": "Change Journal Entry",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Status.LineStatus",
+    "Value": "Processing",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Status.PaymentStatus",
+    "Value": "Paid",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Status.FulfillmentStatus",
+    "Value": "Shipped",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Status.ShipmentStatus",
+    "Value": "Delivered",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Times.CreatedOn",
+    "Value": "2023-08-16 14:00:00",
+    "Type": "TIMESTAMP"
+  },
+  {
+    "Code": "SalesOrder.Lines.Times.LastUpdatedOn",
+    "Value": "2023-08-17 09:30:00",
+    "Type": "TIMESTAMP"
+  },
+  {
+    "Code": "SalesOrder.Lines.Times.CancelledOn",
+    "Value": "2023-08-18 11:15:00",
+    "Type": "TIMESTAMP"
+  },
+  {
+    "Code": "SalesOrder.Lines.Times.FulfilledOn",
+    "Value": "2023-08-19 13:45:00",
+    "Type": "TIMESTAMP"
+  },
+  {
+    "Code": "SalesOrder.Lines.Times.PriceOverridenOn",
+    "Value": "2023-08-19 14:30:00",
+    "Type": "TIMESTAMP"
+  },
+  {
+    "Code": "SalesOrder.Lines.Locations.FulfilledFrom",
+    "Value": "Warehouse A",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Locations.FulfilledTo",
+    "Value": "Customer Address",
+    "Type": "STRING"
+  },
+  {
+    "Code": "SalesOrder.Lines.Qtys.QtySold",
+    "Value": 20,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Qtys.QtyNet",
+    "Value": 18,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Qtys.QtyPaid",
+    "Value": 18,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Qtys.QtyShipped",
+    "Value": 18,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Qtys.QtyDelivered",
+    "Value": 18,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Qtys.QtyCancelled",
+    "Value": 2,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Qtys.QtyVoided",
+    "Value": 0,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Qtys.QtyReturned",
+    "Value": 2,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Qtys.QtyRefunded",
+    "Value": 2,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Qtys.QtyExchanged",
+    "Value": 0,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Prices.LineUnitPriceBeforeDiscounts.CurrentBCY",
+    "Value": 50.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Prices.LineUnitPriceBeforeDiscounts.CurrentLCY",
+    "Value": 60.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Prices.LineUnitPriceBeforeDiscounts.OriginalBCY",
+    "Value": 55.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Prices.LineUnitPriceBeforeDiscounts.OriginalLCY",
+    "Value": 65.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Prices.LineUnitDiscounts.CurrentBCY",
+    "Value": 10.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Prices.LineUnitDiscounts.CurrentLCY",
+    "Value": 12.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Prices.LineUnitDiscounts.OriginalBCY",
+    "Value": 11.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Prices.LineUnitDiscounts.OriginalLCY",
+    "Value": 13.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Prices.LineUnitPriceAfterDiscounts.CurrentBCY",
+    "Value": 40.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Prices.LineUnitPriceAfterDiscounts.CurrentLCY",
+    "Value": 48.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Prices.LineUnitPriceAfterDiscounts.OriginalBCY",
+    "Value": 44.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Prices.LineUnitPriceAfterDiscounts.OriginalLCY",
+    "Value": 52.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Prices.LineUnitSoldPrice.CurrentBCY",
+    "Value": 45.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Prices.LineUnitSoldPrice.CurrentLCY",
+    "Value": 54.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Prices.LineUnitSoldPrice.OriginalBCY",
+    "Value": 49.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Prices.LineUnitSoldPrice.OriginalLCY",
+    "Value": 58.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.LineSubTotalBeforeDiscounts.CurrentBCY",
+    "Value": 900.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.LineSubTotalBeforeDiscounts.CurrentLCY",
+    "Value": 1080.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.LineSubTotalBeforeDiscounts.OriginalBCY",
+    "Value": 990.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.LineSubTotalBeforeDiscounts.OriginalLCY",
+    "Value": 1170.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.LineDiscountsTotal.CurrentBCY",
+    "Value": 100.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.LineDiscountsTotal.CurrentLCY",
+    "Value": 120.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.LineDiscountsTotal.OriginalBCY",
+    "Value": 110.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.LineDiscountsTotal.OriginalLCY",
+    "Value": 130.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.LineSubTotalAfterDiscounts.CurrentBCY",
+    "Value": 800.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.LineSubTotalAfterDiscounts.CurrentLCY",
+    "Value": 960.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.LineSubTotalAfterDiscounts.OriginalBCY",
+    "Value": 880.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.LineSubTotalAfterDiscounts.OriginalLCY",
+    "Value": 1040.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.TaxTotal.CurrentBCY",
+    "Value": 80.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.TaxTotal.CurrentLCY",
+    "Value": 96.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.TaxTotal.OriginalBCY",
+    "Value": 88.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.TaxTotal.OriginalLCY",
+    "Value": 104.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.ChargesTotal.CurrentBCY",
+    "Value": 20.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.ChargesTotal.CurrentLCY",
+    "Value": 24.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.ChargesTotal.OriginalBCY",
+    "Value": 22.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.ChargesTotal.OriginalLCY",
+    "Value": 26.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.ProductCostTotal.CurrentBCY",
+    "Value": 400.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.ProductCostTotal.CurrentLCY",
+    "Value": 480.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.ProductCostTotal.OriginalBCY",
+    "Value": 440.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.ProductCostTotal.OriginalLCY",
+    "Value": 520.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.LogisticsCostTotal.CurrentBCY",
+    "Value": 100.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.LogisticsCostTotal.CurrentLCY",
+    "Value": 120.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.LogisticsCostTotal.OriginalBCY",
+    "Value": 110.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.LogisticsCostTotal.OriginalLCY",
+    "Value": 130.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.MarginTotal.CurrentBCY",
+    "Value": 300.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.MarginTotal.CurrentLCY",
+    "Value": 360.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.MarginTotal.OriginalBCY",
+    "Value": 330.00,
+    "Type": "NUMERIC"
+  },
+  {
+    "Code": "SalesOrder.Lines.Totals.MarginTotal.OriginalLCY",
+    "Value": 390.00,
+    "Type": "NUMERIC"
+  }
+]

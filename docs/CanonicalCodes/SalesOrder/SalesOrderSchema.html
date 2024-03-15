@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>JSONata Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+      
+      pre {
+        background-color: #f5f5f5;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        line-height: 1.4;
+        overflow-x: auto;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/jsonata/jsonata.min.js"></script>
+    <script>
+      // Function to load the JSON file
+      function loadJSON(callback) {
+        var xobj = new XMLHttpRequest();
+        xobj.overrideMimeType("application/json");
+        xobj.open('GET', 'SalesOrderCodes.json', true);
+        xobj.onreadystatechange = function () {
+          if (xobj.readyState == 4 && xobj.status == "200") {
+            callback(xobj.responseText);
+          }
+        };
+        xobj.send(null);
+      }
+      
+      // Function to load the JSONata expression
+      function loadExpression(callback) {
+        var xobj = new XMLHttpRequest();
+        xobj.overrideMimeType("text/plain");
+        xobj.open('GET', '../Schema.jsonata', true);
+        xobj.onreadystatechange = function () {
+          if (xobj.readyState == 4 && xobj.status == "200") {
+            callback(xobj.responseText);
+          }
+        };
+        xobj.send(null);
+      }
+      
+      // Function to parse the JSON data and evaluate the expression
+      async function parseJSON(json, expression) {
+        var data = JSON.parse(json);
+        var output = document.getElementById('output');
+        var result = await jsonata(expression).evaluate(data);
+        
+        // Display the data on the HTML page
+        output.textContent = JSON.stringify(result, null, 2);
+      }
+      
+      // Load the JSON file and expression, then parse them
+      function loadAndParse() {
+        loadJSON(function(json) {
+          loadExpression(function(expression) {
+            parseJSON(json, expression);
+          });
+        });
+      }
+
+      // Set the header as the name of the JSON file
+      function setHeader(jsonFilename) {
+        var header = document.getElementById('header');
+        header.textContent = jsonFilename;
+      }
+
+      // Get the JSON filename from the file path
+      function getJSONFilename(path) {
+        var startIndex = (path.indexOf('\\') >= 0 ? path.lastIndexOf('\\') : path.lastIndexOf('/'));
+        var filename = path.substring(startIndex);
+        if (filename.indexOf('\\') === 0 || filename.indexOf('/') === 0) {
+          filename = filename.substring(1);
+        }
+        return filename;
+      }
+
+      // Call the loadAndParse and setHeader functions to start the process
+      window.onload = function() {
+        var jsonFilePath = 'SalesOrderCodes.json'; // Replace with the correct path to your JSON file
+        var jsonFilename = getJSONFilename(jsonFilePath);
+        setHeader(jsonFilename);
+        loadAndParse();
+      };
+
+    </script>
+  </head>
+  <body>
+    <h1 id="header"></h1>
+    <pre id="output"></pre>
+  </body>
+</html>
